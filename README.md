@@ -19,3 +19,4 @@ If you're interested in contributing then please do, any help you can give is gr
 * Variable declaration in bulk seperated by commas
 * No whitespace inbetween parenthesis
 * Tabs only no double spaces
+* Try and write JSLint.com happy code
