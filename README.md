@@ -10,4 +10,11 @@ The application, unlike other services such as Mibbit and IRCCloud isn't directl
 Contributing
 ------------
 
-If you're interested in contributing then please do, any help you can give is greatly appreciated. If you're
+If you're interested in contributing then please do, any help you can give is greatly appreciated. If you're contributing by reporting bugs, then please use the issue tracker with nessicary information. If you're contributing new features / fixes, then please do it in a seperate branch and perform a pull request. Please bare in mind that if you're contributing code, it would be ideal to conform to the coding standards below:
+
+#### Javascript
+* Always use semi colons to trail lines.
+* Curley braces always on new lines.
+* Camel case only, no _ (I know some of the code base is using non camel case, this will be migrated over time)
+* Variable declaration in bulk seperated by commas
+* No whitespace inbetween parenthesis
