@@ -18,3 +18,4 @@ If you're interested in contributing then please do, any help you can give is gr
 * Camel case only, no _ (I know some of the code base is using non camel case, this will be migrated over time)
 * Variable declaration in bulk seperated by commas
 * No whitespace inbetween parenthesis
+* Tabs only no double spaces
