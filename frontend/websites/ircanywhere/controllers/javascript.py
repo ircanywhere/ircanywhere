@@ -57,7 +57,7 @@ class Controller(object):
 	# a function to get our javascript from all the files in self.files
 
 	def get(self):
-		response = app.make_response(self.combine_js(config.config['use_cache']))
+		response = app.make_response(self.combine_js(True))
 		response.headers['Content-Type'] = 'application/javascript'
 		return response
 

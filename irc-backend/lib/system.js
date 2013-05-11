@@ -63,8 +63,8 @@ exports.System.runTasks = function()
 	
 	database.nodeModel.findOneAndUpdate(query, {running: true, bootTime: new Date()}, function(err, row)
 	{
-		if (err != null)
-			throw new Error('No node found in the database for settings specified, please check environment variables');
+		if (err != null || row == null)
+			throw new Error('No node found in the database for settings specified, please check configuration file');
 		// throw an error
 
 		_this._id = row._id.toString();

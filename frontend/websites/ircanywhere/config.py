@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 config = {
 	'mongo': 'mongodb://localhost/ircanywhere',
-	'mongodb': 'webclient',
+	'mongodb': 'ircanywhere',
 	'smtp_host': 'smtp.gmail.com',
 	'smtp_user': 'username@email.com',
 	'smtp_pass': 'password',
