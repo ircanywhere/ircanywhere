@@ -1020,8 +1020,6 @@ null:f.isFunction(a[b])?a[b]():a[b]},o=function(){throw Error('A "url" property 
 			// node is offline
 
 			this.socket = io.connect(this.endpoint, {
-				'secure': true,
-				'port': 443,
 				'reconnect': false,
 				'auto connect': true,
 				'force new connection': true
@@ -1633,6 +1631,7 @@ var client = new SocketEngine();var Workspace = Backbone.Router.extend({
 				tabCollections.changeTopicBar('Add Network', '', '', '');
 				
 				//$('div#home-content div#edit-warning').html('<p>You are on a free plan and have one network left to join. Please consider upgrading for raised limits.</p>').show();
+				$('div#home-content div#edit-warning').remove();
 				$('div#home-content input#server-nickname').val(userInfo.nickname);
 				$('div#home-content input#server-realname').val(userInfo.realname);
 			});

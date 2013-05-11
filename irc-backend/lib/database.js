@@ -129,6 +129,15 @@ exports.Database.setup = function(callback)
 		logs: []
 	}, { autoIndex: false });
 
+	var ChannelDataModel = new mongoose.Schema({
+		network: ObjectId,
+		channel: String,
+		topic: String,
+		modes: String,
+		users: {},
+		changedUsers: {}
+	}, { autoIndex: false });
+
 	var BufferModel = new mongoose.Schema({
 		account: String,
 		network: ObjectId,
@@ -161,6 +170,7 @@ exports.Database.setup = function(callback)
 	_this.userModel = mongoose.model('Users', UserModel);
 	_this.networkModel = mongoose.model('Networks', NetworkModel);
 	_this.networkLogsModel = mongoose.model('NetworkLogs', NetworkLogsModel, 'networkLogs');
+	_this.channelDataModel = mongoose.model('ChannelData', ChannelDataModel, 'channelData');
 	_this.bufferModel = mongoose.model('Buffers', BufferModel);
 	_this.accTypeModel = mongoose.model('AccountTypes', AccTypeModel, 'accountTypes');
 	_this.nodeModel = mongoose.model('Nodes', NodeModel);

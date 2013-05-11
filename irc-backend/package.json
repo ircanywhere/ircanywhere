@@ -5,7 +5,7 @@
 	"version": "0.1.0-4",
 	"author": "IRCAnywhere <support@ircanywhere.com>",
 	"private": true,
-	"main": "./src/server.js",
+	"main": "./lib/server.js",
 	"contributors": [
 		{
 			"name": "Ricki Hastings",

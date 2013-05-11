@@ -51,7 +51,7 @@ var pkg = require('../package.json'),
 	bnc = require('./bnc').BNC,
 	server = require('./server').Server,
 	system = require('./system').System,
-	replyFor = require('././lib/codes');
+	replyFor = require('../../lib/codes');
 
 /*
  * IrcHandler::handleEvents
@@ -417,7 +417,7 @@ exports.IrcHandler.handleJoin = function(d, channel, nick, message)
 	}
 	// make sure the above code is only executed when we join a channel
 
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -443,7 +443,7 @@ exports.IrcHandler.handlePart = function(d, channel, nick, reason, message)
 		// update users data model
 	}
 	
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -469,7 +469,7 @@ exports.IrcHandler.handleKick = function(d, channel, nick, by, reason, message)
 		// update users data model
 	}
 
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -488,7 +488,7 @@ exports.IrcHandler.handleMode = function(d, channel, by, modes, message)
 {
 	var _this = this;
 
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -519,7 +519,7 @@ exports.IrcHandler.handleTopic = function(d, channel, topic, nick, message)
 {
 	var _this = this;
 	
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -565,7 +565,7 @@ exports.IrcHandler.handleNick = function(d, oldnick, newnick, channels, message)
 	{
 		var channel = channels[ci];
 
-		database.channelData.findOne({network: d.networkName, channel: ci}, function(err, doc)
+		database.channelDataModel.findOne({network: d.networkName, channel: ci}, function(err, doc)
 		{
 			doc = _this.checkObject(d.networkName, channel, doc);
 			// check if the object exists
@@ -613,7 +613,7 @@ exports.IrcHandler.handleQuit = function(d, nick, reason, channels, message)
 
 	for (var ci in channels)
 	{
-		database.channelData.findOne({network: d.networkName, channel: ci}, function(err, doc)
+		database.channelDataModel.findOne({network: d.networkName, channel: ci}, function(err, doc)
 		{
 			doc = _this.checkObject(d.networkName, channel, doc);
 			// check if the object exists
@@ -692,7 +692,7 @@ exports.IrcHandler.handleWho = function(d, channel, hostname, nick, extra, messa
 	var ret = modeParser.convertToPrefix(server.client_data[d.account]['networks'][d.network].extra, nick, extra);
 	// calculate the prefix
 
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
@@ -720,14 +720,14 @@ exports.IrcHandler.handleEndOfWho = function(d, channel)
 {
 	var _this = this;
 
-	database.channelData.findOne({network: d.networkName, channel: channel}, function(err, doc)
+	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
 	{
 		doc = _this.checkObject(d.networkName, channel, doc);
 		// check if the object exists
 
 		var tabId = server.generateTabId(d.network, 'chan', channel);
 		
-		if (chanList != undefined)
+		if (doc != null)
 		{
 			server.emit(server.client_data[d.account], 'userlist', {
 				network: d.network,
@@ -798,7 +798,7 @@ exports.IrcHandler.checkObject = function(name, chan, doc)
 {
 	if (doc == null)
 	{
-		doc = new database.channelData();
+		doc = new database.channelDataModel();
 		doc.channel = chan;
 		doc.topic = '';
 		doc.modes = '';

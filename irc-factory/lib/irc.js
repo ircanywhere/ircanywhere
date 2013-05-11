@@ -24,8 +24,7 @@ var net = require('net'),
 	tls = require('tls'),
 	util = require('util'),
 	EventEmitter2 = require('eventemitter2').EventEmitter2,
-	replyFor = require('././lib/codes'),
-	parseMessage = require('././lib/parse').parseMessage;
+	parseMessage = require('../../lib/parse').parseMessage;
 
 function Client(opt)
 {

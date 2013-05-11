@@ -29,7 +29,7 @@ var database = require('./database').Database,
 	system = require('./system').System,
 	server = require('./server').Server,
 	ircHandler = require('./irc_handler').IrcHandler,
-	parseMessage = require('././lib/parse').parseMessage;
+	parseMessage = require('../../lib/parse').parseMessage;
 
 /*
  * BufferEngine::decodeLogJSON

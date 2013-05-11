@@ -47,8 +47,6 @@ SocketEngine = Backbone.Model.extend({
 			// node is offline
 
 			this.socket = io.connect(this.endpoint, {
-				'secure': true,
-				'port': 443,
 				'reconnect': false,
 				'auto connect': true,
 				'force new connection': true
