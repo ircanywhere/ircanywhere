@@ -1,0 +1,27 @@
+{
+	"name": "ircanywhere",
+	"description": "DB Partitioner for IRCAnywhere",
+	"version": "0.0.1",
+	"author": "IRCAnywhere <support@ircanywhere.com>",
+	"main": "run.js",
+	"contributors": [
+		{
+			"name": "Ricki Hastings",
+			"email": "ricki@ircanywhere.com"
+		}
+	],
+	"scripts": {
+		"start":  "run.js"
+	},
+	"dependencies": {
+		"asyncblock": "2.1.13",
+		"async": "*",
+		"cli-color": "*"
+	},
+	"engines": {
+		"node": ">= 0.6.11"
+	},
+	"bundleDependencies": [
+		"mongoose"
+	]
+}
