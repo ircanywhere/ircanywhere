@@ -1,0 +1,95 @@
+{% extends "index.html" %}
+{% block content %}
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h1>IRCAnywhere</h1>
+				<h3>IRC on the web, no matter where you are.</h3>
+				<a href="{{ base_url }}signup" class="btn primary large">Sign up for a free account now</a>
+			</div>
+			<div class="banner-right">
+				<div id="login-box">
+					<form method="post" id="login-form"><fieldset>
+						<div class="box">
+							<h5>Login</h5>
+							<div id="login-error"></div>
+							<div class="field"><input class="login-input" id="login-username" name="login-username" type="text" value="Username or Email Address" /></div>
+							<div class="field"><input class="login-input" id="login-pass" name="login-pass" type="password" value="Password" /></div>
+						</div>
+						<div class="actions">
+							<input class="btn primary" id="login" name="login" value="Login" type="submit" /><a href="#" id="forgot-password-link" class="btn secondary">Forgot password?</a>
+						</div>
+					</fieldset></form>
+					<form method="post" id="reset-form"><fieldset>
+						<div id="forgot-password" class="box hide">
+							<h5>Forgot Password</h5>
+							<div id="reset-response"></div>
+							<div class="field"><input class="login-input" id="reset-email" name="reset-email" type="text" value="Email Address" /></div>
+						</div>
+						<div id="forgot-password-actions" class="actions hide">
+							<input class="btn primary" id="reset" name="reset" value="Reset" type="submit" />
+						</div>
+					</fieldset></form>
+				</div>
+			</div>
+			<div class="screenshot">
+				<img src="{{ base_url }}static/images/screenshot.png" border="0" />
+			</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="main-inner">
+			<div class="modal-header-top">
+				<h2>IRCAnywhere</h2><h3>IRC on the web, no matter where you are.</h3>
+			</div>
+			<div class="row feature-tour clear">
+				<div class="span4">
+					<h3>IRC Bouncers</h3>
+					<p>Our service keeps you connected to your networks when you close your browser so you don't miss out on a thing.</p>
+				</div>
+				<div class="span4">
+					<h3>Secure SSL</h3>
+					<p>Connect to IRC over SSL for better security. Websockets are SSL by default to ensure extra security.</p>
+				</div>
+				<div class="span4">
+					<h3>Web Client</h3>
+					<p>Our focus is the attractive web client, no need to install anything, just login and start chatting.</p>
+				</div>
+			</div>
+			<div class="row feature-tour clear">
+				<div class="span4">
+					<h3>Notifications</h3>
+					<p>Recieve desktop notifications on highlights and new private messages when you're away from the client.</p>
+				</div>
+				<div class="span4">
+					<h3>Multiple Networks</h3>
+					<p>Connect to multiple IRC networks (including private networks) with just one account.</p>
+				</div>
+				<div class="span4">
+					<h3>Log Viewer</h3>
+					<p>Advanced log viewer so navigating through months worth of logs becomes an easy task.</p>
+				</div>
+			</div>
+			<div class="modal-header-top">
+				<h2 class="dimmed">Coming soon...</h2>
+			</div>
+			<div class="row feature-tour clear">
+				<div class="span4">
+					<h3>Subscription Accounts</h3>
+					<p>Limitless accounts with additional features.</p>
+				</div>
+				<div class="span4">
+					<h3>Downloadable Logs</h3>
+					<p>Download your entire log archive in one zip file with the click of a button.</p>
+				</div>
+				<div class="span4">
+					<h3>Connect from an IRC Client</h3>
+					<p>Connect straight to your IRCAnywhere BNC from a traditional IRC client.</p>
+				</div>
+			</div>
+			<div class="row signup clear">
+				<h3>Signup for a free account now</h3><a href="{{ base_url }}signup" class="btn primary large">Sign up now</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

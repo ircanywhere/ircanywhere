@@ -1,0 +1,34 @@
+{
+	"name": "ircanywhere-s1",
+	"description": "Web Bouncer daemon for IRCAnywhere in node.js",
+	"subdomain": "ircanywhere-s1",
+	"version": "0.1.0-4",
+	"author": "IRCAnywhere <support@ircanywhere.com>",
+	"private": true,
+	"main": "./src/server.js",
+	"contributors": [
+		{
+			"name": "Ricki Hastings",
+			"email": "ricki@ircanywhere.com"
+		}
+	],
+	"scripts": {
+		"start":  "./lib/server.js"
+	},
+	"dependencies": {
+		"mongoose": "3.5.5",
+		"socket.io": "0.8.7",
+		"express": "2.5.8",
+		"function-queue": "0.0.12",
+		"ipevents": "git://github.com/ircanywhere/node-ipevents.git",
+		"winston": "git://github.com/flatiron/winston.git",
+		"node-syslog": "1.1.7",
+		"cron": "1.0.1"
+	},
+	"engines": {
+		"node": ">= 0.6.11"
+	},
+	"bundleDependencies": [
+		"mongoose"
+	]
+}

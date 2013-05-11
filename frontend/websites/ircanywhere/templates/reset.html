@@ -1,0 +1,54 @@
+{% extends "index.html" %}
+{% block content %}
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h2>Contact us</h2>
+			</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="main-inner">
+			<form method="post" id="reset-password-form"><fieldset>
+			<div class="clear modal-body">
+				<div class="left">
+					{% if valid %}
+						<p class="large">You can use the form below to reset your password if you have forgotten or lost it.</p>
+
+						<input type="hidden" name="account-id" id="account-id" value="{{ account_id }}" />
+						<div id="message-holder"></div>
+
+						<div class="clearfix">
+							<label for="password">New Password</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="password" name="password" type="password" tabindex="5" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, between 6 and 25 characters.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="password">Confirm Password</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="confirm-password" name="confirm-password" type="password" tabindex="5" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, again.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<div class="input">
+								<div class="field">
+									<input type="submit" class="btn primary" value="Reset Password" tabindex="6">
+								</div>
+							</div>
+						</div>
+					{% else %}
+						<div class="alert-message block-message error"><p>The password reset link you have followed is invalid.</p></div>
+					{% endif %}
+				</div>
+			</div>
+			</fieldset></form>
+		</div>
+	</div>
+{% endblock %}

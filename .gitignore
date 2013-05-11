@@ -1,0 +1,9 @@
+logs/
+node_modules/
+_build/
+venv/
+server.crt
+server.csr
+server.key
+*.sublime*
+*.pyc

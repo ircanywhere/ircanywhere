@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>IRCAnywhere</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
+	<meta name="keywords" content="IRC, Bouncer, Webclient, IRC Client, BNC" />
+
+	<link id="favicon" rel="shortcut icon" type="image/ico" href="{{ base_url }}static/images/favicon.ico" />
+	<link rel="stylesheet" href="{{ base_url }}static/css/client.css" type="text/css" media="screen" />
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ base_url }}static/js/deps/socket.io.js"></script>
+	<script type="text/javascript">
+		window.jQuery || document.write('<script type="text/javascript" src="{{ base_url }}static/js/deps/jquery.js"><\/script>');
+		hostUrl = '{{ base_url }}';
+		WEB_SOCKET_SWF_LOCATION = '{{ base_url }}static/ext/WebSocketMain.swf';
+	</script>
+
+	<script type="text/javascript" src="javascript"></script>
+	<script type="text/javascript">
+		/*var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-29855733-1']);
+		_gaq.push(['_setDomainName', 'ircanywhere.com']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();*/
+	</script>
+</head>
+<body class="client">
+	<noscript>
+		<div id="nojs" class="modal">
+			<div class="modal-header">
+				<h3>IRCAnywhere</h3>
+			</div>
+			<div class="modal-body">
+				<p>Unfortunately IRCAnywhere heavily relies on javascript to run. On this note we're not even going to bother showing you the front page because of how javascript intensive our website also is.</p>
+				<p>If you have javascript enabled and are still seeing this message, then you are most likely using an unsupported browser, probably IE. We currently support the latest versions of <a href="http://www.google.co.uk/chrome">Chrome</a>, <a href="http://www.apple.com/safari/">Safari</a> and <a href="http://www.getfirefox.net/">Mozilla Firefox</a>.</p>
+			</div>
+		</div>
+	</noscript>
+	<div id="holder" class="clear">
+		<div class="sidebar">
+			<div class="header">
+				<h3>IRCAnywhere</h3>
+				<a href="#?/settings">Settings</a> &middot; <a href="/logout">Logout</a>
+			</div>
+			<div id="sidebar"></div>
+			<div id="footer">
+				<div class="link">
+					<a href="#?/add-network">Add a new network</a>
+				</div>
+				<div class="text">
+					&copy; IRCAnywhere 2013 &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a><br /><a href="{{ base_url }}about" target="_blank">About</a> &middot; <a href="{{ base_url }}contact" target="_blank">Contact</a> &middot; <a href="https://github.com/ircanywhere/ircanywhere/issues" target="_blank">Issue tracker</a>
+				</div>
+			</div>
+		</div>
+		<div class="container clear" id="content-container">
+			<div class="topbar clear">
+				<div class="top-bar-left">
+					<div class="topic-wrap"><p class="topic-bar">
+						<span class="chan-title"></span><span class="chan-modes"></span>
+						<span class="chan-desc"></span>
+					</p></div>
+				</div>
+				<ul id="options-menu" style="">
+					<li class="dropdown"><a href data-toggle="dropdown" class="dropdown-toggle">Options</a>
+						<ul class="dropdown-menu">
+							<li><a href id="edit-network-link">Edit Network</a></li>
+							<li><a href id="set-topic-link">Set Topic</a></li>
+							<li class="divider"><span id="divider1"></span></li>
+							<li><a href id="hide-users-link">Hide Users</a></li>
+							<li><a href id="hide-extra-link">Hide Joins/Parts</a></li>
+							<li><a href id="view-logs-link" target="_blank">View Logs</a></li>
+							<li class="divider"><span id="divider2"></span></li>
+							<li><a href id="leave-chan-link">Leave</a></li>
+							<li class="hide"><a href id="connect-link" class="connect-link">Disconnect</a></li>
+						</ul>
+					</li>
+					<li><a href id="close-link">Close</a></li>
+				</ul>
+			<div class="topbar inner"></div></div>
+			<div class="content-holder" id="content"><div id="inner-content">
+				<div id="loading"><img src="{{ base_url }}static/images/loader-1.gif" alt="Loading..." /></div>
+				<div id="channel-window">
+					<div id="not-connected" class="hide">
+						<h3>Oh-oh!</h3>
+						<p>IRCAnywhere is currently unable to connect at the moment, Please wait around, we will attempt to reconnect you in <span id="second-timer">30</span> seconds.</p>
+					</div>
+					<div id="no-networks" class="hide">
+						<h3>Hello there!</h3>
+						<p>You are seeing this page because you are not connected to any networks, perhaps you are new?</p>
+						<p>Well, if thats the case then consider <a href="#?/add-network">adding a network</a>.</p>
+						<p>If you are not sure why you are here then you may have been disconnected from your networks for an unknown reason.</p>
+					</div>
+					<div id="home-content">
+						<div class="content">
+							
+						</div>
+					</div>
+					<div id="channel-window-data">
+						
+					</div>
+				</div>
+				<div id="channel-input" class="clear">
+					<label for="chat" id="nick-button"></label>
+					<span></span>
+				</div>
+			</div></div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends "index.html" %}
+{% block content %}
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h2>About IRCAnywhere</h2>
+			</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="main-inner">
+			<div class="modal-header-top">
+				<h2>About IRCAnywhere</h2>
+			</div>
+			<div class="row paragraph clear">
+				<p>IRCAnywhere is a web interface for IRC, designed to keep you connected when you are not around. We keep you connected no matter where you are, and you can easily come back and catch up on what you've missed!</p>
+				<p>Currently setting up an IRC bnc can be quite a hassle, and not always free! The hassle of acquiring hosting space, setting up the bnc software, creating individual accounts for multiple networks, and then connecting to them all. We make this experience seamless and all the above can be done in just a few clicks!</p>
+			</div>
+			<div class="modal-header-top">
+				<h2>Why we made IRCAnywhere</h2>
+			</div>
+			<div class="row paragraph clear">
+				<p>IRC is still a very widely used chatting medium for users all around the world. With the direction of new technology steering closer to the web, combined with the old age of IRC, we decided to create IRCAnywhere. We wanted to make our client a pleasure to use and look at, most IRC software can be incredibly unpleasant and unattractive, we aim to make our software the opposite of this.</p>
+				<p>Unlike competetors we're focused on creating a free experience for as long as possible, with the option of subscribing in the future for users wanting limit less accounts. We're aimed at making a reliable product that isn't tied to a money hungry organisation, any funds gained from subscriptions will be going back into improving the service.</p>
+			</div>
+			<div class="modal-header-top">
+				<h2 class="dimmed">Technical information</h2>
+			</div>
+			<div class="row paragraph clear">
+				<p>IRCAnywhere is almost completely built on a javascript platform, it's powered by multiple backend services which link together written in <a href="http://nodejs.org" target="_blank">NodeJS</a> and uses <a href="http://www.mongodb.org" target="_blank">MongoDB</a> as a storage medium. The data is exposed on a secure websocket server using <a href="http://socket.io" target="_blank">socket.io</a>, which exchanges JSON with the frontend client built using HTML5 and Javascript. API information for the websocket protocol will be available in the near future for people wishing to make alternative frontend clients.
+				<p>Security is key, and we enforce SSL connections where we can, we encourage you to use SSL connections when connecting to your IRC servers of choice. IRCAnywhere is currently developed by a one man team, you can find more information on me <a href="https://github.com/n0valyfe" target="_blank">here @ my github</a>. You can come chat to me in <a href="irc://irc.ircanywhere.com/ircanywhere">#ircanywhere</a> if you have any problems or just want to help us make IRCAnywhere better!</p>
+			</div>
+			<div class="row signup clear">
+				<h3>Signup for a free account now</h3><a href="{{ base_url }}signup" class="btn primary large">Sign up now</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
