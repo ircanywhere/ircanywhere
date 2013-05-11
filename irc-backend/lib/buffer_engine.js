@@ -169,22 +169,7 @@ exports.BufferEngine.saveLogs = function(account, network, outgo, ours)
 			read = (!status) ? ((server.client_data[account].tab !== tabId || !server.client_data[account].active) ? false : true) : false;
 			read = (nick === '*' || outgoing.args[0].substr(0, 3) === '***') ? true : read;
 			// setup tab id and determine whether we mark this as read
-
-		if (outgoing.command === 'PRIVMSG')
-		{
-			var input = (ours) ? system.inputs.outgoingPrivMsgs : system.inputs.incomingPrivMsgs;
-			system.log.sys(input, {
-				account: account,
-				network: {
-					id: network,
-					host: server.client_data[account].networks[network].host,
-					port: server.client_data[account].networks[network].port
-				},
-				target: target
-			});
-			// send the data to log entries
-		}
-
+		
 		var buffer = new database.bufferModel();
 		// setup the log object
 

@@ -24,10 +24,6 @@ exports.System.log = {
 	error: function() {}
 };
 
-exports.System.logglyConfig = defconf.logglyConfig;
-exports.System.inputs = defconf.logInputs;
-// the config array for this server
-
 var cronJob = require('cron').CronJob,
 	winston = require('winston'),
 	syslog = require('node-syslog'),
@@ -88,9 +84,6 @@ exports.System.runTasks = function()
 		});
 		// start booting our bouncers
 	}
-
-	_this.log.sys(_this.inputs.reboots, 'Winston, logentries and factory successfully setup, reboot complete.');
-	// log it
 };
 
 /*
@@ -172,11 +165,6 @@ exports.System.setupWinston = function()
 			actualError = err.message;
 		}
 		// no stack trace exists, save err.message
-
-		var time = new Date(),
-			date = '[' + time.getDate() + '/' + time.getMonth() + '/' + time.getFullYear() + ' ' + time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds() + ']';
-		
-		_this.log.sys(_this.inputs.exceptions, date + ' ' + actualError);
 	};
 	// the error catching one is more sophisticated
 

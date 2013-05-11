@@ -383,13 +383,6 @@ exports.BNC.handleLogin = function(socket, user, row, data)
 		}
 		// loop through networks and mark us as not away and return the logs
 	});
-
-	system.log.sys(system.inputs.sessionLogins, {
-		account: user,
-		user_agent: data.user_agent,
-		ip: ip
-	});
-	// send the data to log entries
 };
 
 /*

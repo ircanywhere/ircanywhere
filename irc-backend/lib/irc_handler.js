@@ -344,14 +344,6 @@ exports.IrcHandler.handleWelcome = function(d, message)
 		chans: _this.encodeChans(server.client_data[d.account]['networks'][d.network].chans)
 	});
 	// update the network status
-
-	system.log.sys(system.inputs.newConnections, {
-		account: d.account,
-		nick: server.client_data[d.account]['networks'][d.network].nick,
-		host: server.client_data[d.account]['networks'][d.network].host,
-		port: server.client_data[d.account]['networks'][d.network].port
-	});
-	// send the data to log entries
 };
 
 /*
