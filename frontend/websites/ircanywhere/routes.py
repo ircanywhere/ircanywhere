@@ -20,10 +20,6 @@ def page_not_found(e):
 def index_route_get():
 	return index.controller.get()
 
-@app.route('/about')
-def about_route_get():
-	return about.controller.get()
-
 @app.route('/init')
 def init_route_get():
 	return init.controller.get()
@@ -39,14 +35,6 @@ def login_route_get():
 @app.route('/logout')
 def logout_route_get():
 	return logout.controller.get()
-
-@app.route('/contact')
-def contact_route_get():
-	return contact.controller.get()
-
-@app.route('/contact', methods=['POST'])
-def contact_route_post():
-	return contact.controller.post()
 
 @app.route('/network')
 def network_route_get():

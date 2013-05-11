@@ -211,7 +211,7 @@ class Controller(object):
 		else:
 			template = 'log-channel-view.html'
 
-		return render_template(template, title = '%s - %s - %s - %s' % (config.config['title'], 'Logs', net_object['url'], target), base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'], prev_date = d['prev'], date = d['date'], next_date = d['next'], log_nets = log_nets, logs = logs, log_data = log_data)
+		return render_template(template, title = '%s - %s - %s - %s' % (config.config['title'], 'Logs', net_object['url'], target), base_url = config.config['base_url'], prev_date = d['prev'], date = d['date'], next_date = d['next'], log_nets = log_nets, logs = logs, log_data = log_data)
 		# render and return the template
 
 	def handleDefaultChannelView(self, network, target):
@@ -297,7 +297,7 @@ class Controller(object):
 		else:
 			template = 'log-def-channel-view.html'
 
-		return render_template(template, title = '%s - %s - %s - %s' % (config.config['title'], 'Logs', net_object['url'], target), base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'], sorted = sorted, len = len(months), months = months, log_nets = log_nets, logs = logs)
+		return render_template(template, title = '%s - %s - %s - %s' % (config.config['title'], 'Logs', net_object['url'], target), base_url = config.config['base_url'], sorted = sorted, len = len(months), months = months, log_nets = log_nets, logs = logs)
 		# render and return the template
 
 	def get(self, req_type, network, channel, date):	

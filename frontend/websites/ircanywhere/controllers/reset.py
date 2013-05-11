@@ -69,9 +69,9 @@ class Controller(object):
 			# set a field so we know when they last requested a new password to prevent spamming
 
 			try:
-				server = SMTP(config.config['mailjet_host'])
+				server = SMTP(config.config['smtp_host'])
 				server.set_debuglevel(0)
-				server.login(config.config['mailjet_user'], config.config['mailjet_pass'])
+				server.login(config.config['smtp_user'], config.config['smtp_pass'])
 				# connect to mailguns smtp
 
 				html = render_template('emails/reset.html', name = signup_row['real'], link = activate_link)
@@ -197,7 +197,7 @@ class Controller(object):
 			valid = True if valid and account_row != None else False
 			# find account
 
-			return render_template('reset.html', title = '%s - %s' % (config.config['title'], 'Reset your password'), base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'], valid = valid, account_id = account_row['_id'])
+			return render_template('reset.html', title = '%s - %s' % (config.config['title'], 'Reset your password'), base_url = config.config['base_url'], valid = valid, account_id = account_row['_id'])
 			# handle a get request for the reset page
 		except Exception, e:
 			return notfound.controller.get(), 404

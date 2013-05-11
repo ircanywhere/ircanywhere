@@ -185,9 +185,9 @@ class Controller(object):
 		# a function which inserts the user record properly and sends an email out
 
 		try:
-			server = SMTP(config.config['mailjet_host'])
+			server = SMTP(config.config['smtp_host'])
 			server.set_debuglevel(0)
-			server.login(config.config['mailjet_user'], config.config['mailjet_pass'])
+			server.login(config.config['smtp_user'], config.config['smtp_pass'])
 			# connect to mailguns smtp
 		
 			html = render_template('emails/signup.html', name = self.name)
@@ -258,7 +258,7 @@ class Controller(object):
 		self.validateCode(code)
 		# validate code
 
-		return render_template('signup.html', title = '%s - %s' % (config.config['title'], 'Signup'), base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'], open = self.is_open)
+		return render_template('signup.html', title = '%s - %s' % (config.config['title'], 'Signup'), base_url = config.config['base_url'], open = self.is_open)
 		# handle a get request for the signup page
 
 controller = Controller()

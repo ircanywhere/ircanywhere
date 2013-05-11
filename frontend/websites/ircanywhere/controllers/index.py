@@ -16,9 +16,9 @@ class Controller(object):
 
 	def get(self):
 		if self.checkAccess() == False:
-			template = render_template('home.html', title = config.config['title'], base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'])
+			template = render_template('home.html', title = config.config['title'], base_url = config.config['base_url'])
 		else:
-			template = render_template('app.html', title = config.config['title'], base_url = config.config['base_url'], cdn_url = config.config['cdn_url'], cache_version = config.config['cache_version'])
+			template = render_template('app.html', title = config.config['title'], base_url = config.config['base_url'])
 
 		return template
 		# handle a get request for the reset page
