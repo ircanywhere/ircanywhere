@@ -25,7 +25,8 @@ exports.BufferEngine.saveCommands = [
 ];
 // commands to save into the buffer
 
-var database = require('./database').Database,
+var events = require('events'),
+	database = require('./database').Database,
 	system = require('./system').System,
 	server = require('./server').Server,
 	ircHandler = require('./irc_handler').IrcHandler,
@@ -87,7 +88,8 @@ exports.BufferEngine.compileOutgoing = function(account, network, data)
 {
 	"use strict";
 
-	var outgoing = {};
+	var me = new events.EventEmitter(),
+		outgoing = {};
 		
 	outgoing.network = network;
 	outgoing.time = (outgoing.time === undefined) ? new Date().toString() : outgoing.time.toString();
@@ -101,28 +103,34 @@ exports.BufferEngine.compileOutgoing = function(account, network, data)
 
 	var nick = (data.nick === undefined) ? '*' : data.nick.toLowerCase(),
 		target = (data.args[0] === undefined) ? server.client_data[account].networks[network].nick : data.args[0].toLowerCase(),
-		networkName = server.client_data[account].networks[network].name,
-		channelObject = (ircHandler.channels[networkName] === undefined) ? undefined : (ircHandler.channels[networkName][target] === undefined) ? undefined: ircHandler.channels[networkName][target];
+		networkName = server.client_data[account].networks[network].name;
 
-	outgoing.self = (data.nick == server.client_data[account].networks[network].nick) ? true : false;
-	outgoing.target = target;
-	outgoing.highlight = (data.command === 'PRIVMSG' && this.determineHighlight(account, network, false, data.args.slice(1).join(' '))) ? true : false;
-	outgoing.userPrefix = (channelObject === undefined) ? 'Z' : ((channelObject.users[nick] === undefined) ? 'Z' : channelObject.users[nick].prefix);
-	
-	for (var k in data)
+	database.channelDataModel.findOne({network: networkName, channel: target}, function(err, doc)
 	{
-		if (data.hasOwnProperty(k))
+		var channelObject = doc;
+
+		outgoing.self = (data.nick == server.client_data[account].networks[network].nick) ? true : false;
+		outgoing.target = target;
+		outgoing.highlight = (data.command === 'PRIVMSG' && this.determineHighlight(account, network, false, data.args.slice(1).join(' '))) ? true : false;
+		outgoing.userPrefix = (channelObject === undefined) ? 'Z' : ((channelObject.users[nick] === undefined) ? 'Z' : channelObject.users[nick].prefix);
+		
+		for (var k in data)
 		{
-			outgoing[k] = data[k];
+			if (data.hasOwnProperty(k))
+			{
+				outgoing[k] = data[k];
+			}
 		}
-	}
-	// transfer some settings.
+		// transfer some settings.
 
-	var dubPrefix = String(outgoing.prefix);
-		outgoing.prefix = (dubPrefix.indexOf('!') > -1) ? dubPrefix.split('!')[1] : outgoing.prefix;
-	// remove the (Ricki!) part from prefix's (Ricki!jim@host.com)
+		var dubPrefix = String(outgoing.prefix);
+			outgoing.prefix = (dubPrefix.indexOf('!') > -1) ? dubPrefix.split('!')[1] : outgoing.prefix;
+		// remove the (Ricki!) part from prefix's (Ricki!jim@host.com)
 
-	return outgoing;
+		me.emit('return', outgoing);
+	});
+
+	return me;
 };
 
 /*
@@ -159,8 +167,7 @@ exports.BufferEngine.saveLogs = function(account, network, outgo, ours)
 
 		var nick = (outgoing.nick === undefined) ? '*' : outgoing.nick.toLowerCase(),
 			target = (outgoing.command === 'QUIT' || outgoing.command === 'NICK') ? outgoing.args[0].toLowerCase() : outgoing.target.toLowerCase(),
-			networkName = server.client_data[account].networks[network].name,
-			channelObject = (ircHandler.channels[networkName] === undefined) ? undefined : (ircHandler.channels[networkName][target] === undefined) ? undefined: ircHandler.channels[networkName][target];
+			networkName = server.client_data[account].networks[network].name;
 			// setup some other variables
 
 		var status = (ircHandler.isChannel(account, network, outgoing.args[0]) || outgoing.command === 'PRIVMSG') ? false : true,
@@ -173,7 +180,7 @@ exports.BufferEngine.saveLogs = function(account, network, outgo, ours)
 		var buffer = new database.bufferModel();
 		// setup the log object
 
-		buffer.userPrefix = (channelObject === undefined) ? 'Z' : ((channelObject.users[nick] === undefined) ? 'Z' : channelObject.users[nick].prefix);
+		buffer.userPrefix = outgoing.userPrefix;
 		buffer.account = account;
 		buffer.network = network;
 		buffer.timestamp = timestamp;

@@ -100,8 +100,8 @@ exports.System.setupWinston = function()
 	winston.loggers.add('info', 
 	{
 		file: {
-			filename: '../logs/info.log',
-			dirname: __dirname + '/../logs',
+			filename: '../../logs/backend.info.log',
+			dirname: __dirname + '/../../logs',
 			timestamp: true,
 			json: false,
 			maxsize: 1048576
@@ -111,8 +111,8 @@ exports.System.setupWinston = function()
 	winston.loggers.add('error', 
 	{
 		file: {
-			filename: '../logs/error.log',
-			dirname: __dirname + '/../logs',
+			filename: '../../logs/backend.error.log',
+			dirname: __dirname + '/../../logs',
 			timestamp: true,
 			json: false,
 			maxsize: 1048576
@@ -122,8 +122,8 @@ exports.System.setupWinston = function()
 	winston.loggers.add('socket',
 	{
 		file: {
-			filename: '../logs/socket.log',
-			dirname: __dirname + '/../logs',
+			filename: '../../logs/backend.socket.log',
+			dirname: __dirname + '/../../logs',
 			timestamp: true,
 			json: false,
 			maxsize: 1048576

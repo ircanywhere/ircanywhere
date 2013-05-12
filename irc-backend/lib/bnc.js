@@ -398,37 +398,39 @@ exports.BNC.outputToChans = function(socket, user, key, network)
 	{
 		if (network.chans.hasOwnProperty(chan))
 		{
-			if (ircHandler.channels[network.name] !== undefined && 
-				ircHandler.channels[network.name][chan] !== undefined)
+			database.channelDataModel.findOne({network: network.name, channel: chan}, function(err, doc)
 			{
-				var chanList = ircHandler.channels[network.name][chan].users,
-					modes = ircHandler.channels[network.name][chan].modes,
-					topic = ircHandler.channels[network.name][chan].topic,
-					tabId = server.generateTabId(key, 'chan', chan);
+				if (err != null && doc != null)
+				{
+					var chanList = doc.users,
+						modes = doc.modes,
+						topic = doc.topic,
+						tabId = server.generateTabId(key, 'chan', chan);
 
-				server.emit(socket, 'channelUpdate', {
-					network: key,
-					chan: chan,
-					tabId: tabId,
-					modes: modes,
-					topic: topic,
-					users: []
-				}, true);
-				
-				server.emit(socket, 'userlist', {
-					network: key,
-					chan: chan,
-					tabId: tabId,
-					list: chanList
-				}, true);
-			}
-			else
-			{
-				server.client_data[user].networks[key].send('send', ['TOPIC', chan]);
-				server.client_data[user].networks[key].send('send', ['MODE', chan]);
-				server.client_data[user].networks[key].send('send', ['WHO', chan]);
-			}
-			// send out the user list we have in memory, OR request a new one if we can't find it
+					server.emit(socket, 'channelUpdate', {
+						network: key,
+						chan: chan,
+						tabId: tabId,
+						modes: modes,
+						topic: topic,
+						users: []
+					}, true);
+					
+					server.emit(socket, 'userlist', {
+						network: key,
+						chan: chan,
+						tabId: tabId,
+						list: chanList
+					}, true);
+				}
+				else
+				{
+					server.client_data[user].networks[key].send('send', ['TOPIC', chan]);
+					server.client_data[user].networks[key].send('send', ['MODE', chan]);
+					server.client_data[user].networks[key].send('send', ['WHO', chan]);
+				}
+				// send out the user list we have in memory, OR request a new one if we can't find it
+			});
 		}
 	}
 };

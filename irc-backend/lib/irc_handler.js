@@ -13,8 +13,7 @@
 exports.IrcHandler = {};
 exports.IrcHandler.queue = require('function-queue')();
 
-exports.IrcHandler.channels = {};
-exports.IrcHandler.chanlist = {};
+exports.IrcHandler.userlist = {};
 // our internal storage objects
 
 exports.IrcHandler.ignoredCommands = [
@@ -206,27 +205,33 @@ exports.IrcHandler.handleRaw = function(d, message)
 		server.client_data[d.account]['networks'][d.network].forcedNickChange = true;
 	// mark nickname as forced changed. so don't update the default record
 
-	var outgoing = bufferEngine.compileOutgoing(d.account, d.network, message.line),
-		type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
-	// compile our output array
+	var emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line);
 
-	if (_this.ignoredCommands.indexOf(message.command) == -1)
+	emitter.once('return', function(outgoing)
 	{
-		_this.queue.push(function (callback, object)
+		var	type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
+		// compile our output array
+
+		if (_this.ignoredCommands.indexOf(message.command) == -1)
 		{
-			var self = (message.nick == server.client_data[d.account]['networks'][d.network].nick) ? true : false;
+			_this.queue.push(function (callback, object)
+			{
+				var self = (message.nick == server.client_data[d.account]['networks'][d.network].nick) ? true : false;
 
-			outgoing._id = bufferEngine.saveLogs(object.d.account, object.d.network, object.outgoing, self);
-			outgoing.network = object.d.network;
-			outgoing.tabId = server.generateTabId(object.d.network, type, outgoing.target);
+				outgoing._id = bufferEngine.saveLogs(object.d.account, object.d.network, object.outgoing, self);
+				outgoing.network = object.d.network;
+				outgoing.tabId = server.generateTabId(object.d.network, type, outgoing.target);
 
-			server.emit(server.client_data[object.d.account], 'data', object.outgoing);
-			// they're connected, just send it straight out.
+				server.emit(server.client_data[object.d.account], 'data', object.outgoing);
+				// they're connected, just send it straight out.
 
-			callback();
-		}, {d: d, outgoing: outgoing});
-	}
-	// insert it into the logfile
+				callback();
+			}, {d: d, outgoing: outgoing});
+		}
+		// insert it into the logfile
+
+		delete emitter;
+	});
 };
 
 /*
@@ -582,18 +587,24 @@ exports.IrcHandler.handleNick = function(d, oldnick, newnick, channels, message)
 				doc.save();
 			}
 
-			var outgoing = bufferEngine.compileOutgoing(d.account, d.network, message.line, false),
-				type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
+			var emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line, false);
 
-			outgoing.line = ':' + message.prefix + ' ' + message.command + ' :' + channel + ' ' + newnick;
-			outgoing.args.unshift(channel);
-			outgoing._id = bufferEngine.saveLogs(d.account, d.network, outgoing, false);
-			outgoing.network = d.network;
-			outgoing.read = true;
-			outgoing.tabId = server.generateTabId(d.network, type, outgoing.target);
+			emitter.once('ready', function(outgoing)
+			{
+				var type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
 
-			server.emit(server.client_data[d.account], 'data', outgoing);
-			// usually we send this out with raw data. But we modify it slightly
+				outgoing.line = ':' + message.prefix + ' ' + message.command + ' :' + channel + ' ' + newnick;
+				outgoing.args.unshift(channel);
+				outgoing._id = bufferEngine.saveLogs(d.account, d.network, outgoing, false);
+				outgoing.network = d.network;
+				outgoing.read = true;
+				outgoing.tabId = server.generateTabId(d.network, type, outgoing.target);
+
+				server.emit(server.client_data[d.account], 'data', outgoing);
+				// usually we send this out with raw data. But we modify it slightly
+
+				delete emitter;
+			});
 		});
 	}
 };
@@ -619,22 +630,28 @@ exports.IrcHandler.handleQuit = function(d, nick, reason, channels, message)
 			// check if the object exists
 
 			var channel = channels[ci],
-				outgoing = bufferEngine.compileOutgoing(d.account, d.network, message.line),
-				type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
+				emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line);
+			
+			emitter.once('ready', function(outgoing)
+			{
+				var type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
 
-			delete doc.users[nick.toLowerCase()];
-			doc.save();
-			// delete the user
+				delete doc.users[nick.toLowerCase()];
+				doc.save();
+				// delete the user
 
-			outgoing.line = ':' + message.prefix + ' ' + message.command + ' ' + channel + ' :' + reason;
-			outgoing.args.unshift(channel);
-			outgoing._id = bufferEngine.saveLogs(d.account, d.network, outgoing, false);
-			outgoing.network = d.network;
-			outgoing.read = true;
-			outgoing.tabId = server.generateTabId(d.network, type, outgoing.target);
+				outgoing.line = ':' + message.prefix + ' ' + message.command + ' ' + channel + ' :' + reason;
+				outgoing.args.unshift(channel);
+				outgoing._id = bufferEngine.saveLogs(d.account, d.network, outgoing, false);
+				outgoing.network = d.network;
+				outgoing.read = true;
+				outgoing.tabId = server.generateTabId(d.network, type, outgoing.target);
 
-			server.emit(server.client_data[d.account], 'data', outgoing);
-			// usually we send this out with raw data. But we modify it slightly
+				server.emit(server.client_data[d.account], 'data', outgoing);
+				// usually we send this out with raw data. But we modify it slightly
+
+				delete emitter;
+			});
 		});
 	}
 };
@@ -692,23 +709,16 @@ exports.IrcHandler.handleWho = function(d, channel, hostname, nick, extra, messa
 	var ret = modeParser.convertToPrefix(server.client_data[d.account]['networks'][d.network].extra, nick, extra);
 	// calculate the prefix
 
-	database.channelDataModel.findOne({network: d.networkName, channel: channel}, function(err, doc)
-	{
-		doc = _this.checkObject(d.networkName, channel, doc);
-		// check if the object exists
+	if (ret == undefined || ret.modes == undefined)
+		modes = '';
+	else
+		modes = ret.modes;
 
-		if (ret == undefined || ret.modes == undefined)
-			modes = '';
-		else
-			modes = ret.modes;
-	
-		delete doc.users[nick.toLowerCase()];
-		doc.users[nick.toLowerCase()] = {user: nick, modes: modes, prefix: ret.prefix, away: away, hostname: hostname};
-		// alter the users list
+	if (_this.userlist[channel] == undefined)
+		_this.userlist[channel] = {};
 
-		doc.save();
-		// save record
-	});
+	_this.userlist[channel][nick.toLowerCase()] = {user: nick, modes: modes, prefix: ret.prefix, away: away, hostname: hostname};
+	// alter the users list
 };
 
 /*
@@ -726,15 +736,22 @@ exports.IrcHandler.handleEndOfWho = function(d, channel)
 		// check if the object exists
 
 		var tabId = server.generateTabId(d.network, 'chan', channel);
-		
+
 		if (doc != null)
 		{
+			doc.users = _this.userlist[channel];
+			doc.save();
+
 			server.emit(server.client_data[d.account], 'userlist', {
 				network: d.network,
 				chan: channel,
 				tabId: tabId,
 				list: doc.users
 			});
+			
+			delete _this.userlist[channel];
+
+			console.log(doc);
 		}
 	});
 };

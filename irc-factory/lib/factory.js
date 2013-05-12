@@ -35,8 +35,8 @@ var winston = require('winston'),
 winston.loggers.add('error', 
 {
 	file: {
-		filename: '../logs/error.log',
-		dirname: __dirname + '/../logs',
+		filename: '../../logs/factory.error.log',
+		dirname: __dirname + '/../../logs',
 		timestamp: true,
 		json: false,
 		maxsize: 1048576
