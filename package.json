@@ -1,7 +1,7 @@
 {
 	"name": "ircanywhere",
 	"description": "DB Partitioner for IRCAnywhere",
-	"version": "0.0.1",
+	"version": "0.1.2",
 	"author": "IRCAnywhere <support@ircanywhere.com>",
 	"main": "run.js",
 	"contributors": [
@@ -17,7 +17,8 @@
 		"asyncblock": "2.1.13",
 		"async": "*",
 		"cli-color": "*",
-		"forever": "*"
+		"commander": "1.1.1",
+		"forever-monitor": "*"
 	},
 	"engines": {
 		"node": ">= 0.6.11"

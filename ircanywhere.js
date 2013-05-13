@@ -1,0 +1,127 @@
+
+var pkjson = require('./package.json'),
+	async = require('async'),
+	clc = require('cli-color'),
+	program = require('commander'),
+	forever = require('forever-monitor'),
+	util = require('util'),
+	error = function(text) { util.log(clc.red(text)); process.exit(1) },
+	warn = function(text) { util.log(clc.yellow(text)) };
+	success = function(text) { util.log(clc.green(text)) },
+	notice = function(text) { util.log(clc.cyanBright(text)) };
+
+function main(argv)
+{
+	program
+		.version(pkjson.version)
+		.option('-c, --config [filename]', 'The filename of the configuration file to use', 'config.json')
+		.parse(argv);
+	// setup the program with commander to handle any parameters and such
+
+	console.log(' ');
+	console.log('       _______  ________                    __               ');
+	console.log('       /  _/ _ \/ ___/ _ | ___  __ ___    __/ /  ___ _______ ');
+	console.log('      _/ // , _/ /__/ __ |/ _ \/ // / |/|/ / _ \/ -_) __/ -_)');
+	console.log('     /___/_/|_|\___/_/ |_/_//_/\_, /|__,__/_//_/\__/_/  \__/ ');
+	console.log('                          /___/                              ');
+	console.log(' ');
+	console.log('          Version:', pkjson.version, ' (c) 2013 ircanywhere.com');
+	console.log(' ');
+	// display some fancy stuff, logo etc.
+
+	startFactory();
+	// first on the line is irc-factory, if successful, the rest will be started in sequence
+}
+
+function startFactory()
+{
+	notice('[notice] attempting to fork and start irc-factory with forever');
+	var client = new (forever.Monitor)('lib/factory.js', {
+		max: 3,
+		silent: true,
+		sourceDir: 'irc-factory',
+		logFile: 'logs/factory.forever.log',
+		outFile: 'logs/factory.forever.log',
+		errFile: 'logs/factory.error.log',
+		options: ['config.json']
+	});
+
+	client.on('start', function()
+	{
+		setTimeout(function()
+		{
+			success('[success] irc-factory successfully started');
+			startBackend();
+
+		}, 3000);
+	});
+
+	client.on('exit', function ()
+	{
+		error('[error] irc-factory has failed to start, please check logs/factory.error.log or logs/factory.forever.log');
+	});
+
+	client.start();
+}
+
+function startBackend()
+{
+	notice('[notice] attempting to fork and start irc-backend with forever');
+	var client = new (forever.Monitor)('lib/server.js', {
+		max: 3,
+		silent: true,
+		sourceDir: 'irc-backend',
+		logFile: 'logs/backend.forever.log',
+		outFile: 'logs/backend.forever.log',
+		errFile: 'logs/backend.error.log',
+		options: ['config.json']
+	});
+
+	client.on('start', function()
+	{
+		setTimeout(function()
+		{
+			success('[success] irc-backend successfully started');
+			startFrontend();
+
+		}, 3000);
+	});
+
+	client.on('exit', function ()
+	{
+		error('[error] irc-backend has failed to start, please check logs/backend.error.log or logs/backend.forever.log');
+	});
+
+	client.start();
+}
+
+function startFrontend()
+{
+	notice('[notice] attempting to fork and start frontend flask server with forever');
+	var client = new (forever.Monitor)(['python', 'runserver.py'], {
+		max: 3,
+		silent: true,
+		sourceDir: 'frontend',
+		logFile: 'logs/frontend.output.log',
+		outFile: 'logs/frontend.output.log',
+		errFile: 'logs/frontend.output.log'
+	});
+
+	client.on('start', function()
+	{
+		setTimeout(function()
+		{
+			success('[success] frontend successfully started');
+
+		}, 3000);
+	});
+
+	client.on('exit', function ()
+	{
+		error('[error] frontend has failed to start, please check logs/frontend.output.log');
+	});
+
+	client.start();
+}
+
+main(process.argv);

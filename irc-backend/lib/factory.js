@@ -10,9 +10,9 @@
  *
  * ============================================================ */
 
-var defconf = require('../config.json'),
-	crypto = require('crypto'),
+var crypto = require('crypto'),
 	server = require('./server').Server,
+	defconf = server.config,
 	system = require('./system').System;
 
 exports.Factory = {};

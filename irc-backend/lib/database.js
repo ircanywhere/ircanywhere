@@ -10,8 +10,7 @@
  *
  * ============================================================ */
 
-var defconf = require('../config.json'),
-	mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
 	ObjectId = mongoose.Schema.ObjectId;
 
 exports.Database = {};
@@ -27,10 +26,11 @@ exports.Database.mongoose = mongoose;
 */
 exports.Database.connect = function(callback)
 {
-	var system = require('./system').System,
+	var server = require('./server').Server,
+		system = require('./system').System,
 		_this = this;
 
-	_this.mongoose.connect('mongodb://' + defconf.database, function(err)
+	_this.mongoose.connect('mongodb://' + server.config.database, function(err)
 	{
 		if (err)
 			throw err;
@@ -55,7 +55,7 @@ exports.Database.connect = function(callback)
  */
 exports.Database.getAccountTypes = function()
 {
-	var server = require('./server').Server;;
+	var server = require('./server').Server;
 
 	this.accTypeModel.find({}, function(err, docs)
 	{

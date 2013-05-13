@@ -84,12 +84,16 @@ exports.BufferEngine.determineHighlight = function(account, network, ours, text)
  *
  * Compile an outgoing data object
  */
-exports.BufferEngine.compileOutgoing = function(account, network, data)
+exports.BufferEngine.compileOutgoing = function(account, network, data, callback)
 {
 	"use strict";
 
-	var me = new events.EventEmitter(),
+	var _this = this,
+		me = new events.EventEmitter(),
 		outgoing = {};
+
+	me.on('return', callback);
+	// assign the callback first.
 		
 	outgoing.network = network;
 	outgoing.time = (outgoing.time === undefined) ? new Date().toString() : outgoing.time.toString();
@@ -111,7 +115,7 @@ exports.BufferEngine.compileOutgoing = function(account, network, data)
 
 		outgoing.self = (data.nick == server.client_data[account].networks[network].nick) ? true : false;
 		outgoing.target = target;
-		outgoing.highlight = (data.command === 'PRIVMSG' && this.determineHighlight(account, network, false, data.args.slice(1).join(' '))) ? true : false;
+		outgoing.highlight = (data.command === 'PRIVMSG' && _this.determineHighlight(account, network, false, data.args.slice(1).join(' '))) ? true : false;
 		outgoing.userPrefix = (channelObject === undefined) ? 'Z' : ((channelObject.users[nick] === undefined) ? 'Z' : channelObject.users[nick].prefix);
 		
 		for (var k in data)
@@ -129,8 +133,6 @@ exports.BufferEngine.compileOutgoing = function(account, network, data)
 
 		me.emit('return', outgoing);
 	});
-
-	return me;
 };
 
 /*

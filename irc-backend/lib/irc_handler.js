@@ -205,9 +205,7 @@ exports.IrcHandler.handleRaw = function(d, message)
 		server.client_data[d.account]['networks'][d.network].forcedNickChange = true;
 	// mark nickname as forced changed. so don't update the default record
 
-	var emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line);
-
-	emitter.once('return', function(outgoing)
+	bufferEngine.compileOutgoing(d.account, d.network, message.line, function(outgoing)
 	{
 		var	type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
 		// compile our output array
@@ -229,8 +227,6 @@ exports.IrcHandler.handleRaw = function(d, message)
 			}, {d: d, outgoing: outgoing});
 		}
 		// insert it into the logfile
-
-		delete emitter;
 	});
 };
 
@@ -587,9 +583,7 @@ exports.IrcHandler.handleNick = function(d, oldnick, newnick, channels, message)
 				doc.save();
 			}
 
-			var emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line, false);
-
-			emitter.once('ready', function(outgoing)
+			bufferEngine.compileOutgoing(d.account, d.network, message.line, function(outgoing)
 			{
 				var type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
 
@@ -602,8 +596,6 @@ exports.IrcHandler.handleNick = function(d, oldnick, newnick, channels, message)
 
 				server.emit(server.client_data[d.account], 'data', outgoing);
 				// usually we send this out with raw data. But we modify it slightly
-
-				delete emitter;
 			});
 		});
 	}
@@ -629,10 +621,9 @@ exports.IrcHandler.handleQuit = function(d, nick, reason, channels, message)
 			doc = _this.checkObject(d.networkName, channel, doc);
 			// check if the object exists
 
-			var channel = channels[ci],
-				emitter = bufferEngine.compileOutgoing(d.account, d.network, message.line);
+			var channel = channels[ci];
 			
-			emitter.once('ready', function(outgoing)
+			bufferEngine.compileOutgoing(d.account, d.network, message.line, function(outgoing)
 			{
 				var type = (_this.isChannel(outgoing.target)) ? 'chan' : 'query';
 
@@ -649,8 +640,6 @@ exports.IrcHandler.handleQuit = function(d, nick, reason, channels, message)
 
 				server.emit(server.client_data[d.account], 'data', outgoing);
 				// usually we send this out with raw data. But we modify it slightly
-
-				delete emitter;
 			});
 		});
 	}
@@ -750,8 +739,6 @@ exports.IrcHandler.handleEndOfWho = function(d, channel)
 			});
 			
 			delete _this.userlist[channel];
-
-			console.log(doc);
 		}
 	});
 };

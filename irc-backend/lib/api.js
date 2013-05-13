@@ -1,16 +1,15 @@
 
-var defconf = require('../config.json');
-
 exports.API = {};
-exports.API.authentication = defconf.api.authentication;
-// irc.anywhere:fjr838shfks
 
 var system = require('./system').System,
 	server = require('./server').Server,
+	defconf = server.config,
 	stats = require('./stats').Stats,
 	database = require('./database').Database,
 	factory = require('./factory').Factory;
 // any external objects we need
+
+exports.API.authentication = defconf.api.authentication;
 
 /*
  * API::disconnectNetwork

@@ -1,6 +1,9 @@
+var arguments = process.argv.splice(2),
+	defconf = require('../../' + arguments[0]);
 
 exports.Server = {};
 exports.Server.app = {};
+exports.Server.config = defconf;
 
 exports.Server.client_data = {};
 exports.Server.clients = {};

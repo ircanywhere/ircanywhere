@@ -10,15 +10,9 @@
  *
  * ============================================================ */
 
-var defconf = require('../config.json');
-
 exports.System = {};
 exports.System._id = null;
-exports.System.config = {
-	hostname: defconf.hostname,
-	endpoint: defconf.endpoint,
-	port: defconf.port,
-};
+exports.System.config = {};
 
 exports.System.log = {
 	error: function() {}
@@ -29,6 +23,7 @@ var cronJob = require('cron').CronJob,
 	syslog = require('node-syslog'),
 	factory = require('./factory').Factory,
 	server = require('./server').Server,
+	defconf = server.config,
 	stats = require('./stats').Stats,
 	database = require('./database').Database,
 	bufferEngine = require('./buffer_engine').BufferEngine,
@@ -42,6 +37,12 @@ var cronJob = require('cron').CronJob,
  */
 exports.System.runTasks = function()
 {
+	this.config = {
+		hostname: defconf.hostname,
+		endpoint: defconf.endpoint,
+		port: defconf.port,
+	}
+
 	var _this = this,
 		query = _this.config;
 		query.port = query.port.toString();

@@ -18,7 +18,9 @@
 	along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var winston = require('winston'),
+var arguments = process.argv.splice(2),
+	config = require('../../' + arguments[0]),
+	winston = require('winston'),
 	domain = require('domain'),
 	fqueue = require('function-queue')(),
 	util = require('util'),
@@ -77,23 +79,17 @@ d.on('error', function(err)
  */
 d.run(function()
 {
+	config.factory.socket.onlyConnect = false;
+	// override this
+
+	var pingTimers = {},
+		timeoutTimers = {};
+
 	ipem
-		.options({
-			restart: true,
-			delayRestart: 0,
-			useSocket: true,
-			socket: {
-				onlyConnect: false,
-				socketPath: null,
-				port: 7200,
-				host: 'localhost',
-				reconnect: true,
-				delayReconnect: 1000
-			}
-		})
+		.options(config.factory)
 		.on('pong', function()
 		{
-			clearTimeout(ipem._timeoutTimers[this.from]);
+			clearTimeout(timeoutTimers[this.from]);
 			// clear any old timers
 		})
 		.on('identd connected', function(pid)
@@ -119,20 +115,13 @@ d.run(function()
 			ipem.sendTo([_this.from], 'identd connected', identDaemon);
 			// also relay out anything else any other processes need, in this case "identd connected"
 
-			if (ipem._pingTimers === undefined || typeof ipem._pingTimers !== 'object')
-				ipem._pingTimers = {};
-
-			if (ipem._timeoutTimers === undefined || typeof ipem._timeoutTimers !== 'object')
-				ipem._timeoutTimers = {};
-			// make sure these exist
-
-			clearInterval(ipem._pingTimers[_this.from]);
+			clearInterval(pingTimers[_this.from]);
 			// clear any old timers
 
-			ipem._pingTimers[_this.from] = setInterval(function()
+			pingTimers[_this.from] = setInterval(function()
 			{
 				ipem.sendTo([_this.from], 'ping', +new Date());
-				ipem._timeoutTimers[_this.from] = setTimeout(function()
+				timeoutTimers[_this.from] = setTimeout(function()
 				{
 					ipem.disconnect([_this.from]);
 					// reconnect here
@@ -144,7 +133,7 @@ d.run(function()
 		})
 		.on('offline', function()
 		{
-			clearInterval(ipem._pingTimers[this.from]);
+			clearInterval(pingTimers[this.from]);
 			// clear any old timers
 		})
 		.on('create', function(keyObject)
@@ -159,7 +148,7 @@ d.run(function()
 
 				var key = keyObject.key;
 					clientPool[key] = new irc.Client(keyObject.object);
-				// setup an irc client
+				// setup anf irc client
 
 				clientPool[key].queue = [];
 				clientPool[key].process = [_this.from];
