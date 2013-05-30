@@ -39,6 +39,8 @@ exports.Server.run = function()
 
 	_this.d.run(function()
 	{
+		fs.writeFile('irc-backend/irc-backend.pid', process.pid);
+
 		database.connect(function()
 		{
 			system.runTasks();

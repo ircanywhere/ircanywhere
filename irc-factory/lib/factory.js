@@ -22,6 +22,7 @@ var arguments = process.argv.splice(2),
 	config = require('../../' + arguments[0]),
 	winston = require('winston'),
 	domain = require('domain'),
+	fs = require('fs'),
 	fqueue = require('function-queue')(),
 	util = require('util'),
 	crypto = require('crypto'),
@@ -79,6 +80,8 @@ d.on('error', function(err)
  */
 d.run(function()
 {
+	fs.writeFile('irc-factory/irc-factory.pid', process.pid);
+
 	config.factory.socket.onlyConnect = false;
 	// override this
 

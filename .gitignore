@@ -7,3 +7,4 @@ server.csr
 server.key
 *.sublime*
 *.pyc
+*.pid
