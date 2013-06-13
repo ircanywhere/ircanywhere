@@ -20,3 +20,8 @@ If you're interested in contributing then please do, any help you can give is gr
 * No whitespace inbetween parenthesis
 * Tabs only no double spaces
 * Try and write JSLint.com happy code
+
+NOTE
+----
+
+Please note that this application needs a hell of a lot of work to be "out of the box", this means that it works, but isn't very orientated towards customisation and stuff, a lot of the stuff is in the code. An example of this is in the python code for the website frontend, it's not geared towards a custom application at all, and all the content is just manually wrote in. Ideally an install script or a larger configuration file with more options will be implemented in the future, feel free to work on this yourselves.
