@@ -1,4 +1,6 @@
 import re
+import string
+import random
 import time
 import hashlib
 import base64
@@ -54,7 +56,7 @@ class Controller(object):
 			newdate = (date.today() + timedelta(days=1)).strftime('%d-%m-%Y')
 			timestamp = int(datetime.strptime(newdate, '%d-%m-%Y').strftime('%s'))
 
-			activate_hash = base64.b64encode('%s;%s' % (signup_row['account'], str(timestamp)[::-1]))
+			activate_hash = base64.b64encode('%s;%s;%s' % (signup_row['account'], str(timestamp)[::-1], join(random.choice(string.ascii_uppercase + string.digits) for x in range(N))))
 			activate_link = '%sreset/%s' % (config.config['base_url'], activate_hash.replace('=', ''))
 			# generate a link
 
@@ -190,11 +192,13 @@ class Controller(object):
 			real_id = base64.b64decode('%s==' % (_id)).split(';')
 			account = real_id[0]
 			timestamp = real_id[1][::-1]
+			rand_str = real_id[2]
 			valid = True if int(time.time()) < timestamp else False
 			# grab the values
 
 			account_row = config.db.users.find_one({'account': account})
 			valid = True if valid and account_row != None else False
+			valid = True if account_row['extra']['reset_password_link'] == _id else False
 			# find account
 
 			return render_template('reset.html', title = '%s - %s' % (config.config['title'], 'Reset your password'), base_url = config.config['base_url'], valid = valid, account_id = account_row['_id'])

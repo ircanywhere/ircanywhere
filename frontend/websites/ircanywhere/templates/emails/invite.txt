@@ -1,9 +1,0 @@
-You have been invited to join IRCAnywhere
-
-Hello {{ name }}.
-
-Recently you signed up to be informed when there are more open registrations for IRCAnywhere. We're pleased to inform you that there is space for new users.
-
-To proceed and create an account for IRCAnywhere, please follow this link {{ link }}.
-
-If you have any problems with the link not working please reply to this email. We look forward to chatting with you!
