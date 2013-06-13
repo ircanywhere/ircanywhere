@@ -19,7 +19,6 @@ class Controller(object):
 		self.email = ''
 		self.password = ''
 		self.confirm_pass = ''
-		self.message = ''
 		self.free_id = '4f57b8ced49a753889df9dea'
 		self.json = {
 			'error': False,
@@ -29,7 +28,6 @@ class Controller(object):
 		# setup some variables and a basic json response object
 
 		self.responses = {
-			'NO_SIGNUPS': 'We are currently not accepting any new signups, however we\'ve taken a note of your email and will be in touch when we are!', 
 			'REQUIRED': 'All fields are required',
 			'INVAL_NAME': 'The name you have entered is too long.',
 			'INVAL_NICK': 'The nickname you have entered is invalid.',
@@ -39,7 +37,6 @@ class Controller(object):
 			'USED_EMAIL': 'The email you have entered is already in use.',
 			'INVAL_PASS': 'The password you enter must be between 6 and 25 characters.',
 			'INVAL_CPASS': 'The passwords you have entered do not match.',
-			'MAX_LENGTH': 'The max length for the how you use IRC field is 200 characters.',
 			'SUCCESS': 'Your account has been sucessfully created, you will recieve an email shortly.'
 		}
 		# setup an object with our response codes and messages
@@ -54,7 +51,6 @@ class Controller(object):
 			self.username = request.form['username']
 			self.password = request.form['password']
 			self.confirm_pass = request.form['confirm-password']
-			self.message = '' if 'message' not in request.form else request.form['message']
 			# assign the variables
 
 			signup_row_a = config.db.users.find_one({'account': self.username})
@@ -77,45 +73,12 @@ class Controller(object):
 				self.json['error_message'].append(self.responses['INVAL_PASS'])
 			if self.confirm_pass != self.password:
 				self.json['error_message'].append(self.responses['INVAL_CPASS'])
-			if len(self.message) > 200:
-				self.json['error_message'].append(self.responses['MAX_LENGTH'])
 			# validate size and email address validity
 
 		if len(self.json['error_message']) > 0:
 			self.json['error'] = True
 		else:
 			self.insertUser()
-
-		return app.make_response(json.dumps(self.json))
-		# a function to validate inputs and generate a json response
-
-	def handleEmailAdd(self):
-		if 'your-name' not in request.form or 'email-address' not in request.form:
-			self.json['error_message'].append(self.responses['REQUIRED'])
-		else:
-			self.name = request.form['your-name']
-			self.email = request.form['email-address']
-			# assign the variables
-
-			signup_row = config.db.emails.find_one({'email': self.email})
-
-			if signup_row != None:
-				self.json['error_message'].append(self.responses['USED_EMAIL'])
-			if not re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$', self.email, re.IGNORECASE):
-				self.json['error_message'].append(self.responses['INVAL_EMAIL'])
-			# validate the email address
-
-		if len(self.json['error_message']) > 0:
-			self.json['error'] = True
-		else:
-			self.json['error'] = False
-			self.json['success_message'] = self.responses['NO_SIGNUPS']
-
-			config.db.emails.insert({
-				'name': self.name,
-				'email': self.email,
-				'invited': False
-			})
 
 		return app.make_response(json.dumps(self.json))
 		# a function to validate inputs and generate a json response
@@ -129,26 +92,11 @@ class Controller(object):
 		salt = randint(100000, 999999)
 		# get the new uid, and generate a new salt
 
-		network = {
-			'_id': bson.ObjectId(),
-			'name': 'IRCAnywhere',
-			'host': 'irc.ircanywhere.com',
-			'port': '6667',
-			'url': 'irc.ircanywhere.com:6667',
-			'password': '',
-			'secure': False,
-			'sasl': False,
-			'nick': self.nick,
-			'ident': 'ia' + str(user_rows),
-			'real': self.nick,
-			'user': self.username,
-			'ip': '',
-			'status': 'disconnected',
-			'locked': True,
-			'chans': {
-				base64.b64encode('#ircanywhere'): ''
-			}
-		}
+		network = config.settings['defaultNetwork']
+		network['nick'] = self.nick
+		network['ident'] = 'ia' + str(user_rows)
+		network['real'] = self.nick
+		network['user'] = self.username
 
 		config.db.networks.insert(network)
 		# add the network first
@@ -170,7 +118,6 @@ class Controller(object):
 			'tab': '',
 			'time': int(time.time()),
 			'extra': {
-				'irc_usage': self.message,
 				'reset_password_ts': 0,
 				'reset_password_link': ''
 			},
@@ -250,8 +197,6 @@ class Controller(object):
 
 		if self.is_open == True:
 			return self.handleSignup()
-		else:
-			return self.handleEmailAdd()
 		# are we allowed to continue?
 
 	def get(self, code):

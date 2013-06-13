@@ -13,7 +13,7 @@
 			<div class="clear modal-body">
 				<div class="left">
 					{% if open %}
-						<p class="large">Please note there is currently a limited number of accounts available, it seems there are accounts available, on registration your account will be activated immediately and ready for use.</p>
+						<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
 
 						<div id="message-holder"></div>
 
@@ -72,15 +72,6 @@
 						</div>
 
 						<div class="clearfix">
-							<label for="message">How do you use IRC?</label>
-							<div class="input">
-								<div class="field">
-									<textarea class="xlarge" id="message" name="message" rows="4" tabindex="6"></textarea>
-								</div><span class="tt-tooltip"><a href="#" rel="twipsy" title="A little bit about how you use IRC, how many networks, how often? Etc.">?</a></span>
-							</div>
-						</div>
-
-						<div class="clearfix">
 							<div class="input">
 								<div class="field">
 									<input type="submit" class="btn primary" value="Sign up to IRCAnywhere" tabindex="6" />
@@ -88,35 +79,7 @@
 							</div>
 						</div>
 					{% else %}
-						<p class="large">New signups are currently closed, IRCAnywhere is in alpha stages and users are being introduced in waves, to know more about when the next wave is opening fill in the form below and we'll be in touch.</p>
-
-						<div id="message-holder"></div>
-
-						<div class="clearfix">
-							<label for="your-name">Your Name</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a></span>
-							</div>
-						</div>
-
-						<div class="clearfix">
-							<label for="email-address">Email Address</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="2" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid email address.">?</a></span>
-							</div>
-						</div>
-						
-						<div class="clearfix">
-							<div class="input">
-								<div class="field">
-									<input type="submit" class="btn primary" value="Sign up for waiting list" tabindex="3" />
-								</div>
-							</div>
-						</div>
+						<p class="large">New signups are currently closed.</p>
 					{% endif %}
 				</div>
 				<div class="right">
