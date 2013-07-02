@@ -22,7 +22,8 @@
 		"function-queue": "0.0.12",
 		"ipevents": "git://github.com/ircanywhere/node-ipevents.git",
 		"winston": "git://github.com/flatiron/winston.git",
-		"cron": "1.0.1"
+		"cron": "1.0.1",
+		"node-syslog": "*"
 	},
 	"engines": {
 		"node": ">= 0.6.11"
