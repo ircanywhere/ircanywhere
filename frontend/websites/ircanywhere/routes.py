@@ -1,6 +1,6 @@
 from werkzeug.debug import get_current_traceback
 from websites.ircanywhere import app
-from controllers import notfound, index, about, init, javascript, login, logs, logout, contact, settings, signup, reset, network
+from controllers import notfound, index, init, javascript, login, logs, logout, settings, signup, reset, network
 
 @app.errorhandler(500)
 def internal_server_error(e):
