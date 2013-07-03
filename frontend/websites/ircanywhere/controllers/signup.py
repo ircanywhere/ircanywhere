@@ -180,7 +180,7 @@ class Controller(object):
 			self.code_row = None
 		# is there a code?
 
-		if config.settings['newSignups'] == True or (code != None and self.code_row != None):
+		if (config.config.get('newSignups', False) == True) or (code != None and self.code_row != None):
 			self.is_open = True
 		else:
 			self.is_open = False
