@@ -8,7 +8,8 @@ config = {
 	'smtp_user': 'username@email.com',
 	'smtp_pass': 'password',
 	'title': 'IRCAnywhere',
-	'base_url': 'http://localhost:5000/'
+	'base_url': 'http://localhost:5000/',
+	'newSignups': True
 }
 # a config dictionary
 
