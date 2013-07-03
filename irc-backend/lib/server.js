@@ -53,7 +53,7 @@ exports.Server.run = function()
 			io = require('socket.io').listen(_this.app);
 			// setup the server as an ssl server and also use gzip
 
-			io.set('origins', 'http://localhost:5000');
+			//io.set('origins', 'http://localhost:5000');
 			io.set('heartbeats', true);
 			io.set('browser client', false);
 			io.set('log level', 2);
