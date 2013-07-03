@@ -242,7 +242,7 @@ exports.Server.createHTTPChunk = function(socket, hash, type, data)
 		isSocket = (type == 'chanlist') ? false : true;
 	
 	_this.app.get('/' + type + '/' + rhash, function(req, res) {
-		res.header('Access-Control-Allow-Origin', 'http://localhost:5000');
+		res.header('Access-Control-Allow-Origin', '*');
 		res.json(data);
 	});
 	// create a temp path for the backlog
