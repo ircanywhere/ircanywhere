@@ -1,6 +1,6 @@
 {
 	"name": "ircanywhere",
-	"description": "DB Partitioner for IRCAnywhere",
+	"description": "IRCAnywhere",
 	"version": "0.1.2",
 	"author": "IRCAnywhere <support@ircanywhere.com>",
 	"main": "run.js",
@@ -22,8 +22,5 @@
 	},
 	"engines": {
 		"node": ">= 0.6.11"
-	},
-	"bundleDependencies": [
-		"mongoose"
-	]
+	}
 }
