@@ -24,7 +24,7 @@ If you're interested in contributing then please do, any help you can give is gr
 Installing
 ----------
 
-Follow the instructions [https://github.com/ircanywhere/ircanywhere](https://github.com/ircanywhere/ircanywhere) to install.
+Follow the instructions [https://github.com/ircanywhere/ircanywhere/wiki/Installing](https://github.com/ircanywhere/ircanywhere/wiki/Installing) to install.
 
 NOTE
 ----
