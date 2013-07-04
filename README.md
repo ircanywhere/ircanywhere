@@ -21,6 +21,11 @@ If you're interested in contributing then please do, any help you can give is gr
 * Tabs only no double spaces
 * Try and write JSLint.com happy code
 
+Installing
+----------
+
+Follow the instructions [https://github.com/ircanywhere/ircanywhere](https://github.com/ircanywhere/ircanywhere) to install.
+
 NOTE
 ----
 
