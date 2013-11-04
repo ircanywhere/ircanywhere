@@ -17,8 +17,17 @@
 		"asyncblock": "2.1.13",
 		"async": "*",
 		"cli-color": "*",
+		"cron": "1.0.1",
 		"commander": "1.1.1",
-		"forever-monitor": "*"
+		"eventemitter2": "0.4.11",
+		"express": "2.5.8",
+		"forever-monitor": "*",
+		"function-queue": "0.0.12",
+		"ipevents": "git://github.com/ircanywhere/node-ipevents.git",
+		"mongoose": "3.5.5",
+		"node-syslog": "*",
+		"socket.io": "0.8.7",
+		"winston": "git://github.com/flatiron/winston.git"
 	},
 	"engines": {
 		"node": ">= 0.6.11"

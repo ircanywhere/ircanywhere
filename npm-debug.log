@@ -1,0 +1,321 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@1.2.12
+3 info using node@v0.8.16
+4 verbose read json /home/ricki/shared/ircanywhere/package.json
+5 verbose readDependencies using package.json deps
+6 verbose install where, deps [ '/home/ricki/shared/ircanywhere',
+6 verbose install   [ 'asyncblock',
+6 verbose install     'async',
+6 verbose install     'cli-color',
+6 verbose install     'cron',
+6 verbose install     'commander',
+6 verbose install     'eventemitter2',
+6 verbose install     'express',
+6 verbose install     'forever-monitor',
+6 verbose install     'function-queue',
+6 verbose install     'ipevents',
+6 verbose install     'mongoose',
+6 verbose install     'node-syslog',
+6 verbose install     'socket.io',
+6 verbose install     'winston' ] ]
+7 verbose from cache /home/ricki/shared/ircanywhere/package.json
+8 info preinstall ircanywhere@0.1.2
+9 verbose from cache /home/ricki/shared/ircanywhere/package.json
+10 verbose readDependencies using package.json deps
+11 verbose cache add [ 'asyncblock@2.1.13', null ]
+12 verbose cache add name=undefined spec="asyncblock@2.1.13" args=["asyncblock@2.1.13",null]
+13 verbose parsed url { pathname: 'asyncblock@2.1.13',
+13 verbose parsed url   path: 'asyncblock@2.1.13',
+13 verbose parsed url   href: 'asyncblock@2.1.13' }
+14 verbose cache add name="asyncblock" spec="2.1.13" args=["asyncblock","2.1.13"]
+15 verbose parsed url { pathname: '2.1.13', path: '2.1.13', href: '2.1.13' }
+16 verbose addNamed [ 'asyncblock', '2.1.13' ]
+17 verbose addNamed [ '2.1.13', '2.1.13' ]
+18 verbose cache add [ 'async@*', null ]
+19 verbose cache add name=undefined spec="async@*" args=["async@*",null]
+20 verbose parsed url { pathname: 'async@*', path: 'async@*', href: 'async@*' }
+21 verbose cache add name="async" spec="*" args=["async","*"]
+22 verbose parsed url { pathname: '*', path: '*', href: '*' }
+23 verbose addNamed [ 'async', '*' ]
+24 verbose addNamed [ null, '' ]
+25 verbose cache add [ 'cli-color@*', null ]
+26 verbose cache add name=undefined spec="cli-color@*" args=["cli-color@*",null]
+27 verbose parsed url { pathname: 'cli-color@*',
+27 verbose parsed url   path: 'cli-color@*',
+27 verbose parsed url   href: 'cli-color@*' }
+28 verbose cache add name="cli-color" spec="*" args=["cli-color","*"]
+29 verbose parsed url { pathname: '*', path: '*', href: '*' }
+30 verbose addNamed [ 'cli-color', '*' ]
+31 verbose addNamed [ null, '' ]
+32 silly lockFile 7ceb6640-asyncblock-2-1-13 asyncblock@2.1.13
+33 verbose lock asyncblock@2.1.13 /home/ricki/.npm/7ceb6640-asyncblock-2-1-13.lock
+34 silly lockFile 827e99f9-async async@*
+35 verbose lock async@* /home/ricki/.npm/827e99f9-async.lock
+36 silly lockFile e8d06013-cli-color cli-color@*
+37 verbose lock cli-color@* /home/ricki/.npm/e8d06013-cli-color.lock
+38 silly addNameRange { name: 'async', range: '', hasData: false }
+39 silly addNameRange { name: 'cli-color', range: '', hasData: false }
+40 verbose url raw asyncblock/2.1.13
+41 verbose url resolving [ 'http://registry.npmjs.org/', './asyncblock/2.1.13' ]
+42 verbose url resolved http://registry.npmjs.org/asyncblock/2.1.13
+43 info trying registry request attempt 1 at 12:39:24
+44 verbose etag "ACGWTY01MK7LWXF0P8RWIBWWA"
+45 http GET http://registry.npmjs.org/asyncblock/2.1.13
+46 verbose url raw cli-color
+47 verbose url resolving [ 'http://registry.npmjs.org/', './cli-color' ]
+48 verbose url resolved http://registry.npmjs.org/cli-color
+49 info trying registry request attempt 1 at 12:39:24
+50 verbose etag "9NGKW41C7N3Q0TXE41JK82NW0"
+51 http GET http://registry.npmjs.org/cli-color
+52 verbose url raw async
+53 verbose url resolving [ 'http://registry.npmjs.org/', './async' ]
+54 verbose url resolved http://registry.npmjs.org/async
+55 info trying registry request attempt 1 at 12:39:24
+56 verbose etag "EUPRMP0SA7JZYKV8WO4JNOEK6"
+57 http GET http://registry.npmjs.org/async
+58 verbose cache add [ 'cron@1.0.1', null ]
+59 verbose cache add name=undefined spec="cron@1.0.1" args=["cron@1.0.1",null]
+60 verbose parsed url { pathname: 'cron@1.0.1',
+60 verbose parsed url   path: 'cron@1.0.1',
+60 verbose parsed url   href: 'cron@1.0.1' }
+61 verbose cache add name="cron" spec="1.0.1" args=["cron","1.0.1"]
+62 verbose parsed url { pathname: '1.0.1', path: '1.0.1', href: '1.0.1' }
+63 verbose addNamed [ 'cron', '1.0.1' ]
+64 verbose addNamed [ '1.0.1', '1.0.1' ]
+65 silly lockFile eacdb816-cron-1-0-1 cron@1.0.1
+66 verbose lock cron@1.0.1 /home/ricki/.npm/eacdb816-cron-1-0-1.lock
+67 verbose cache add [ 'commander@1.1.1', null ]
+68 verbose cache add name=undefined spec="commander@1.1.1" args=["commander@1.1.1",null]
+69 verbose parsed url { pathname: 'commander@1.1.1',
+69 verbose parsed url   path: 'commander@1.1.1',
+69 verbose parsed url   href: 'commander@1.1.1' }
+70 verbose cache add name="commander" spec="1.1.1" args=["commander","1.1.1"]
+71 verbose parsed url { pathname: '1.1.1', path: '1.1.1', href: '1.1.1' }
+72 verbose addNamed [ 'commander', '1.1.1' ]
+73 verbose addNamed [ '1.1.1', '1.1.1' ]
+74 silly lockFile e890879a-commander-1-1-1 commander@1.1.1
+75 verbose lock commander@1.1.1 /home/ricki/.npm/e890879a-commander-1-1-1.lock
+76 verbose cache add [ 'eventemitter2@0.4.11', null ]
+77 verbose cache add name=undefined spec="eventemitter2@0.4.11" args=["eventemitter2@0.4.11",null]
+78 verbose parsed url { pathname: 'eventemitter2@0.4.11',
+78 verbose parsed url   path: 'eventemitter2@0.4.11',
+78 verbose parsed url   href: 'eventemitter2@0.4.11' }
+79 verbose cache add name="eventemitter2" spec="0.4.11" args=["eventemitter2","0.4.11"]
+80 verbose parsed url { pathname: '0.4.11', path: '0.4.11', href: '0.4.11' }
+81 verbose addNamed [ 'eventemitter2', '0.4.11' ]
+82 verbose addNamed [ '0.4.11', '0.4.11' ]
+83 silly lockFile 1047a589-eventemitter2-0-4-11 eventemitter2@0.4.11
+84 verbose lock eventemitter2@0.4.11 /home/ricki/.npm/1047a589-eventemitter2-0-4-11.lock
+85 verbose cache add [ 'express@2.5.8', null ]
+86 verbose cache add name=undefined spec="express@2.5.8" args=["express@2.5.8",null]
+87 verbose parsed url { pathname: 'express@2.5.8',
+87 verbose parsed url   path: 'express@2.5.8',
+87 verbose parsed url   href: 'express@2.5.8' }
+88 verbose cache add name="express" spec="2.5.8" args=["express","2.5.8"]
+89 verbose parsed url { pathname: '2.5.8', path: '2.5.8', href: '2.5.8' }
+90 verbose addNamed [ 'express', '2.5.8' ]
+91 verbose addNamed [ '2.5.8', '2.5.8' ]
+92 silly lockFile 70a1a393-express-2-5-8 express@2.5.8
+93 verbose lock express@2.5.8 /home/ricki/.npm/70a1a393-express-2-5-8.lock
+94 verbose cache add [ 'forever-monitor@*', null ]
+95 verbose cache add name=undefined spec="forever-monitor@*" args=["forever-monitor@*",null]
+96 verbose parsed url { pathname: 'forever-monitor@*',
+96 verbose parsed url   path: 'forever-monitor@*',
+96 verbose parsed url   href: 'forever-monitor@*' }
+97 verbose cache add name="forever-monitor" spec="*" args=["forever-monitor","*"]
+98 verbose parsed url { pathname: '*', path: '*', href: '*' }
+99 verbose addNamed [ 'forever-monitor', '*' ]
+100 verbose addNamed [ null, '' ]
+101 silly lockFile f1472a70-forever-monitor forever-monitor@*
+102 verbose lock forever-monitor@* /home/ricki/.npm/f1472a70-forever-monitor.lock
+103 verbose cache add [ 'function-queue@0.0.12', null ]
+104 verbose cache add name=undefined spec="function-queue@0.0.12" args=["function-queue@0.0.12",null]
+105 verbose parsed url { pathname: 'function-queue@0.0.12',
+105 verbose parsed url   path: 'function-queue@0.0.12',
+105 verbose parsed url   href: 'function-queue@0.0.12' }
+106 verbose cache add name="function-queue" spec="0.0.12" args=["function-queue","0.0.12"]
+107 verbose parsed url { pathname: '0.0.12', path: '0.0.12', href: '0.0.12' }
+108 verbose addNamed [ 'function-queue', '0.0.12' ]
+109 verbose addNamed [ '0.0.12', '0.0.12' ]
+110 silly lockFile 72b5762b-function-queue-0-0-12 function-queue@0.0.12
+111 verbose lock function-queue@0.0.12 /home/ricki/.npm/72b5762b-function-queue-0-0-12.lock
+112 verbose cache add [ 'ipevents@git://github.com/ircanywhere/node-ipevents.git',
+112 verbose cache add   null ]
+113 verbose cache add name=undefined spec="ipevents@git://github.com/ircanywhere/node-ipevents.git" args=["ipevents@git://github.com/ircanywhere/node-ipevents.git",null]
+114 verbose parsed url { pathname: 'ipevents@git://github.com/ircanywhere/node-ipevents.git',
+114 verbose parsed url   path: 'ipevents@git://github.com/ircanywhere/node-ipevents.git',
+114 verbose parsed url   href: 'ipevents@git://github.com/ircanywhere/node-ipevents.git' }
+115 verbose cache add name="ipevents" spec="git://github.com/ircanywhere/node-ipevents.git" args=["ipevents","git://github.com/ircanywhere/node-ipevents.git"]
+116 verbose parsed url { protocol: 'git:',
+116 verbose parsed url   slashes: true,
+116 verbose parsed url   host: 'github.com',
+116 verbose parsed url   hostname: 'github.com',
+116 verbose parsed url   href: 'git://github.com/ircanywhere/node-ipevents.git',
+116 verbose parsed url   pathname: '/ircanywhere/node-ipevents.git',
+116 verbose parsed url   path: '/ircanywhere/node-ipevents.git' }
+117 silly lockFile dbf1733b-om-ircanywhere-node-ipevents-git git://github.com/ircanywhere/node-ipevents.git
+118 verbose lock git://github.com/ircanywhere/node-ipevents.git /home/ricki/.npm/dbf1733b-om-ircanywhere-node-ipevents-git.lock
+119 verbose cache add [ 'mongoose@3.5.5', null ]
+120 verbose cache add name=undefined spec="mongoose@3.5.5" args=["mongoose@3.5.5",null]
+121 verbose parsed url { pathname: 'mongoose@3.5.5',
+121 verbose parsed url   path: 'mongoose@3.5.5',
+121 verbose parsed url   href: 'mongoose@3.5.5' }
+122 verbose cache add name="mongoose" spec="3.5.5" args=["mongoose","3.5.5"]
+123 verbose parsed url { pathname: '3.5.5', path: '3.5.5', href: '3.5.5' }
+124 verbose addNamed [ 'mongoose', '3.5.5' ]
+125 verbose addNamed [ '3.5.5', '3.5.5' ]
+126 silly lockFile 0c0b337c-mongoose-3-5-5 mongoose@3.5.5
+127 verbose lock mongoose@3.5.5 /home/ricki/.npm/0c0b337c-mongoose-3-5-5.lock
+128 verbose cache add [ 'node-syslog@*', null ]
+129 verbose cache add name=undefined spec="node-syslog@*" args=["node-syslog@*",null]
+130 verbose parsed url { pathname: 'node-syslog@*',
+130 verbose parsed url   path: 'node-syslog@*',
+130 verbose parsed url   href: 'node-syslog@*' }
+131 verbose cache add name="node-syslog" spec="*" args=["node-syslog","*"]
+132 verbose parsed url { pathname: '*', path: '*', href: '*' }
+133 verbose addNamed [ 'node-syslog', '*' ]
+134 verbose addNamed [ null, '' ]
+135 silly lockFile 7a8222de-node-syslog node-syslog@*
+136 verbose lock node-syslog@* /home/ricki/.npm/7a8222de-node-syslog.lock
+137 verbose cache add [ 'socket.io@0.8.7', null ]
+138 verbose cache add name=undefined spec="socket.io@0.8.7" args=["socket.io@0.8.7",null]
+139 verbose parsed url { pathname: 'socket.io@0.8.7',
+139 verbose parsed url   path: 'socket.io@0.8.7',
+139 verbose parsed url   href: 'socket.io@0.8.7' }
+140 verbose cache add name="socket.io" spec="0.8.7" args=["socket.io","0.8.7"]
+141 verbose parsed url { pathname: '0.8.7', path: '0.8.7', href: '0.8.7' }
+142 verbose addNamed [ 'socket.io', '0.8.7' ]
+143 verbose addNamed [ '0.8.7', '0.8.7' ]
+144 silly lockFile cb903926-socket-io-0-8-7 socket.io@0.8.7
+145 verbose lock socket.io@0.8.7 /home/ricki/.npm/cb903926-socket-io-0-8-7.lock
+146 verbose cache add [ 'winston@git://github.com/flatiron/winston.git', null ]
+147 verbose cache add name=undefined spec="winston@git://github.com/flatiron/winston.git" args=["winston@git://github.com/flatiron/winston.git",null]
+148 verbose parsed url { pathname: 'winston@git://github.com/flatiron/winston.git',
+148 verbose parsed url   path: 'winston@git://github.com/flatiron/winston.git',
+148 verbose parsed url   href: 'winston@git://github.com/flatiron/winston.git' }
+149 verbose cache add name="winston" spec="git://github.com/flatiron/winston.git" args=["winston","git://github.com/flatiron/winston.git"]
+150 verbose parsed url { protocol: 'git:',
+150 verbose parsed url   slashes: true,
+150 verbose parsed url   host: 'github.com',
+150 verbose parsed url   hostname: 'github.com',
+150 verbose parsed url   href: 'git://github.com/flatiron/winston.git',
+150 verbose parsed url   pathname: '/flatiron/winston.git',
+150 verbose parsed url   path: '/flatiron/winston.git' }
+151 silly lockFile 8982c113--github-com-flatiron-winston-git git://github.com/flatiron/winston.git
+152 verbose lock git://github.com/flatiron/winston.git /home/ricki/.npm/8982c113--github-com-flatiron-winston-git.lock
+153 silly addNameRange { name: 'forever-monitor', range: '', hasData: false }
+154 verbose addRemoteGit [ 'git://github.com/ircanywhere/node-ipevents.git', 'master' ]
+155 silly addNameRange { name: 'node-syslog', range: '', hasData: false }
+156 verbose addRemoteGit [ 'git://github.com/flatiron/winston.git', 'master' ]
+157 silly exec git "config" "--get" "remote.origin.url"
+158 silly git,config,--get,remote.origin.url,/home/ricki/.npm/_git-remotes/git-github-com-ircanywhere-node-ipevents-git-dbf1733b spawning
+159 verbose url raw node-syslog
+160 verbose url resolving [ 'http://registry.npmjs.org/', './node-syslog' ]
+161 verbose url resolved http://registry.npmjs.org/node-syslog
+162 info trying registry request attempt 1 at 12:39:24
+163 http GET http://registry.npmjs.org/node-syslog
+164 silly exec git "config" "--get" "remote.origin.url"
+165 silly git,config,--get,remote.origin.url,/home/ricki/.npm/_git-remotes/git-github-com-flatiron-winston-git-8982c113 spawning
+166 verbose git remote.origin.url git://github.com/ircanywhere/node-ipevents.git
+167 silly exec git "fetch" "-a" "origin"
+168 silly git,fetch,-a,origin,/home/ricki/.npm/_git-remotes/git-github-com-ircanywhere-node-ipevents-git-dbf1733b spawning
+169 silly exec git "rev-list" "-n1" "master"
+170 silly git,rev-list,-n1,master,/home/ricki/.npm/_git-remotes/git-github-com-ircanywhere-node-ipevents-git-dbf1733b spawning
+171 verbose git remote.origin.url git://github.com/flatiron/winston.git
+172 silly exec git "fetch" "-a" "origin"
+173 silly git,fetch,-a,origin,/home/ricki/.npm/_git-remotes/git-github-com-flatiron-winston-git-8982c113 spawning
+174 silly exec git "rev-list" "-n1" "master"
+175 silly git,rev-list,-n1,master,/home/ricki/.npm/_git-remotes/git-github-com-flatiron-winston-git-8982c113 spawning
+176 verbose git rev-list -n1 master 94a0ce5de9284a668b28f78de015c80f0facb7fe
+177 verbose resolved git url git://github.com/ircanywhere/node-ipevents.git#94a0ce5de9284a668b28f78de015c80f0facb7fe
+178 verbose git rev-list -n1 master 6cf229d0d691d0e489057c8c1d521b44de97da4f
+179 verbose resolved git url git://github.com/flatiron/winston.git#6cf229d0d691d0e489057c8c1d521b44de97da4f
+180 info retry will retry, error on last attempt: Error: getaddrinfo ENOENT
+181 info retry will retry, error on last attempt: Error: getaddrinfo ENOENT
+182 verbose url raw cron/1.0.1
+183 verbose url resolving [ 'http://registry.npmjs.org/', './cron/1.0.1' ]
+184 verbose url resolved http://registry.npmjs.org/cron/1.0.1
+185 info trying registry request attempt 1 at 12:39:44
+186 verbose etag "CDAFWKQCDNNGXTSTIGDCX42VC"
+187 http GET http://registry.npmjs.org/cron/1.0.1
+188 verbose url raw commander/1.1.1
+189 verbose url resolving [ 'http://registry.npmjs.org/', './commander/1.1.1' ]
+190 verbose url resolved http://registry.npmjs.org/commander/1.1.1
+191 info trying registry request attempt 1 at 12:39:44
+192 verbose etag "EETTLTMNKHH7BT3SOZ01GKBE7"
+193 http GET http://registry.npmjs.org/commander/1.1.1
+194 verbose url raw eventemitter2/0.4.11
+195 verbose url resolving [ 'http://registry.npmjs.org/', './eventemitter2/0.4.11' ]
+196 verbose url resolved http://registry.npmjs.org/eventemitter2/0.4.11
+197 info trying registry request attempt 1 at 12:39:44
+198 verbose etag "A6P3MAJFHZ79XRHKEDDFSYGQF"
+199 http GET http://registry.npmjs.org/eventemitter2/0.4.11
+200 verbose url raw express/2.5.8
+201 verbose url resolving [ 'http://registry.npmjs.org/', './express/2.5.8' ]
+202 verbose url resolved http://registry.npmjs.org/express/2.5.8
+203 info trying registry request attempt 1 at 12:39:44
+204 verbose etag "16IZMP6579B9QJ8L076PSKIJL"
+205 http GET http://registry.npmjs.org/express/2.5.8
+206 verbose url raw forever-monitor
+207 verbose url resolving [ 'http://registry.npmjs.org/', './forever-monitor' ]
+208 verbose url resolved http://registry.npmjs.org/forever-monitor
+209 info trying registry request attempt 1 at 12:39:44
+210 verbose etag "641HNC0QWTEE4I612X4GEN2IQ"
+211 http GET http://registry.npmjs.org/forever-monitor
+212 verbose url raw function-queue/0.0.12
+213 verbose url resolving [ 'http://registry.npmjs.org/', './function-queue/0.0.12' ]
+214 verbose url resolved http://registry.npmjs.org/function-queue/0.0.12
+215 info trying registry request attempt 1 at 12:39:44
+216 verbose etag "2MBKXFGJ024QWOCPCQ2YXNMM0"
+217 http GET http://registry.npmjs.org/function-queue/0.0.12
+218 verbose url raw mongoose/3.5.5
+219 verbose url resolving [ 'http://registry.npmjs.org/', './mongoose/3.5.5' ]
+220 verbose url resolved http://registry.npmjs.org/mongoose/3.5.5
+221 info trying registry request attempt 1 at 12:39:44
+222 verbose etag "DS05V1BGX9404DK0VZV464DLJ"
+223 http GET http://registry.npmjs.org/mongoose/3.5.5
+224 verbose url raw socket.io/0.8.7
+225 verbose url resolving [ 'http://registry.npmjs.org/', './socket.io/0.8.7' ]
+226 verbose url resolved http://registry.npmjs.org/socket.io/0.8.7
+227 info trying registry request attempt 1 at 12:39:44
+228 verbose etag "AETF0Z3CVJ4JYANXGADE0QI6B"
+229 http GET http://registry.npmjs.org/socket.io/0.8.7
+230 info retry will retry, error on last attempt: Error: getaddrinfo ENOENT
+231 info retry will retry, error on last attempt: Error: getaddrinfo ENOENT
+232 error git fetch -a origin (git://github.com/ircanywhere/node-ipevents.git) fatal: Unable to look up github.com (port 9418) (Name or service not known)
+233 silly lockFile dbf1733b-om-ircanywhere-node-ipevents-git git://github.com/ircanywhere/node-ipevents.git
+234 silly lockFile dbf1733b-om-ircanywhere-node-ipevents-git git://github.com/ircanywhere/node-ipevents.git
+235 error git fetch -a origin (git://github.com/flatiron/winston.git) fatal: Unable to look up github.com (port 9418) (Name or service not known)
+236 silly lockFile 8982c113--github-com-flatiron-winston-git git://github.com/flatiron/winston.git
+237 silly lockFile 8982c113--github-com-flatiron-winston-git git://github.com/flatiron/winston.git
+238 info trying registry request attempt 2 at 12:39:54
+239 verbose etag "9NGKW41C7N3Q0TXE41JK82NW0"
+240 http GET http://registry.npmjs.org/cli-color
+241 info trying registry request attempt 2 at 12:39:54
+242 verbose etag "ACGWTY01MK7LWXF0P8RWIBWWA"
+243 http GET http://registry.npmjs.org/asyncblock/2.1.13
+244 info trying registry request attempt 2 at 12:39:54
+245 verbose etag "EUPRMP0SA7JZYKV8WO4JNOEK6"
+246 http GET http://registry.npmjs.org/async
+247 info trying registry request attempt 2 at 12:39:54
+248 http GET http://registry.npmjs.org/node-syslog
+249 info retry will retry, error on last attempt: Error: getaddrinfo ENOENT
+250 error Error: `git "fetch" "-a" "origin"` failed with 128
+250 error     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/exec.js:56:20)
+250 error     at ChildProcess.EventEmitter.emit (events.js:99:17)
+250 error     at maybeClose (child_process.js:638:16)
+250 error     at Socket.ChildProcess.spawn.stdin (child_process.js:815:11)
+250 error     at Socket.EventEmitter.emit (events.js:96:17)
+250 error     at Socket._destroy.destroyed (net.js:358:10)
+250 error     at process.startup.processNextTick.process._tickCallback (node.js:244:9)
+251 error If you need help, you may report this log at:
+251 error     <http://github.com/isaacs/npm/issues>
+251 error or email it to:
+251 error     <npm-@googlegroups.com>
+252 error System Linux 2.6.32-5-686
+253 error command "node" "/usr/local/bin/npm" "install"
+254 error cwd /home/ricki/shared/ircanywhere
+255 error node -v v0.8.16
+256 error npm -v 1.2.12
+257 verbose exit [ 1, true ]
