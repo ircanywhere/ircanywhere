@@ -4,7 +4,7 @@ var arguments = process.argv.splice(2),
 exports.Server = {};
 exports.Server.app = {};
 exports.Server.config = defconf;
-
+exports.Server.configFile = arguments[0];
 exports.Server.client_data = {};
 exports.Server.clients = {};
 exports.Server.accountTypes = {};

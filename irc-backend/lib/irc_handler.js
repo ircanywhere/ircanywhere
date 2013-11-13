@@ -42,7 +42,7 @@ exports.IrcHandler.ignoredCommands = [
 	'RPL_ENDOFWHOIS'
 ];
 
-var pkg = require('../package.json'),
+var pkg = require('../../package.json'),
 	database = require('./database').Database,
 	stats = require('./stats').Stats,
 	modeParser = require('./mode_parser').ModeParser,

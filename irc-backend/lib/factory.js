@@ -13,10 +13,11 @@
 var crypto = require('crypto'),
 	server = require('./server').Server,
 	defconf = server.config,
-	system = require('./system').System;
+	system = require('./system').System,
+	child_process = require('child_process'),
+	child = {};
 
 exports.Factory = {};
-exports.Factory.ipem = require('ipevents');
 exports.Factory.keys = {};
 exports.Factory.tempKeys = {};
 
@@ -31,9 +32,15 @@ exports.Factory.setup = function()
 		ircHandler = require('./irc_handler').IrcHandler,
 		_this = this;
 
-	_this.ipem
-		.options(defconf.factory)
-		.on('connected', function()
+	child = child_process.fork('irc-factory/lib/factory', [server.configFile], {silent: false});
+
+	child.on('message', function(m)
+	{
+		// m is the JSON object coming, ask it what type of message is, and get the data
+		var message = m.message.toLowerCase(),
+			data = m.data;
+
+		if (message == 'connected')
 		{
 			if (typeof _this.keys != 'object')
 				return;
@@ -41,15 +48,13 @@ exports.Factory.setup = function()
 			_this.lock(false);
 
 			for (var i in _this.keys)
-				_this.ipem.sendToGrandMaster('initial validate', _this.keys[i]);
-		})
-		.on('offline', function()
+				child.send({message: 'initial validate', data: {keyObject: _this.keys[i]}});
+		}
+		else if (message == 'initial validate')
 		{
-			if (this.pids.indexOf(this.parent) == -1)
-				_this.lock(true);
-		})
-		.on('initial validate', function(keyObject, valid)
-		{
+			var keyObject = data.keyObject,
+				valid = data.valid;
+
 			if (valid === true)
 			{
 				_this.keys[keyObject.key] = keyObject;
@@ -65,7 +70,7 @@ exports.Factory.setup = function()
 			else
 			{
 				_this.destroy(keyObject.key);
-				_this.ipem.sendToGrandMaster('create', keyObject);
+				child.send({message: 'create', data: {keyObject: keyObject}});
 				// we dont have a valid key, request to create a new client
 
 				system.networkLog(keyObject.account, keyObject.network, 'successfully connected to ' + keyObject.object.server + ':' + keyObject.object.port);
@@ -73,22 +78,28 @@ exports.Factory.setup = function()
 			}
 
 			_this.restartTimeout(keyObject.account, keyObject.network);
-		})
-		.on('destroyed', function(key)
+		}
+		else if (message == 'destroyed')
 		{
+			var key = data.key;
+
 			delete _this.keys[key];
 			delete _this.tempKeys[key];
 			// remove our keys
-		})
-		.on('created', function(keyObject, socket)
+		}
+		else if (message == 'created')
 		{
+			var keyObject = data.keyObject;
+
 			_this.keys[keyObject.key] = keyObject;
 			delete _this.tempKeys[keyObject.key];
 			// remove the temp key and reassign the normal one
-		})
-		.on('closed', function(key, timeout)
+		}
+		else if (message == 'closed')
 		{
-			var keyObject = _this.keys[key];
+			var key = data.key,
+				timeout = data.timeout,
+				keyObject = _this.keys[key];
 
 			if (keyObject === undefined)
 				return;
@@ -97,10 +108,11 @@ exports.Factory.setup = function()
 			bnc.setNetworkStatus(keyObject.account, keyObject.network, status);
 			// it appears we've either timed out or the sockets been closed, update the status
 			// factory will take care of a reconnection if its a timeout or anything else
-		})
-		.on('failed', function(key)
+		}
+		else if (message == 'failed')
 		{
-			var keyObject = _this.keys[key];
+			var key = data.key,
+				keyObject = _this.keys[key];
 
 			if (keyObject === undefined)
 				return;
@@ -113,9 +125,13 @@ exports.Factory.setup = function()
 
 			system.networkLog(keyObject.account, keyObject.network, 'FAILED to connected to ' + keyObject.object.server + ':' + keyObject.object.port);
 			// log this action
-		})
-		.on('irc', function(key, e, args)
+		}
+		else if (message == 'irc')
 		{
+			var key = data.key,
+				e = data.event,
+				args = data.args;
+
 			if (_this.keys[key] == undefined && _this.tempKeys[key] == undefined)
 				return;
 			// alert
@@ -131,9 +147,6 @@ exports.Factory.setup = function()
 				{
 					var uid = server.client_data[keyObject.account].networks[keyObject.network].ident;
 						uid = (uid == null) ? keyObject.object.userName : uid;
-
-					_this.ipem.broadcast('register ident', args[0].port, keyObject.object.port, uid);
-					// register the ident
 				}
 				// do some checking here, we don't want any crashes.
 			}
@@ -144,16 +157,8 @@ exports.Factory.setup = function()
 				ircHandler.handleEvents(keyObject.account, keyObject.network, e, args);
 			}
 			// handle all irc events
-		})
-		.on('ping', function()
-		{
-			_this.ipem.sendTo([this.from], 'pong');
-		})
-		.on('error', function(error)
-		{
-			
-		})
-		.start();
+		}
+	});
 };
 
 /*
@@ -176,9 +181,7 @@ exports.Factory.hash = function(account, network)
  */
 exports.Factory.send = function(key, command, args)
 {
-	var _this = this;
-
-	_this.ipem.sendToGrandMaster('rpc', key, command, args);
+	child.send({message: 'rpc', data: {key: key, command: command, args: args}});
 	// send the rpc command
 };
 
@@ -189,9 +192,7 @@ exports.Factory.send = function(key, command, args)
  */
 exports.Factory.destroy = function(key)
 {
-	var _this = this;
-	
-	_this.ipem.sendToGrandMaster('destroy', key);
+	child.send({message: 'destroy', data: {key: key}});
 	// send the command
 };
 
@@ -213,7 +214,7 @@ exports.Factory.create = function(account, network, ircObject)
 	};
 	// store a temp key
 
-	_this.ipem.sendToGrandMaster('initial validate', _this.tempKeys[key]);
+	child.send({message: 'initial validate', data: {keyObject: _this.tempKeys[key]}});
 	// call initial validate, this will let us know whether we have a real object or not
 
 	return key;

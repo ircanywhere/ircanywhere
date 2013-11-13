@@ -54,7 +54,7 @@ function main(argv)
 		console.log(' ');
 		// display some fancy stuff, logo etc.
 
-		startFactory();
+		startBackend();
 		// first on the line is irc-factory, if successful, the rest will be started in sequence
 	}
 }

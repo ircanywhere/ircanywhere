@@ -23,7 +23,6 @@
 		"express": "2.5.8",
 		"forever-monitor": "*",
 		"function-queue": "0.0.12",
-		"ipevents": "git://github.com/ircanywhere/node-ipevents.git",
 		"mongoose": "3.5.5",
 		"node-syslog": "*",
 		"socket.io": "0.8.7",
