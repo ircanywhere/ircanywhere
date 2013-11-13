@@ -85,217 +85,185 @@ d.run(function()
 	config.factory.socket.onlyConnect = false;
 	// override this
 
-	var pingTimers = {},
-		timeoutTimers = {};
-
-	ipem
-		.options(config.factory)
-		.on('pong', function()
+	process
+		.on('message', function(m)
 		{
-			clearTimeout(timeoutTimers[this.from]);
-			// clear any old timers
-		})
-		.on('identd connected', function(pid)
-		{
-			identDaemon = pid;
-		})
-		.on('register ident', function(local, remote, uid)
-		{
-			ipem.sendTo([identDaemon], 'register ident', local, remote, uid);
-		})
-		.on('remove ident', function(local, remote, uid)
-		{
-			ipem.sendTo([identDaemon], 'remove ident', uid);
-		})
-		.on('online', function()
-		{
-			var _this = this;
+			// m is the JSON object coming, ask it what type of message is, and get the data
+			var message = m.message.toLowerCase(),
+				data = m.data;
 
-			if (this.pids.length <= 1)
-				return;
-
-			ipem.sendTo([_this.from], 'connected', _this.from, ipem.pid);
-			ipem.sendTo([_this.from], 'identd connected', identDaemon);
-			// also relay out anything else any other processes need, in this case "identd connected"
-
-			clearInterval(pingTimers[_this.from]);
-			// clear any old timers
-
-			pingTimers[_this.from] = setInterval(function()
+			if (message == 'pong')
 			{
-				ipem.sendTo([_this.from], 'ping', +new Date());
-				timeoutTimers[_this.from] = setTimeout(function()
+				clearTimeout(timeoutTimers[this.from]);
+				// clear any old timers
+			}
+			else if (message == 'online')
+			{
+				process.send({message: 'connected'});
+				// send a message back confirming the connection
+				// taken out ping timers, no need to do it now that we're using node's built in child_process
+				// API, this handles it all very nicely.
+			}
+			else if (message == 'create')
+			{
+				var keyObject = data.keyObject;
+
+				fqueue.push(function(callback)
 				{
-					ipem.disconnect([_this.from]);
-					// reconnect here
-				}, 10000);
-				// wait 10 seconds, if no reply, reconnect
+					if (typeof keyObject != 'object' || keyObject == null || (keyObject != null && (keyObject.object == undefined || keyObject.key == undefined)))
+						return false;
+					// invalid key object
 
-			}, 60000);
-			// create a new one
-		})
-		.on('offline', function()
-		{
-			clearInterval(pingTimers[this.from]);
-			// clear any old timers
-		})
-		.on('create', function(keyObject)
-		{
-			var _this = this;
-			
-			fqueue.push(function(callback)
+					var key = keyObject.key;
+						clientPool[key] = new irc.Client(keyObject.object);
+					// setup anf irc client
+
+					clientPool[key].queue = [];
+					// set some variables
+
+					clientPool[key].events.onAny(function()
+					{
+						if (stack.length > 10)
+							stack.pop();
+						// pop the first element
+
+						stack.push({key: key, event: this.event, args: arguments});
+						// push to the queue stack
+
+						if (clientPool[key] != undefined)
+							process.send({message: 'irc', data: {key: this.event, arguments: arguments}});
+						// send it under one event, so we can easily monitor it elsewhere
+					});
+
+					clientPool[key].events.on('close', function()
+					{
+						process.send({message: 'closed', data: {key: key, timeout: false}});
+						// emit an event to tell any processes that a connection has been closed
+					});
+
+					clientPool[key].events.on('timeout', function()
+					{
+						if (clientPool[key] != undefined && typeof clientPool[key].connect == 'function')
+							clientPool[key].connect();
+						// reconnect
+
+						process.send({message: 'closed', data: {key: key, timeout: true}});
+						// emit an event to tell any processes that a connection has been closed
+						// the timeout value is true in this case which indicates a timeout
+					});
+
+					clientPool[key].events.on('abort', function()
+					{
+						if (clientPool[key] == undefined)
+							return false;
+						// invalid client
+
+						clientPool[key].destroy(function()
+						{
+							clientPool[key] = null;
+							delete clientPool[key];
+							// null the socket and remove it from the client pool
+
+							process.send({message: 'closed', data: {key: key, timeout: false}});
+							process.send({message: 'failed', data: {key: key}});
+							// connection failed, not being throttled just failed to connect the
+							// maximum number of times so let's just sack it off.
+						});
+					});
+
+					clientPool[key].events.on('registered', function()
+					{
+						process.send({message: 'created', data: {keyObject: keyObject}});
+						// send created when we know the client has actually registered and irc is working
+						// not just an open socket, or a command to say the socket is open
+					});
+					// bind events to it
+
+					setTimeout(function()
+					{
+						callback();
+					
+					}, 1000);
+					// wait 1 second before attempting to connect a new client
+				});
+			}
+			else if (message == 'destroy')
 			{
-				if (typeof keyObject != 'object' || keyObject == null || (keyObject != null && (keyObject.object == undefined || keyObject.key == undefined)))
+				var key = data.key;
+
+				if (clientPool[key] == undefined)
+					return false;
+				// invalid key, send an error
+
+				clientPool[key].destroy(function()
+				{
+					clientPool[key] = null;
+					delete clientPool[key];
+					// null the socket and remove it from the client pool
+
+					process.send({message: 'closed', data: {key: key, timeout: false}});
+					process.send({message: 'destroyed', data: {key: key}});
+				});
+			}
+			else if (message == 'initial validate')
+			{
+				var keyObject = data.keyObject;
+
+				if (typeof keyObject != 'object' || (keyObject.object == undefined || keyObject.key == undefined))
 					return false;
 				// invalid key object
 
-				var key = keyObject.key;
-					clientPool[key] = new irc.Client(keyObject.object);
-				// setup anf irc client
+				process.send({message: 'initial validate', data: {keyObject: keyObject, valid: (!(clientPool[keyObject.key] == undefined))}});
+				// validate key
 
-				clientPool[key].queue = [];
-				clientPool[key].process = [_this.from];
-				// set some variables
+				if (clientPool[keyObject.key] == undefined)
+					return;
 
-				clientPool[key].events.onAny(function()
+				clientPool[keyObject.key].ping();
+				// ping to check if the connection is alive, if it isn't we'll
+				// know within 30 seconds and the timeout event will be emitted
+
+				for (var i in clientPool[keyObject.key].queue)
 				{
-					if (stack.length > 10)
-						stack.pop();
-					// pop the first element
+					var item = clientPool[keyObject.key].queue[i];
+					
+					process.send({message: 'irc', data: {key: item.key, arguments: item.args}});
+					// send any queued items down
 
-					stack.push({key: key, event: this.event, args: arguments});
-					// push to the queue stack
-
-					if (clientPool[key] != undefined)
-						ipem.sendTo(clientPool[key].process, 'irc', key, this.event, arguments);
-					// send it under one event, so we can easily monitor it elsewhere
-				});
-
-				clientPool[key].events.on('close', function()
-				{
-					ipem.sendTo([_this.from], 'closed', key, false);
-					// emit an event to tell any processes that a connection has been closed
-				});
-
-				clientPool[key].events.on('timeout', function()
-				{
-					if (clientPool[key] != undefined && typeof clientPool[key].connect == 'function')
-						clientPool[key].connect();
-					// reconnect
-
-					ipem.sendTo([_this.from], 'closed', key, true);
-					// emit an event to tell any processes that a connection has been closed
-					// the last value is true in this case which indicates a timeout
-				});
-
-				clientPool[key].events.on('abort', function()
-				{
-					if (clientPool[key] == undefined)
-						return false;
-					// invalid client
-
-					clientPool[key].destroy(function()
-					{
-						clientPool[key] = null;
-						delete clientPool[key];
-						// null the socket and remove it from the client pool
-
-						ipem.sendTo([this.from], 'closed', key, false);
-						ipem.sendTo([_this.from], 'failed', key);
-						// connection failed, not being throttled just failed to connect the
-						// maximum number of times so let's just sack it off.
-					});
-				});
-
-				clientPool[key].events.on('registered', function()
-				{
-					ipem.sendTo([_this.from], 'created', keyObject);
-					// send created when we know the client has actually registered and irc is working
-					// not just an open socket, or a command to say the socket is open
-				});
-				// bind events to it
-
-				setTimeout(function() {
-					callback();
-				}, 1000);
-				// wait 1 second before attempting to connect a new client
-			});
-		})
-		.on('destroy', function(key)
-		{
-			if (clientPool[key] == undefined)
-				return false;
-			// invalid key, send an error
-
-			clientPool[key].destroy(function()
-			{
-				clientPool[key] = null;
-				delete clientPool[key];
-				// null the socket and remove it from the client pool
-
-				ipem.sendTo([this.from], 'closed', key, false);
-				ipem.sendTo([this.from], 'destroyed', key);
-			});
-		})
-		.on('validate', function(key)
-		{
-			ipem.sendTo([this.from], 'validate', key, (!(clientPool[key] == undefined)));
-			// validate key
-		})
-		.on('initial validate', function(keyObject)
-		{
-			if (typeof keyObject != 'object' || (keyObject.object == undefined || keyObject.key == undefined))
-				return false;
-			// invalid key object
-
-			if (clientPool[keyObject.key] != undefined)
-				clientPool[keyObject.key].process = [this.from];
-
-			ipem.sendTo([this.from], 'initial validate', keyObject, (!(clientPool[keyObject.key] == undefined)));
-			// validate key
-
-			if (clientPool[keyObject.key] == undefined)
-				return;
-
-			clientPool[keyObject.key].ping();
-			// ping to check if the connection is alive, if it isn't we'll
-			// know within 30 seconds and the timeout event will be emitted
-
-			for (var i in clientPool[keyObject.key].queue)
-			{
-				var item = clientPool[keyObject.key].queue[i];
-				
-				ipem.sendTo([this.from], 'irc', item.key, item.event, item.args);
-				// send any queued items down
-
-				delete item;
+					delete item;
+				}
 			}
-		})
-		.on('rpc', function(key, command, args)
-		{
-			if (clientPool[key] == undefined)
-				return false;
-			// invalid key, send an error
-
-			if (clientPool[key][command] == undefined)
-				return false;
-			// invalid command
-
-			clientPool[key][command].apply(clientPool[key], args);
-			// we execute this, however we don't get a callback
-		})
-		.on('error', function(error)
-		{
-			if (new RegExp('Can not push to [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}\: Process not found.', 'i').test(error.message))
+			else if (message == 'rpc')
 			{
-				var item = stack[stack.length - 1];
+				var key = data.key,
+					command = data.command,
+					args = data.args;
 
-				if (item !== undefined && clientPool[item.key] !== undefined)
-					clientPool[item.key].queue.push(item);
-				// get last item and push it to the queue
+				if (clientPool[key] == undefined)
+					return false;
+				// invalid key, send an error
+
+				if (clientPool[key][command] == undefined)
+					return false;
+				// invalid command
+
+				clientPool[key][command].apply(clientPool[key], args);
+				// we execute this, however we don't get a callback
 			}
-			// cant push to a certain process
-		})
-		.start();
+			else if (message == 'error')
+			{
+				var error = data.error;
+
+				if (new RegExp('Can not push to [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}\: Process not found.', 'i').test(error.message))
+				{
+					var item = stack[stack.length - 1];
+
+					if (item !== undefined && clientPool[item.key] !== undefined)
+						clientPool[item.key].queue.push(item);
+					// get last item and push it to the queue
+				}
+				// cant push to a certain process
+			}
+		});
 });
 // run this in the domain

@@ -2,6 +2,7 @@ logs/
 node_modules/
 _build/
 venv/
+npm-debug.log
 server.crt
 server.csr
 server.key
