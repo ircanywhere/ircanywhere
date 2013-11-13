@@ -50,7 +50,7 @@ var pkg = require('../../package.json'),
 	bnc = require('./bnc').BNC,
 	server = require('./server').Server,
 	system = require('./system').System,
-	replyFor = require('../../lib/codes');
+	replyFor = require('../lib/codes');
 
 /*
  * IrcHandler::handleEvents

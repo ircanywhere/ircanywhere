@@ -19,7 +19,7 @@
 */
 
 var arguments = process.argv.splice(2),
-	config = require('../../' + arguments[0]),
+	config = require('../../../' + arguments[0]),
 	winston = require('winston'),
 	domain = require('domain'),
 	fs = require('fs'),
@@ -37,8 +37,8 @@ var arguments = process.argv.splice(2),
 winston.loggers.add('error', 
 {
 	file: {
-		filename: '../../logs/factory.error.log',
-		dirname: __dirname + '/../../logs',
+		filename: '../../../logs/factory.error.log',
+		dirname: __dirname + '/../../../logs',
 		timestamp: true,
 		json: false,
 		maxsize: 1048576

@@ -55,48 +55,17 @@ function main(argv)
 		// display some fancy stuff, logo etc.
 
 		startBackend();
-		// first on the line is irc-factory, if successful, the rest will be started in sequence
+		// no more 3 sequence start ups now, irc-backend boots everything needed
 	}
-}
-
-function startFactory()
-{
-	notice('[notice] attempting to fork and start irc-factory with forever');
-	var client = new (forever.Monitor)('lib/factory.js', {
-		max: 3,
-		silent: true,
-		sourceDir: 'irc-factory',
-		logFile: 'logs/factory.forever.log',
-		outFile: 'logs/factory.forever.log',
-		errFile: 'logs/factory.error.log',
-		options: [program.config]
-	});
-
-	client.on('start', function()
-	{
-		setTimeout(function()
-		{
-			success('[success] irc-factory successfully started');
-			startBackend();
-
-		}, 3000);
-	});
-
-	client.on('exit', function ()
-	{
-		error('[error] irc-factory has failed to start, please check logs/factory.error.log or logs/factory.forever.log');
-	});
-
-	client.start();
 }
 
 function startBackend()
 {
 	notice('[notice] attempting to fork and start irc-backend with forever');
-	var client = new (forever.Monitor)('lib/server.js', {
+	var client = new (forever.Monitor)('server.js', {
 		max: 3,
 		silent: true,
-		sourceDir: 'irc-backend',
+		sourceDir: 'src/backend',
 		logFile: 'logs/backend.forever.log',
 		outFile: 'logs/backend.forever.log',
 		errFile: 'logs/backend.error.log',

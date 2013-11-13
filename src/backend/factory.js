@@ -32,7 +32,7 @@ exports.Factory.setup = function()
 		ircHandler = require('./irc_handler').IrcHandler,
 		_this = this;
 
-	child = child_process.fork('irc-factory/lib/factory', [server.configFile], {silent: false});
+	child = child_process.fork('src/factory/lib/factory', [server.configFile], {silent: false});
 
 	child.on('message', function(m)
 	{
