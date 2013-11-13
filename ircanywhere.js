@@ -1,4 +1,3 @@
-
 var pkjson = require('./package.json'),
 	async = require('async'),
 	clc = require('cli-color'),
@@ -6,6 +5,7 @@ var pkjson = require('./package.json'),
 	forever = require('forever-monitor'),
 	util = require('util'),
 	fs = require('fs'),
+	derby = require('derby'),
 	error = function(text) { util.log(clc.red(text)); process.exit(1) },
 	warn = function(text) { util.log(clc.yellow(text)) };
 	success = function(text) { util.log(clc.green(text)) },
@@ -54,72 +54,9 @@ function main(argv)
 		console.log(' ');
 		// display some fancy stuff, logo etc.
 
-		startBackend();
+		derby.run(__dirname + '/lib/server');
 		// no more 3 sequence start ups now, irc-backend boots everything needed
 	}
 }
 
-function startBackend()
-{
-	notice('[notice] attempting to fork and start irc-backend with forever');
-	var client = new (forever.Monitor)('server.js', {
-		max: 3,
-		silent: true,
-		sourceDir: 'src/backend',
-		logFile: 'logs/backend.forever.log',
-		outFile: 'logs/backend.forever.log',
-		errFile: 'logs/backend.error.log',
-		options: [program.config]
-	});
-
-	client.on('start', function()
-	{
-		setTimeout(function()
-		{
-			success('[success] irc-backend successfully started');
-			startFrontend();
-
-		}, 3000);
-	});
-
-	client.on('exit', function ()
-	{
-		error('[error] irc-backend has failed to start, please check logs/backend.error.log or logs/backend.forever.log');
-	});
-
-	client.start();
-}
-
-function startFrontend()
-{
-	notice('[notice] attempting to fork and start frontend flask server with forever');
-	var client = new (forever.Monitor)(['python', 'runserver.py'], {
-		max: 3,
-		silent: true,
-		sourceDir: 'frontend',
-		pidFile: 'frontend.pid',
-		logFile: 'logs/frontend.output.log',
-		outFile: 'logs/frontend.output.log',
-		errFile: 'logs/frontend.output.log'
-	});
-
-	client.on('start', function()
-	{
-		setTimeout(function()
-		{
-			success('[success] frontend successfully started');
-			notice('[exiting] fully started up, now exiting');
-			process.exit(0);
-
-		}, 3000);
-	});
-
-	client.on('exit', function ()
-	{
-		error('[error] frontend has failed to start, please check logs/frontend.output.log');
-	});
-
-	client.start();
-}
-
-main(process.argv);
+main(process.argv);	

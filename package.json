@@ -3,7 +3,7 @@
 	"description": "IRCAnywhere",
 	"version": "0.2.0",
 	"author": "IRCAnywhere <support@ircanywhere.com>",
-	"main": "run.js",
+	"main": "ircanywhere.js",
 	"contributors": [
 		{
 			"name": "Ricki Hastings",
@@ -18,10 +18,11 @@
 		"express": "~3.2.5",
 		"redis": "~0.8.3",
 		"livedb-mongo": "~0.2.0",
+		"racer": "0.5.12",
 		"racer-browserchannel": "~0.1.0",
 		"connect-mongo": "~0.3.2",
 		"derby-ui-boot": "0.1.x",
-		// old packages below
+
 		"async": "*",
 		"cli-color": "*",
 		"cron": "1.0.1",
