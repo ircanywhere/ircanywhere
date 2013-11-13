@@ -1,7 +1,7 @@
 {
 	"name": "ircanywhere",
 	"description": "IRCAnywhere",
-	"version": "0.1.2",
+	"version": "0.2.0",
 	"author": "IRCAnywhere <support@ircanywhere.com>",
 	"main": "run.js",
 	"contributors": [
@@ -14,17 +14,22 @@
 		"start":  "ircanywhere.js"
 	},
 	"dependencies": {
-		"asyncblock": "2.1.13",
+		"derby": "0.5.x",
+		"express": "~3.2.5",
+		"redis": "~0.8.3",
+		"livedb-mongo": "~0.2.0",
+		"racer-browserchannel": "~0.1.0",
+		"connect-mongo": "~0.3.2",
+		"derby-ui-boot": "0.1.x",
+		// old packages below
 		"async": "*",
 		"cli-color": "*",
 		"cron": "1.0.1",
-		"commander": "1.1.1",
+        "commander": "1.1.1",
 		"eventemitter2": "0.4.11",
-		"express": "2.5.8",
 		"forever-monitor": "*",
 		"function-queue": "0.0.12",
 		"mongoose": "3.5.5",
-		"node-syslog": "*",
 		"socket.io": "0.8.7",
 		"winston": "git://github.com/flatiron/winston.git"
 	},

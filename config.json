@@ -2,21 +2,5 @@
 	"hostname": "irc.anywhere",
 	"endpoint": "http://localhost:3000",
 	"port": 3000,
-	"database": "localhost/ircanywhere",
-	"api": {
-		"authentication": "sw4f3fcwxw32u4ywe8xm483y84yx"
-	},
-	"factory": {
-		"restart": true,
-		"delayRestart": 0,
-		"useSocket": true,
-		"socket": {
-			"onlyConnect": true,
-			"socketPath": null,
-			"port": 7200,
-			"host": "localhost",
-			"reconnect": true,
-			"delayReconnect": 1000
-		}
-	}
+	"database": "localhost/ircanywhere"
 }

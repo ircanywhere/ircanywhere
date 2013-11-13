@@ -1,3 +1,0 @@
-[submodule "lib/asyncblock"]
-	path = lib/asyncblock
-	url = git://github.com/scriby/asyncblock.git
