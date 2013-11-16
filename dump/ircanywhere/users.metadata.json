@@ -1,1 +1,0 @@
-{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "ircanywhere.users", "name" : "_id_" }, { "v" : 1, "key" : { "account" : 1 }, "unique" : true, "ns" : "ircanywhere.users", "dropDups" : 1, "background" : 1, "name" : "account" } ] }

@@ -3,11 +3,5 @@
 	"endpoint": "http://localhost:3000",
 	"port": 3000,
 	"database": "localhost/ircanywhere",
-	"db2": "mongodb://localhost:27017/ircanywhere2-0",
-	"redis": {
-		"hostname": "localhost",
-		"port": "6379",
-		"password": "",
-		"cloud_url": ""
-	}
+	"db2": "mongodb://localhost:27017/ircanywhere2-0"
 }

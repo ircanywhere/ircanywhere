@@ -1,1 +1,0 @@
-{ "indexes" : [ { "v" : 1, "key" : { "user" : 1, "userSource" : 1 }, "unique" : true, "ns" : "ircanywhere.system.users", "name" : "user_1_userSource_1" }, { "v" : 1, "key" : { "_id" : 1 }, "ns" : "ircanywhere.system.users", "name" : "_id_" } ] }

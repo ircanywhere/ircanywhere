@@ -54,7 +54,7 @@ function main(argv)
 		console.log(' ');
 		// display some fancy stuff, logo etc.
 
-		derby.run(__dirname + '/lib/server');
+		derby.run(__dirname + '/src/server');
 		// no more 3 sequence start ups now, irc-backend boots everything needed
 	}
 }

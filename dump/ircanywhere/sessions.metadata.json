@@ -1,1 +1,0 @@
-{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "ircanywhere.sessions", "name" : "_id_" }, { "v" : 1, "key" : { "account" : 1 }, "ns" : "ircanywhere.sessions", "background" : 1, "name" : "account" }, { "v" : 1, "key" : { "node_id" : 1 }, "ns" : "ircanywhere.sessions", "background" : 1, "name" : "node_id" } ] }
