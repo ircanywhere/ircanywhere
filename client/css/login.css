@@ -1,0 +1,147 @@
+/* login page styles */
+
+div#banner
+{
+	margin-top: 42px;
+	background: #2E323B;
+	z-index: 2000;
+}
+
+div#banner-inner
+{
+	width: 950px;
+	margin: 0 auto;
+}
+
+	div#banner div.banner-left
+	{
+		float: left;
+		padding: 0 0 0 14px;
+	}
+
+		div#banner div.banner-left h1
+		{
+			font-size: 54px;
+			font-weight: 500;
+			color: #fff;
+			margin: 35px 0 20px 30px;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+			text-rendering: optimizeLegibility;
+		}
+
+		div#banner div.banner-left h2
+		{
+			font-size: 34px;
+			font-weight: 500;
+			color: #fff;
+			margin: 30px 0 35px 30px;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+			text-rendering: optimizeLegibility;
+		}
+
+		div#banner div.banner-left h3
+		{
+			font-size: 20px;
+			font-weight: 600;
+			color: #fff;
+			margin: 0 30px;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+			text-rendering: optimizeLegibility;
+		}
+
+		div#banner div.banner-left a.btn
+		{
+			margin: 30px;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+		}
+
+	div#banner div.banner-right
+	{
+		float: right;
+		width: 320px;
+		padding: 20px 24px 30px 0;
+	}
+
+		div#login-box
+		{
+			padding: 0;
+			margin: 10px 10px 0 10px;
+			background: #fff;
+			border-right: 1px solid #D9D9D9;
+			border-bottom: 1px solid #D9D9D9;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			-ms-border-radius: 3px;
+			-o-border-radius: 3px;
+		}
+
+			div#login-box form, div#login-box fieldset 
+			{
+				padding: 0;
+				margin: 0;
+			}
+
+			div#login-box div.box
+			{
+				padding: 0 10px;
+				margin: 0;
+				clear: both;
+			}
+
+			div#login-box div.actions 
+			{
+				padding: 10px;
+				margin: 0;
+				background: #F2FCFF;
+				clear: both;
+				-webkit-border-radius: 0 0 3px 3px;
+				-moz-border-radius: 0 0 3px 3px;
+				-ms-border-radius: 0 0 3px 3px;
+				-o-border-radius: 0 0 3px 3px;
+			}
+
+				div.actions-no-rounded
+				{
+					padding: 10px;
+					margin: 0;
+					background: #F2FCFF;
+					clear: both;
+				}
+
+			div#login-box h5
+			{
+				color: #404040;
+				font-weight: bold;
+				line-height: 36px;
+				font-size: 14px;
+				padding: 0;
+				margin: 0 0 5px 0;
+			}
+
+			div#login-box div.field
+			{
+				width: 275px;
+				margin-bottom: 10px;
+			}
+
+			div#login-box input.login-input
+			{
+				width: 263px;
+			}
+
+			div#login-box input.login-input:focus
+			{
+				border-color: rgba(82, 168, 236, 0.8);
+				outline: 0;
+				color: #000;
+			}
+
+			a#forgot-password-link
+			{
+				margin-left: 12px;
+			}
+
+			input#login
+			{
+				margin-top: -3px;
+			}

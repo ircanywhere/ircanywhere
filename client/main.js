@@ -1,11 +1,17 @@
-Template.hello.greeting = function () {
-	return "Welcome to myapp.";
+Template.login.create = function () {
+	Session.set('forgotPasswordHidden', true);
 };
 
-Template.hello.events({
-	'click input' : function () {
-	  // template data, if any, is available in 'this'
-	  if (typeof console !== 'undefined')
-		console.log("You pressed the button");
+Template.login.visibility = function () {
+	return (Session.get('forgotPasswordHidden')) ? 'hide' : 'show';
+};
+
+Template.login.events({
+	'click a#forgot-password-link' : function (event, template) {
+		var currentStatus = Session.get('forgotPasswordHidden');
+		Session.set('forgotPasswordHidden', !currentStatus);
+		// basically just grab the current status and reverse it to create a toggle effect.
+
+		return false;
 	}
 });
