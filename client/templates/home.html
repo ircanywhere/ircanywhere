@@ -1,0 +1,176 @@
+<head>
+	<title>{{ title }}</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
+	<meta name="keywords" content="IRC, Bouncer, Webclient, IRC Client, BNC" />
+</head>
+
+<body>
+	<div id="main-holder" class="clear">
+		<div class="topbar clear main">
+			<ul id="main-menu">
+				<li class="logo"><a href="{{ base_url }}">IRCAnywhere</a></li>
+				<li><a href="{{ base_url }}signup">Signup</a></li>
+			</ul>
+			<div class="topbar inner"></div>
+		</div>
+		{{> login}}
+		<div id="main-footer">
+			<p><a href="{{ base_url }}signup">Signup</a> &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
+			<p>© 2013 IRCAnywhere. All rights reserved.</p>
+		</div>
+	</div>
+</body>
+
+<template name="login">
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h1>IRCAnywhere</h1>
+				<h3>IRC on the web, no matter where you are.</h3>
+				<a href="{{ base_url }}signup" class="btn primary large">Sign up for a free account now</a>
+			</div>
+			<div class="banner-right">
+				<div id="login-box">
+					<form method="post" id="login-form"><fieldset>
+						<div class="box">
+							<h5>Login</h5>
+							<div id="login-error">{{ error }}</div>
+							<div class="field"><input class="login-input" id="login-username" name="login-username" type="text" value="Username or Email Address" /></div>
+							<div class="field"><input class="login-input" id="login-password" name="login-password" type="password" value="Password" /></div>
+						</div>
+						<div class="actions">
+							<input class="btn primary" id="login" name="login" value="Login" type="submit" /><a href="#" id="forgot-password-link" class="btn secondary">Forgot password?</a>
+						</div>
+					</fieldset></form>
+					<form method="post" id="reset-form"><fieldset>
+						<div id="forgot-password" class="box {{ visibility }}">
+							<h5>Forgot Password</h5>
+							<div id="reset-response"></div>
+							<div class="field"><input class="login-input" id="reset-email" name="reset-email" type="text" value="Email Address" /></div>
+						</div>
+						<div id="forgot-password-actions" class="actions hide">
+							<input class="btn primary" id="reset" name="reset" value="Reset" type="submit" />
+						</div>
+					</fieldset></form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="register">
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h2>Sign up to IRCAnywhere</h2>
+			</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="main-inner">
+			<form method="post" id="signup-form"><fieldset>
+			<div class="clear modal-body">
+				<div class="left">
+					{% if open %}
+						<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
+
+						<div id="message-holder"></div>
+
+						<div class="clearfix">
+							<label for="your-name">Your Name</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="irc-nickname">IRC Nickname</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="irc-nickname" name="irc-nickname" type="text" tabindex="2" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="email-address">Email Address</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="3" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid email address.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="username">Username</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="username" name="username" type="text" tabindex="4" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your username you will use to login, must be between 4 and 25 characters.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="password">Password</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="password" name="password" type="password" tabindex="5" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, between 6 and 25 characters.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<label for="password">Confirm Password</label>
+							<div class="input">
+								<div class="field">
+									<input class="xlarge" id="confirm-password" name="confirm-password" type="password" tabindex="5" />
+								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, again.">?</a></span>
+							</div>
+						</div>
+
+						<div class="clearfix">
+							<div class="input">
+								<div class="field">
+									<input type="submit" class="btn primary" value="Sign up to IRCAnywhere" tabindex="6" />
+								</div>
+							</div>
+						</div>
+					{% else %}
+						<p class="large">New signups are currently closed.</p>
+					{% endif %}
+				</div>
+				<div class="right">
+					{% if open %}
+						<h3>What we offer.</h3>
+						<div class="indent">
+							<h5>BNC</h5>
+							<p class="large">Our service keeps you connected to your networks when you close your browser so you don't miss out on a thing!</p>
+							<h5>Secure SSL</h5>
+							<p class="large">Connect to IRC over SSL for better security.</p>
+						</div>
+						<h3>Coming soon.</h3>
+						<div class="indent">
+							<h5>Connect from an IRC Client</h5>
+							<p class="large">We are focused on creating a great web interface for IRC, however we are planning on adding the ability to connect to your clients through a traditional IRC Client.</p>
+							<h5>Downloading and searching logs.</h5>
+							<p class="large">We are working on the ability to directly search your logs from the web interface and also download them as formatted text files.</p>
+						</div>
+					{% else %}
+						<h3>What we offer.</h3>
+						<div class="indent">
+							<h5>BNC</h5>
+							<p class="large">Our service keeps you connected to your networks when you close your browser so you don't miss out on a thing!</p>
+							<h5>Secure SSL</h5>
+							<p class="large">Connect to IRC over SSL for better security.</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+			</fieldset></form>
+		</div>
+	</div>
+</template>

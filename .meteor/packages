@@ -5,4 +5,5 @@
 
 autopublish
 standard-app-packages
-accounts-ui
+accounts-base
+accounts-password
