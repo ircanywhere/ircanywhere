@@ -1,0 +1,8 @@
+{
+	"hostname": "irc.anywhere",
+	"port": 3000,
+	"db2": "mongodb://localhost:27017/ircanywhere2-0",
+	"public": {
+		"enableRegistrations": true
+	}
+}

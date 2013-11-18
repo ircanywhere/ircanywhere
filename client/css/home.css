@@ -1,3 +1,120 @@
+/* homepage styles */
+
+div#main
+{
+	border-top: 1px solid #eee;
+	background: white;
+}
+
+	div#main-inner
+	{
+		width: 922px;
+		margin: 0 auto;
+		padding: 20px 14px 30px 14px;
+	}
+
+	div#main-inner div.modal-header,
+	div#main-inner div.modal-header-top
+	{
+		border-bottom: 1px solid #eee;
+		padding: 0 5px 15px 5px;
+		margin-bottom: 25px;
+	}
+
+	div#main-inner div.modal-header-top
+	{
+		border-bottom: 0;
+		border-top: 1px solid #eee;
+		padding: 20px 5px 0 5px;
+		margin-top: 20px;
+		text-align: center;
+	}
+
+		div#main-inner div.modal-header h3
+		{
+			font-weight: bold;
+			margin: 0;
+			padding: 0;
+		}
+
+			div#main-inner div.modal-header h2.dimmed,
+			div#main-inner div.modal-header-top h2.dimmed { color: #808080; }
+
+		div#main-inner div.modal-header h2,
+		div#main-inner div.modal-header-top h2
+		{
+			display: inline-block;
+			font-weight: bold;
+			font-size: 20px;
+		}
+
+		div#main-inner div.modal-header h3,
+		div#main-inner div.modal-header-top h3
+		{
+			display: inline-block;
+			padding: 0 0 0 20px;
+			font-size: 15px;
+			font-weight: bold;
+			color: #808080;
+		}
+
+	div#main-inner div.modal-body div.left,
+	div#main-inner div.modal-body div.left-set,
+	div#main-inner div.modal-body div.right,
+	div.modal-body div.right-set
+	{
+		float: left;
+		width: 48%;
+	}
+
+		div#main-inner div.modal-body div.left
+		{
+			padding-right: 20px;
+			border-right: 1px solid #eee;
+		}
+
+		div#main-inner div.modal-body div.right
+		{
+			width: 46%;
+			padding-left: 20px;
+		}
+
+		div#main-inner div.modal-body div.indent
+		{
+			margin-left: 10px;
+		}
+
+		div#main-inner div.modal-body ul
+		{
+			list-style-type: disc;
+			margin: 0;
+			font-size: 12px;
+			line-height: 18px;
+		}
+
+			div.block-message ul
+			{
+				margin: 0 0 0 20px!important;
+			}
+
+		div#main-inner div.modal-body p
+		{
+			font-size: 12px;
+			line-height: 18px;
+			margin-bottom: 13px;
+			text-align: justify;
+		}
+
+		div#main-inner div.modal-body p.indent
+		{
+			margin-left: 20px!important;
+		}
+
+		div#main-inner div.modal-body h3
+		{
+			font-weight: bold;
+		}
+
 /* login page styles */
 
 div#banner
@@ -145,3 +262,36 @@ div#banner-inner
 			{
 				margin-top: -3px;
 			}
+
+/* signup styles */
+
+div.row.signup
+{
+	border-bottom: 0;
+	border-top: 1px solid #eee;
+	padding: 20px 5px 0 5px;
+	margin-top: 20px;
+	text-align: center;
+}
+
+	div.row.signup h3
+	{
+		font-weight: bold;
+		font-size: 20px;
+		display: inline-block;
+		margin-right: 20px;
+		color: #000;
+	}
+
+	div.row.signup .btn
+	{
+		display: inline-block;
+		margin-left: 20px;
+	}
+
+	div.modal-body p.large
+	{
+		font-size: 14px!important;
+		line-height: 1.5!important;
+		margin-bottom: 25px!important;
+	}

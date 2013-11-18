@@ -1,37 +1,36 @@
-Template.login.visibility = function () {
-	return (Session.get('login.forgotpassword')) ? 'hide' : 'show';
-};
-
 Template.login.events({
 	'focus input#login-username' : function (e, t) {
-		if (e.target.value == 'Username or Email Address')
-			e.target.value = '';
+		if ($(e.target).val() == 'Username or Email Address')
+			$(e.target).val('');
 	},
 
 	'focus input#login-password' : function (e, t) {
-		if (e.target.value == 'Password')
-			e.target.value = '';
+		if ($(e.target).val() == 'Password')
+			$(e.target).val('');
 	},
 
 	'focus input#reset-email' : function (e, t) {
-		if (e.target.value == 'Email Address')
-			e.target.value = '';
+		if ($(e.target).val() == 'Email Address')
+			$(e.target).val('');
 	},
 
-	'blur input#reset-email' : function (e, t) {
-		if (e.target.value == '')
-			e.target.value = 'Email Address';
+	'blur input#login-username' : function (e, t) {
+		if ($(e.target).val() == '')
+			$(e.target).val('Username or Email Address');
 	},
 
 	'blur input#login-password' : function (e, t) {
-		if (e.target.value == '')
-			e.target.value = 'Password';
+		if ($(e.target).val() == '')
+			$(e.target).val('Password');
+	},
+
+	'blur input#reset-email' : function (e, t) {
+		if ($(e.target).val() == '')
+			$(e.target).val('Email Address');
 	},
 
 	'click a#forgot-password-link' : function (e, t) {
-		var currentStatus = Session.get('login.forgotpassword');
-		Session.set('login.forgotpassword', !currentStatus);
-		// basically just grab the current status and reverse it to create a toggle effect.
+		t.find('#forgot-password').toggle();
 
 		return false;
 	},
@@ -39,17 +38,18 @@ Template.login.events({
 	'submit form#login-form': function (e, t) {
 		e.preventDefault();
 
-		var username = t.find('#login-username').value,
-			password = t.find('#login-password').value;
+		var username = t.find('#login-username').val(),
+			password = t.find('#login-password').val();
 		// retrieve input fields
 
 		Meteor.loginWithPassword(username, password, function (err) {
 			if (err) {
-				t.find('#login-error').innerHTML = '<div class="alert-message block-message error">User details incorrect</div>';
+				t.find('#login-error').show();
 				// it seems there was an error, possibly user not found
 				// or password was incorrect, lets notify the user
 			}
 			else {
+				t.find('#login-error').hide();
 				// the user has been logged in
 			}
 		});

@@ -37,7 +37,9 @@
 					<form method="post" id="login-form"><fieldset>
 						<div class="box">
 							<h5>Login</h5>
-							<div id="login-error"></div>
+							<div id="login-error" class="hide">
+								<div class="alert-message block-message error">User details incorrect</div>
+							</div>
 							<div class="field"><input class="login-input" id="login-username" name="login-username" type="text" value="Username or Email Address" /></div>
 							<div class="field"><input class="login-input" id="login-password" name="login-password" type="password" value="Password" /></div>
 						</div>
@@ -46,7 +48,7 @@
 						</div>
 					</fieldset></form>
 					<form method="post" id="reset-form"><fieldset>
-						<div id="forgot-password" class="box {{visibility}}">
+						<div id="forgot-password" class="box hide">
 							<h5>Forgot Password</h5>
 							<div id="reset-response"></div>
 							<div class="field"><input class="login-input" id="reset-email" name="reset-email" type="text" value="Email Address" /></div>
@@ -73,7 +75,7 @@
 			<form method="post" id="signup-form"><fieldset>
 			<div class="clear modal-body">
 				<div class="left">
-					{% if open %}
+					{{#if signupOpen}}
 						<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
 
 						<div id="message-holder"></div>
@@ -139,12 +141,12 @@
 								</div>
 							</div>
 						</div>
-					{% else %}
+					{{else}}
 						<p class="large">New signups are currently closed.</p>
-					{% endif %}
+					{{/if}}
 				</div>
 				<div class="right">
-					{% if open %}
+					{{#if signupOpen}}
 						<h3>What we offer.</h3>
 						<div class="indent">
 							<h5>BNC</h5>
@@ -159,7 +161,7 @@
 							<h5>Downloading and searching logs.</h5>
 							<p class="large">We are working on the ability to directly search your logs from the web interface and also download them as formatted text files.</p>
 						</div>
-					{% else %}
+					{{else}}
 						<h3>What we offer.</h3>
 						<div class="indent">
 							<h5>BNC</h5>
@@ -167,7 +169,7 @@
 							<h5>Secure SSL</h5>
 							<p class="large">Connect to IRC over SSL for better security.</p>
 						</div>
-					{% endif %}
+					{{/if}}
 				</div>
 			</div>
 			</fieldset></form>

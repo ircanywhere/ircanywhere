@@ -956,3 +956,114 @@ div#main-footer
 		{
 			text-decoration: underline;
 		}
+
+/* tooltips */
+
+div.tooltip
+{
+	position: absolute;
+	z-index: 1030;
+	display: block;
+	visibility: visible;
+	font-size: 11px;
+	line-height: 1.4;
+	opacity: 0;
+	filter: alpha(opacity=0);
+	width: auto!important;
+}
+
+div.tooltip.in
+{
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
+div.tooltip.top
+{
+	margin-top: -10px;
+	padding: 5px 0!important;
+}
+
+div.tooltip.right
+{
+	margin-left: 10px;
+	padding: 0 5px!important;
+}
+
+div.tooltip.bottom
+{
+	margin-top: 10px;
+	padding: 5px 0!important;
+}
+
+div.tooltip.left
+{
+	margin-left: -10px;
+	padding: 0 5px!important;
+}
+
+.tooltip-inner
+{
+	background-color: #000000;
+	color: white;
+	max-width: 200px;
+	padding: 4px 8px;
+	text-align: left;
+	text-decoration: none;
+}
+
+.tooltip-arrow
+{
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+}
+
+.tooltip.top .tooltip-arrow
+{
+	bottom: 0;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px 5px 0;
+	border-top-color: #000000;
+}
+
+.tooltip.right .tooltip-arrow
+{
+	top: 50%;
+	left: 0;
+	margin-top: -5px;
+	border-width: 5px 5px 5px 0;
+	border-right-color: #000000;
+}
+
+.tooltip.left .tooltip-arrow
+{
+	top: 50%;
+	right: 0;
+	margin-top: -5px;
+	border-width: 5px 0 5px 5px;
+	border-left-color: #000000;
+}
+
+.tooltip.bottom .tooltip-arrow
+{
+	top: 0;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 0 5px 5px;
+	border-bottom-color: #000000;
+}
+
+span.tooltip, span.tt-tooltip
+{
+	font-family: Tahoma;
+	padding: 10px 0 0 8px;
+	font-size: 12px;
+	display: inline-block;
+	float: left;
+}
+
+	span.tt-tooltip a, span.tooltip a { color: #00458C; font-weight: bold; }

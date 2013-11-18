@@ -19,6 +19,9 @@ Router.map(function () {
 	this.route('signup', {
 		path: '/signup',
 		template: 'signup',
-		layoutTemplate: 'index'
+		layoutTemplate: 'index',
+		data: {
+			signupOpen: Meteor.settings.public.enableRegistrations
+		}
 	});
 });
