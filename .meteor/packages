@@ -7,3 +7,4 @@ autopublish
 standard-app-packages
 accounts-base
 accounts-password
+iron-router

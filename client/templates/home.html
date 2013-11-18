@@ -1,27 +1,28 @@
 <head>
-	<title>{{ title }}</title>
+	<title>{{title}}</title>
 
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
 	<meta name="keywords" content="IRC, Bouncer, Webclient, IRC Client, BNC" />
 </head>
 
-<body>
+<template name="index">
 	<div id="main-holder" class="clear">
 		<div class="topbar clear main">
 			<ul id="main-menu">
-				<li class="logo"><a href="{{ base_url }}">IRCAnywhere</a></li>
-				<li><a href="{{ base_url }}signup">Signup</a></li>
+				<li class="logo"><a href="{{pathFor 'home'}}">IRCAnywhere</a></li>
+				<li><a href="{{pathFor 'signup'}}">Signup</a></li>
 			</ul>
 			<div class="topbar inner"></div>
 		</div>
-		{{> login}}
+		{{yield}}
+		</div>
 		<div id="main-footer">
-			<p><a href="{{ base_url }}signup">Signup</a> &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
+			<p><a href="{{pathFor 'signup'}}">Signup</a> &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
 			<p>© 2013 IRCAnywhere. All rights reserved.</p>
 		</div>
 	</div>
-</body>
+</template>
 
 <template name="login">
 	<div id="banner">
@@ -29,14 +30,14 @@
 			<div class="banner-left">
 				<h1>IRCAnywhere</h1>
 				<h3>IRC on the web, no matter where you are.</h3>
-				<a href="{{ base_url }}signup" class="btn primary large">Sign up for a free account now</a>
+				<a href="{{pathFor 'signup'}}" class="btn primary large">Sign up for a free account now</a>
 			</div>
 			<div class="banner-right">
 				<div id="login-box">
 					<form method="post" id="login-form"><fieldset>
 						<div class="box">
 							<h5>Login</h5>
-							<div id="login-error">{{ error }}</div>
+							<div id="login-error"></div>
 							<div class="field"><input class="login-input" id="login-username" name="login-username" type="text" value="Username or Email Address" /></div>
 							<div class="field"><input class="login-input" id="login-password" name="login-password" type="password" value="Password" /></div>
 						</div>
@@ -45,7 +46,7 @@
 						</div>
 					</fieldset></form>
 					<form method="post" id="reset-form"><fieldset>
-						<div id="forgot-password" class="box {{ visibility }}">
+						<div id="forgot-password" class="box {{visibility}}">
 							<h5>Forgot Password</h5>
 							<div id="reset-response"></div>
 							<div class="field"><input class="login-input" id="reset-email" name="reset-email" type="text" value="Email Address" /></div>
@@ -57,10 +58,9 @@
 				</div>
 			</div>
 		</div>
-	</div>
 </template>
 
-<template name="register">
+<template name="signup">
 	<div id="banner">
 		<div id="banner-inner" class="clear">
 			<div class="banner-left">
