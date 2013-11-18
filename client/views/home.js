@@ -1,36 +1,30 @@
+var focusEmail = function (e, t) {
+		if (e.target.value == 'Email Address')
+			e.target.value = '';
+	},
+	blurEmail = function (e, t) {
+		if (e.target.value == '')
+			e.target.value = 'Email Address';
+	};
+
 Template.login.events({
-	'focus input#login-username' : function (e, t) {
-		if ($(e.target).val() == 'Username or Email Address')
-			$(e.target).val('');
+	'focus input#login-email': focusEmail,
+	'focus input#reset-email': focusEmail,
+	'blur input#login-email': blurEmail,
+	'blur input#reset-email': blurEmail,
+
+	'focus input#login-password': function (e, t) {
+		if (e.target.value == 'Password')
+			e.target.value = '';
 	},
 
-	'focus input#login-password' : function (e, t) {
-		if ($(e.target).val() == 'Password')
-			$(e.target).val('');
+	'blur input#login-password': function (e, t) {
+		if (e.target.value == '')
+			e.target.value = 'Password';
 	},
 
-	'focus input#reset-email' : function (e, t) {
-		if ($(e.target).val() == 'Email Address')
-			$(e.target).val('');
-	},
-
-	'blur input#login-username' : function (e, t) {
-		if ($(e.target).val() == '')
-			$(e.target).val('Username or Email Address');
-	},
-
-	'blur input#login-password' : function (e, t) {
-		if ($(e.target).val() == '')
-			$(e.target).val('Password');
-	},
-
-	'blur input#reset-email' : function (e, t) {
-		if ($(e.target).val() == '')
-			$(e.target).val('Email Address');
-	},
-
-	'click a#forgot-password-link' : function (e, t) {
-		t.find('#forgot-password').toggle();
+	'click a#forgot-password-link': function (e, t) {
+		$('#forgot-password,#forgot-password-actions').toggle();
 
 		return false;
 	},
@@ -38,9 +32,12 @@ Template.login.events({
 	'submit form#login-form': function (e, t) {
 		e.preventDefault();
 
-		var username = t.find('#login-username').val(),
-			password = t.find('#login-password').val();
+		var username = t.find('#login-email').value,
+			password = t.find('#login-password').value;
 		// retrieve input fields
+
+		username = username.replace(/^\s*|\s*$/g, "");
+		// validation
 
 		Meteor.loginWithPassword(username, password, function (err) {
 			if (err) {
@@ -57,5 +54,20 @@ Template.login.events({
         // Meteor.loginWithPassword() function
 
         return false;
+	}
+});
+
+Template.signup.events({
+	'submit form#signup-form': function(e, t) {
+		e.preventDefault();
+
+		var name = t.find('#your-name').value,
+			nickname = t.find('#irc-nickname').value,
+			email = t.find('#email-address').value,
+			password = t.find('#password').value;
+
+		var email = Helpers.trimInput(email);
+
+		
 	}
 });
