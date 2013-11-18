@@ -636,8 +636,13 @@ body
 		webkit-box-shadow: none;
 	}
 
-	.alert-message.block-message ul, .alert-message.block-message p { margin-right: 30px; margin-top: 2px; }
-	.alert-message.block-message ul { margin-bottom: 0; }
+	.alert-message.block-message ul, .alert-message.block-message p
+	{
+		margin-right: 30px;
+		margin-bottom: 0;
+		margin-top: 2px;
+	}
+	
 	.alert-message.block-message li { color: #404040; }
 	.alert-message.block-message .alert-actions { margin-top: 5px; }
 	.alert-message.block-message.error, .alert-message.block-message.success, .alert-message.block-message.info

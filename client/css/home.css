@@ -97,7 +97,12 @@ div#main
 				margin: 0 0 0 20px!important;
 			}
 
-		div#main-inner div.modal-body p
+			div.block-message p
+			{
+				font-size: 12px;
+			}
+
+		div#main-inner div.modal-body > div > p
 		{
 			font-size: 12px;
 			line-height: 18px;
