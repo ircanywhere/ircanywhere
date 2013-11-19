@@ -47,12 +47,12 @@ Template.login.events({
 
 		Meteor.loginWithPassword(username, password, function (err) {
 			if (err) {
-				t.find('#login-error').show();
+				$(t.find('#login-error')).show();
 				// it seems there was an error, possibly user not found
 				// or password was incorrect, lets notify the user
 			}
 			else {
-				t.find('#login-error').hide();
+				$(t.find('#login-error')).hide();
 				// the user has been logged in
 			}
 		});
@@ -101,10 +101,11 @@ Template.signup.events({
 				Session.set('signup.ircNickname', nickname);
 				Session.set('signup.emailAddress', email);
 				Session.set('signup.errors', result.errors);
+				Session.set('signup.success', '');
 				// reset some fields to keep our user happy
 			} else {
 				Session.set('signup.errors', []);
-				Session.set('signup.success', 'Your account has been sucessfully created, you will recieve an email shortly');
+				Session.set('signup.success', result.successMessage);
 			}
 		});
 	}

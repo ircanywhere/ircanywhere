@@ -1,8 +1,13 @@
 {
-	"hostname": "irc.anywhere",
-	"port": 3000,
-	"db2": "mongodb://localhost:27017/ircanywhere2-0",
 	"public": {
+		"pageTitle": "IRCAnywhere",
 		"enableRegistrations": true
+	},
+	"server": {
+		"email": {
+			"forceValidation": true,
+			"siteName": "IRCAnywhere",
+			"from": "IRCAnywhere <no-reply@ircanywhere.com>"
+		}
 	}
 }
