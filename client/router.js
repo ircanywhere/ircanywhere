@@ -2,7 +2,7 @@ Router.map(function () {
 	
 	var before = function() {
 		if (!Meteor.user()) {
-			this.render('login');
+			Router.go('/');
 			this.stop();
 			// stop what we're doing and show the user the login template
 		}
@@ -21,7 +21,15 @@ Router.map(function () {
 		template: 'signup',
 		layoutTemplate: 'index',
 		data: {
-			signupOpen: Meteor.settings.public.enableRegistrations
+			signupOpen: Meteor.settings.public.enableRegistrations,
+			errors: Session.get('signup.errors')
 		}
 	});
+
+	this.route('verify', {
+		path: '/verify-email/:token',
+		action: function() {
+			Meteor.Actions.verifyUser(this, this.params['token']);
+		}
+	})
 });

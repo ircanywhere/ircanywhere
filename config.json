@@ -4,6 +4,7 @@
 		"enableRegistrations": true
 	},
 	"server": {
+		"secure": false,
 		"email": {
 			"forceValidation": true,
 			"siteName": "IRCAnywhere",
