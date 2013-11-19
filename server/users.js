@@ -21,19 +21,6 @@ Accounts.urls.enrollAccount = function (token) {
 };
 // override the verify url functions etc to get our own link formats
 
-Accounts.emailTemplates.verifyEmail.subject = function (user) {
-    return 'Welcome to ' + Accounts.emailTemplates.siteName;
-};
-
-Accounts.emailTemplates.verifyEmail.text = function(user, url) {
-	// grab the token from the url
-	return "Hello " + user.profile.name + ", welcome to " + Accounts.emailTemplates.siteName + "\n\n" +
-		   "To verify your account please visit the url below:\n\n" +
-		   url + "\n\n"
-		   "Thanks";
-};
-// setup our default email template
-
 Meteor.methods({
 	registerUser: function(name, nickname, email, password, confirmPassword) {
 
