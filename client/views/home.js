@@ -1,3 +1,15 @@
+Template.login.forgotPassword = function() {
+	return (Session.get('login.forgotPasswordBox')) ? 'show' : 'hide';
+};
+
+Template.login.errors = function() {
+	return Session.get('login.errors');
+};
+
+Template.login.resetErrors = function() {
+	return Session.get('login.resetErrors');
+};
+
 Template.login.events({
 	'focus input#login-email': function (e, t) {
 		if (e.target.value == 'Email Address')
@@ -30,7 +42,8 @@ Template.login.events({
 	},
 
 	'click a#forgot-password-link': function (e, t) {
-		$('#forgot-password,#forgot-password-actions').slideToggle('fast');
+		var current = Session.get('login.forgotPasswordBox');
+		Session.set('login.forgotPasswordBox', !current);
 
 		return false;
 	},
@@ -38,20 +51,20 @@ Template.login.events({
 	'submit form#login-form': function (e, t) {
 		e.preventDefault();
 
-		var username = t.find('#login-email').value,
+		var email = t.find('#login-email').value,
 			password = t.find('#login-password').value;
 		// retrieve input fields
 
-		username = username.replace(/^\s*|\s*$/g, "");
+		email = Meteor.Helpers.trimInput(email);
 		// validation
 
-		Meteor.loginWithPassword(username, password, function (err) {
+		Meteor.loginWithPassword(email, password, function (err) {
 			if (err) {
+				Session.set('login.errors', err.reason);
 				$(t.find('#login-error')).show();
 				// it seems there was an error, possibly user not found
 				// or password was incorrect, lets notify the user
-			}
-			else {
+			} else {
 				$(t.find('#login-error')).hide();
 				// the user has been logged in
 			}
@@ -60,6 +73,26 @@ Template.login.events({
         // Meteor.loginWithPassword() function
 
         return false;
+	},
+
+	'submit form#reset-form': function(e, t) {
+		e.preventDefault();
+
+		var email = t.find('#reset-email').value;
+		// grab input field
+
+		email = Meteor.Helpers.trimInput(email);
+		// validation
+
+		Accounts.forgotPassword({email: email}, function(err) {
+			if (err) {
+				Session.set('login.resetErrors', err.reason);
+				$(t.find('#reset-response')).show();
+			}
+		});
+		// request a password reset link
+
+		return false;
 	}
 });
 

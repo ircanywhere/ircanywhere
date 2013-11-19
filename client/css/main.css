@@ -35,6 +35,9 @@ body
 
 	.clear:after { clear: both; }
 
+	.show { display: block; }
+	.hide { display: none; }
+
 	form .clearfix
 	{
 		margin-bottom: 18px;
@@ -70,8 +73,6 @@ body
 	}
 
 	.pull-left { float: left; }
-	.hide { display: none; }
-	.show { display: block; }
 
 	button, input, select, textarea
 	{
