@@ -33,6 +33,19 @@ Router.map(function () {
 		}
 	});
 
+	this.route('reset', {
+		path: '/reset-password/:token',
+		template: 'reset',
+		layoutTemplate: 'index',
+		data: function() {
+			var token = this.params['token'];
+			return {
+				token: token,
+				errors: []
+			}
+		}
+	});
+
 	this.route('verify', {
 		path: '/verify-email/:token',
 		action: function() { Meteor.Actions.verifyUser(this, this.params['token']) }
