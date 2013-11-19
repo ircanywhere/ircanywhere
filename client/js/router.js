@@ -11,7 +11,7 @@ Router.map(function () {
 			self.stop();
 			// stop what we're doing and show the user the login template
 		} else {
-			Router.go('app');
+			self.stop();
 		}
 	}
 	// this function is basically a blocker which will send the user back
@@ -49,5 +49,5 @@ Router.map(function () {
 	this.route('verify', {
 		path: '/verify-email/:token',
 		action: function() { Meteor.Actions.verifyUser(this, this.params['token']) }
-	})
+	});
 });

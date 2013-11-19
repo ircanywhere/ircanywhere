@@ -84,25 +84,29 @@ Template.login.events({
 	},
 
 	'submit form#login-form': function(e, t) {
-		homeModule.loginFormSubmit(e, t, $('form#login-form').serializeObject());
+		e.preventDefault();
+		homeModule.loginFormSubmit($('form#login-form').serializeObject());
 	},
 
 	'submit form#reset-form': function(e, t) {
-		homeModule.resetFormSubmit(e, t, $('form#reset-form').serializeObject());
+		e.preventDefault();
+		homeModule.resetFormSubmit($('form#reset-form').serializeObject());
 	}
 });
 
 
 Template.signup.events({
 	'submit form#signup-form': function(e, t) {
-		homeModule.signupFormSubmit(e, t, $('form#signup-form').serializeObject());
+		e.preventDefault();
+		homeModule.signupFormSubmit($('form#signup-form').serializeObject());
 	}
 });
 
 
 Template.reset.events({
 	'submit form#reset-password-form': function(e, t) {
-		homeModule.resetPassFormSubmit(e, t, $('form#reset-password-form').serializeObject());
+		e.preventDefault();
+		homeModule.resetPassFormSubmit($('form#reset-password-form').serializeObject());
 	}
 });
 // bind all our events, notice most are submit events which go to functions

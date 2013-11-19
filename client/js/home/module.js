@@ -20,8 +20,7 @@ HomeModule = (function() {
 
 	return Module;
 
-	function loginFormSubmit(e, t, items) {
-		e.preventDefault();
+	function loginFormSubmit(items, callback) {
 
 		var email = items['login-email'],
 			password = items['login-password'];
@@ -39,13 +38,14 @@ HomeModule = (function() {
 				Session.set('login.errors', '');
 				// the user has been logged in
 			}
+
+			if (callback) callback();
 		});
 		// supply the appropriate fields to the
         // Meteor.loginWithPassword() function
 	}
 
-	function resetFormSubmit(e, t, items) {
-		e.preventDefault();
+	function resetFormSubmit(items, callback) {
 
 		var email = items['reset-email'];
 		// grab input field
@@ -60,14 +60,15 @@ HomeModule = (function() {
 				Session.set('login.resetErrors', '');
 				Session.set('login.resetSuccess', 'An email has been sent instructing you how to reset your password');
 			}
+
+			if (callback) callback();
 		});
 		// request a password reset link
 
 		return false;
 	}
 
-	function signupFormSubmit(e, t, items) {
-		e.preventDefault();
+	function signupFormSubmit(items, callback) {
 
 		var name = items['your-name'],
 			nickname = items['irc-nickname'],
@@ -88,14 +89,15 @@ HomeModule = (function() {
 				Session.set('signup.errors', '');
 				Session.set('signup.success', result.successMessage);
 			}
+
+			if (callback) callback();
 		});
 
 		return false;
 	}
 
-	function resetPassFormSubmit(e, t, items) {
-		e.preventDefault();
-
+	function resetPassFormSubmit(items, callback) {
+		
 		var token = items['token'],
 			password = items['#password'],
 			confirmPassword = items['#confirm-password'],
@@ -122,6 +124,8 @@ HomeModule = (function() {
 				Session.set('reset.errors', '');
 				Session.set('reset.success', 'Your password has successfully been changed, you may have to login again');
 			}
+
+			if (callback) callback();
 		});
 	}
 
