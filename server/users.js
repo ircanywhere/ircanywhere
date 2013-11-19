@@ -8,17 +8,24 @@ Accounts.emailTemplates.siteName = Meteor.settings.server.email.siteName;
 Accounts.emailTemplates.from = Meteor.settings.server.email.from;
 // global email templates settings
 
+Accounts.urls.resetPassword = function (token) {
+	return Meteor.absoluteUrl('reset-password/' + token);
+};
+
+Accounts.urls.verifyEmail = function (token) {
+	return Meteor.absoluteUrl('verify-email/' + token);
+};
+
+Accounts.urls.enrollAccount = function (token) {
+	return Meteor.absoluteUrl('enroll-account/' + token);
+};
+// override the verify url functions etc to get our own link formats
+
 Accounts.emailTemplates.verifyEmail.subject = function (user) {
     return 'Welcome to ' + Accounts.emailTemplates.siteName;
 };
 
 Accounts.emailTemplates.verifyEmail.text = function(user, url) {
-	var split = url.split('/'),
-		token = url[url.length - 1],
-		url = Meteor.absoluteUrl('verify/' + token, {
-			secure: Meteor.settings.server.secure
-		});
-
 	// grab the token from the url
 	return "Hello " + user.profile.name + ", welcome to " + Accounts.emailTemplates.siteName + "\n\n" +
 		   "To verify your account please visit the url below:\n\n" +
