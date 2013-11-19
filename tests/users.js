@@ -12,8 +12,10 @@ suite('Users', function() {
 
 		client.eval(function() {
 			Meteor.loginWithPassword('john.smith@aol.com', '123456', function() {
-				Posts.insert({title: 'hello'});
+				done();
 			});
 		});
 	});
+
+	
 });
