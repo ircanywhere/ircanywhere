@@ -1,17 +1,18 @@
 Router.configure({
-	layoutTemplate: 'index',
-	notFoundTemplate: 'notfound'
+	layoutTemplate: 'app',
+	notFoundTemplate: 'notfound',
+	data: {
+		title: Meteor.settings.public.pageTitle
+	}
 });
 
 Router.map(function () {
 	
 	var before = function(self) {
 		if (!Meteor.user()) {
-			self.render('login');
 			self.stop();
+			Router.go('/login');
 			// stop what we're doing and show the user the login template
-		} else {
-			self.stop();
 		}
 	}
 	// this function is basically a blocker which will send the user back
@@ -19,8 +20,19 @@ Router.map(function () {
 
 	this.route('home', {
 		path: '/',
+		template: 'main',
+		before: function() {
+			before(this)
+		}
+	});
+
+	this.route('login', {
+		path: '/login',
+		template: 'login',
 		layoutTemplate: 'index',
-		before: function() { before(this) }		
+		data: {
+			title: Meteor.settings.public.pageTitle
+		}
 	});
 
 	this.route('signup', {
@@ -28,6 +40,7 @@ Router.map(function () {
 		template: 'signup',
 		layoutTemplate: 'index',
 		data: {
+			title: Meteor.settings.public.pageTitle + ' - Sign up',
 			signupOpen: Meteor.settings.public.enableRegistrations,
 			errors: Session.get('signup.errors')
 		}
@@ -40,6 +53,7 @@ Router.map(function () {
 		data: function() {
 			var token = this.params['token'];
 			return {
+				title: Meteor.settings.public.pageTitle + ' - Reset Password',
 				token: token,
 				errors: []
 			}

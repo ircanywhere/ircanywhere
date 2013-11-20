@@ -21,6 +21,13 @@ Accounts.urls.enrollAccount = function (token) {
 };
 // override the verify url functions etc to get our own link formats
 
+Meteor.users.deny({
+	insert: function () { return true; },
+	update: function () { return true; },
+	remove: function () { return true; }
+});
+// deny users being updated by the client
+
 Meteor.methods({
 	registerUser: function(name, nickname, email, password, confirmPassword) {
 
