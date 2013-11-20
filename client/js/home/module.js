@@ -35,7 +35,10 @@ HomeModule = (function() {
 				// it seems there was an error, possibly user not found
 				// or password was incorrect, lets notify the user
 			} else {
+				Meteor.call('onUserLogin');
+				
 				Session.set('login.errors', '');
+				Router.go('/');
 				// the user has been logged in
 			}
 
@@ -128,5 +131,4 @@ HomeModule = (function() {
 			if (callback) callback();
 		});
 	}
-
 }());
