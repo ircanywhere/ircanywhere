@@ -3,14 +3,20 @@ IRCFactory = (function() {
 
 	var Factory = {
 
+		clients: {},
+		// this object will store our irc clients
+
 		init: function() {
 
 			this.process = Meteor.require('irc-factory').process;
-			// first we fork 
-
 			// this is what we do to initialise the irc factory
 			// this will basically be the client end of ircanywhere/irc-factory package
 			// docs on how that work are in the README file
+		},
+
+		create: function(key, object) {
+
+
 		}
 	};
 

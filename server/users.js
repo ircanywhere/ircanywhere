@@ -65,7 +65,17 @@
 			// seems we have some errors, lets just return them
 
 			try {
-				userId = Accounts.createUser({email: email, password: password, profile: {name: name, nickname: nickname}});
+				userId = Accounts.createUser({
+					email: email,
+					password: password,
+					profile: {
+						name: name,
+						nickname: nickname,
+						flags: {
+							newUser: true
+						}
+					}
+				});
 				// try and create the user
 			} catch (e) {
 				output.failed = true;
@@ -98,7 +108,14 @@
 		},
 
 		onUserLogin: function() {
-			console.log(this.userId);
+			var me = Meteor.user(),
+				myNetworks = Networks.find({userId: this.UserId}).fetch();
+			// find user's networks
+
+			if (me.profile.flags.newUser && myNetworks.length == 0) {
+				Meteor.networkManager.addNetwork(me, {});
+			}
+			// user is new and has no networks, create one for them.
 		}
 	});
 }());
