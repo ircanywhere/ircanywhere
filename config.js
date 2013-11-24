@@ -1,10 +1,10 @@
-{
+CONFIG = {
 	"public": {
 		"pageTitle": "IRCAnywhere",
 		"enableRegistrations": true
 	},
 	"server": {
-		"secure": false,
+		"ssl": false,
 		"email": {
 			"forceValidation": true,
 			"siteName": "IRCAnywhere",
