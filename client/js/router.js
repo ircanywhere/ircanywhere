@@ -2,7 +2,7 @@ Router.configure({
 	layoutTemplate: 'app',
 	notFoundTemplate: 'notfound',
 	data: {
-		title: Meteor.settings.public.pageTitle
+		title: Meteor.config.pageTitle
 	}
 });
 
@@ -31,7 +31,7 @@ Router.map(function () {
 		template: 'login',
 		layoutTemplate: 'index',
 		data: {
-			title: Meteor.settings.public.pageTitle
+			title: Meteor.config.pageTitle
 		}
 	});
 
@@ -40,8 +40,8 @@ Router.map(function () {
 		template: 'signup',
 		layoutTemplate: 'index',
 		data: {
-			title: Meteor.settings.public.pageTitle + ' - Sign up',
-			signupOpen: Meteor.settings.public.enableRegistrations,
+			title: Meteor.config.pageTitle + ' - Sign up',
+			signupOpen: Meteor.config.enableRegistrations,
 			errors: Session.get('signup.errors')
 		}
 	});
@@ -53,7 +53,7 @@ Router.map(function () {
 		data: function() {
 			var token = this.params['token'];
 			return {
-				title: Meteor.settings.public.pageTitle + ' - Reset Password',
+				title: Meteor.config.pageTitle + ' - Reset Password',
 				token: token,
 				errors: []
 			}

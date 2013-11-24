@@ -1,0 +1,117 @@
+{
+	/* The following section is the client side configuration settings
+	 * only. Everything outside of this section won't be available
+	 * client side. */
+	"public": {
+		"pageTitle": "IRCAnywhere",
+		/* -- string 
+		 * -- usage: The html title of the application, used in a few other places too
+		 			 defaults to "IRCAnywhere" */
+		
+		"enableRegistrations": true
+		/* -- required
+		 * -- boolean 
+		 * -- usage: Whether to enable registrations or not */
+	},
+
+	/* The following section is the server side configuration settings
+	 * only. These configuration options will only be available on the
+	 * server side. */
+	"server": {
+		"ssl": false,
+		/* -- boolean 
+		 * -- usage: Whether to enable HTTPS or not - you will need certificates
+		 			 defaults to false */
+
+		"email": {
+			"forceValidation": true,
+			/* -- required
+			 * -- boolean 
+			 * -- usage: Whether to enable email validation for new users */
+
+			"siteName": "IRCAnywhere",
+			/* -- string 
+			 * -- usage: The title to use in validation/forgot password emails
+			 			 defaults to "IRCAnywhere" */
+
+			"from": "IRCAnywhere <no-reply@ircanywhere.com>"
+			/* -- required
+			 * -- string 
+			 * -- usage: The email address to send emails from, can be either email@domain.tld
+			 			 or Name <email@domain.tld> */
+		},
+
+		"clientSettings": {
+			"networkLimit": 2,
+			/* -- required
+			 * -- number
+			 * -- usage: Network limit for users, minimum is 1, maximum is 10, at the moment */
+
+			"networkRestriction": "*.verxe.net",
+			/* -- string
+			 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
+			 			 disabled by omitting completely, or setting to "" */
+
+			"identPrefix": "ia"
+			/* -- required
+			 * -- string 
+			 * -- usage: The ident prefix for users, each registered user has it's own ident
+			 			 based on this prefix + a sequential number */
+		},
+
+		"defaultNetwork": {
+			"host": "irc.verxe.net",
+			/* -- required
+			 * -- string 
+			 * -- usage: Hostname of the default network to connect new users to */
+
+			"port": 6667,
+			/* -- required
+			 * -- number
+			 * -- usage: Port to connect the default client to, min 1, max 65535 */
+
+			"realName": "IRC Client",
+			/* -- required
+			 * -- string 
+			 * -- usage: The gecos for default irc clients */
+
+			"autoRejoin": false,
+			/* -- boolean 
+			 * -- usage: Whether to automatically rejoin default clients on kicks
+			 			 defaults to false if omitted */
+
+			"autoConnect": true,
+			/* -- boolean 
+			 * -- usage: Whether to automatically attempt to reconnect clients on any form
+			 			 of disconnection. Default to true if ommited */
+
+			"retryCount": 10,
+			/* -- number
+			 * -- usage: How many times to attempt a reconnect before marking the user as failed
+			 			 has a maxmium of 20 and a minimum of 1. Doesn't take affect if autoConnect
+			 			 is set to false. Can also be omitted completely, defaults to 10 if so */
+
+			"retryDelay": 1000,
+			/* -- number 
+			 * -- usage: How long to wait in ms between retryCount's, defaults to 1000 if ommited
+			 			 has a maximum of 60000 (1m) and 1000 (1s) */
+
+			"secure": false,
+			/* -- boolean 
+			 * -- usage: Whether to use ssl for the default irc client, can be omitted
+			 			 defaults to false if so */
+
+			"password": "",
+			/* -- string
+			 * -- usage: If the server requires a password, enter it here. Leaving it blank
+			 			 if it's a public server with no password */
+
+			"channels": [
+				"#ircanywhere-test channel-password"
+			]
+			/* -- array 
+			 * -- usage: An array of channels to connect to on startup, a space will seperate
+						 any channel keys that need to be entered */
+		}
+	}
+}
