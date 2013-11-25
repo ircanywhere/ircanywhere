@@ -1,3 +1,11 @@
+Meteor.call('getConfig', function(err, result) {
+	Meteor.config = result;
+	// basically we've gotta wait until this function is ran until
+	// we've populated Meteor.config, it was touch and go prior to this
+});
+
+console.log(Meteor.settings);
+
 Router.configure({
 	layoutTemplate: 'app',
 	notFoundTemplate: 'notfound',

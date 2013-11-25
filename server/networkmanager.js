@@ -3,12 +3,21 @@ NetworkManager = (function() {
 
 	var Manager = {
 
+		flags: {
+			connected: 'connected',
+			disconnected: 'disconnected',
+			closed: 'closed',
+			failed: 'failed'
+		},
+
 		init: function() {
 
 			
 		},
 
 		addNetwork: function(user, network) {
+			var self = this;
+
 			network.autoRejoin = (network.autoRejoin === undefined) ? false : network.autoRejoin;
 			network.autoConnect = (network.autoConnect === undefined) ? true : network.autoConnect;
 			network.retryCount = (network.retryCount === undefined) ? 10 : network.retryCount;
@@ -23,7 +32,18 @@ NetworkManager = (function() {
 			// XXX - this looks a bit messy, tidied up at some point? it would be nice
 			//		 if validate could automatically cast these, maybe it can with cast: {}
 
-			
+			network.internal = {
+				userId: user.userId,
+				status: self.flags.disconnected,
+				channels: {},
+				url: network.host + ':' + ((network.secure) ? '+' : '') + network.port
+			}
+			// this stores internal information about the network, it will be available to
+			// the client but they wont be able to edit it, it also wont be able to be enforced
+			// by the config settings or network settings, it's overwritten every time.
+
+			console.log(network);
+			//Networks.insert({})
 		}
 	};
 

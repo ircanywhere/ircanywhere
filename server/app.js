@@ -38,19 +38,18 @@ var data = validate(schema, config, { cast: true });
 // attempt to validate our config file
 
 if (Array.isArray(data)) {
-	console.log(data);
 	process.exit(1);
 } else {
-	Meteor.config = data;
+	Meteor.settings = data;
 }
 // any errors, y/n ?
 
 Meteor.methods({
 	getConfig: function() {
-		if (Meteor.config.public === undefined)
+		if (Meteor.settings.public === undefined)
 			return {}
 		else
-			return Meteor.config.public;
+			return Meteor.settings.public;
 		// expose a function to the client that lets us grab the current
 		// public config, in the client it'll be assigned to CONFIG, and
 		// everything outside of "public" will be inaccessible

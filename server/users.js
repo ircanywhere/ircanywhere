@@ -1,11 +1,11 @@
 Accounts.config({
-	sendVerificationEmail: Meteor.config.server.email.forceValidation,
+	sendVerificationEmail: Meteor.settings.server.email.forceValidation,
 	forbidClientAccountCreation: true
 	// set our default accounts config
 });
 
-Accounts.emailTemplates.siteName = Meteor.config.server.email.siteName;
-Accounts.emailTemplates.from = Meteor.config.server.email.from;
+Accounts.emailTemplates.siteName = Meteor.settings.server.email.siteName;
+Accounts.emailTemplates.from = Meteor.settings.server.email.from;
 // global email templates settings
 
 Accounts.urls.resetPassword = function (token) {
@@ -98,11 +98,11 @@ Meteor.methods({
 
 	onUserLogin: function() {
 		var me = Meteor.user(),
-			myNetworks = Networks.find({userId: this.UserId}).fetch();
+			myNetworks = Networks.find({'internal.userId': this.UserId}).fetch();
 		// find user's networks
 
 		if (me.profile.flags.newUser && myNetworks.length == 0) {
-			Meteor.networkManager.addNetwork(me, Meteor.config.server.defaultNetwork);
+			Meteor.networkManager.addNetwork(me, Meteor.settings.server.defaultNetwork);
 		}
 		// user is new and has no networks, create one for them.
 	}
