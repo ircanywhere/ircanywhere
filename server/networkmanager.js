@@ -1,5 +1,3 @@
-Networks = new Meteor.SmartCollection('networks');
-
 NetworkManager = (function() {
 	"use strict";
 
