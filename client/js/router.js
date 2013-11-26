@@ -1,38 +1,42 @@
 Router.configure({
-	layoutTemplate: 'app',
+	layoutTemplate: 'index',
 	notFoundTemplate: 'notfound'
 });
 
-Router.map(function () {
-	
-	var before = function(self) {
-		if (!Meteor.user()) {
-			self.stop();
-			Router.go('/login');
-			// stop what we're doing and show the user the login template
-		}
+var before = function() {
+	if (!Meteor.user()) {
+		this.stop();
+		Router.go('login');
+		// stop what we're doing and show the user the login template
 	}
-	// this function is basically a blocker which will send the user back
-	// to the homepage template when they're not logged in.
+}
+// this function is basically a blocker which will send the user back
+// to the homepage template when they're not logged in.
 
+
+Router.before(before, {except: ['login', 'signup', 'reset', 'verify']});
+
+Router.map(function () {
 	this.route('home', {
 		path: '/',
 		template: 'main',
-		before: function() {
-			before(this)
-		}
+		layoutTemplate: 'app'
 	});
 
 	this.route('login', {
 		path: '/login',
-		template: 'login',
-		layoutTemplate: 'index'
+		layoutTemplate: 'index',
+		before: function() {
+			if (Meteor.user()) {
+				this.stop();
+				Router.go('home');
+			}
+		}
 	});
 
 	this.route('signup', {
 		path: '/signup',
 		template: 'signup',
-		layoutTemplate: 'index',
 		data: {
 			title: 'Sign up',
 			errors: Session.get('signup.errors')
@@ -42,7 +46,6 @@ Router.map(function () {
 	this.route('reset', {
 		path: '/reset-password/:token',
 		template: 'reset',
-		layoutTemplate: 'index',
 		data: function() {
 			var token = this.params['token'];
 			return {

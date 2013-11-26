@@ -11,8 +11,10 @@ NetworkManager = (function() {
 		},
 
 		init: function() {
-
-			
+			Meteor.publish("networks", function() {
+				return Networks.find({'internal.userId': this.UserId});
+			});
+			// handle our meteor publish collections here
 		},
 
 		addNetwork: function(user, network) {
@@ -33,7 +35,7 @@ NetworkManager = (function() {
 			//		 if validate could automatically cast these, maybe it can with cast: {}
 
 			network.internal = {
-				userId: user.userId,
+				userId: user._id,
 				status: self.flags.disconnected,
 				channels: {},
 				url: network.host + ':' + ((network.secure) ? '+' : '') + network.port
@@ -42,8 +44,7 @@ NetworkManager = (function() {
 			// the client but they wont be able to edit it, it also wont be able to be enforced
 			// by the config settings or network settings, it's overwritten every time.
 
-			console.log(network);
-			//Networks.insert({})
+			//Networks.insert(network);
 		}
 	};
 
