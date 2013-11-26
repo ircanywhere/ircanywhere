@@ -11,8 +11,8 @@ NetworkManager = (function() {
 		},
 
 		init: function() {
-			Meteor.publish("networks", function() {
-				return Networks.find({'internal.userId': this.UserId});
+			Meteor.publish('networks', function() {
+				return Networks.find({'internal.userId': this.userId});
 			});
 			// handle our meteor publish collections here
 		},
@@ -44,7 +44,7 @@ NetworkManager = (function() {
 			// the client but they wont be able to edit it, it also wont be able to be enforced
 			// by the config settings or network settings, it's overwritten every time.
 
-			//Networks.insert(network);
+			Networks.insert(network);
 		}
 	};
 
