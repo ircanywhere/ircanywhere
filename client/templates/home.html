@@ -1,6 +1,6 @@
 <template name="index">
 	<head>
-		<title>{{title}}</title>
+		<title>{{#if title}}IRCAnywhere - {{title}}{{else}}IRCAnywhere{{/if}}</title>
 
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
@@ -150,79 +150,75 @@
 			<form method="post" id="signup-form"><fieldset>
 			<div class="clear modal-body">
 				<div class="left">
-					{{#if signupOpen}}
-						<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
+					<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
 
-						<div id="message-holder">
-							{{#if errors}}
-							<div class="alert-message block-message error">
-								<ul>
-									{{#each errors}}
-									<li>{{this.error}}</li>
-									{{/each}}
-								</ul>
-							</div>
-							{{/if}}
-							{{#if success}}
-							<div class="alert-message block-message success"><p>{{success}}</p></div>
-							{{/if}}
+					<div id="message-holder">
+						{{#if errors}}
+						<div class="alert-message block-message error">
+							<ul>
+								{{#each errors}}
+								<li>{{this.error}}</li>
+								{{/each}}
+							</ul>
 						</div>
+						{{/if}}
+						{{#if success}}
+						<div class="alert-message block-message success"><p>{{success}}</p></div>
+						{{/if}}
+					</div>
 
-						<div class="clearfix">
-							<label for="your-name">Your Name</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" value="{{yourName}}" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a></span>
-							</div>
+					<div class="clearfix">
+						<label for="your-name">Your Name</label>
+						<div class="input">
+							<div class="field">
+								<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" value="{{yourName}}" />
+							</div><span class="tooltip"><a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a></span>
 						</div>
+					</div>
 
-						<div class="clearfix">
-							<label for="irc-nickname">IRC Nickname</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="irc-nickname" name="irc-nickname" type="text" tabindex="2" value="{{ircNickname}}" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a></span>
-							</div>
+					<div class="clearfix">
+						<label for="irc-nickname">IRC Nickname</label>
+						<div class="input">
+							<div class="field">
+								<input class="xlarge" id="irc-nickname" name="irc-nickname" type="text" tabindex="2" value="{{ircNickname}}" />
+							</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a></span>
 						</div>
+					</div>
 
-						<div class="clearfix">
-							<label for="email-address">Email Address</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="3" value="{{emailAddress}}" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid email address.">?</a></span>
-							</div>
+					<div class="clearfix">
+						<label for="email-address">Email Address</label>
+						<div class="input">
+							<div class="field">
+								<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="3" value="{{emailAddress}}" />
+							</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid email address.">?</a></span>
 						</div>
+					</div>
 
-						<div class="clearfix">
-							<label for="password">Password</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="password" name="password" type="password" tabindex="5" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, longer than 6 characters.">?</a></span>
-							</div>
+					<div class="clearfix">
+						<label for="password">Password</label>
+						<div class="input">
+							<div class="field">
+								<input class="xlarge" id="password" name="password" type="password" tabindex="5" />
+							</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, longer than 6 characters.">?</a></span>
 						</div>
+					</div>
 
-						<div class="clearfix">
-							<label for="password">Confirm Password</label>
-							<div class="input">
-								<div class="field">
-									<input class="xlarge" id="confirm-password" name="confirm-password" type="password" tabindex="5" />
-								</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, again.">?</a></span>
-							</div>
+					<div class="clearfix">
+						<label for="password">Confirm Password</label>
+						<div class="input">
+							<div class="field">
+								<input class="xlarge" id="confirm-password" name="confirm-password" type="password" tabindex="5" />
+							</div><span class="tooltip"><a href="#" rel="twipsy" title="Your password, again.">?</a></span>
 						</div>
+					</div>
 
-						<div class="clearfix">
-							<div class="input">
-								<div class="field">
-									<input type="submit" class="btn primary" value="Sign up to IRCAnywhere" tabindex="6" />
-								</div>
+					<div class="clearfix">
+						<div class="input">
+							<div class="field">
+								<input type="submit" class="btn primary" value="Sign up to IRCAnywhere" tabindex="6" />
 							</div>
 						</div>
-					{{else}}
-						<p class="large">New signups are currently closed.</p>
-					{{/if}}
+					</div>
 				</div>
 				<div class="right">
 					{{#if signupOpen}}

@@ -1,17 +1,6 @@
-Meteor.call('getConfig', function(err, result) {
-	Meteor.config = result;
-	// basically we've gotta wait until this function is ran until
-	// we've populated Meteor.config, it was touch and go prior to this
-});
-
-console.log(Meteor.settings);
-
 Router.configure({
 	layoutTemplate: 'app',
-	notFoundTemplate: 'notfound',
-	data: {
-		title: Meteor.config.pageTitle
-	}
+	notFoundTemplate: 'notfound'
 });
 
 Router.map(function () {
@@ -37,10 +26,7 @@ Router.map(function () {
 	this.route('login', {
 		path: '/login',
 		template: 'login',
-		layoutTemplate: 'index',
-		data: {
-			title: Meteor.config.pageTitle
-		}
+		layoutTemplate: 'index'
 	});
 
 	this.route('signup', {
@@ -48,8 +34,7 @@ Router.map(function () {
 		template: 'signup',
 		layoutTemplate: 'index',
 		data: {
-			title: Meteor.config.pageTitle + ' - Sign up',
-			signupOpen: Meteor.config.enableRegistrations,
+			title: 'Sign up',
 			errors: Session.get('signup.errors')
 		}
 	});
@@ -61,7 +46,7 @@ Router.map(function () {
 		data: function() {
 			var token = this.params['token'];
 			return {
-				title: Meteor.config.pageTitle + ' - Reset Password',
+				title: 'Reset Password',
 				token: token,
 				errors: []
 			}

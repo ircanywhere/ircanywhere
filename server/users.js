@@ -1,11 +1,11 @@
 Accounts.config({
-	sendVerificationEmail: Meteor.settings.server.email.forceValidation,
+	sendVerificationEmail: Meteor.config.email.forceValidation,
 	forbidClientAccountCreation: true
 	// set our default accounts config
 });
 
-Accounts.emailTemplates.siteName = Meteor.settings.server.email.siteName;
-Accounts.emailTemplates.from = Meteor.settings.server.email.from;
+Accounts.emailTemplates.siteName = Meteor.config.email.siteName;
+Accounts.emailTemplates.from = Meteor.config.email.from;
 // global email templates settings
 
 Accounts.urls.resetPassword = function (token) {
@@ -26,26 +26,30 @@ Meteor.methods({
 		var output = {failed: false, successMessage: '', errors: []},
 			userId = null;
 
-		name = Meteor.Helpers.trimInput(name);
-		nickname = Meteor.Helpers.trimInput(nickname);
-		email = Meteor.Helpers.trimInput(email);
-		// trim inputs
+		if (!Meteor.config.enableRegistrations) {
+			output.errors.push({error: 'New registrations are currently closed'});
+		} else {
+			name = Meteor.Helpers.trimInput(name);
+			nickname = Meteor.Helpers.trimInput(nickname);
+			email = Meteor.Helpers.trimInput(email);
+			// trim inputs
 
-		if (name == '' || nickname == '' || email == '' || password == '' || confirmPassword == '')
-			output.errors.push({error: 'All fields are required'});
-		// check if the fields have been entered (all are required)
+			if (name == '' || nickname == '' || email == '' || password == '' || confirmPassword == '')
+				output.errors.push({error: 'All fields are required'});
+			// check if the fields have been entered (all are required)
 
-		if (!Meteor.Helpers.isValidName(name))
-			output.errors.push({error: 'The name you have entered is too long'});
-		if (!Meteor.Helpers.isValidNickname(nickname))
-			output.errors.push({error: 'The nickname you have entered is invalid'});
-		if (!Meteor.Helpers.isValidEmail(email))
-			output.errors.push({error: 'The email address you have entered is invalid'});
-		if (!Meteor.Helpers.isValidPassword(password))
-			output.errors.push({error: 'The password you have entered is invalid'});
-		if (password != confirmPassword)
-			output.errors.push({error: 'The passwords you have entered do not match'});
-		// some more validation
+			if (!Meteor.Helpers.isValidName(name))
+				output.errors.push({error: 'The name you have entered is too long'});
+			if (!Meteor.Helpers.isValidNickname(nickname))
+				output.errors.push({error: 'The nickname you have entered is invalid'});
+			if (!Meteor.Helpers.isValidEmail(email))
+				output.errors.push({error: 'The email address you have entered is invalid'});
+			if (!Meteor.Helpers.isValidPassword(password))
+				output.errors.push({error: 'The password you have entered is invalid'});
+			if (password != confirmPassword)
+				output.errors.push({error: 'The passwords you have entered do not match'});
+			// some more validation
+		}
 
 		if (output.errors.length > 0) {
 			output.failed = true;
@@ -74,7 +78,7 @@ Meteor.methods({
 			return output;
 		}
 
-		if (!Meteor.settings.server.email.forceValidation) {
+		if (!Meteor.config.email.forceValidation) {
 			output.successMessage = 'Your account has been successfully created, you may now login';
 			return output;
 		}
@@ -102,7 +106,7 @@ Meteor.methods({
 		// find user's networks
 
 		if (me.profile.flags.newUser && myNetworks.length == 0) {
-			Meteor.networkManager.addNetwork(me, Meteor.settings.server.defaultNetwork);
+			Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
 		}
 		// user is new and has no networks, create one for them.
 	}
