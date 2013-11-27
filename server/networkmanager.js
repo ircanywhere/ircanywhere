@@ -32,7 +32,7 @@ NetworkManager = (function() {
 			// validating them before hand either because app.js takes care of that.
 			// 
 			// XXX - this looks a bit messy, tidied up at some point? it would be nice
-			//		 if validate could automatically cast these, maybe it can with cast: {}
+			//		 if simple-schema could automatically cast these, maybe it can with cast: {}
 
 			network.internal = {
 				userId: user._id,
