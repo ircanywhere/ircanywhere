@@ -21,7 +21,7 @@ NetworkManager = (function() {
 		},
 
 		addNetwork: function(user, network) {
-			var userCount = Meteor.users.find({}).count() + 1,
+			var userCount = Meteor.users.find({}).count(),
 				userName = Meteor.config.clientSettings.userNamePrefix + userCount;
 
 			network.nick = user.profile.nickname + '-';
@@ -31,7 +31,7 @@ NetworkManager = (function() {
 			network.retryCount = (network.retryCount === undefined) ? 10 : network.retryCount;
 			network.retryDelay = (network.retryDelay === undefined) ? 1000 : network.retryDelay;
 			network.secure = (network.secure === undefined) ? false : network.secure;
-			network.password = (network.password === undefined) ? '' : network.password;
+			network.password = (network.password === undefined || network.password === '') ? null : network.password;
 			network.channels = (network.channels === undefined) ? [] : network.channels;
 			// because some settings can be omitted, we're going to set them to
 			// the hard-coded defaults if they are, ok. We don't need to worry about
@@ -71,9 +71,10 @@ NetworkManager = (function() {
 			// we do this because we manually join our channels instead of sending
 			// them into node-irc immediately, because it's crappy and doesn't support passwords
 
+			delete network.internal;
 			network.hostname = Meteor.config.reverseDns;
 			network.channels = [];
-			network.debug = true;
+			network.debug = false;
 			network.floodProtection = false;
 			network.selfSigned = true;
 			network.certExpired = true;
@@ -84,10 +85,6 @@ NetworkManager = (function() {
 
 			Meteor.ircFactory.create(user, network);
 			// tell the factory to create a network
-
-			Networks.update(network._id, {$set: {'internal.status': this.flags.connecting}});
-			// mark the network as connecting, the beauty of meteor comes into play here
-			// no need to send a message to the client, live database YEAH BABY
 		}
 	};
 

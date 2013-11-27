@@ -78,7 +78,7 @@
 		 * -- usage: Whether to automatically attempt to reconnect clients on any form
 		 			 of disconnection. Default to true if ommited */
 
-		"retryCount": 2,
+		"retryCount": 10,
 		/* -- number
 		 * -- usage: How many times to attempt a reconnect before marking the user as failed
 		 			 has a maxmium of 20 and a minimum of 1. Doesn't take affect if autoConnect
