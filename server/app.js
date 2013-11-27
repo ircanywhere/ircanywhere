@@ -1,40 +1,107 @@
 var jsonminify = Meteor.require('jsonminify'),
-	validate = Meteor.require('validate'),
-	raw = Assets.getText('config.json'),
-	config = JSON.parse(jsonminify(raw)),
-	schema = {
-		enableRegistrations: { type: 'boolean', required: true },
-		ssl: { type: 'boolean' },
-		email: {
-			forceValidation: { type: 'boolean', required: true },
-			siteName: { type: 'string' },
-			from: { type: 'string', required: true }
-		},
-		clientSettings: {
-			networkLimit: { type: 'number', min: 1, max: 10, required: true },
-			networkRestriction: { type: 'string' },
-			identPrefix: { type: 'string', required: true }
-		},
-		defaultNetwork: {
-			host: { type: 'string', required: true },
-			port: { type: 'number', min: 1, max: 65535, required: true },
-			realName: { type: 'string', required: true },
-			autoRejoin: { type: 'boolean' },
-			autoReconnect: { type: 'boolean' },
-			retryCount: { type: 'number', min: 1, max: 20 },
-			retryDelay: { type: 'number', min: 1000, max: 60000 },
-			secure: { type: 'boolean' },
-			channels: { type: 'array', values: { type: 'string' } }
-		}
-	};
+	raw = Assets.getText('config.json');
+
+Meteor.config = JSON.parse(jsonminify(raw));
+
+var schema = new SimpleSchema({
+	'enableRegistrations': {
+		type: Boolean,
+		optional: false
+	},
+	'ssl': {
+		type: Boolean,
+		optional: true
+	},
+	'email': {
+		type: Object,
+		optional: false
+	},
+	'email.forceValidation': {
+		type: Boolean,
+		optional: false
+	},
+	'email.siteName': {
+		type: String,
+		optional: true
+	},
+	'email.from': {
+		type: String,
+		optional: false
+	},
+	'clientSettings': {
+		type: Object,
+		optional: false
+	},
+	'clientSettings.networkLimit': {
+		type: Number,
+		min: 1,
+		max: 10,
+		optional: false
+	},
+	'clientSettings.networkRestriction': {
+		type: String,
+		optional: true
+	},
+	'clientSettings.identPrefix': {
+		type: String,
+		optional: false
+	},
+	'defaultNetwork': {
+		type: Object,
+		optional: false
+	},
+	'defaultNetwork.host': {
+		type: String,
+		optional: false
+	},
+	'defaultNetwork.port': {
+		type: Number,
+		min: 1,
+		max: 65535,
+		optional: false
+	},
+	'defaultNetwork.realName': {
+		type: String,
+		optional: false
+	},
+	'defaultNetwork.autoRejoin': {
+		type: Boolean,
+		optional: true
+	},
+	'defaultNetwork.autoRejoin': {
+		type: Boolean,
+		optional: true
+	},
+	'defaultNetwork.autoConnect': {
+		type: Boolean,
+		optional: true
+	},
+	'defaultNetwork.retryCount': {
+		type: Number,
+		min: 1,
+		max: 20,
+		optional: true
+	},
+	'defaultNetwork.retryDelay': {
+		type: Number,
+		min: 1000,
+		max: 60000,
+		optional: true
+	},
+	'defaultNetwork.secure': {
+		type: Boolean,
+		optional: true
+	},
+	'defaultNetwork.password': {
+		type: String,
+		optional: true
+	},
+	'defaultNetwork.channels': {
+		type: [String],
+		optional: true
+	}
+});
 // set up some code to validate our config schema
 
-var data = validate(schema, config, { cast: true });
+check(Meteor.config, schema);
 // attempt to validate our config file
-
-if (Array.isArray(data)) {
-	process.exit(1);
-} else {
-	Meteor.config = data;
-}
-// any errors, y/n ?
