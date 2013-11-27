@@ -8,6 +8,7 @@ NetworkManager = (function() {
 		flags: {
 			connected: 'connected',
 			disconnected: 'disconnected',
+			connecting: 'connecting',
 			closed: 'closed',
 			failed: 'failed'
 		},
@@ -20,8 +21,11 @@ NetworkManager = (function() {
 		},
 
 		addNetwork: function(user, network) {
-			var self = this;
+			var userCount = Meteor.users.find({}).count() + 1,
+				ident = Meteor.config.clientSettings.identPrefix + userCount;
 
+			network.nick = user.profile.nickname + '-';
+			network.ident = ident;
 			network.autoRejoin = (network.autoRejoin === undefined) ? false : network.autoRejoin;
 			network.autoConnect = (network.autoConnect === undefined) ? true : network.autoConnect;
 			network.retryCount = (network.retryCount === undefined) ? 10 : network.retryCount;
@@ -38,7 +42,7 @@ NetworkManager = (function() {
 
 			network.internal = {
 				userId: user._id,
-				status: self.flags.disconnected,
+				status: this.flags.closed,
 				channels: {},
 				url: network.host + ':' + ((network.secure) ? '+' : '') + network.port
 			}
@@ -51,7 +55,40 @@ NetworkManager = (function() {
 			// down the pipe to our client @ this.userId, also by calling insert without
 			// a callback meteor automatically sets up a fiber, blocking the code in users.js
 
+			console.log(network);
+
 			return network;
+		},
+
+		connectNetwork: function(user, network) {
+			for (var channel in network.channels) {
+				var split = channel.split(' '),
+					chan = split[0],
+					pass = (split[1] !== undefined) ? split[1] : '';
+				// split the channel name up
+
+				network.internal.channels[chan] = pass;
+			}
+			// move into network.internal.channels
+			// we do this because we manually join our channels instead of sending
+			// them into node-irc immediately, because it's crappy and doesn't support passwords
+
+			network.channels = [];
+			network.debug = false;
+			network.floodProtection = false;
+			network.selfSigned = true;
+			network.certExpired = true;
+			network.stripColours = false;
+			network.channelPrefxies = '&#';
+			// set some node-irc default settings, channel prefixes is assumed here
+			// but will be confirmed when we get the capabilities back later on
+
+			Meteor.ircFactory.create(user, network);
+			// tell the factory to create a network
+
+			Networks.update(network._id, {$set: {'internal.status': this.flags.connecting}});
+			// mark the network as connecting, the beauty of meteor comes into play here
+			// no need to send a message to the client, live database YEAH BABY
 		}
 	};
 

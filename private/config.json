@@ -46,7 +46,7 @@
 	},
 
 	"defaultNetwork": {
-		"host": "*.verxe.net",
+		"host": "irc.verxe.net",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */

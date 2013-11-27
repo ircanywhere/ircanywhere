@@ -107,13 +107,23 @@ Meteor.methods({
 		var networks = Networks.find({'internal.userId': userId}).fetch();
 		// find user's networks
 
-		if (me.profile.flags.newUser && myNetworks.length == 0) {
+		if (me.profile.flags.newUser && networks.length == 0) {
 			var network = Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
 			networks.push(network);
 		}
 		// user is new and has no networks, create one for them.
 
-		
+		for (netId in networks) {
+			var network = networks[netId],
+				reconnect = false;
+
+			if (network.internal.status == 'closed' || network.internal.status == 'failed')
+				reconnect = true;
+			// check whether we should reconnect or not
+
+			Meteor.networkManager.connectNetwork(me, network);
+			// ok we've got the go ahead now.
+		}
 		// loop through our networks and connect them if need be
 	}
 });
