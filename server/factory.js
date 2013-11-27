@@ -16,7 +16,7 @@ IRCFactory = (function() {
 
 			this.process.on('message', function(m) {
 				console.log(m);
-			})
+			});
 		},
 
 		hash: function(user, network) {
@@ -36,7 +36,7 @@ IRCFactory = (function() {
 			};
 			// store it in the clients object
 
-			this.process.send({message: 'create', data: {key: key, this.clients[key].object}});
+			this.process.send({message: 'create', data: {key: key, ircObject: this.clients[key].object}});
 			// send to the process
 		}
 	};
