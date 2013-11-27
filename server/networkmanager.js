@@ -1,3 +1,5 @@
+
+
 NetworkManager = (function() {
 	"use strict";
 
@@ -44,7 +46,12 @@ NetworkManager = (function() {
 			// the client but they wont be able to edit it, it also wont be able to be enforced
 			// by the config settings or network settings, it's overwritten every time.
 
-			Networks.insert(network);
+			network._id = Networks.insert(network);
+			// insert the network. Just doing this will propogate the change directly
+			// down the pipe to our client @ this.userId, also by calling insert without
+			// a callback meteor automatically sets up a fiber, blocking the code in users.js
+
+			return network;
 		}
 	};
 

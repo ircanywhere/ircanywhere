@@ -101,13 +101,19 @@ Meteor.methods({
 	},
 
 	onUserLogin: function() {
-		var me = Meteor.user(),
-			myNetworks = Networks.find({'internal.userId': this.UserId}).fetch();
+		var userId = this.userId,
+			me = Meteor.user();
+
+		var networks = Networks.find({'internal.userId': userId}).fetch();
 		// find user's networks
 
 		if (me.profile.flags.newUser && myNetworks.length == 0) {
-			Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
+			var network = Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
+			networks.push(network);
 		}
 		// user is new and has no networks, create one for them.
+
+		
+		// loop through our networks and connect them if need be
 	}
 });
