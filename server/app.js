@@ -4,6 +4,10 @@ var jsonminify = Meteor.require('jsonminify'),
 Meteor.config = JSON.parse(jsonminify(raw));
 
 var schema = new SimpleSchema({
+	'reverseDns': {
+		type: String,
+		optional: false
+	},
 	'enableRegistrations': {
 		type: Boolean,
 		optional: false
@@ -42,7 +46,7 @@ var schema = new SimpleSchema({
 		type: String,
 		optional: true
 	},
-	'clientSettings.identPrefix': {
+	'clientSettings.userNamePrefix': {
 		type: String,
 		optional: false
 	},
@@ -50,7 +54,7 @@ var schema = new SimpleSchema({
 		type: Object,
 		optional: false
 	},
-	'defaultNetwork.host': {
+	'defaultNetwork.server': {
 		type: String,
 		optional: false
 	},

@@ -1,4 +1,11 @@
 {
+	"reverseDns": "localhost",
+	/* -- required
+	 * -- string
+	 * -- usage: The reverse DNS of this server, this needs to match exactly for certain features to work
+	             if no reverse dns is setup, enter your ip address in http://mxtoolbox.com/ReverseLookup.aspx
+	             and enter the value in "Domain Name" here. */
+
 	"enableRegistrations": true,
 	/* -- required
 	 * -- boolean 
@@ -38,15 +45,15 @@
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
 		 			 disabled by omitting completely, or setting to "" */
 
-		"identPrefix": "ia"
+		"userNamePrefix": "ia"
 		/* -- required
 		 * -- string 
-		 * -- usage: The ident prefix for users, each registered user has it's own ident
+		 * -- usage: The username prefix for users, each registered user has it's own ident
 		 			 based on this prefix + a sequential number */
 	},
 
 	"defaultNetwork": {
-		"host": "irc.verxe.net",
+		"server": "irc.verxe.net",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */
@@ -71,7 +78,7 @@
 		 * -- usage: Whether to automatically attempt to reconnect clients on any form
 		 			 of disconnection. Default to true if ommited */
 
-		"retryCount": 10,
+		"retryCount": 2,
 		/* -- number
 		 * -- usage: How many times to attempt a reconnect before marking the user as failed
 		 			 has a maxmium of 20 and a minimum of 1. Doesn't take affect if autoConnect

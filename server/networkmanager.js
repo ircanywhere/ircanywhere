@@ -22,10 +22,10 @@ NetworkManager = (function() {
 
 		addNetwork: function(user, network) {
 			var userCount = Meteor.users.find({}).count() + 1,
-				ident = Meteor.config.clientSettings.identPrefix + userCount;
+				userName = Meteor.config.clientSettings.userNamePrefix + userCount;
 
 			network.nick = user.profile.nickname + '-';
-			network.ident = ident;
+			network.userName = userName;
 			network.autoRejoin = (network.autoRejoin === undefined) ? false : network.autoRejoin;
 			network.autoConnect = (network.autoConnect === undefined) ? true : network.autoConnect;
 			network.retryCount = (network.retryCount === undefined) ? 10 : network.retryCount;
@@ -44,7 +44,7 @@ NetworkManager = (function() {
 				userId: user._id,
 				status: this.flags.closed,
 				channels: {},
-				url: network.host + ':' + ((network.secure) ? '+' : '') + network.port
+				url: network.server + ':' + ((network.secure) ? '+' : '') + network.port
 			}
 			// this stores internal information about the network, it will be available to
 			// the client but they wont be able to edit it, it also wont be able to be enforced
@@ -54,8 +54,6 @@ NetworkManager = (function() {
 			// insert the network. Just doing this will propogate the change directly
 			// down the pipe to our client @ this.userId, also by calling insert without
 			// a callback meteor automatically sets up a fiber, blocking the code in users.js
-
-			console.log(network);
 
 			return network;
 		},
@@ -73,8 +71,9 @@ NetworkManager = (function() {
 			// we do this because we manually join our channels instead of sending
 			// them into node-irc immediately, because it's crappy and doesn't support passwords
 
+			network.hostname = Meteor.config.reverseDns;
 			network.channels = [];
-			network.debug = false;
+			network.debug = true;
 			network.floodProtection = false;
 			network.selfSigned = true;
 			network.certExpired = true;

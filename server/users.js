@@ -117,7 +117,7 @@ Meteor.methods({
 			var network = networks[netId],
 				reconnect = false;
 
-			if (network.internal.status == 'closed' || network.internal.status == 'failed')
+			if (network.internal.status == 'closed' || network.internal.status == 'failed' || network.internal.status == 'connecting')
 				reconnect = true;
 			// check whether we should reconnect or not
 

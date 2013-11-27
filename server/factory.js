@@ -9,14 +9,29 @@ IRCFactory = (function() {
 		// this object will store our irc clients
 
 		init: function() {
+			var self = this;
 			this.process = Meteor.require('irc-factory').process;
 			// this is what we do to initialise the irc factory
 			// this will basically be the client end of ircanywhere/irc-factory package
 			// docs on how that work are in the README file
 
 			this.process.on('message', function(m) {
-				console.log(m);
+				var message = m.message.toLowerCase(),
+					data = m.data;
+				// m is the JSON object coming, ask it what type of message is, and get the data
+				
+				switch (message) {
+					case 'created':
+						self.onCreated(data.key, data.ircObject.object);
+						// call the onCreated method
+					default:
+						console.log(m);
+				}
 			});
+		},
+
+		onCreated: function(key, client) {
+			console.log('Connecting', client.nickname, 'to', client.server, client.port, '(', client.secure, ')')
 		},
 
 		hash: function(user, network) {
@@ -36,7 +51,9 @@ IRCFactory = (function() {
 			};
 			// store it in the clients object
 
-			this.process.send({message: 'create', data: {key: key, ircObject: this.clients[key].object}});
+			console.log(network);
+
+			this.process.send({message: 'create', data: {key: key, ircObject: this.clients[key]}});
 			// send to the process
 		}
 	};
