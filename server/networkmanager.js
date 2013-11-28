@@ -1,5 +1,3 @@
-
-
 NetworkManager = (function() {
 	"use strict";
 

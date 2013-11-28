@@ -1,9 +1,8 @@
-var crypto = Meteor.require('crypto')
-
 IRCFactory = (function() {
 	"use strict";
 
-	var Factory = {
+	var crypto = Meteor.require('crypto'),
+		Factory = {
 
 		clients: {},
 		// this object will store our irc clients
