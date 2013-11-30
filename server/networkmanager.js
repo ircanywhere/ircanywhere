@@ -12,10 +12,34 @@ NetworkManager = (function() {
 		},
 
 		init: function() {
+			this.reconnectClients();
+			// reconnect our clients here
+
 			Meteor.publish('networks', function() {
 				return Networks.find({'internal.userId': this.userId});
 			});
 			// handle our meteor publish collections here
+		},
+
+		reconnectClients: function() {
+			var networks = Networks.find({}).fetch();
+			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
+
+			for (var netId in networks) {
+				var network = networks[netId],
+					me = Meteor.users.find(network.internal.userId).fetch(),
+					reconnect = false;
+
+				if (network.internal.status !== this.flags.disconnected)
+					reconnect = true;
+				// check whether we should reconnect or not
+
+				if (reconnect)
+					this.connectNetwork(me, network);
+				// ok we've got the go ahead now.
+			}
+			// now, we need to loop through the networks and do our work on
+			// starting them up individually
 		},
 
 		addNetwork: function(user, network) {
@@ -39,6 +63,7 @@ NetworkManager = (function() {
 			//		 if simple-schema could automatically cast these, maybe it can with cast: {}
 
 			network.internal = {
+				nodeId: Meteor.nodeId,
 				userId: user._id,
 				status: this.flags.closed,
 				channels: {},

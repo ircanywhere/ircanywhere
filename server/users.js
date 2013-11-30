@@ -108,8 +108,6 @@ UserManager = (function() {
 		},
 
 		onUserLogin: function() {
-			console.log(this);
-
 			var userId = this.userId,
 				me = Meteor.user();
 
@@ -126,11 +124,12 @@ UserManager = (function() {
 				var network = networks[netId],
 					reconnect = false;
 
-				if (network.internal.status == 'closed' || network.internal.status == 'failed' || network.internal.status == 'connecting')
+				if (network.internal.status === Meteor.networkManager.flags.closed || network.internal.status === Meteor.networkManager.flags.failed || network.internal.status === Meteor.networkManager.flags.connecting)
 					reconnect = true;
 				// check whether we should reconnect or not
 
-				Meteor.networkManager.connectNetwork(me, network);
+				if (reconnect)
+					Meteor.networkManager.connectNetwork(me, network);
 				// ok we've got the go ahead now.
 			}
 			// loop through our networks and connect them if need be

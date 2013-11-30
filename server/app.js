@@ -158,6 +158,9 @@ Application = (function() {
 				json.nodeId = nodeId;
 				// update the json
 			}
+
+			Meteor.nodeId = json.nodeId;
+			// save the node id in the Meteor environment so we can access it elsewhere
 			
 			if (data === JSON.stringify(json))
 				return false;
@@ -168,10 +171,6 @@ Application = (function() {
 				else
 					console.log('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
 			});
-		},
-
-		reconnectClients: function() {
-
 		}
 	};
 
