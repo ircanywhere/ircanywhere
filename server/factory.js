@@ -43,7 +43,7 @@ IRCFactory = (function() {
 		},
 
 		onCreated: function(key) {
-			Networks.update(this.clients[key].networkId, {$set: {'internal.status': Meteor.networkManager.flags.connecting}});
+			Meteor.networkManager.changeStatus(this.clients[key].networkId, Meteor.networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
 			// no need to send a message to the client, live database YEAH BABY
 			// we need to do this here because if we do it when we're calling create, it may have failed.
@@ -55,17 +55,16 @@ IRCFactory = (function() {
 		},
 
 		onClosed: function(key, timeout) {
-			Networks.update(this.clients[key].networkId, {$set: {'internal.status': Meteor.networkManager.flags.closed}});
+			Meteor.networkManager.changeStatus(this.clients[key].networkId, Meteor.networkManager.flags.closed);
 			// mark the network as closed
 		},
 
 		onFailed: function(key) {
-			Networks.update(this.clients[key].networkId, {$set: {'internal.status': Meteor.networkManager.flags.failed}});
-			// mark the network as closed
+			Meteor.networkManager.changeStatus(this.clients[key].networkId, Meteor.networkManager.flags.failed);			// mark the network as closed
 		},
 
 		onIRC: function(key, event, args) {
-			console.log(key, event, args);
+			//console.log(key, event, args);
 			// console.log data for now
 		},
 

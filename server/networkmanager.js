@@ -108,6 +108,14 @@ NetworkManager = (function() {
 
 			Meteor.ircFactory.create(user, network);
 			// tell the factory to create a network
+		},
+
+		changeStatus: function(networkId, status) {
+			if (this.flags[status] === undefined)
+				return console.log('warn: the status', status, 'passed into changeStatus for', networkId, 'is invalid.');
+			// status is invalid
+
+			Networks.update(networkId, {$set: {'internal.status': status}});
 		}
 	};
 
