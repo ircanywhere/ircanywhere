@@ -4,7 +4,7 @@
 	 * -- string
 	 * -- usage: The reverse DNS of this server, this needs to match exactly for certain features to work
 	             if no reverse dns is setup, enter your ip address in http://mxtoolbox.com/ReverseLookup.aspx
-	             and enter the value in "Domain Name" here. */
+	             and enter the value in "Domain Name" here. This isn't the domain that the server runs on */
 
 	"enableRegistrations": true,
 	/* -- required
@@ -40,10 +40,10 @@
 		 * -- number
 		 * -- usage: Network limit for users, minimum is 1, maximum is 10, at the moment */
 
-		"networkRestriction": "*.verxe.net",
+		"networkRestriction": "*",
 		/* -- string
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
-		 			 disabled by omitting completely, or setting to "" */
+		 			 disabled by omitting completely, or setting to empty or * */
 
 		"userNamePrefix": "ia"
 		/* -- required
@@ -53,7 +53,7 @@
 	},
 
 	"defaultNetwork": {
-		"server": "irc.verxe.net",
+		"server": "irc.freenode.net",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */

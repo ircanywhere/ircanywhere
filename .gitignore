@@ -1,5 +1,5 @@
-node_modules/
-*.sublime*
-smart.lock
+private/node.json
 packages
 .build*
+*.sublime*
+smart.lock

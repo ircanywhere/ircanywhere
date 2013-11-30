@@ -109,7 +109,7 @@ UserManager = (function() {
 
 		onUserLogin: function() {
 			console.log(this);
-			
+
 			var userId = this.userId,
 				me = Meteor.user();
 
@@ -139,7 +139,7 @@ UserManager = (function() {
 
 	return Manager;
 }());
-// create our factory object
+// create our user manager object
 
 Meteor.userManager = Object.create(UserManager);
 Meteor.userManager.init();
