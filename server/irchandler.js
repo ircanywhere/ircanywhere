@@ -48,11 +48,13 @@ IRCHandler = (function() {
 			}
 			// find the channels we were previously in (could have been disconnected and not saved)
 
-			console.log(channels);
-			/*for (var channel in channels) {
-
-			}*/
+			for (var channel in channels) {
+				Meteor.ircFactory.send(client.key, 'send', [channel, channels[channel]]);
+			}
 			// merge the channels and join them all with their respective keys
+
+			Meteor.networkManager.changeStatus(client.networkId, Meteor.networkManager.flags.connected);
+			// update the status to connected
 		}
 	};
 
