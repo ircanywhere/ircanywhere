@@ -67,7 +67,7 @@ NetworkManager = (function() {
 				nodeId: Meteor.nodeId,
 				userId: user._id,
 				status: this.flags.closed,
-				channels: {},
+				channels: [],
 				url: network.server + ':' + ((network.secure) ? '+' : '') + network.port
 			}
 			// this stores internal information about the network, it will be available to

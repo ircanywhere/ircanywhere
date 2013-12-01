@@ -112,10 +112,10 @@ UserManager = (function() {
 			var userId = this.userId,
 				me = Meteor.user();
 
-			var networks = Networks.findOne({'internal.userId': userId});
+			var networks = Networks.find({'internal.userId': userId}).fetch();
 			// find user's networks
 
-			if (me.profile.flags.newUser && networks.length == 0) {
+			if (me.profile.flags.newUser && networks.length === 0) {
 				var network = Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
 				networks.push(network);
 			}

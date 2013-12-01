@@ -28,19 +28,23 @@ IRCHandler = (function() {
 			// XXX - send our connect commands, things that the user defines
 			// 		 nickserv identify or something
 
-			for (var channel in network.channels) {
-				var password = network.channels[channel];
+			for (var key in network.channels) {
+				var channel = network.channels[key],
+					chan = channel.channel,
+					password = (channel.password === undefined) ? '' : channel.password;
 				// split the channel name by space to check for a password
 
-				channels[channel] = (password === undefined) ? '' : password;
+				channels[chan] = password;
 			}
 			// find our channels to automatically join from the network setup
 
 			for (var key in network.internal.channels) {
-				var password = network.channels[channel];
+				var channel = network.internal.channels[key],
+					chan = channel.channel,
+					password = (channel.password === undefined) ? '' : channel.password;
 				// split the channel name by space to check for a password
 
-				channels[channel] = (password === undefined) ? '' : password;
+				channels[chan] = password;
 			}
 			// find the channels we were previously in (could have been disconnected and not saved)
 
