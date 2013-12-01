@@ -4,6 +4,10 @@ IRCHandler = (function() {
 	var Handler = {
 		init: function() {
 			
+		},
+
+		handle: function(client, e, args) {
+			console.log(e, args);
 		}
 	};
 

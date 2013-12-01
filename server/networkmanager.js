@@ -46,6 +46,7 @@ NetworkManager = (function() {
 			var userCount = Meteor.users.find({}).count(),
 				userName = Meteor.config.clientSettings.userNamePrefix + userCount;
 
+			network.name = network.server;
 			network.nick = user.profile.nickname + '-';
 			network.userName = userName;
 			network.autoRejoin = (network.autoRejoin === undefined) ? false : network.autoRejoin;

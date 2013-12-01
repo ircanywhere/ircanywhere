@@ -63,9 +63,18 @@ IRCFactory = (function() {
 			Meteor.networkManager.changeStatus(this.clients[key].networkId, Meteor.networkManager.flags.failed);			// mark the network as closed
 		},
 
-		onIRC: function(key, event, args) {
-			//console.log(key, event, args);
-			// console.log data for now
+		onIRC: function(key, e, args) {
+			var client = this.clients[key];
+			// get our client 
+
+			if (e === 'socketinfo') {
+				// XXX - at the moment we do nothing with socketinfo stuff
+				// not sure if we ever will, maybe for an ident daemon? probably.
+			} else {
+				Meteor.ircHandler.handle(client, e, args);
+				// send this data over to handleEvents where we'll do a switch matching
+				// all the commands and sending them to individual functions
+			}
 		},
 
 		hash: function(user, network) {
@@ -80,7 +89,8 @@ IRCFactory = (function() {
 			this.clients[key] = {
 				key: key,
 				userId: user._id,
-				networkId: network._id
+				networkId: network._id,
+				networkName: network._server
 			};
 			// store it in the clients object
 
