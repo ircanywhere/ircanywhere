@@ -101,6 +101,16 @@ IRCFactory = (function() {
 
 			this.process.send({message: 'create', data: {key: key, ircObject: network}});
 			// send to the process
+		},
+
+		destroy: function(key) {
+			this.process.send({message: 'destroy', data: {key: key}});
+			// send the destroy command (we handle the response later on)
+		},
+
+		send: function(key, command, args) {
+			this.process.send({message: 'rpc', data: {key: key, command: command, args: args}});
+			// send message to the process (this should be used for IRC commands)
 		}
 	};
 
