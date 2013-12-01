@@ -125,7 +125,7 @@ UserManager = (function() {
 				var network = networks[netId],
 					reconnect = false;
 
-				if (network.internal.status === Meteor.networkManager.flags.closed || network.internal.status === Meteor.networkManager.flags.failed || network.internal.status === Meteor.networkManager.flags.connecting)
+				if (network.internal.status !== Meteor.networkManager.flags.disconnect)
 					reconnect = true;
 				// check whether we should reconnect or not
 

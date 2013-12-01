@@ -49,7 +49,7 @@ IRCHandler = (function() {
 			// find the channels we were previously in (could have been disconnected and not saved)
 
 			for (var channel in channels) {
-				Meteor.ircFactory.send(client.key, 'send', [channel, channels[channel]]);
+				Meteor.ircFactory.send(client.key, 'join', [channel, channels[channel]]);
 			}
 			// merge the channels and join them all with their respective keys
 
