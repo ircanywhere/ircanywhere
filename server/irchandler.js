@@ -2,12 +2,53 @@ IRCHandler = (function() {
 	"use strict";
 
 	var Handler = {
+
 		init: function() {
 			
 		},
 
 		handle: function(client, e, args) {
-			console.log(e, args);
+			switch (e) {
+				case 'registered':
+					this.onRegister(client, args[0]);
+					break;
+				default:
+
+					break;
+			};
+			// handle our event with a switch, we'll determine what to do
+			// with irc parsed commands and where to send them here
+		},
+
+		onRegister: function(client, message) {
+			var channels = {},
+				network = Networks.findOne(client.networkId);
+			// firstly we grab the network record from the database
+
+			// XXX - send our connect commands, things that the user defines
+			// 		 nickserv identify or something
+
+			for (var channel in network.channels) {
+				var password = network.channels[channel];
+				// split the channel name by space to check for a password
+
+				channels[channel] = (password === undefined) ? '' : password;
+			}
+			// find our channels to automatically join from the network setup
+
+			for (var key in network.internal.channels) {
+				var password = network.channels[channel];
+				// split the channel name by space to check for a password
+
+				channels[channel] = (password === undefined) ? '' : password;
+			}
+			// find the channels we were previously in (could have been disconnected and not saved)
+
+			console.log(channels);
+			/*for (var channel in channels) {
+
+			}*/
+			// merge the channels and join them all with their respective keys
 		}
 	};
 

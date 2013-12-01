@@ -90,7 +90,7 @@ IRCFactory = (function() {
 				key: key,
 				userId: user._id,
 				networkId: network._id,
-				networkName: network._server
+				networkName: network.server
 			};
 			// store it in the clients object
 

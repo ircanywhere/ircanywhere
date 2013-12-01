@@ -100,10 +100,13 @@
 		 			 if it's a public server with no password */
 
 		"channels": [
-			"#ircanywhere-test channel-password"
+			{
+				"channel": "#ircanywhere-test",
+				"password": "channel-password"
+			}
 		]
-		/* -- array 
-		 * -- usage: An array of channels to connect to on startup, a space will seperate
-					 any channel keys that need to be entered */
+		/* -- array > object
+		 * -- usage: An array of channels to connect to on startup, the channel must be the
+					 same as the above object, password is optional, channel is not. */
 	}
 }

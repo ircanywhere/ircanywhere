@@ -2,6 +2,7 @@ UserManager = (function() {
 	"use strict";
 
 	var Manager = {
+		
 		init: function() {
 			Accounts.config({
 				sendVerificationEmail: Meteor.config.email.forceValidation,
@@ -111,7 +112,7 @@ UserManager = (function() {
 			var userId = this.userId,
 				me = Meteor.user();
 
-			var networks = Networks.find({'internal.userId': userId}).fetch();
+			var networks = Networks.findOne({'internal.userId': userId});
 			// find user's networks
 
 			if (me.profile.flags.newUser && networks.length == 0) {

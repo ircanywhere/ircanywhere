@@ -27,7 +27,7 @@ NetworkManager = (function() {
 
 			for (var netId in networks) {
 				var network = networks[netId],
-					me = Meteor.users.find(network.internal.userId).fetch(),
+					me = Meteor.users.findOne(network.internal.userId),
 					reconnect = false;
 
 				if (network.internal.status !== this.flags.disconnected)

@@ -100,12 +100,22 @@ Application = (function() {
 				optional: true
 			},
 			'defaultNetwork.channels': {
-				type: [String],
+				type: [Object],
+				optional: true
+			},
+			'defaultNetwork.channels.$.channel': {
+				type: String,
+				optional: false,
+				regEx: /([#&][^\x07\x2C\s]{0,200})/
+			},
+			'defaultNetwork.channels.$.password': {
+				type: String,
 				optional: true
 			}
 		});
 
 	var App = {
+		
 		init: function() {
 			Meteor.config = JSON.parse(jsonminify(raw));
 			check(Meteor.config, schema);
