@@ -49,13 +49,13 @@ NetworkManager = (function() {
 			network.name = network.server;
 			network.nick = user.profile.nickname;
 			network.userName = userName;
-			network.autoRejoin = (network.autoRejoin === undefined) ? false : network.autoRejoin;
-			network.autoConnect = (network.autoConnect === undefined) ? true : network.autoConnect;
-			network.retryCount = (network.retryCount === undefined) ? 10 : network.retryCount;
-			network.retryDelay = (network.retryDelay === undefined) ? 1000 : network.retryDelay;
-			network.secure = (network.secure === undefined) ? false : network.secure;
-			network.password = (network.password === undefined || network.password === '') ? null : network.password;
-			network.channels = (network.channels === undefined) ? [] : network.channels;
+			network.autoRejoin = network.autoRejoin || false;
+			network.autoConnect = network.autoConnect || true;
+			network.retryCount = network.retryCount || 10;
+			network.retryDelay = network.retryDelay || 1000;
+			network.secure = network.secure || false;
+			network.password = network.password || null;
+			network.channels = network.channels || [];
 			// because some settings can be omitted, we're going to set them to
 			// the hard-coded defaults if they are, ok. We don't need to worry about
 			// validating them before hand either because app.js takes care of that.
@@ -86,7 +86,7 @@ NetworkManager = (function() {
 			for (var channel in network.channels) {
 				var split = channel.split(' '),
 					chan = split[0],
-					pass = (split[1] !== undefined) ? split[1] : '';
+					pass = split[1] || '';
 				// split the channel name up
 
 				network.internal.channels[chan] = pass;
@@ -102,7 +102,6 @@ NetworkManager = (function() {
 			network.floodProtection = false;
 			network.selfSigned = true;
 			network.certExpired = true;
-			network.stripColours = false;
 			network.channelPrefxies = '&#';
 			// set some node-irc default settings, channel prefixes is assumed here
 			// but will be confirmed when we get the capabilities back later on
@@ -112,7 +111,7 @@ NetworkManager = (function() {
 		},
 
 		changeStatus: function(networkId, status) {
-			if (this.flags[status] === undefined)
+			if (status in this.flags)
 				return console.log('warn: the status', status, 'passed into changeStatus for', networkId, 'is invalid.');
 			// status is invalid
 

@@ -6,7 +6,6 @@
 standard-app-packages
 accounts-base
 accounts-password
-iron-router
 npm
 smart-collections
 simple-schema

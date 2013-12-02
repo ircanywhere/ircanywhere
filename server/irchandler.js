@@ -13,7 +13,6 @@ IRCHandler = (function() {
 					this.onRegister(client, args[0]);
 					break;
 				default:
-
 					break;
 			};
 			// handle our event with a switch, we'll determine what to do
@@ -31,7 +30,7 @@ IRCHandler = (function() {
 			for (var key in network.channels) {
 				var channel = network.channels[key],
 					chan = channel.channel,
-					password = (channel.password === undefined) ? '' : channel.password;
+					password = channel.password || '';
 				// split the channel name by space to check for a password
 
 				channels[chan] = password;
@@ -41,7 +40,7 @@ IRCHandler = (function() {
 			for (var key in network.internal.channels) {
 				var channel = network.internal.channels[key],
 					chan = channel.channel,
-					password = (channel.password === undefined) ? '' : channel.password;
+					password = channel.password || '';
 				// split the channel name by space to check for a password
 
 				channels[chan] = password;
