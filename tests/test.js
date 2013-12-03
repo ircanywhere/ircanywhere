@@ -1,6 +1,8 @@
-var assert = require('assert');
+/*var assert = require('assert');
 
 suite('Client user forms', function() {
+	test('speed test', function(done, server, client) { done(); });
+
 	test('register a user through signup form', function(done, server, client) {
 		client.eval(function() {
 			var homeModule = Object.create(HomeModule);
@@ -40,4 +42,4 @@ suite('Client user forms', function() {
 			done();
 		});
 	});
-});
+});*/
