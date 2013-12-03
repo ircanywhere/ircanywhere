@@ -76,7 +76,6 @@ IRCFactory = (function() {
 				// XXX - at the moment we do nothing with socketinfo stuff
 				// not sure if we ever will, maybe for an ident daemon? probably.
 			} else {
-				console.log(e, args);
 				Meteor.ircHandler.handle(client, e, args);
 				// send this data over to handleEvents where we'll do a switch matching
 				// all the commands and sending them to individual functions
