@@ -27,6 +27,7 @@ suite('Client user forms', function() {
 	test('register a user on the server and attempt to login through form', function(done, server, client) {
 		server.eval(function() {
 			var output = Meteor.call('registerUser', 'John Smith', 'john', 'john.smith@aol.com', '123456', '123456');
+			emit('ready', output);
 		});
 
 		client.eval(function() {

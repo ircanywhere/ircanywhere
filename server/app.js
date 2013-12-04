@@ -127,12 +127,6 @@ Application = (function() {
 		},
 
 		setupNode: function() {
-			if (Meteor.settings.test) {
-				Meteor.nodeId = Meteor.Collection.ObjectID();
-				return;
-			}
-			// we're in the testing environment, lets create a fake nodeId and bail
-
 			var data = '',
 				json = {},
 				defaultJson = {

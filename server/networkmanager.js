@@ -12,7 +12,7 @@ NetworkManager = (function() {
 		},
 
 		init: function() {
-			//this.reconnectClients();
+			this.reconnectClients();
 			// reconnect our clients here
 
 			Meteor.publish('networks', function() {
