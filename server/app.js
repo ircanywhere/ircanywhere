@@ -67,29 +67,9 @@ Application = (function() {
 				max: 65535,
 				optional: false
 			},
-			'defaultNetwork.realName': {
+			'defaultNetwork.realname': {
 				type: String,
 				optional: false
-			},
-			'defaultNetwork.autoRejoin': {
-				type: Boolean,
-				optional: true
-			},
-			'defaultNetwork.autoConnect': {
-				type: Boolean,
-				optional: true
-			},
-			'defaultNetwork.retryCount': {
-				type: Number,
-				min: 1,
-				max: 20,
-				optional: true
-			},
-			'defaultNetwork.retryDelay': {
-				type: Number,
-				min: 1000,
-				max: 60000,
-				optional: true
 			},
 			'defaultNetwork.secure': {
 				type: Boolean,

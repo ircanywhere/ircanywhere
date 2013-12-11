@@ -9,12 +9,12 @@ IRCFactory = (function() {
 
 		init: function() {
 			var self = this;
-			this.process = Meteor.require('irc-factory').process;
+			//this.process = Meteor.require('irc-factory').process;
 			// this is what we do to initialise the irc factory
 			// this will basically be the client end of ircanywhere/irc-factory package
 			// docs on how that work are in the README file
 
-			var fn = Meteor.bindEnvironment(function(m) {
+			/*var fn = Meteor.bindEnvironment(function(m) {
 				var message = m.message.toLowerCase(),
 					data = m.data;
 				// m is the JSON object coming, ask it what type of message is, and get the data
@@ -44,7 +44,7 @@ IRCFactory = (function() {
 			});
 			// create a function to handle incoming messages and wrap it in meteor's environment
 
-			this.process.on('message', fn);
+			this.process.on('message', fn);*/
 		},
 
 		onCreated: function(key) {

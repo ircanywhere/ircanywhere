@@ -63,41 +63,20 @@
 		 * -- number
 		 * -- usage: Port to connect the default client to, min 1, max 65535 */
 
-		"realName": "IRC Client",
+		"realname": "IRC Client",
 		/* -- required
 		 * -- string 
 		 * -- usage: The gecos for default irc clients */
-
-		"autoRejoin": false,
-		/* -- boolean 
-		 * -- usage: Whether to automatically rejoin default clients on kicks
-		 			 defaults to false if omitted */
-
-		"autoConnect": true,
-		/* -- boolean 
-		 * -- usage: Whether to automatically attempt to reconnect clients on any form
-		 			 of disconnection. Default to true if ommited */
-
-		"retryCount": 10,
-		/* -- number
-		 * -- usage: How many times to attempt a reconnect before marking the user as failed
-		 			 has a maxmium of 20 and a minimum of 1. Doesn't take affect if autoConnect
-		 			 is set to false. Can also be omitted completely, defaults to 10 if so */
-
-		"retryDelay": 1000,
-		/* -- number 
-		 * -- usage: How long to wait in ms between retryCount's, defaults to 1000 if ommited
-		 			 has a maximum of 60000 (1m) and 1000 (1s) */
 
 		"secure": false,
 		/* -- boolean 
 		 * -- usage: Whether to use ssl for the default irc client, can be omitted
 		 			 defaults to false if so */
 
-		"password": "",
+		"password": null,
 		/* -- string
-		 * -- usage: If the server requires a password, enter it here. Leaving it blank
-		 			 if it's a public server with no password */
+		 * -- usage: If the server requires a password, enter it here. Set to null to emit it
+		 			 or remove it completely */
 
 		"channels": [
 			{
