@@ -1,4 +1,6 @@
 {
 	"jsonminify": "0.2.2",
-	"irc-factory": "1.0.5"
+	"irc-factory": "1.0.5",
+	"underscore": "1.5.2",
+	"axon": "1.0.0"
 }

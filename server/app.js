@@ -5,8 +5,10 @@ Application = (function() {
 		fs = Meteor.require('fs'),
 		path = Meteor.require('path'),
 		jsonminify = Meteor.require('jsonminify'),
-		raw = Assets.getText('config.json'),
-		schema = new SimpleSchema({
+		raw = Assets.getText('config.json');;
+	// dependencies
+	
+	var schema = new SimpleSchema({
 			'reverseDns': {
 				type: String,
 				optional: false

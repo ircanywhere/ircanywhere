@@ -48,14 +48,11 @@ NetworkManager = (function() {
 
 			network.name = network.server;
 			network.nick = user.profile.nickname;
-			network.userName = userName;
-			network.autoRejoin = network.autoRejoin || false;
-			network.autoConnect = network.autoConnect || true;
-			network.retryCount = network.retryCount || 10;
-			network.retryDelay = network.retryDelay || 1000;
+			network.user = userName;
 			network.secure = network.secure || false;
+			network.sasl = network.sasl || false;
+			network.saslUsername = network.saslUsername || undefined;
 			network.password = network.password || null;
-			network.channels = network.channels || [];
 			// because some settings can be omitted, we're going to set them to
 			// the hard-coded defaults if they are, ok. We don't need to worry about
 			// validating them before hand either because app.js takes care of that.
@@ -93,25 +90,16 @@ NetworkManager = (function() {
 			}
 			// move into network.internal.channels
 			// we do this because we manually join our channels instead of sending
-			// them into node-irc immediately, because it's crappy and doesn't support passwords
+			// them into irc-factory immediately, because it's crappy and doesn't support passwords
 
 			delete network.internal;
-			network.hostname = Meteor.config.reverseDns;
-			network.channels = [];
-			network.debug = false;
-			network.floodProtection = false;
-			network.selfSigned = true;
-			network.certExpired = true;
-			network.channelPrefxies = '&#';
-			// set some node-irc default settings, channel prefixes is assumed here
-			// but will be confirmed when we get the capabilities back later on
 
 			Meteor.ircFactory.create(user, network);
 			// tell the factory to create a network
 		},
 
 		changeStatus: function(networkId, status) {
-			if (status in this.flags)
+			if (!(status in this.flags))
 				return console.log('warn: the status', status, 'passed into changeStatus for', networkId, 'is invalid.');
 			// status is invalid
 
