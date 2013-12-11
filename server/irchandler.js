@@ -3,25 +3,9 @@ IRCHandler = (function() {
 
 	var Handler = {
 
-		init: function() {
-			
-		},
-
-		handle: function(client, e, args) {
-			switch (e) {
-				case 'registered':
-					this.onRegister(client, args[0]);
-					break;
-				default:
-					break;
-			};
-			// handle our event with a switch, we'll determine what to do
-			// with irc parsed commands and where to send them here
-		},
-
-		onRegister: function(client, message) {
+		registered: function(client, message) {
 			var channels = {},
-				network = Networks.findOne(client.networkId);
+				network = Networks.findOne(client.key);
 			// firstly we grab the network record from the database
 
 			// XXX - send our connect commands, things that the user defines
@@ -52,7 +36,7 @@ IRCHandler = (function() {
 			}
 			// merge the channels and join them all with their respective keys
 
-			Meteor.networkManager.changeStatus(client.networkId, Meteor.networkManager.flags.connected);
+			Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
 			// update the status to connected
 		}
 	};
@@ -62,5 +46,4 @@ IRCHandler = (function() {
 // create our application
 
 Meteor.ircHandler = Object.create(IRCHandler);
-Meteor.ircHandler.init();
 // assign it to Meteor namespace so its accessible

@@ -29,6 +29,27 @@ IRCFactory = (function() {
 			this.outgoing.connect(31930);
 			// connect to our uplinks
 
+			var handler = Meteor.bindEnvironment(function(message) {
+				if (message.event == 'synchronize') {
+					
+					console.log(message);
+
+					var keys = _.keys(self.clients),
+						difference = _.difference(keys, message.keys);
+
+					_.each(difference, function(key) {
+						self.reCreate(key);
+					});
+					// we have some clients to reconnect it seems..
+				} else {
+					self.handleEvent(message.event, message.message);
+					// any other events are irc events from irc-factory
+				}
+			}, function(err) {
+				console.log(err);
+			});
+			// create an on message function but bind it in our meteor environment
+
 			this.incoming.on('socket error', function(e) {
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
 					self.api.fork();
@@ -38,21 +59,21 @@ IRCFactory = (function() {
 				// likely that an irc-factory server isn't setup for us yet, lets try setting one up
 			});
 
-			this.incoming.on('message', function(message) {
-				if (message.event == 'synchronize') {
-					var keys = _.keys(self.clients),
-						difference = _.intersection(keys, message.keys);
-
-					if (difference.length > 0) {
-						console.log('reconnecting..', difference);
-					}
-					// we have some clients to reconnect it seems..
-				} else {
-					console.log(message);
-					// any other events are irc events from irc-factory
-				}
-			});
+			this.incoming.on('message', handler);
 			// now we define how to handle our incoming events
+		},
+
+		handleEvent: function(event, object) {
+			var key = event[0],
+				e = event[1],
+				client = this.clients[key];
+			// get our client
+
+			if (_.isFunction(Meteor.ircHandler[e])) {
+				Meteor.ircHandler[e].call(Meteor.ircHandler, client, message);
+			} else {
+				console.log(event, object);
+			}
 		},
 
 		/*onIRC: function(key, e, args) {
@@ -69,14 +90,25 @@ IRCFactory = (function() {
 			}
 		},*/
 
+		reCreate: function(key) {
+			var client = this.clients[key],
+				network = Networks.findOne(key);
+			// get the client
+
+			console.log(key, network);
+
+			this.outgoing.emit('createClient', key, network);
+			// send our createClient again
+		},
+
 		create: function(user, network) {
 			var key = network._id;
-			// generate a key
+			// generate a key, we just use the network id because it's unique per network
+			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
 			this.clients[key] = {
 				key: key,
 				userId: user._id,
-				networkId: network._id,
 				networkName: network.server
 			};
 			// store it in the clients object
@@ -87,7 +119,7 @@ IRCFactory = (function() {
 			// we need to do this here because if we do it when we're calling create, it may have failed.
 
 			this.outgoing.emit('createClient', key, network);
-			// send to the process
+			// send out create client command
 		},
 
 		destroy: function(key) {
@@ -100,7 +132,7 @@ IRCFactory = (function() {
 
 		send: function(key, command, args) {
 			this.outgoing.emit('call', key, command, args);
-			// send message to the process (this should be used for IRC commands)
+			// send message to the process
 		}
 	};
 
