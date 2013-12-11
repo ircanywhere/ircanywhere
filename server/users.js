@@ -58,30 +58,39 @@ UserManager = (function() {
 				output.failed = true;
 				return output;
 			}
+			// any errors?
+
+			var user = {
+				email: email,
+				password: password,
+				profile: {
+					name: name,
+					nickname: nickname,
+					flags: {
+						newUser: true
+					}
+				}
+			};
+			// the user record
 
 			try {
-				userId = Accounts.createUser({
-					email: email,
-					password: password,
-					profile: {
-						name: name,
-						nickname: nickname,
-						flags: {
-							newUser: true
-						}
-					}
-				});
+				userId = Accounts.createUser(user);
+				delete user.password;
 			} catch (e) {
 				output.failed = true;
 				output.errors.push({error: 'The email you have used is already in use'});
 
 				return output;
 			}
+			// it's failed, lets bail
 
 			if (!Meteor.config.email.forceValidation) {
 				output.successMessage = 'Your account has been successfully created, you may now login';
 				return output;
 			}
+
+			Meteor.logger.log('info', 'account created', user);
+			// log this event
 
 			try {
 				Accounts.sendVerificationEmail(userId);
@@ -91,6 +100,7 @@ UserManager = (function() {
 
 				return output;
 			}
+			// did we send the email?
 
 			output.successMessage = 'Your account has been successfully created, you will get an email shortly';
 
@@ -123,6 +133,9 @@ UserManager = (function() {
 				}
 			}
 			// loop through our networks and connect them if need be
+
+			Meteor.logger.log('info', 'user logged in', {userId: userId});
+			// log this event
 		}
 	});
 

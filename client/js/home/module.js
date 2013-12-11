@@ -4,7 +4,6 @@ HomeModule = (function() {
 	var Module = {
 
 		init: function() {
-
 			Session.set('login.errors', '');
 			Session.set('login.resetErrors', '');
 			Session.set('login.resetSuccess', '');
@@ -21,7 +20,6 @@ HomeModule = (function() {
 	return Module;
 
 	function loginFormSubmit(items, callback) {
-
 		var email = items['login-email'],
 			password = items['login-password'];
 		// retrieve input fields
@@ -50,7 +48,6 @@ HomeModule = (function() {
 	}
 
 	function resetFormSubmit(items, callback) {
-
 		var email = items['reset-email'];
 		// grab input field
 
@@ -73,7 +70,6 @@ HomeModule = (function() {
 	}
 
 	function signupFormSubmit(items, callback) {
-
 		var name = items['your-name'],
 			nickname = items['irc-nickname'],
 			email = items['email-address'],
@@ -101,7 +97,6 @@ HomeModule = (function() {
 	}
 
 	function resetPassFormSubmit(items, callback) {
-		
 		var token = items['token'],
 			password = items['#password'],
 			confirmPassword = items['#confirm-password'],
