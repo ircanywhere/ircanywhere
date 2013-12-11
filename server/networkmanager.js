@@ -53,6 +53,7 @@ NetworkManager = (function() {
 			network.sasl = network.sasl || false;
 			network.saslUsername = network.saslUsername || undefined;
 			network.password = network.password || null;
+			network.capab = true;
 			// because some settings can be omitted, we're going to set them to
 			// the hard-coded defaults if they are, ok. We don't need to worry about
 			// validating them before hand either because app.js takes care of that.
