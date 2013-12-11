@@ -18,7 +18,6 @@ NetworkManager = (function() {
 			Meteor.publish('networks', function() {
 				return Networks.find({'internal.userId': this.userId});
 			});
-			// handle our meteor publish collections here
 		},
 
 		reconnectClients: function() {
@@ -30,13 +29,13 @@ NetworkManager = (function() {
 					me = Meteor.users.findOne(network.internal.userId),
 					reconnect = false;
 
-				if (network.internal.status !== this.flags.disconnected)
+				if (network.internal.status !== this.flags.disconnected) {
 					reconnect = true;
-				// check whether we should reconnect or not
+				}
 
-				if (reconnect)
+				if (reconnect) {
 					this.connectNetwork(me, network);
-				// ok we've got the go ahead now.
+				}
 			}
 			// now, we need to loop through the networks and do our work on
 			// starting them up individually
@@ -85,7 +84,6 @@ NetworkManager = (function() {
 				var split = channel.split(' '),
 					chan = split[0],
 					pass = split[1] || '';
-				// split the channel name up
 
 				network.internal.channels[chan] = pass;
 			}
@@ -96,13 +94,13 @@ NetworkManager = (function() {
 			delete network.internal;
 
 			Meteor.ircFactory.create(user, network);
-			// tell the factory to create a network
 		},
 
 		changeStatus: function(networkId, status) {
-			if (!(status in this.flags))
-				return console.log('warn: the status', status, 'passed into changeStatus for', networkId, 'is invalid.');
-			// status is invalid
+			if (!(status in this.flags)) {
+				Meteor.logger.log('warn', 'invalid status flag', {flag: status, network: networkId});
+				return;
+			}
 
 			Networks.update(networkId, {$set: {'internal.status': status}});
 		}
@@ -110,8 +108,6 @@ NetworkManager = (function() {
 
 	return Manager;
 }());
-// create our factory object
 
 Meteor.networkManager = Object.create(NetworkManager);
 Meteor.networkManager.init();
-// assign it to Meteor namespace so its accessible and rememberable

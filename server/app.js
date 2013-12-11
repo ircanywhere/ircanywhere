@@ -1,11 +1,12 @@
 Application = (function() {
 	"use strict";
 
-	var os = Meteor.require('os'),
+	var winston = Meteor.require('winston'),
+		os = Meteor.require('os'),
 		fs = Meteor.require('fs'),
 		path = Meteor.require('path'),
 		jsonminify = Meteor.require('jsonminify'),
-		raw = Assets.getText('config.json');;
+		raw = Assets.getText('config.json');
 	// dependencies
 	
 	var schema = new SimpleSchema({
@@ -103,9 +104,61 @@ Application = (function() {
 			check(Meteor.config, schema);
 			// attempt to validate our config file
 
+			this.getPath();
+			this.setupWinston();
 			this.setupNode();
 			// next thing to do if we're all alright is setup our node
 			// this has been implemented now in the way for clustering
+		},
+
+		getPath: function() {
+			if (process.env.NODE_ENV == 'development') {
+				var realPath = __meteor_bootstrap__.serverDir.split('.meteor/'),
+					path = realPath[0] + 'private/';
+
+				Meteor.config.rootPath = realPath[0];
+			} else {
+				var realPath = __meteor_bootstrap__.serverDir,
+					path = realPath + '/assets/app/';
+
+				Meteor.config.rootPath = realPath;
+			}
+			// get the full url, depending on the environment, development or private
+			// XXX - This is a bit hacky, although meteor provides no better more reliable way?
+
+			Meteor.config.assetPath = path;
+		},
+
+		setupWinston: function() {
+			Meteor.logger = new (winston.Logger)({
+				transports: [
+					new (winston.transports.File)({
+						name: 'error',
+						level: 'error',
+						filename: Meteor.config.rootPath + 'logs/error.log',
+						json: false,
+						timestamp: true
+					}),
+					new (winston.transports.File)({
+						name: 'warn',
+						level: 'warn',
+						filename: Meteor.config.rootPath + 'logs/warn.log',
+						json: false,
+						timestamp: true
+					}),
+					new (winston.transports.File)({
+						name: 'info',
+						level: 'info',
+						filename: Meteor.config.rootPath + 'logs/info.log',
+						json: false,
+						timestamp: true
+					})
+				]
+			});
+
+			/*Meteor.logger.log('error', new Error('this is an error').stack);
+			Meteor.logger.log('warn', 'factory disconnected', {server: 'lol.dongs'});
+			Meteor.logger.log('info', 'client connecting', {server: 'lol.dongs'});*/
 		},
 
 		setupNode: function() {
@@ -119,45 +172,29 @@ Application = (function() {
 					ipAddress: (process.env.IP_ADDR) ? process.env.IP_ADDR : '0.0.0.0'
 				};
 
-			if (process.env.NODE_ENV == 'development') {
-				var realPath = __meteor_bootstrap__.serverDir.split('.meteor/'),
-					path = realPath[0] + 'private/';
-			} else {
-				var realPath = __meteor_bootstrap__.serverDir,
-					path = realPath + '/assets/app/';
-			}
-			// get the full url, depending on the environment, development or private
-			// XXX - This is a bit hacky, although meteor provides no better more reliable way?
-
 			try {
-				data = fs.readFileSync(path + 'node.json', {encoding: 'utf8'});
+				data = fs.readFileSync(Meteor.config.assetPath + 'node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
-				// get the file contents
 
 				var node = Nodes.findOne(json.nodeId);
-				// get the node
 
 				json = defaultJson;
 				Nodes.update(json.nodeId, defaultJson);
-				// we'll now reupdate it in the database
 
 				json.nodeId = node._id;
 			} catch (e) {			
 				var nodeId = Nodes.insert(defaultJson);
-				// insert the record and get a node id
 
 				json = defaultJson;
 				json.nodeId = nodeId;
-				// update the json
 			}
 
 			Meteor.nodeId = json.nodeId;
-			// save the node id in the Meteor environment so we can access it elsewhere
 			
 			if (data === JSON.stringify(json))
 				return false;
 
-			fs.writeFile(path + 'node.json', JSON.stringify(json), function(err) {
+			fs.writeFile(Meteor.config.assetPath + 'node.json', JSON.stringify(json), function(err) {
 				if (err)
 					throw err;
 				else
@@ -168,8 +205,6 @@ Application = (function() {
 
 	return App;
 }());
-// create our application
 
 Meteor.application = Object.create(Application);
 Meteor.application.init();
-// assign it to Meteor namespace so its accessible
