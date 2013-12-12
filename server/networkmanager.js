@@ -12,16 +12,14 @@ NetworkManager = (function() {
 		},
 
 		init: function() {
-			this.reconnectClients();
-			// reconnect our clients here
-
 			Meteor.publish('networks', function() {
 				return Networks.find({'internal.userId': this.userId});
 			});
 		},
 
-		reconnectClients: function() {
-			var networks = Networks.find({}).fetch();
+		getClients: function() {
+			var clients = {},
+				networks = Networks.find({}).fetch();
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 			for (var netId in networks) {
@@ -34,11 +32,12 @@ NetworkManager = (function() {
 				}
 
 				if (reconnect) {
-					this.connectNetwork(me, network);
+					clients[network._id] = {user: me, network: network};
 				}
 			}
-			// now, we need to loop through the networks and do our work on
-			// starting them up individually
+			// here we just mark them for connection by passing them into this.reconnect
+
+			return clients;
 		},
 
 		addNetwork: function(user, network) {

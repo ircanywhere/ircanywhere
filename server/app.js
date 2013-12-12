@@ -155,13 +155,11 @@ Application = (function() {
 					})
 				]
 			});
-
-			/*Meteor.logger.log('error', new Error('this is an error').stack);
-			Meteor.logger.log('warn', 'factory disconnected', {server: 'lol.dongs'});
-			Meteor.logger.log('info', 'client connecting', {server: 'lol.dongs'});*/
 		},
 
 		setupNode: function() {
+			// XXX - Stop this from happening on tests, it's trashing the speed completely
+
 			var data = '',
 				json = {},
 				defaultJson = {

@@ -31,12 +31,15 @@ IRCFactory = (function() {
 
 			var messageHandler = Meteor.bindEnvironment(function(message) {
 				if (message.event == 'synchronize') {
-					var keys = _.keys(self.clients),
+					var users = Meteor.networkManager.getClients(),
+						keys = _.keys(users),
 						difference = _.difference(keys, message.keys);
 
 					_.each(difference, function(key) {
-						self.reCreate(key);
+						var user = users[key];
+						Meteor.networkManager.connectNetwork(user.user, user.network);
 					});
+					// the clients we're going to actually attempt to boot up
 
 					Meteor.logger.log('warn', 'factory synchronize', message);
 				} else {
@@ -52,6 +55,7 @@ IRCFactory = (function() {
 
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
 					self.api.fork();
+					// fork the daemon
 				}
 				// we've tried our original connect and got ECONNREFUSED, it's highly
 				// likely that an irc-factory server isn't setup for us yet, lets try setting one up
@@ -74,13 +78,6 @@ IRCFactory = (function() {
 			} else {
 				console.log(event, object);
 			}
-		},
-
-		reCreate: function(key) {
-			var client = this.clients[key],
-				network = Networks.findOne(key);
-
-			this.outgoing.emit('createClient', key, network);
 		},
 
 		create: function(user, network) {

@@ -3,7 +3,7 @@ IRCHandler = (function() {
 
 	var Handler = {
 
-		ready: function(client, message) {
+		registered: function(client, message) {
 			var channels = {},
 				network = Networks.findOne(client.key);
 			// firstly we grab the network record from the database
@@ -33,7 +33,25 @@ IRCHandler = (function() {
 				Meteor.ircFactory.send(client.key, 'raw', ['JOIN', channel, channels[channel]]);
 			}
 
-			Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
+			Networks.update(client.key, {$set: {
+				'name': message.capabilities.network.name,
+				'internal.status': Meteor.networkManager.flags.connected
+			}});
+			//Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
+			// commented this out because we do other changes to the network object here
+			// so we don't use this but we use a straight update to utilise 1 query instead of 2
+		},
+
+		closed: function(client, message) {
+			Meteor.networkManager.changeStatus({_id: client.key, 'internal.status': {$ne: Meteor.networkManager.closed}}, Meteor.networkManager.flags.closed);
+			// a bit of sorcery here, strictly speaking .changeStatus takes a networkId. But because of meteor's beauty
+			// we can pass in an ID, or a selector. So instead of getting the status and checking it, we just do a mongo update
+			// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
+			// which means someone has clicked disconnected, if not, just set it as closed (means we've disconnected for whatever reason)
+		},
+
+		failed: function(client, message) {
+			Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.failed);
 		}
 	};
 
