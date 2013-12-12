@@ -98,7 +98,6 @@ Application = (function() {
 		});
 
 	var App = {
-		
 		init: function() {
 			Meteor.config = JSON.parse(jsonminify(raw));
 			check(Meteor.config, schema);

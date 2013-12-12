@@ -2,7 +2,6 @@ NetworkManager = (function() {
 	"use strict";
 
 	var Manager = {
-
 		flags: {
 			connected: 'connected',
 			disconnected: 'disconnected',

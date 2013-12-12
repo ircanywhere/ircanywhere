@@ -2,7 +2,6 @@ IRCHandler = (function() {
 	"use strict";
 
 	var Handler = {
-
 		registered: function(client, message) {
 			var channels = {},
 				network = Networks.findOne(client.key);
@@ -31,15 +30,21 @@ IRCHandler = (function() {
 
 			for (var channel in channels) {
 				Meteor.ircFactory.send(client.key, 'raw', ['JOIN', channel, channels[channel]]);
+				Meteor.ircFactory.send(client.key, 'raw', ['MODE', channel]);
+				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 
+			client.network = message.capabilities.network.name;
 			Networks.update(client.key, {$set: {
+				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': Meteor.networkManager.flags.connected
 			}});
 			//Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
+
+			console.log(message);
 		},
 
 		closed: function(client, message) {
@@ -52,6 +57,18 @@ IRCHandler = (function() {
 
 		failed: function(client, message) {
 			Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.failed);
+		},
+
+		join: function(client, message) {
+			var user = {
+				username: message.username,
+				hostname: message.hostname,
+				nickname: message.nickname,
+				modes: {}
+			};
+			// just a standard user object, although with a modes object aswell
+
+			Meteor.channelManager.insertUser(client.key, client.network, message.channel, user);
 		}
 	};
 

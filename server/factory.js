@@ -8,7 +8,6 @@ IRCFactory = (function() {
 	// dependencies
 
 	var Factory = {
-
 		api: new factory(),
 		incoming: axon.socket('pull'),
 		outgoing: axon.socket('pub-emitter'),
@@ -54,7 +53,8 @@ IRCFactory = (function() {
 				Meteor.logger.log('warn', 'factory socket error', e);
 
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
-					self.api.fork();
+					//self.api.fork();
+					self.api.setupServer();
 					// fork the daemon
 				}
 				// we've tried our original connect and got ECONNREFUSED, it's highly
@@ -88,7 +88,7 @@ IRCFactory = (function() {
 			this.clients[key] = {
 				key: key,
 				userId: user._id,
-				networkName: network.server
+				network: network.server
 			};
 
 			Meteor.networkManager.changeStatus(key, Meteor.networkManager.flags.connecting);

@@ -2,7 +2,6 @@ UserManager = (function() {
 	"use strict";
 
 	var Manager = {
-		
 		init: function() {
 			Accounts.config({
 				sendVerificationEmail: Meteor.config.email.forceValidation,
