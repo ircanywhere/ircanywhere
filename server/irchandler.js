@@ -34,6 +34,7 @@ IRCHandler = (function() {
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 
+			client.capabilities = message.capabilities;
 			client.network = message.capabilities.network.name;
 			Networks.update(client.key, {$set: {
 				'nick': message.nickname,
@@ -43,8 +44,6 @@ IRCHandler = (function() {
 			//Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
-
-			console.log(message);
 		},
 
 		closed: function(client, message) {
@@ -68,7 +67,37 @@ IRCHandler = (function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			Meteor.channelManager.insertUser(client.key, client.network, message.channel, user);
+			Meteor.channelManager.insertUser(client.key, client.network, message.channel, [user]);
+		},
+
+		part: function() {
+
+
+		},
+
+		who: function(client, message) {
+			var users = [],
+				prefixes = _.invert(client.capabilities.modes.prefixmodes);
+
+			_.each(message.who, function(u) {
+				var split = u.prefix.split('@'),
+					mode = u.mode.replace(/[a-z0-9]/i, ''),
+					user = {};
+
+				user.username = split[0];
+				user.hostname = split[1];
+				user.nickname = u.nickname;
+				user.modes = {};
+
+				for (var i = 0, len = mode.length; i < len; i++) {
+					var prefix = mode.charAt(i);
+					user.modes[prefix] = prefixes[prefix];
+				}
+
+				users.push(user);
+			});
+
+			Meteor.channelManager.insertUser(client.key, client.network, message.channel, users);
 		}
 	};
 
