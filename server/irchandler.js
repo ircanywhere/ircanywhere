@@ -39,7 +39,8 @@ IRCHandler = (function() {
 			Networks.update(client.key, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
-				'internal.status': Meteor.networkManager.flags.connected
+				'internal.status': Meteor.networkManager.flags.connected,
+				'internal.capabilities': message.capabilities
 			}});
 			//Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
@@ -67,12 +68,11 @@ IRCHandler = (function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			Meteor.channelManager.insertUser(client.key, client.network, message.channel, [user]);
+			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, [user]);
 		},
 
-		part: function() {
-
-
+		part: function(client, message) {
+			Meteor.channelManager.removeUsers(client.key, client.network, message.channel, [message.nickname]);
 		},
 
 		who: function(client, message) {
@@ -97,7 +97,7 @@ IRCHandler = (function() {
 				users.push(user);
 			});
 
-			Meteor.channelManager.insertUser(client.key, client.network, message.channel, users);
+			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, users);
 		}
 	};
 

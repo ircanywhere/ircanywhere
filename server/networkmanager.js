@@ -32,6 +32,10 @@ NetworkManager = (function() {
 
 				if (reconnect) {
 					clients[network._id] = {user: me, network: network};
+					
+					Meteor.ircFactory.create(me, network, true);
+					// call create directly but with the skip parameter cause all we want to do is
+					// add the record into this.clients
 				}
 			}
 			// here we just mark them for connection by passing them into this.reconnect

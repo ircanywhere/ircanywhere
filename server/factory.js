@@ -33,7 +33,7 @@ IRCFactory = (function() {
 					var users = Meteor.networkManager.getClients(),
 						keys = _.keys(users),
 						difference = _.difference(keys, message.keys);
-
+					
 					_.each(difference, function(key) {
 						var user = users[key];
 						Meteor.networkManager.connectNetwork(user.user, user.network);
@@ -53,8 +53,8 @@ IRCFactory = (function() {
 				Meteor.logger.log('warn', 'factory socket error', e);
 
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
-					//self.api.fork();
-					self.api.setupServer();
+					self.api.fork();
+					//self.api.setupServer();
 					// fork the daemon
 				}
 				// we've tried our original connect and got ECONNREFUSED, it's highly
@@ -80,8 +80,9 @@ IRCFactory = (function() {
 			}
 		},
 
-		create: function(user, network) {
-			var key = network._id;
+		create: function(user, network, skip) {
+			var skip = skip || false,
+				key = network._id;
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
@@ -90,6 +91,14 @@ IRCFactory = (function() {
 				userId: user._id,
 				network: network.server
 			};
+
+			if (skip) {
+				this.clients[key].network = network.name;
+				this.clients[key].capabilities = network.internal.capabilities;
+				return;
+			}
+			// skip means we're just reconnecting to the irc-factory, so we need to
+			// set a few things that would normally be set on register event
 
 			Meteor.networkManager.changeStatus(key, Meteor.networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
