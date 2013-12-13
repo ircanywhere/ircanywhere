@@ -1,0 +1,40 @@
+{
+  "builtBy": "meteor/10",
+  "sliceDependencies": {
+    "browser.json": {
+      "files": {
+        "/home/ricki/shared/ircanywhere/packages/ircanywhere/package.js": "8791315594cc1c0d544d78dad3a3f5406c799592"
+      },
+      "directories": []
+    },
+    "os.json": {
+      "files": {
+        "/home/ricki/shared/ircanywhere/packages/ircanywhere/package.js": "8791315594cc1c0d544d78dad3a3f5406c799592"
+      },
+      "directories": []
+    },
+    "tests.browser.json": {
+      "files": {
+        "/home/ricki/shared/ircanywhere/packages/ircanywhere/package.js": "8791315594cc1c0d544d78dad3a3f5406c799592"
+      },
+      "directories": []
+    },
+    "tests.os.json": {
+      "files": {
+        "/home/ricki/shared/ircanywhere/packages/ircanywhere/package.js": "8791315594cc1c0d544d78dad3a3f5406c799592"
+      },
+      "directories": []
+    }
+  },
+  "pluginDependencies": {
+    "files": {
+      "/home/ricki/shared/ircanywhere/packages/ircanywhere/package.js": "8791315594cc1c0d544d78dad3a3f5406c799592"
+    },
+    "directories": []
+  },
+  "pluginProviderPackages": {
+    "ircanywhere": "/home/ricki/shared/ircanywhere/packages/ircanywhere",
+    "meteor": "/home/ricki/.meteor/packages/meteor/088e5254e3"
+  },
+  "source": "/home/ricki/shared/ircanywhere/packages/ircanywhere"
+}
