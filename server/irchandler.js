@@ -100,7 +100,30 @@ var IRCHandler = function() {
 				users.push(user);
 			});
 
-			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, users);
+			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, users, true);
+		},
+
+		names: function(client, message) {
+			var channel = Meteor.channelManager.getChannel(client.network, message.channel),
+				users = [],
+				regex = new RegExp('[' + Meteor.Helpers.escape(client.capabilities.modes.prefixes) + ']', 'g'),
+				keys = _.keys(channel.users);
+
+			for (var user in message.names) {
+				users.push(message.names[user].replace(regex, ''));
+			}
+			// strip prefixes
+
+			function compare(arrays) {
+				return _.all(arrays, function(array) {
+					return array.length == arrays[0].length && _.difference(array, arrays[0]).length == 0;
+				});
+			};
+
+			if (!compare([keys, users])) {
+				Meteor.ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
+			}
+			// different lists.. lets do a /WHO
 		}
 	};
 

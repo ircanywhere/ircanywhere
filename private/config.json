@@ -16,6 +16,13 @@
 	 * -- usage: Whether to enable HTTPS or not - you will need certificates
 	 			 defaults to false. Note you'll have to have force-ssl package enabled for this to work */
 
+	"forkProcess": false,
+	/* -- required
+	 * -- boolean 
+	 * -- usage: Whether to fork a seperate process for irc connections, this will allow connections to stay
+	 			 online when the main application closes. It'll also probably speed things up. It's recommended 
+	 			 to only ever set this to false when developing */
+
 	"email": {
 		"forceValidation": true,
 		/* -- required

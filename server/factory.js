@@ -57,8 +57,11 @@ var IRCFactory = function(axon) {
 				Meteor.logger.log('warn', 'factory socket error', e);
 
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
-					self.api.fork();
-					//self.api.setupServer();
+					if (Meteor.config.forkProcess) {
+						self.api.fork();
+					} else {
+						self.api.setupServer();
+					}
 					// fork the daemon
 				}
 				// we've tried our original connect and got ECONNREFUSED, it's highly
@@ -90,20 +93,6 @@ var IRCFactory = function(axon) {
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
-			this.clients[key] = {
-				key: key,
-				userId: user._id,
-				network: network.server
-			};
-
-			if (skip) {
-				this.clients[key].network = network.name;
-				this.clients[key].capabilities = network.internal.capabilities;
-				return;
-			}
-			// skip means we're just reconnecting to the irc-factory, so we need to
-			// set a few things that would normally be set on register event
-
 			Meteor.networkManager.changeStatus(key, Meteor.networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
 			// no need to send a message to the client, live database YEAH BABY
@@ -117,8 +106,6 @@ var IRCFactory = function(axon) {
 		destroy: function(key) {
 			Meteor.logger.log('info', 'destroying irc client', this.clients[key]);
 			// log it before we destroy it below
-
-			delete this.clients[key];
 
 			this.outgoing.emit('destroyClient', key);
 		},

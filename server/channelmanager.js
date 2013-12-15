@@ -36,8 +36,9 @@ var ChannelManager = function() {
 			return Channels.findOne({network: network, channel: channel});
 		},
 
-		insertUsers: function(key, network, channel, users) {
-			var update = {},
+		insertUsers: function(key, network, channel, users, force) {
+			var force = force || false,
+				update = {},
 				chan = this.getChannel(network, channel);
 
 			if (!chan) {
@@ -50,11 +51,16 @@ var ChannelManager = function() {
 			}
 
 			_.each(users, function(u) {
-				update['users.' + u.nickname] = u;
+				var field = (force) ? u.nickname : 'users.' + u.nickname;
+				update[field] = u;
 			});
 			// create an update record
 
-			Channels.update({network: network, channel: channel}, {$set: update});
+			if (force) {
+				Channels.update({network: network, channel: channel}, {$set: {users: update}});
+			} else {
+				Channels.update({network: network, channel: channel}, {$set: update});
+			}
 			// send the update out
 		},
 

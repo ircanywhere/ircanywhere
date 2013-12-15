@@ -27,6 +27,10 @@ var Application = function(raw) {
 				type: Boolean,
 				optional: true
 			},
+			'forkProcess': {
+				type: Boolean,
+				optional: false
+			},
 			'email': {
 				type: Object,
 				optional: false
