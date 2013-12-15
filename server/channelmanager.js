@@ -96,38 +96,26 @@ var ChannelManager = function() {
 				update = {},
 				nickChange = false;
 
-			_.each(values, function(v) {
-				if (v == 'nickname') {
-					nickChange = true;
-				}
-
-				_.each(users, function(u) {
-					if (v == 'nickname') {
-						update['users.' + u + '.' + v] = values[m];
-					} else {
-						query['users.' + u] = {$exists: true};
-					}
-				});
-				// create an update record
-			});
-
 			_.each(users, function(u) {
-				var s = {};
+				var s = {network: network};
 					s['users.' + u] = {$exists: true};
 				var q = _.extend(query, s),
-					record = Channels.findOne(q),
-					user = record.users[u],
-					updated = _.extend(user, values);
+					records = Channels.find(q);
 
-				if ('nickname' in values) {
-					record['users'][values.nickname] = updated;
-					delete record['users'][u];
-				} else {
-					record['users'][record.nickname] = updated;
-				}
+				records.forEach(function (record) {
+					var user = record.users[u],
+						updated = _.extend(user, values);
 
-				Channels.update({network: network, channel: channel}, record);
-				// update the channel record
+					if ('nickname' in values) {
+						record.users[values.nickname] = updated;
+						delete record.users[u];
+					} else {
+						record.users[record.nickname] = updated;
+					}
+
+					Channels.update({network: network, channel: record.channel}, {$set: {users: record.users}});
+					// update the record
+				});
 			});
 			// this is hacky as hell I feel but it's getting done this way to
 			// comply with all the other functions in this class
