@@ -1,5 +1,6 @@
 {
 	"axon": "1.0.0",
+	"dependable": "0.2.5",
 	"irc-factory": "1.1.1",
 	"jsonminify": "0.2.2",
 	"underscore": "1.5.2",

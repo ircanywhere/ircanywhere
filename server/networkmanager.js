@@ -1,4 +1,7 @@
-NetworkManager = (function() {
+var dependable = Meteor.require('dependable'),
+    container = dependable.container();
+
+var NetworkManager = function() {
 	"use strict";
 
 	var Manager = {
@@ -108,8 +111,9 @@ NetworkManager = (function() {
 		}
 	};
 
-	return Manager;
-}());
+	Manager.init();
 
-Meteor.networkManager = Object.create(NetworkManager);
-Meteor.networkManager.init();
+	return Manager;
+};
+
+Meteor.networkManager = container.resolve(NetworkManager);

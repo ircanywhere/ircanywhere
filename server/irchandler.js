@@ -1,4 +1,7 @@
-IRCHandler = (function() {
+var dependable = Meteor.require('dependable'),
+    container = dependable.container();
+    
+var IRCHandler = function() {
 	"use strict";
 
 	var Handler = {
@@ -102,8 +105,6 @@ IRCHandler = (function() {
 	};
 
 	return Handler;
-}());
+};
 
-Meteor.ircHandler = Object.create(IRCHandler);
-// dont call init here, none of these functions should ever be called directly
-// they are called by factory js based on whether the function names match irc-factory events
+Meteor.ircHandler = container.resolve(IRCHandler);

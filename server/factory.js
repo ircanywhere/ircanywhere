@@ -1,11 +1,15 @@
-IRCFactory = (function() {
-	"use strict";
+var crypto = Meteor.require('crypto'),
+	factory = Meteor.require('irc-factory').Api,
+	_ = Meteor.require('underscore'),
+	axon = Meteor.require('axon'),
+	dependable = Meteor.require('dependable'),
+    container = dependable.container();
 
-	var crypto = Meteor.require('crypto'),
-		factory = Meteor.require('irc-factory').Api,
-		axon = Meteor.require('axon'),
-		_ = Meteor.require('underscore');
-	// dependencies
+container.register('axon', axon);
+// inject axon
+
+var IRCFactory = function(axon) {
+	"use strict";
 
 	var Factory = {
 		api: new factory(),
@@ -124,8 +128,9 @@ IRCFactory = (function() {
 		}
 	};
 
-	return Factory;
-}());
+	Factory.init();
 
-Meteor.ircFactory = Object.create(IRCFactory);
-Meteor.ircFactory.init();
+	return Factory;
+};
+
+Meteor.ircFactory = container.resolve(IRCFactory);

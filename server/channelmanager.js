@@ -1,7 +1,9 @@
-ChannelManager = (function() {
-	"use strict";
+var dependable = Meteor.require('dependable'),
+    container = dependable.container(),
+    _ = Meteor.require('underscore');
 
-	var _ = Meteor.require('underscore');
+var ChannelManager = function() {
+	"use strict";
 
 	var Manager = {
 		channel: {
@@ -70,8 +72,9 @@ ChannelManager = (function() {
 		}
 	};
 
-	return Manager;
-}());
+	Manager.init();
 
-Meteor.channelManager = Object.create(ChannelManager);
-Meteor.channelManager.init();
+	return Manager;
+};
+
+Meteor.channelManager = container.resolve(ChannelManager);

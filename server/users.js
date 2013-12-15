@@ -1,4 +1,7 @@
-UserManager = (function() {
+var dependable = Meteor.require('dependable'),
+    container = dependable.container();
+
+var UserManager = function() {
 	"use strict";
 
 	var Manager = {
@@ -23,10 +26,8 @@ UserManager = (function() {
 				return Meteor.absoluteUrl('enroll-account/' + token);
 			};
 			// override the verify url functions etc to get our own link formats
-		}
-	};
+		},
 
-	Meteor.methods({
 		registerUser: function(name, nickname, email, password, confirmPassword) {
 			var output = {failed: false, successMessage: '', errors: []},
 				userId = null;
@@ -136,11 +137,18 @@ UserManager = (function() {
 			Meteor.logger.log('info', 'user logged in', {userId: userId});
 			// log this event
 		}
+	};
+
+	Meteor.methods({
+		registerUser: Manager.registerUser,
+		onUserLogin: Manager.onUserLogin
 	});
+	// open these methods up to the client side
+
+	Manager.init();
 
 	return Manager;
-}());
+};
 // create our user manager object
 
-Meteor.userManager = Object.create(UserManager);
-Meteor.userManager.init();
+Meteor.userManager = container.resolve(UserManager);

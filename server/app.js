@@ -1,14 +1,19 @@
-Application = (function() {
+var winston = Meteor.require('winston'),
+	os = Meteor.require('os'),
+	fs = Meteor.require('fs'),
+	path = Meteor.require('path'),
+	jsonminify = Meteor.require('jsonminify'),
+	raw = Assets.getText('config.json'),
+	dependable = Meteor.require('dependable'),
+    container = dependable.container();
+
+container.register('raw', raw);
+// inject the config so we can mimic it in tests if needed
+// XXX - maybe inject fs aswell because setupNode() causes problems in tests
+
+var Application = function(raw) {
 	"use strict";
 
-	var winston = Meteor.require('winston'),
-		os = Meteor.require('os'),
-		fs = Meteor.require('fs'),
-		path = Meteor.require('path'),
-		jsonminify = Meteor.require('jsonminify'),
-		raw = Assets.getText('config.json');
-	// dependencies
-	
 	var schema = new SimpleSchema({
 			'reverseDns': {
 				type: String,
@@ -200,8 +205,10 @@ Application = (function() {
 		}
 	};
 
-	return App;
-}());
+	App.init();
+	// initiate the module if need be
 
-Meteor.application = Object.create(Application);
-Meteor.application.init();
+	return App;
+};
+
+Meteor.application = container.resolve(Application);

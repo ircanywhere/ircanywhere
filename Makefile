@@ -1,3 +1,3 @@
 test: 
-	laika -t 10000 --settings private/test-config.json --reporter spec
+	laika -t 10000 --reporter spec
 .PHONY: test
