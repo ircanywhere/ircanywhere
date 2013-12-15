@@ -75,7 +75,19 @@ var IRCHandler = function() {
 		},
 
 		part: function(client, message) {
-			Meteor.channelManager.removeUsers(client.key, client.network, message.channel, [message.nickname]);
+			Meteor.channelManager.removeUsers(client.network, message.channel, [message.nickname]);
+		},
+
+		kick: function(client, message) {
+			Meteor.channelManager.removeUsers(client.network, message.channel, [message.kicked]);
+		},
+
+		quit: function(client, message) {
+			Meteor.channelManager.removeUsers(client.network, [message.nickname]);
+		},
+
+		nick: function(client, message) {
+			Meteor.channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
 		},
 
 		who: function(client, message) {
