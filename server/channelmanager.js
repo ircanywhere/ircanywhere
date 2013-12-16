@@ -93,8 +93,7 @@ var ChannelManager = function() {
 
 		updateUsers: function(network, users, values) {
 			var query = {network: network},
-				update = {},
-				nickChange = false;
+				update = {};
 
 			_.each(users, function(u) {
 				var s = {network: network};

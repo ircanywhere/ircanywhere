@@ -1,4 +1,4 @@
-var assert = require('assert');
+/*var assert = require('assert');
 
 suite('Client user forms', function() {
 	test('speed test', function(done, server, client) { done(); });
@@ -43,4 +43,4 @@ suite('Client user forms', function() {
 			done();
 		});
 	});
-});
+});*/
