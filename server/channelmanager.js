@@ -20,14 +20,31 @@ ChannelManager = function() {
 
 				networks.forEach(function(network) {
 					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab) {
+						if ('key' in tab && tab.target == 'channel') {
 							ids.push(tab.key);
 						}
 					});
 				});
 				// XXX - Look into this, maybe bad design? :/
+				//       i cant think of a better way of doing it because tabs are stored in network.internal
+				//       which is MUCH better than the previous implementation in the old ircanywhere..
 
 				return Channels.find({_id: {$in: ids}});
+			});
+
+			Meteor.publish('tabs', function() {
+				var networks = Networks.find({'internal.userId': this.userId}),
+					ids = [];
+
+				networks.forEach(function(network) {
+					_.each(network.internal.tabs, function(tab) {
+						if ('key' in tab && tab.target !== 'channel') {
+							ids.push(tab.key);
+						}
+					});
+				});
+
+				return Tabs.find({_id: {$in: ids}});
 			});
 		},
 

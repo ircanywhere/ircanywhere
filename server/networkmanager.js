@@ -96,10 +96,6 @@ NetworkManager = function() {
 					key: id,
 				};
 
-			if (type !== 'channel') {
-				delete obj.key;
-			};
-			
 			network.internal.tabs[obj.target] = obj;
 			Networks.update(client.key, {$set: {'internal.tabs': network.internal.tabs}});
 		},
