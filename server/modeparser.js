@@ -1,0 +1,251 @@
+ModeParser = function() {
+	"use strict";
+
+	var _ = Meteor.require('underscore');
+
+	var Parser = {
+		sortModes: function(capabilities, modes) {
+			var params = [],
+				splitModes = [],
+				omodes = modes;
+
+			if (modes.charAt(0) != '+' && modes.charAt(0) != '-') {
+				modes = '+' + modes;
+			}
+
+			if (modes.indexOf(' ') >= 0) {
+				params = modes.split(' ');
+				modes = params[0];
+				params.shift();
+			}
+			// split the mode string into modes and params.
+
+			splitModes = modes.split('');
+			
+			var modes = {
+					plus: '',
+					minus: '',
+					params: (params.length == 0 || params[0] == '') ? {} : params
+				},
+				modeType = null,
+				newParams = [],
+				paramCount = 1;
+				params = [];
+			// set some variables
+
+			for (var num = 0; num < splitModes.length; num++) {
+				var mode = splitModes[num];
+				if (mode == '+') {
+					modeType = 'plus';
+					continue;
+				} else if (mode == '-') {
+					modeType = 'minus';
+					continue;
+				}
+				// set the modeType to plus or minus
+
+				if (modeType == null) {
+					continue;
+				}
+				// this shouldn't occur but if it does just bail
+
+				if (capabilities.types.c.indexOf(mode) >= 0 && modeType == 'minus') {
+					modes[modeType] += mode;
+				} else if (capabilities.param.indexOf(mode) >= 0) {
+					params.push((modeType == 'plus' ? '+' + mode : '-' + mode));
+				} else {
+					modes[modeType] += mode;
+				}
+			}
+
+			var length = modes.params.length;
+			if (length > 0) {
+				for (var num = 0; num < length; num++) {
+					var param = modes.params[num],
+						mode = params[num];
+					
+					if (!_.has(newParams, param)) {
+						newParams[param] = {plus: '', minus: ''};
+					}
+					
+					if (_.has(params, num) && mode.charAt(0) == '+') {
+						newParams[param].plus += mode.replace('+', '');
+					} else if (_.has(params, num) && mode.charAt(0) == '-') {
+						newParams[param].minus += mode.replace('-', '');
+					}
+				}
+				// go through each parameter and find the mode
+				// that comes with it
+
+				modes.params = newParams;
+			}
+
+			return modes;
+		},
+
+		changeModes: function(capabilities, modes, modeArray) {
+			var prefixModes = _.keys(capabilities.prefixmodes).join('');
+			
+			if (modeArray.plus != '') {
+				var arr = modeArray.plus.split();
+				for (var pos = 0; pos < arr.length; pos++) {
+					var mode = arr[pos];
+					if (modes.indexOf(mode) == -1) {
+						modes += mode;
+					}
+				}
+			}
+			// we have plus modes? add them to the channel string
+
+			if (modeArray.minus != '') {
+				var arr = modeArray.plus.split();
+				for (var pos = 0; pos < arr.length; pos++) {
+					var mode = arr[pos],
+						parts = modes.split(' ');
+
+					if (parts[0].indexOf(mode) >= 0) {
+						var nStr = '',
+							splitParts = parts[0].split('');
+
+						for (var rmi = 0; rmi < splitParts.length; rmi++) {
+							var rm = splitParts[rmi];
+							if (capabilities.c.indexOf(rm) >= 0) {
+								nStr += rm;
+							}
+						}
+						// build a string of modes to remove.
+
+						var strPos = nStr.indexOf(mode);
+						if (strPos >= 0) {
+							parts.splice(strPos + 1, 1);
+						}
+						// find the location of the parameter
+
+						parts[0] = parts[0].replace(mode, '');
+						modes = parts.join(' ');
+						// remove the mode and param
+					}
+					// remove the mode (-)
+				}
+			}
+			// handle minus modes
+
+			for (var param in modeArray.params) {
+				if (modeArray.params[param].plus != '') {
+					var plusSplit = modeArray.params[param].plus.split('');
+					for (var pmi in plusSplit) {
+						var pm = plusSplit[pmi];
+
+						if (prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
+							continue;
+						}
+						// ignore these modes, handled elsewhere
+
+						var parts = modes.split(' '),
+							strPos = parts[0].indexOf(pm);
+
+						if (strPos >= 0) {
+							parts[0] = parts[0].replace(pm, '');
+							parts.splice(pmi + 1, 1);
+						}
+						// it exists, lets replace it
+						
+						parts[0] += pm;
+						parts.push(param);
+						// lets add it
+
+						modes = parts.join(' ');
+						// remove the mode and param
+					}
+				}
+				// handle plus modes
+
+				if (modeArray.params[param].minus != '') {
+					var minusSplit = modeArray.params[param].minus.split('');
+					for (var mmi in minusSplit) {
+						var mm = minusSplit[mmi];
+
+						if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
+							continue;
+						}
+						// ignore these modes, handled elsewhere
+						
+						var parts = modes.split(' '),
+							strPos = parts[0].indexOf(mm);
+
+						if (strPos >= 0) {
+							parts[0] = parts[0].replace(mm, '');
+							parts.splice(mmi + 1, 1);
+						}
+						// it exists, lets replace it
+
+						modes = parts.join(' ');
+						// remove the mode and param
+					}
+				}
+				// handle minus modes
+			}
+			// handle modes with unrequired parameters, such as flj
+
+			return modes;
+		},
+
+		handleParams: function(capabilities, channel, modeArray) {
+			var prefixModes = _.keys(capabilities.prefixmodes).join(''),
+				changedUsers = {};
+
+			for (var param in modeArray.params) {
+				var user = channel.users[param];
+				if (_.has(channel.users, param)) {
+					var changed = false;
+
+					if (modeArray.params[param].plus != '') {
+						var plusSplit = modeArray.params[param].plus.split('');
+						for (var pmi in plusSplit) {
+							var pm = plusSplit[pmi];
+
+							if (prefixModes.indexOf(pm) == -1) {
+								continue;
+							}
+							// we've found a user but be careful, this could still
+							// be a key, with the name of a user
+
+							if (!_.has(user.modes, pm)) {
+								user.modes[capabilities.prefixmodes[pm]] = pm;
+							}
+						}
+					}
+					// loop throug the plus modes
+
+					if (modeArray.params[param].minus != '') {
+						var minusSplit = modeArray.params[param].minus.split('');
+						for (var mmi in minusSplit) {
+							var mm = minusSplit[mmi];
+
+							if (prefixModes.indexOf(mm) == -1) {
+								continue;
+							}
+							// we've found a user but be careful, this could still
+							// be a key, with the name of a user
+							
+							if (_.has(user.modes, capabilities.prefixmodes[mm])) {
+								delete user.modes[capabilities.prefixmodes[mm]];
+							}
+						}
+					}
+					// loop through the plus modes
+				}
+				// determine if the parameter is a nick, based on what our
+				// user list for this channel looks like.
+
+				// XXX - Ban list and exception list etc another time
+			}
+			// handle modes with required on and off parameters
+			// ie status modes and restriction modes, also keys
+
+			return channel;
+		}
+	};
+
+	return Parser;
+};
