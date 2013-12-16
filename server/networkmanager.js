@@ -1,7 +1,4 @@
-var dependable = Meteor.require('dependable'),
-    container = dependable.container();
-
-var NetworkManager = function() {
+NetworkManager = function() {
 	"use strict";
 
 	var Manager = {
@@ -36,7 +33,7 @@ var NetworkManager = function() {
 				if (reconnect) {
 					clients[network._id] = {user: me, network: network};
 					
-					Meteor.ircFactory.clients[network._id] = {
+					ircFactory.clients[network._id] = {
 						key: network._id,
 						userId: me._id,
 						network:  network.name || network.server,
@@ -53,7 +50,7 @@ var NetworkManager = function() {
 
 		addNetwork: function(user, network) {
 			var userCount = Meteor.users.find({}).count(),
-				userName = Meteor.config.clientSettings.userNamePrefix + userCount;
+				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;
 			network.nick = user.profile.nickname;
@@ -92,12 +89,12 @@ var NetworkManager = function() {
 		connectNetwork: function(user, network) {
 			delete network.internal;
 
-			Meteor.ircFactory.create(user, network);
+			ircFactory.create(user, network);
 		},
 
 		changeStatus: function(networkId, status) {
 			if (!(status in this.flags)) {
-				Meteor.logger.log('warn', 'invalid status flag', {flag: status, network: networkId});
+				application.logger.log('warn', 'invalid status flag', {flag: status, network: networkId});
 				return;
 			}
 
@@ -109,5 +106,3 @@ var NetworkManager = function() {
 
 	return Manager;
 };
-
-Meteor.networkManager = container.resolve(NetworkManager);

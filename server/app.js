@@ -1,18 +1,11 @@
-var winston = Meteor.require('winston'),
-	os = Meteor.require('os'),
-	fs = Meteor.require('fs'),
-	path = Meteor.require('path'),
-	jsonminify = Meteor.require('jsonminify'),
-	raw = Assets.getText('config.json'),
-	dependable = Meteor.require('dependable'),
-    container = dependable.container();
-
-container.register('raw', raw);
-// inject the config so we can mimic it in tests if needed
-// XXX - maybe inject fs aswell because setupNode() causes problems in tests
-
-var Application = function(raw) {
+Application = function(raw) {
 	"use strict";
+
+	var winston = Meteor.require('winston'),
+		os = Meteor.require('os'),
+		fs = Meteor.require('fs'),
+		path = Meteor.require('path'),
+		jsonminify = Meteor.require('jsonminify');
 
 	var schema = new SimpleSchema({
 			'reverseDns': {
@@ -108,8 +101,8 @@ var Application = function(raw) {
 
 	var App = {
 		init: function() {
-			Meteor.config = JSON.parse(jsonminify(raw));
-			check(Meteor.config, schema);
+			this.config = JSON.parse(jsonminify(raw));
+			check(this.config, schema);
 			// attempt to validate our config file
 
 			this.getPath();
@@ -124,40 +117,40 @@ var Application = function(raw) {
 				var realPath = __meteor_bootstrap__.serverDir.split('.meteor/'),
 					path = realPath[0] + 'private/';
 
-				Meteor.config.rootPath = realPath[0];
+				this.config.rootPath = realPath[0];
 			} else {
 				var realPath = __meteor_bootstrap__.serverDir,
 					path = realPath + '/assets/app/';
 
-				Meteor.config.rootPath = realPath;
+				this.config.rootPath = realPath;
 			}
 			// get the full url, depending on the environment, development or private
 			// XXX - This is a bit hacky, although meteor provides no better more reliable way?
 
-			Meteor.config.assetPath = path;
+			this.config.assetPath = path;
 		},
 
 		setupWinston: function() {
-			Meteor.logger = new (winston.Logger)({
+			this.logger = new (winston.Logger)({
 				transports: [
 					new (winston.transports.File)({
 						name: 'error',
 						level: 'error',
-						filename: Meteor.config.rootPath + 'logs/error.log',
+						filename: this.config.rootPath + 'logs/error.log',
 						json: false,
 						timestamp: true
 					}),
 					new (winston.transports.File)({
 						name: 'warn',
 						level: 'warn',
-						filename: Meteor.config.rootPath + 'logs/warn.log',
+						filename: this.config.rootPath + 'logs/warn.log',
 						json: false,
 						timestamp: true
 					}),
 					new (winston.transports.File)({
 						name: 'info',
 						level: 'info',
-						filename: Meteor.config.rootPath + 'logs/info.log',
+						filename: this.config.rootPath + 'logs/info.log',
 						json: false,
 						timestamp: true
 					})
@@ -171,15 +164,15 @@ var Application = function(raw) {
 			var data = '',
 				json = {},
 				defaultJson = {
-					endpoint: Meteor.absoluteUrl('', Meteor.config.ssl),
+					endpoint: Meteor.absoluteUrl('', this.config.ssl),
 					hostname: os.hostname(),
-					reverseDns: Meteor.config.reverseDns,
+					reverseDns: this.config.reverseDns,
 					port: process.env.PORT,
 					ipAddress: (process.env.IP_ADDR) ? process.env.IP_ADDR : '0.0.0.0'
 				};
 
 			try {
-				data = fs.readFileSync(Meteor.config.assetPath + 'node.json', {encoding: 'utf8'});
+				data = fs.readFileSync(this.config.assetPath + 'node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
 
 				var node = Nodes.findOne(json.nodeId);
@@ -200,7 +193,7 @@ var Application = function(raw) {
 			if (data === JSON.stringify(json))
 				return false;
 
-			fs.writeFile(Meteor.config.assetPath + 'node.json', JSON.stringify(json), function(err) {
+			fs.writeFile(this.config.assetPath + 'node.json', JSON.stringify(json), function(err) {
 				if (err)
 					throw err;
 				else
@@ -214,5 +207,3 @@ var Application = function(raw) {
 
 	return App;
 };
-
-Meteor.application = container.resolve(Application);

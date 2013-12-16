@@ -1,9 +1,7 @@
-var dependable = Meteor.require('dependable'),
-    container = dependable.container(),
-    _ = Meteor.require('underscore');
-
-var ChannelManager = function() {
+ChannelManager = function() {
 	"use strict";
+
+	var _ = Meteor.require('underscore');
 
 	var Manager = {
 		channel: {
@@ -46,7 +44,7 @@ var ChannelManager = function() {
 				var chan = this.createChannel(network, channel);
 				// create the channel
 
-				Meteor.ircFactory.send(key, 'raw', ['WHO', channel]);
+				ircFactory.send(key, 'raw', ['WHO', channel]);
 				// we also do a /WHO here because we don't have this channel.. We want something
 				// a bit more detailed than the default NAMES reply
 			}
@@ -125,5 +123,3 @@ var ChannelManager = function() {
 
 	return Manager;
 };
-
-Meteor.channelManager = container.resolve(ChannelManager);

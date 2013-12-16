@@ -1,15 +1,9 @@
-var crypto = Meteor.require('crypto'),
-	factory = Meteor.require('irc-factory').Api,
-	_ = Meteor.require('underscore'),
-	axon = Meteor.require('axon'),
-	dependable = Meteor.require('dependable'),
-    container = dependable.container();
-
-container.register('axon', axon);
-// inject axon
-
-var IRCFactory = function(axon) {
+IRCFactory = function(axon) {
 	"use strict";
+
+	var crypto = Meteor.require('crypto'),
+		factory = Meteor.require('irc-factory').Api,
+		_ = Meteor.require('underscore');
 
 	var Factory = {
 		api: new factory(),
@@ -34,30 +28,30 @@ var IRCFactory = function(axon) {
 
 			var messageHandler = Meteor.bindEnvironment(function(message) {
 				if (message.event == 'synchronize') {
-					var users = Meteor.networkManager.getClients(),
+					var users = networkManager.getClients(),
 						keys = _.keys(users),
 						difference = _.difference(keys, message.keys);
 					
 					_.each(difference, function(key) {
 						var user = users[key];
-						Meteor.networkManager.connectNetwork(user.user, user.network);
+						networkManager.connectNetwork(user.user, user.network);
 					});
 					// the clients we're going to actually attempt to boot up
 
-					Meteor.logger.log('warn', 'factory synchronize', message);
+					application.logger.log('warn', 'factory synchronize', message);
 				} else {
 					self.handleEvent(message.event, message.message);
 				}
 			}, function(err) {
-				Meteor.logger.log('error', err.stack);
+				application.logger.log('error', err.stack);
 			});
 			// create an on message function but bind it in our meteor environment
 
 			var socketError = Meteor.bindEnvironment(function(e) {
-				Meteor.logger.log('warn', 'factory socket error', e);
+				application.logger.log('warn', 'factory socket error', e);
 
 				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
-					if (Meteor.config.forkProcess) {
+					if (application.config.forkProcess) {
 						self.api.fork();
 					} else {
 						self.api.setupServer();
@@ -67,7 +61,7 @@ var IRCFactory = function(axon) {
 				// we've tried our original connect and got ECONNREFUSED, it's highly
 				// likely that an irc-factory server isn't setup for us yet, lets try setting one up
 			}, function(err) {
-				Meteor.logger.log('error', err.stack);
+				application.logger.log('error', err.stack);
 			});
 			// create a socket error function
 
@@ -80,8 +74,8 @@ var IRCFactory = function(axon) {
 				e = event[1],
 				client = this.clients[key];
 
-			if (_.isFunction(Meteor.ircHandler[e])) {
-				Meteor.ircHandler[e].call(Meteor.ircHandler, client, object);
+			if (_.isFunction(ircHandler[e])) {
+				ircHandler[e].call(ircHandler, client, object);
 			} else {
 				console.log(event, object);
 			}
@@ -102,18 +96,18 @@ var IRCFactory = function(axon) {
 				};
 			}
 
-			Meteor.networkManager.changeStatus(key, Meteor.networkManager.flags.connecting);
+			networkManager.changeStatus(key, networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
 			// no need to send a message to the client, live database YEAH BABY
 			// we need to do this here because if we do it when we're calling create, it may have failed.
 
 			this.outgoing.emit('createClient', key, network);
 
-			Meteor.logger.log('info', 'creating irc client', this.clients[key]);
+			application.logger.log('info', 'creating irc client', this.clients[key]);
 		},
 
 		destroy: function(key) {
-			Meteor.logger.log('info', 'destroying irc client', this.clients[key]);
+			application.logger.log('info', 'destroying irc client', this.clients[key]);
 			// log it before we destroy it below
 
 			this.outgoing.emit('destroyClient', key);
@@ -128,5 +122,3 @@ var IRCFactory = function(axon) {
 
 	return Factory;
 };
-
-Meteor.ircFactory = container.resolve(IRCFactory);

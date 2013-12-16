@@ -1,18 +1,15 @@
-var dependable = Meteor.require('dependable'),
-    container = dependable.container();
-
-var UserManager = function() {
+UserManager = function() {
 	"use strict";
 
 	var Manager = {
 		init: function() {
 			Accounts.config({
-				sendVerificationEmail: Meteor.config.email.forceValidation,
+				sendVerificationEmail: application.config.email.forceValidation,
 				forbidClientAccountCreation: true
 			});
 
-			Accounts.emailTemplates.siteName = Meteor.config.email.siteName;
-			Accounts.emailTemplates.from = Meteor.config.email.from;
+			Accounts.emailTemplates.siteName = application.config.email.siteName;
+			Accounts.emailTemplates.from = application.config.email.from;
 
 			Accounts.urls.resetPassword = function (token) {
 				return Meteor.absoluteUrl('reset-password/' + token);
@@ -32,7 +29,7 @@ var UserManager = function() {
 			var output = {failed: false, successMessage: '', errors: []},
 				userId = null;
 
-			if (!Meteor.config.enableRegistrations) {
+			if (!application.config.enableRegistrations) {
 				output.errors.push({error: 'New registrations are currently closed'});
 			} else {
 				name = Meteor.Helpers.trimInput(name);
@@ -84,12 +81,12 @@ var UserManager = function() {
 			}
 			// it's failed, lets bail
 
-			if (!Meteor.config.email.forceValidation) {
+			if (!application.config.email.forceValidation) {
 				output.successMessage = 'Your account has been successfully created, you may now login';
 				return output;
 			}
 
-			Meteor.logger.log('info', 'account created', user);
+			application.logger.log('info', 'account created', user);
 			// log this event
 
 			try {
@@ -115,7 +112,7 @@ var UserManager = function() {
 			// find user's networks
 
 			if (me.profile.flags.newUser && networks.length === 0) {
-				var network = Meteor.networkManager.addNetwork(me, Meteor.config.defaultNetwork);
+				var network = Meteor.networkManager.addNetwork(me, application.config.defaultNetwork);
 				networks.push(network);
 			}
 			// user is new and has no networks, create one for them.
@@ -134,7 +131,7 @@ var UserManager = function() {
 			}
 			// loop through our networks and connect them if need be
 
-			Meteor.logger.log('info', 'user logged in', {userId: userId});
+			application.logger.log('info', 'user logged in', {userId: userId});
 			// log this event
 		}
 	};
@@ -149,6 +146,3 @@ var UserManager = function() {
 
 	return Manager;
 };
-// create our user manager object
-
-Meteor.userManager = container.resolve(UserManager);

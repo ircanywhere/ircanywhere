@@ -1,7 +1,4 @@
-var dependable = Meteor.require('dependable'),
-    container = dependable.container();
-    
-var IRCHandler = function() {
+IRCHandler = function() {
 	"use strict";
 
 	var Handler = {
@@ -141,5 +138,3 @@ var IRCHandler = function() {
 
 	return Handler;
 };
-
-Meteor.ircHandler = container.resolve(IRCHandler);
