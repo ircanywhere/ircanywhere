@@ -87,7 +87,7 @@ IRCFactory = function(axon) {
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
-			if (!(key in this.clients)) {
+			if (!_.has(this.clients, key)) {
 				this.clients[key] = {
 					key: key,
 					userId: user._id,

@@ -8,14 +8,10 @@ ChannelManager = function() {
 			network: '',
 			channel: '',
 			topic: {},
-			modes: {},
+			modes: '',
 			users: {}
 		},
 		// a default channel object
-
-		init: function() {
-
-		},
 
 		createChannel: function(network, channel) {
 			var chan = _.clone(this.channel);
@@ -116,10 +112,45 @@ ChannelManager = function() {
 			});
 			// this is hacky as hell I feel but it's getting done this way to
 			// comply with all the other functions in this class
+		},
+
+		updateModes: function(capab, network, channel, mode) {
+			var channel = channel.toLowerCase(),
+				chan = this.getChannel(network, channel);
+
+			if (!chan) {
+				var chan = this.createChannel(network, channel);
+				// create the channel
+			}
+
+			var parsedModes = modeParser.sortModes(capab, mode);
+			// we're not arsed about the channel or network here
+
+			chan.modes = modeParser.changeModes(capab, chan.modes, parsedModes);
+			chan.users = modeParser.handleParams(capab, chan.users, parsedModes);
+			// we need to attempt to update the record now with the new info
+
+			Channels.update({network: network, channel: channel}, {$set: {users: chan.users, modes: chan.modes}});
+			// update the record
+		},
+
+		updateTopic: function(network, channel, topic, setby) {
+			var channel = channel.toLowerCase(),
+				chan = this.getChannel(network, channel);
+
+			if (!chan) {
+				var chan = this.createChannel(network, channel);
+				// create the channel
+			}
+
+			chan.topic.topic = topic;
+			chan.topic.setter = setby || '';
+			// updat the topic record
+
+			Channels.update({network: network, channel: channel}, {$set: {topic: chan.topic}});
+			// update the record
 		}
 	};
-
-	Manager.init();
 
 	return Manager;
 };

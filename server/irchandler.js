@@ -136,9 +136,11 @@ IRCHandler = function() {
 		},
 
 		mode: function(client, message) {
-			console.log(message);
+			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+		},
 
-			console.log(modeParser.sortModes(client.capabilities, message.params[0]));
+		topic: function(client, message) {
+			channelManager.updateTopic(client.network, message.channel, message.topic, message.topicBy);
 		}
 	};
 

@@ -83,16 +83,16 @@ ModeParser = function() {
 			return modes;
 		},
 
-		changeModes: function(capabilities, modes, modeArray) {
-			var prefixModes = _.keys(capabilities.prefixmodes);
-			
+        changeModes: function(capabilities, modes, modeArray) {
+		    var prefixModes = _.keys(capabilities.prefixmodes);
+		    
 			if (modeArray.plus != '') {
 				var arr = modeArray.plus.split();
 				for (var pos = 0; pos < arr.length; pos++) {
 					var mode = arr[pos];
-					if (modes.indexOf(mode) == -1) {
+		            if (modes.indexOf(mode) == -1) {
 						modes += mode;
-					}
+		            }
 				}
 			}
 			// we have plus modes? add them to the channel string
@@ -109,16 +109,16 @@ ModeParser = function() {
 
 						for (var rmi = 0; rmi < splitParts.length; rmi++) {
 							var rm = splitParts[rmi];
-							if (capabilities.c.indexOf(rm) >= 0) {
+		                    if (capabilities.c.indexOf(rm) >= 0) {
 								nStr += rm;
-							}
+		                    }
 						}
 						// build a string of modes to remove.
 
 						var strPos = nStr.indexOf(mode);
-						if (strPos >= 0) {
+		                if (strPos >= 0) {
 							parts.splice(strPos + 1, 1);
-						}
+		                }
 						// find the location of the parameter
 
 						parts[0] = parts[0].replace(mode, '');
@@ -135,10 +135,10 @@ ModeParser = function() {
 					var plusSplit = modeArray.params[param].plus.split('');
 					for (var pmi in plusSplit) {
 						var pm = plusSplit[pmi];
-
-						if (_.has(prefixModes, pm) || capabilities.types.a.indexOf(pm) >= 0) {
+						
+						if (prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
 							continue;
-						}
+		                }
 						// ignore these modes, handled elsewhere
 
 						var parts = modes.split(' '),
@@ -165,15 +165,15 @@ ModeParser = function() {
 					for (var mmi in minusSplit) {
 						var mm = minusSplit[mmi];
 
-						if (_.has(prefixModes, pm) || capabilities.types.a.indexOf(mm) >= 0) {
+		                if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
 							continue;
-						}
+		                }
 						// ignore these modes, handled elsewhere
-						
-						var parts = modes.split(' '),
+                        
+                        var parts = modes.split(' '),
 							strPos = parts[0].indexOf(mm);
 
-						if (strPos >= 0) {
+		                if (strPos >= 0) {
 							parts[0] = parts[0].replace(mm, '');
 							parts.splice(mmi + 1, 1);
 						}
@@ -190,13 +190,13 @@ ModeParser = function() {
 			return modes;
 		},
 
-		handleParams: function(capabilities, channel, modeArray) {
+		handleParams: function(capabilities, users, modeArray) {
 			var prefixModes = _.keys(capabilities.prefixmodes),
 				changedUsers = {};
 
 			for (var param in modeArray.params) {
-				var user = channel.users[param];
-				if (_.has(channel.users, param)) {
+				var user = users[param];
+				if (_.has(users, param)) {
 					var changed = false;
 
 					if (modeArray.params[param].plus != '') {
@@ -204,13 +204,13 @@ ModeParser = function() {
 						for (var pmi in plusSplit) {
 							var pm = plusSplit[pmi];
 
-							if (!_.has(prefixModes, pm)) {
+							if (prefixModes.indexOf(pm) == -1) {
 								continue;
 							}
 							// we've found a user but be careful, this could still
 							// be a key, with the name of a user
 
-							if (!_.has(user.modes, pm)) {
+							if (!(pm in user.modes)) {
 								user.modes[capabilities.prefixmodes[pm]] = pm;
 							}
 						}
@@ -222,7 +222,7 @@ ModeParser = function() {
 						for (var mmi in minusSplit) {
 							var mm = minusSplit[mmi];
 
-							if (!_.has(prefixModes, mm)) {
+							if (prefixModes.indexOf(mm) == -1) {
 								continue;
 							}
 							// we've found a user but be careful, this could still
@@ -238,12 +238,12 @@ ModeParser = function() {
 				// determine if the parameter is a nick, based on what our
 				// user list for this channel looks like.
 
-				// XXX - Ban list and exception list etc another time
+				// XXX - Ban list and exception list etc another time. maybe? is this needed?
 			}
 			// handle modes with required on and off parameters
 			// ie status modes and restriction modes, also keys
 
-			return channel;
+			return users;
 		}
 	};
 
