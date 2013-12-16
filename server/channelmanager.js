@@ -13,6 +13,24 @@ ChannelManager = function() {
 		},
 		// a default channel object
 
+		init: function() {
+			Meteor.publish('channels', function() {
+				var networks = Networks.find({'internal.userId': this.userId}),
+					ids = [];
+
+				networks.forEach(function(network) {
+					_.each(network.internal.tabs, function(tab) {
+						if ('key' in tab) {
+							ids.push(tab.key);
+						}
+					});
+				});
+				// XXX - Look into this, maybe bad design? :/
+
+				return Channels.find({_id: {$in: ids}});
+			});
+		},
+
 		createChannel: function(network, channel) {
 			var chan = _.clone(this.channel);
 			// clone this.channel
@@ -153,6 +171,8 @@ ChannelManager = function() {
 			// update the record
 		}
 	};
+
+	Manager.init();
 
 	return Manager;
 };
