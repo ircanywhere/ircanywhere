@@ -1,4 +1,4 @@
-private/node.json
+*node.json
 packages
 logs
 .build
