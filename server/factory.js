@@ -92,7 +92,7 @@ IRCFactory = function(axon) {
 					key: key,
 					userId: user._id,
 					network: network.name || network.server,
-					nickname: network.nickname,
+					nickname: network.nick,
 					capabilities: network.internal.capabilities || {}
 				};
 			}

@@ -15,24 +15,11 @@ IRCHandler = function() {
 					chan = channel.channel,
 					password = channel.password || '';
 
-				channels[chan] = password;
-			}
-			// find our channels to automatically join from the network setup
-
-			for (var key in network.internal.channels) {
-				var channel = network.internal.channels[key],
-					chan = channel.channel,
-					password = channel.password || '';
-
-				channels[chan] = password;
-			}
-			// find the channels we were previously in (could have been disconnected and not saved)
-
-			for (var channel in channels) {
-				ircFactory.send(client.key, 'raw', ['JOIN', channel, channels[channel]]);
-				ircFactory.send(client.key, 'raw', ['MODE', channel]);
+				ircFactory.send(client.key, 'raw', ['JOIN', chan, password]);
+				ircFactory.send(client.key, 'raw', ['MODE', chan]);
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
+			// find our channels to automatically join from the network setup
 
 			client.capabilities = message.capabilities;
 			client.network = message.capabilities.network.name;
@@ -40,7 +27,7 @@ IRCHandler = function() {
 			// update client record on the fly
 
 			Networks.update(client.key, {$set: {
-				'nickname': message.nickname,
+				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
 				'internal.capabilities': message.capabilities
@@ -71,7 +58,12 @@ IRCHandler = function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			channelManager.insertUsers(client.key, client.network, message.channel, [user]);
+			var id = channelManager.insertUsers(client.key, client.network, message.channel, [user]);
+
+			if (message.nickname == client.nickname) {
+				networkManager.addTab(client, message.channel, 'channel', id);
+			}
+			// if it's us joining a channel we'll mark it in internal.tabs
 		},
 
 		part: function(client, message) {
@@ -89,7 +81,7 @@ IRCHandler = function() {
 		nick: function(client, message) {
 			if (message.nickname == client.nickname) {
 				client.nickname = message.newnick;
-				Networks.update(client.key, {$set: {nickname: message.newnick}});
+				Networks.update(client.key, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
 
@@ -118,7 +110,10 @@ IRCHandler = function() {
 				users.push(user);
 			});
 
-			channelManager.insertUsers(client.key, client.network, message.channel, users, true);
+			var id = channelManager.insertUsers(client.key, client.network, message.channel, users, true);
+
+			networkManager.addTab(client, message.channel, 'channel', id);
+			// we'll update our internal channels cause we might be reconnecting after inactivity
 		},
 
 		names: function(client, message) {

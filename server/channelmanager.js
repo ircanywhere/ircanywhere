@@ -57,6 +57,8 @@ ChannelManager = function() {
 				Channels.update({network: network, channel: channel}, {$set: update});
 			}
 			// send the update out
+
+			return chan._id;
 		},
 
 		removeUsers: function(network, channel, users) {

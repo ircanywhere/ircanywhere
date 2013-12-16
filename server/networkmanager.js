@@ -37,7 +37,7 @@ NetworkManager = function() {
 						key: network._id,
 						userId: me._id,
 						network: network.name || network.server,
-						nickname: network.nickname,
+						nickname: network.nick,
 						capabilities: network.internal.capabilities
 					};
 					// call create directly but with the skip parameter cause all we want to do is
@@ -54,7 +54,7 @@ NetworkManager = function() {
 				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;
-			network.nickname = user.profile.nickname;
+			network.nick = user.profile.nickname;
 			network.user = userName;
 			network.secure = network.secure || false;
 			network.sasl = network.sasl || false;
@@ -72,7 +72,7 @@ NetworkManager = function() {
 				nodeId: Meteor.nodeId,
 				userId: user._id,
 				status: this.flags.closed,
-				channels: [],
+				tabs: {},
 				url: network.server + ':' + ((network.secure) ? '+' : '') + network.port
 			}
 			// this stores internal information about the network, it will be available to
@@ -85,6 +85,23 @@ NetworkManager = function() {
 			// a callback meteor automatically sets up a fiber, blocking the code in users.js
 
 			return network;
+		},
+
+		addTab: function(client, target, type, id) {
+			var network = Networks.findOne(client.key),
+				obj = {
+					target: target.toLowerCase(),
+					title: target,
+					type: type,
+					key: id,
+				};
+
+			if (type !== 'channel') {
+				delete obj.key;
+			};
+			
+			network.internal.tabs[obj.target] = obj;
+			Networks.update(client.key, {$set: {'internal.tabs': network.internal.tabs}});
 		},
 
 		connectNetwork: function(user, network) {
