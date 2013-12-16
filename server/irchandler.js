@@ -1,6 +1,9 @@
 IRCHandler = function() {
 	"use strict";
 
+	var fs = Meteor.require('fs'),
+		smartjson = JSON.parse(fs.readFileSync(application.config.assetPath + '/../smart.json'));
+
 	var Handler = {
 		registered: function(client, message) {
 			var channels = {},
@@ -15,8 +18,8 @@ IRCHandler = function() {
 					chan = channel.channel,
 					password = channel.password || '';
 
-				ircFactory.send(client.key, 'raw', ['JOIN', chan, password]);
-				ircFactory.send(client.key, 'raw', ['MODE', chan]);
+				ircFactory.send(client.key, 'raw', [['JOIN', chan, password]]);
+				ircFactory.send(client.key, 'raw', [['MODE', chan]]);
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 			// find our channels to automatically join from the network setup
@@ -134,7 +137,7 @@ IRCHandler = function() {
 			};
 
 			if (!compare([keys, users])) {
-				ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
+				ircFactory.send(client.key, 'raw', [['WHO', message.channel]]);
 			}
 			// different lists.. lets do a /WHO
 		},
@@ -145,6 +148,13 @@ IRCHandler = function() {
 
 		topic: function(client, message) {
 			channelManager.updateTopic(client.network, message.channel, message.topic, message.topicBy);
+		},
+
+		ctcp_request: function(client, message) {
+			if (message.type.toUpperCase() == 'VERSION') {
+				var version = 'IRCAnywhere v' + smartjson.version + ' ' + smartjson.homepage;
+				ircFactory.send(client.key, 'ctcp', [message.nickname, 'VERSION', version]);
+			}
 		}
 	};
 

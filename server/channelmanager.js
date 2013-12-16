@@ -75,7 +75,7 @@ ChannelManager = function() {
 				var chan = this.createChannel(network, channel);
 				// create the channel
 
-				ircFactory.send(key, 'raw', ['WHO', channel]);
+				ircFactory.send(key, 'raw', [['WHO', channel]]);
 				// we also do a /WHO here because we don't have this channel.. We want something
 				// a bit more detailed than the default NAMES reply
 			}

@@ -3,7 +3,7 @@
   "description": "IRCAnywhere web bnc system",
   "homepage": "https://github.com/ircanywhere/ircanywhere",
   "author": "Ricki Hastings (https://ircanywhere.com)",
-  "version": "0.2.0",
+  "version": "0.2.0-alpha",
   "git": "https://github.com/ircanywhere/ircanywhere.git",
   "packages": {
   	"npm": {},
