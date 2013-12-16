@@ -93,6 +93,15 @@ var IRCFactory = function(axon) {
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
+			if (!(key in this.clients)) {
+				this.clients[key] = {
+					key: key,
+					userId: user._id,
+					network:  network.name || network.server,
+					capabilities: network.internal.capabilities || {}
+				};
+			}
+
 			Meteor.networkManager.changeStatus(key, Meteor.networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
 			// no need to send a message to the client, live database YEAH BABY

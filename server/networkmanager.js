@@ -90,17 +90,6 @@ var NetworkManager = function() {
 		},
 
 		connectNetwork: function(user, network) {
-			for (var channel in network.channels) {
-				var split = channel.split(' '),
-					chan = split[0],
-					pass = split[1] || '';
-
-				network.internal.channels[chan] = pass;
-			}
-			// move into network.internal.channels
-			// we do this because we manually join our channels instead of sending
-			// them into irc-factory immediately, because it's crappy and doesn't support passwords
-
 			delete network.internal;
 
 			Meteor.ircFactory.create(user, network);
