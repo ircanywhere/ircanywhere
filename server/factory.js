@@ -91,7 +91,8 @@ IRCFactory = function(axon) {
 				this.clients[key] = {
 					key: key,
 					userId: user._id,
-					network:  network.name || network.server,
+					network: network.name || network.server,
+					nickname: network.nickname,
 					capabilities: network.internal.capabilities || {}
 				};
 			}

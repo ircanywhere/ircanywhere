@@ -36,7 +36,8 @@ NetworkManager = function() {
 					ircFactory.clients[network._id] = {
 						key: network._id,
 						userId: me._id,
-						network:  network.name || network.server,
+						network: network.name || network.server,
+						nickname: network.nickname,
 						capabilities: network.internal.capabilities
 					};
 					// call create directly but with the skip parameter cause all we want to do is
@@ -53,7 +54,7 @@ NetworkManager = function() {
 				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;
-			network.nick = user.profile.nickname;
+			network.nickname = user.profile.nickname;
 			network.user = userName;
 			network.secure = network.secure || false;
 			network.sasl = network.sasl || false;

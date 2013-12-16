@@ -36,8 +36,11 @@ IRCHandler = function() {
 
 			client.capabilities = message.capabilities;
 			client.network = message.capabilities.network.name;
+			client.nickname = message.nickname;
+			// update client record on the fly
+
 			Networks.update(client.key, {$set: {
-				'nick': message.nickname,
+				'nickname': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
 				'internal.capabilities': message.capabilities
@@ -84,6 +87,12 @@ IRCHandler = function() {
 		},
 
 		nick: function(client, message) {
+			if (message.nickname == client.nickname) {
+				client.nickname = message.newnick;
+				Networks.update(client.key, {$set: {nickname: message.newnick}});
+			}
+			// update the nickname because its us changing our nick
+
 			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
 		},
 
