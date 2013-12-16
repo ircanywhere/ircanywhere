@@ -20,7 +20,7 @@ ChannelManager = function() {
 
 				networks.forEach(function(network) {
 					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab && tab.target == 'channel') {
+						if ('key' in tab && tab.type == 'channel') {
 							ids.push(tab.key);
 						}
 					});
@@ -28,6 +28,8 @@ ChannelManager = function() {
 				// XXX - Look into this, maybe bad design? :/
 				//       i cant think of a better way of doing it because tabs are stored in network.internal
 				//       which is MUCH better than the previous implementation in the old ircanywhere..
+
+				
 
 				return Channels.find({_id: {$in: ids}});
 			});
@@ -38,7 +40,7 @@ ChannelManager = function() {
 
 				networks.forEach(function(network) {
 					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab && tab.target !== 'channel') {
+						if ('key' in tab && tab.type !== 'channel') {
 							ids.push(tab.key);
 						}
 					});
@@ -75,7 +77,7 @@ ChannelManager = function() {
 				var chan = this.createChannel(network, channel);
 				// create the channel
 
-				ircFactory.send(key, 'raw', [['WHO', channel]]);
+				ircFactory.send(key, 'raw', ['WHO ' + channel]);
 				// we also do a /WHO here because we don't have this channel.. We want something
 				// a bit more detailed than the default NAMES reply
 			}

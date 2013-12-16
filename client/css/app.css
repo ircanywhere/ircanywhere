@@ -1,0 +1,17 @@
+div.wire-container {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 12px;
+	color: black;
+	padding: 10px;
+}
+
+div.move-left {
+	float: left;
+	width: 70%;
+}
+
+div.move-right {
+	float: right;
+	width: 30%;
+	text-align: left;
+}

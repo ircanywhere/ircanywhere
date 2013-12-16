@@ -18,8 +18,8 @@ IRCHandler = function() {
 					chan = channel.channel,
 					password = channel.password || '';
 
-				ircFactory.send(client.key, 'raw', [['JOIN', chan, password]]);
-				ircFactory.send(client.key, 'raw', [['MODE', chan]]);
+				ircFactory.send(client.key, 'raw', ['JOIN ' + chan + ' ' + password]);
+				ircFactory.send(client.key, 'raw', ['MODE ' + chan]);
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 			// find our channels to automatically join from the network setup
@@ -137,7 +137,7 @@ IRCHandler = function() {
 			};
 
 			if (!compare([keys, users])) {
-				ircFactory.send(client.key, 'raw', [['WHO', message.channel]]);
+				ircFactory.send(client.key, 'raw', ['WHO ' + message.channel]);
 			}
 			// different lists.. lets do a /WHO
 		},
