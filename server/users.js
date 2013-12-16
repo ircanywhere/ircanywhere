@@ -112,7 +112,7 @@ UserManager = function() {
 			// find user's networks
 
 			if (me.profile.flags.newUser && networks.length === 0) {
-				var network = Meteor.networkManager.addNetwork(me, application.config.defaultNetwork);
+				var network = networkManager.addNetwork(me, application.config.defaultNetwork);
 				networks.push(network);
 			}
 			// user is new and has no networks, create one for them.
@@ -121,12 +121,12 @@ UserManager = function() {
 				var network = networks[netId],
 					reconnect = false;
 
-				if (network.internal.status !== Meteor.networkManager.flags.disconnect) {
+				if (network.internal.status !== networkManager.flags.disconnect) {
 					reconnect = true;
 				}
 
 				if (reconnect) {
-					Meteor.networkManager.connectNetwork(me, network);
+					networkManager.connectNetwork(me, network);
 				}
 			}
 			// loop through our networks and connect them if need be

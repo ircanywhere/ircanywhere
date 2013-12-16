@@ -84,7 +84,7 @@ ModeParser = function() {
 		},
 
 		changeModes: function(capabilities, modes, modeArray) {
-			var prefixModes = _.keys(capabilities.prefixmodes).join('');
+			var prefixModes = _.keys(capabilities.prefixmodes);
 			
 			if (modeArray.plus != '') {
 				var arr = modeArray.plus.split();
@@ -136,7 +136,7 @@ ModeParser = function() {
 					for (var pmi in plusSplit) {
 						var pm = plusSplit[pmi];
 
-						if (prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
+						if (_.has(prefixModes, pm) || capabilities.types.a.indexOf(pm) >= 0) {
 							continue;
 						}
 						// ignore these modes, handled elsewhere
@@ -165,7 +165,7 @@ ModeParser = function() {
 					for (var mmi in minusSplit) {
 						var mm = minusSplit[mmi];
 
-						if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
+						if (_.has(prefixModes, pm) || capabilities.types.a.indexOf(mm) >= 0) {
 							continue;
 						}
 						// ignore these modes, handled elsewhere
@@ -191,7 +191,7 @@ ModeParser = function() {
 		},
 
 		handleParams: function(capabilities, channel, modeArray) {
-			var prefixModes = _.keys(capabilities.prefixmodes).join(''),
+			var prefixModes = _.keys(capabilities.prefixmodes),
 				changedUsers = {};
 
 			for (var param in modeArray.params) {
@@ -204,7 +204,7 @@ ModeParser = function() {
 						for (var pmi in plusSplit) {
 							var pm = plusSplit[pmi];
 
-							if (prefixModes.indexOf(pm) == -1) {
+							if (!_.has(prefixModes, pm)) {
 								continue;
 							}
 							// we've found a user but be careful, this could still
@@ -222,7 +222,7 @@ ModeParser = function() {
 						for (var mmi in minusSplit) {
 							var mm = minusSplit[mmi];
 
-							if (prefixModes.indexOf(mm) == -1) {
+							if (!_.has(prefixModes, mm)) {
 								continue;
 							}
 							// we've found a user but be careful, this could still

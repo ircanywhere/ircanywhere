@@ -8,6 +8,9 @@ application = container.resolve(Application);
 // inject the config so we can mimic it in tests if needed
 // XXX - maybe inject fs aswell because setupNode() causes problems in tests
 
+modeParser = container.resolve(ModeParser);
+// mode parsing engine, no dependencies, just a parser class
+
 userManager = container.resolve(UserManager);
 // user manager
 

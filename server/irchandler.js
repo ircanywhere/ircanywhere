@@ -29,8 +29,8 @@ IRCHandler = function() {
 			// find the channels we were previously in (could have been disconnected and not saved)
 
 			for (var channel in channels) {
-				Meteor.ircFactory.send(client.key, 'raw', ['JOIN', channel, channels[channel]]);
-				Meteor.ircFactory.send(client.key, 'raw', ['MODE', channel]);
+				ircFactory.send(client.key, 'raw', ['JOIN', channel, channels[channel]]);
+				ircFactory.send(client.key, 'raw', ['MODE', channel]);
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 
@@ -39,16 +39,16 @@ IRCHandler = function() {
 			Networks.update(client.key, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
-				'internal.status': Meteor.networkManager.flags.connected,
+				'internal.status': networkManager.flags.connected,
 				'internal.capabilities': message.capabilities
 			}});
-			//Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.connected);
+			//networkManager.changeStatus(client.key, networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
 		},
 
 		closed: function(client, message) {
-			Meteor.networkManager.changeStatus({_id: client.key, 'internal.status': {$ne: Meteor.networkManager.closed}}, Meteor.networkManager.flags.closed);
+			networkManager.changeStatus({_id: client.key, 'internal.status': {$ne: networkManager.closed}}, networkManager.flags.closed);
 			// a bit of sorcery here, strictly speaking .changeStatus takes a networkId. But because of meteor's beauty
 			// we can pass in an ID, or a selector. So instead of getting the status and checking it, we just do a mongo update
 			// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
@@ -56,7 +56,7 @@ IRCHandler = function() {
 		},
 
 		failed: function(client, message) {
-			Meteor.networkManager.changeStatus(client.key, Meteor.networkManager.flags.failed);
+			networkManager.changeStatus(client.key, networkManager.flags.failed);
 		},
 
 		join: function(client, message) {
@@ -68,23 +68,23 @@ IRCHandler = function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, [user]);
+			channelManager.insertUsers(client.key, client.network, message.channel, [user]);
 		},
 
 		part: function(client, message) {
-			Meteor.channelManager.removeUsers(client.network, message.channel, [message.nickname]);
+			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
 		},
 
 		kick: function(client, message) {
-			Meteor.channelManager.removeUsers(client.network, message.channel, [message.kicked]);
+			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
 		},
 
 		quit: function(client, message) {
-			Meteor.channelManager.removeUsers(client.network, [message.nickname]);
+			channelManager.removeUsers(client.network, [message.nickname]);
 		},
 
 		nick: function(client, message) {
-			Meteor.channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
+			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
 		},
 
 		who: function(client, message) {
@@ -109,11 +109,11 @@ IRCHandler = function() {
 				users.push(user);
 			});
 
-			Meteor.channelManager.insertUsers(client.key, client.network, message.channel, users, true);
+			channelManager.insertUsers(client.key, client.network, message.channel, users, true);
 		},
 
 		names: function(client, message) {
-			var channel = Meteor.channelManager.getChannel(client.network, message.channel),
+			var channel = channelManager.getChannel(client.network, message.channel),
 				users = [],
 				regex = new RegExp('[' + Meteor.Helpers.escape(client.capabilities.modes.prefixes) + ']', 'g'),
 				keys = _.keys(channel.users);
@@ -130,9 +130,15 @@ IRCHandler = function() {
 			};
 
 			if (!compare([keys, users])) {
-				Meteor.ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
+				ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
 			}
 			// different lists.. lets do a /WHO
+		},
+
+		mode: function(client, message) {
+			console.log(message);
+
+			console.log(modeParser.sortModes(client.capabilities, message.params[0]));
 		}
 	};
 
