@@ -11,5 +11,6 @@ Deps.autorun(function(c) {
 	if (Session.equals('loggedIn', true)) {
 		Meteor.subscribe('networks');
 		Meteor.subscribe('channels');
+		Meteor.subscribe('tabs');
 	}
 });

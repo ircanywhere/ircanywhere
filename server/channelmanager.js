@@ -29,8 +29,6 @@ ChannelManager = function() {
 				//       i cant think of a better way of doing it because tabs are stored in network.internal
 				//       which is MUCH better than the previous implementation in the old ircanywhere..
 
-				
-
 				return Channels.find({_id: {$in: ids}});
 			});
 
