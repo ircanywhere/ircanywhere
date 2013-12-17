@@ -38,7 +38,8 @@ NetworkManager = function() {
 						userId: me._id,
 						network: network.name || network.server,
 						nickname: network.nick,
-						capabilities: network.internal.capabilities
+						capabilities: network.internal.capabilities,
+						tabs: network.internal.tabs
 					};
 					// call create directly but with the skip parameter cause all we want to do is
 					// add the record into this.clients
@@ -93,11 +94,15 @@ NetworkManager = function() {
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
-					key: id,
+					key: id
 				};
 
 			network.internal.tabs[obj.target] = obj;
 			Networks.update(client.key, {$set: {'internal.tabs': network.internal.tabs}});
+			// insert to db
+
+			client.tabs = network.internal.tabs;
+			// update tabs
 		},
 
 		removeTab: function(client, target) {
@@ -107,6 +112,9 @@ NetworkManager = function() {
 			// this tells us to unset 'internal.tabs.ricki'
 
 			Networks.update(client.key, {$unset: obj});
+
+			delete client.tabs[target];
+			// update tabs
 		},
 
 		connectNetwork: function(user, network) {

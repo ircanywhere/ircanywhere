@@ -38,6 +38,9 @@ IRCHandler = function() {
 			//networkManager.changeStatus(client.key, networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
+
+			networkManager.addTab(client, client.network, 'network', client.key);
+			// add the tab
 		},
 
 		closed: function(client, message) {
@@ -163,9 +166,9 @@ IRCHandler = function() {
 			channelManager.insertEvent(client, message, 'privmsg');
 		},
 
-		notice: function(client, message) {
+		/*notice: function(client, message) {
 			channelManager.insertEvent(client, message, 'notice');
-		},
+		},*/
 
 		ctcp_request: function(client, message) {
 			if (message.type.toUpperCase() == 'VERSION') {

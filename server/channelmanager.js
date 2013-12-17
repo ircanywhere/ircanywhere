@@ -195,12 +195,15 @@ ChannelManager = function() {
 		insertEvent: function(client, message, type) {
 			var output = {
 				type: type,
-				userId: client.userId,
-				network: client.network,
-			},
-			extended = _.extend(message, output);
+				user: client.userId,
+				tab: client.tabs[message.channel || message.target].key || client.key,
+				message: message
+			};
 
-			Events.insert(extended);
+			delete output.message.raw;
+			// dont want this here
+
+			Events.insert(output);
 		}
 	};
 

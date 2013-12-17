@@ -76,9 +76,9 @@ IRCFactory = function(axon) {
 
 			if (_.isFunction(ircHandler[e])) {
 				ircHandler[e].call(ircHandler, client, object);
-			} else {
-				console.log(event, object);
 			}
+			
+			console.log(event, object);
 		},
 
 		create: function(user, network, skip) {
@@ -93,8 +93,11 @@ IRCFactory = function(axon) {
 					userId: user._id,
 					network: network.name || network.server,
 					nickname: network.nick,
-					capabilities: network.internal.capabilities || {}
+					capabilities: network.internal.capabilities || {},
+					tabs: network.internal.tabs
 				};
+				// add a client
+				// XXX - refactor this and the code in network manager together
 			}
 
 			networkManager.changeStatus(key, networkManager.flags.connecting);
