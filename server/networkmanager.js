@@ -118,8 +118,6 @@ NetworkManager = function() {
 		},
 
 		connectNetwork: function(user, network) {
-			delete network.internal;
-
 			ircFactory.create(user, network);
 		},
 
