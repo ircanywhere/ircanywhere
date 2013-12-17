@@ -67,18 +67,24 @@ IRCHandler = function() {
 				networkManager.addTab(client, message.channel, 'channel', id);
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
+
+			channelManager.insertEvent(client, message, 'join');
+			// event
 		},
 
 		part: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
+			channelManager.insertEvent(client, message, 'part');
 		},
 
 		kick: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
+			channelManager.insertEvent(client, message, 'kick');
 		},
 
 		quit: function(client, message) {
 			channelManager.removeUsers(client.network, [message.nickname]);
+			channelManager.insertEvent(client, message, 'quit');
 		},
 
 		nick: function(client, message) {
@@ -89,6 +95,7 @@ IRCHandler = function() {
 			// update the nickname because its us changing our nick
 
 			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
+			channelManager.insertEvent(client, message, 'nick');
 		},
 
 		who: function(client, message) {
@@ -144,10 +151,20 @@ IRCHandler = function() {
 
 		mode: function(client, message) {
 			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+			channelManager.insertEvent(client, message, 'mode');
 		},
 
 		topic: function(client, message) {
 			channelManager.updateTopic(client.network, message.channel, message.topic, message.topicBy);
+			channelManager.insertEvent(client, message, 'topic');
+		},
+
+		privmsg: function(client, message) {
+			channelManager.insertEvent(client, message, 'privmsg');
+		},
+
+		notice: function(client, message) {
+			channelManager.insertEvent(client, message, 'notice');
 		},
 
 		ctcp_request: function(client, message) {

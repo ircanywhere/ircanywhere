@@ -5,7 +5,9 @@
 <template name="main">
 	<div class="wire-container clear">
 		<div class="move-left">
-			left stuff
+			{{#each events}}
+				<pre>{{event this}}</pre>
+			{{/each}}
 		</div>
 		<div class="move-right">
 			<pre>{{data}}</pre>

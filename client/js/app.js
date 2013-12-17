@@ -12,5 +12,6 @@ Deps.autorun(function(c) {
 		Meteor.subscribe('networks');
 		Meteor.subscribe('channels');
 		Meteor.subscribe('tabs');
+		Meteor.subscribe('events');
 	}
 });

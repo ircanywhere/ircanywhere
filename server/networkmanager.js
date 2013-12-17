@@ -100,6 +100,15 @@ NetworkManager = function() {
 			Networks.update(client.key, {$set: {'internal.tabs': network.internal.tabs}});
 		},
 
+		removeTab: function(client, target) {
+			var obj = {};
+			obj['internal.tabs.' + target] = 1;
+			// bit messy but create an object for mongodb query, if the target is 'ricki'
+			// this tells us to unset 'internal.tabs.ricki'
+
+			Networks.update(client.key, {$unset: obj});
+		},
+
 		connectNetwork: function(user, network) {
 			delete network.internal;
 

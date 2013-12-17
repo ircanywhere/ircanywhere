@@ -46,6 +46,10 @@ ChannelManager = function() {
 
 				return Tabs.find({_id: {$in: ids}});
 			});
+
+			Meteor.publish('events', function() {
+				return Events.find({});
+			});
 		},
 
 		createChannel: function(network, channel) {
@@ -186,6 +190,17 @@ ChannelManager = function() {
 
 			Channels.update({network: network, channel: channel}, {$set: {topic: chan.topic}});
 			// update the record
+		},
+
+		insertEvent: function(client, message, type) {
+			var output = {
+				type: type,
+				userId: client.userId,
+				network: client.network,
+			},
+			extended = _.extend(message, output);
+
+			Events.insert(extended);
 		}
 	};
 
