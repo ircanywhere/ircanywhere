@@ -1,14 +1,13 @@
 {
-  "name": "ircanywhere",
-  "description": "IRCAnywhere web bnc system",
-  "homepage": "https://github.com/ircanywhere/ircanywhere",
-  "author": "Ricki Hastings (https://ircanywhere.com)",
-  "version": "0.2.0-alpha",
-  "git": "https://github.com/ircanywhere/ircanywhere.git",
-  "packages": {
-  	"npm": {},
-  	"smart-collections" : {},
-    "simple-schema": {},
-    "iron-router": {}
-  }
+	"name": "ircanywhere",
+	"description": "IRCAnywhere web bnc system",
+	"homepage": "https://github.com/ircanywhere/ircanywhere",
+	"author": "Ricki Hastings (https://ircanywhere.com)",
+	"version": "0.2.0-alpha",
+	"git": "https://github.com/ircanywhere/ircanywhere.git",
+	"packages": {
+		"npm": {},
+		"simple-schema": {},
+		"iron-router": {}
+	}
 }
