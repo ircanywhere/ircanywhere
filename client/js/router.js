@@ -58,6 +58,9 @@ Router.map(function () {
 
 	this.route('verify', {
 		path: '/verify-email/:token',
-		action: function() { Meteor.Actions.verifyUser(this, this.params['token']) }
+		action: function() {
+			Meteor.Actions.verifyUser(this, this.params['token']);
+			Meteor.call('onUserLogin');
+		}
 	});
 });

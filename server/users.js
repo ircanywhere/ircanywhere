@@ -108,6 +108,10 @@ UserManager = function() {
 			var userId = this.userId,
 				me = Meteor.user();
 
+			if (me == null) {
+				return;
+			}
+
 			var networks = Networks.find({'internal.userId': userId}).fetch();
 			// find user's networks
 
