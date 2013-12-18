@@ -27,6 +27,3 @@ ircHandler = container.resolve(IRCHandler);
 container.register('axon', axon);
 ircFactory = container.resolve(IRCFactory);
 // setup irc factory with its dependencies
-
-// XXX - We do this all in one file so scope issues dont go tits up and so we can
-//		 require these files in elsewhere like in tests and inject our own dependencies

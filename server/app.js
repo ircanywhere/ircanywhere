@@ -124,7 +124,7 @@ Application = function(fs, raw) {
 				this.config.rootPath = realPath;
 			}
 			// get the full url, depending on the environment, development or private
-			// XXX - This is a bit hacky, although meteor provides no better more reliable way?
+			// This is a bit hacky, although meteor provides no better more reliable way.. atm
 
 			this.config.assetPath = path;
 		},
@@ -158,8 +158,6 @@ Application = function(fs, raw) {
 		},
 
 		setupNode: function() {
-			// XXX - Stop this from happening on tests, it's trashing the speed completely
-
 			var data = '',
 				json = {},
 				defaultJson = {
