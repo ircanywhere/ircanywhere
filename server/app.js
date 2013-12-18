@@ -1,9 +1,8 @@
-Application = function(raw) {
+Application = function(fs, raw) {
 	"use strict";
 
 	var winston = Meteor.require('winston'),
 		os = Meteor.require('os'),
-		fs = Meteor.require('fs'),
 		path = Meteor.require('path'),
 		jsonminify = Meteor.require('jsonminify');
 

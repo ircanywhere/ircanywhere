@@ -1,12 +1,13 @@
-var axon = Meteor.require('axon'),
+var fs = Meteor.require('fs'),
+	axon = Meteor.require('axon'),
 	raw = Assets.getText('config.json'),
 	dependable = Meteor.require('dependable'),
     container = dependable.container();
 
+container.register('fs', fs);
 container.register('raw', raw);
 application = container.resolve(Application);
 // inject the config so we can mimic it in tests if needed
-// XXX - maybe inject fs aswell because setupNode() causes problems in tests
 
 modeParser = container.resolve(ModeParser);
 // mode parsing engine, no dependencies, just a parser class
