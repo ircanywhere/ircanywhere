@@ -16,6 +16,18 @@ NetworkManager = function() {
 			});
 		},
 
+		addClient: function(user, network) {
+			ircFactory.clients[network._id] = {
+				key: network._id,
+				userId: user._id,
+				network: network.name || network.server,
+				nickname: network.nick,
+				capabilities: network.internal.capabilities,
+				tabs: network.internal.tabs
+			};
+			// add the record into this.clients
+		},
+
 		getClients: function() {
 			var clients = {},
 				networks = Networks.find({}).fetch();
@@ -33,16 +45,8 @@ NetworkManager = function() {
 				if (reconnect) {
 					clients[network._id] = {user: me, network: network};
 					
-					ircFactory.clients[network._id] = {
-						key: network._id,
-						userId: me._id,
-						network: network.name || network.server,
-						nickname: network.nick,
-						capabilities: network.internal.capabilities,
-						tabs: network.internal.tabs
-					};
-					// call create directly but with the skip parameter cause all we want to do is
-					// add the record into this.clients
+					this.addClient(me, network);
+					// add the client into our local cache
 				}
 			}
 			// here we just mark them for connection by passing them into this.reconnect

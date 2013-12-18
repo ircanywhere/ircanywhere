@@ -88,16 +88,8 @@ IRCFactory = function(axon) {
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
 			if (!_.has(this.clients, key)) {
-				this.clients[key] = {
-					key: key,
-					userId: user._id,
-					network: network.name || network.server,
-					nickname: network.nick,
-					capabilities: network.internal.capabilities || {},
-					tabs: network.internal.tabs
-				};
-				// add a client
-				// XXX - refactor this and the code in network manager together
+				networkManager.addClient(user, network);
+				// add a client into the local cache
 			}
 
 			networkManager.changeStatus(key, networkManager.flags.connecting);
