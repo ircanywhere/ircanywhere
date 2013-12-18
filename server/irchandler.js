@@ -154,11 +154,19 @@ IRCHandler = function() {
 
 		mode: function(client, message) {
 			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+		},
+
+		mode_change: function(client, message) {
+			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
 			channelManager.insertEvent(client, message, 'mode');
 		},
 
 		topic: function(client, message) {
 			channelManager.updateTopic(client.network, message.channel, message.topic, message.topicBy);
+		},
+
+		topic_change: function(client, message) {
+			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
 			channelManager.insertEvent(client, message, 'topic');
 		},
 
@@ -169,6 +177,7 @@ IRCHandler = function() {
 		/*notice: function(client, message) {
 			channelManager.insertEvent(client, message, 'notice');
 		},*/
+		// XXX - Change * target to be dumped in the server log
 
 		ctcp_request: function(client, message) {
 			if (message.type.toUpperCase() == 'VERSION') {

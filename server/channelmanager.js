@@ -200,9 +200,6 @@ ChannelManager = function() {
 				message: message
 			};
 
-			delete output.message.raw;
-			// dont want this here
-
 			Events.insert(output);
 		}
 	};
