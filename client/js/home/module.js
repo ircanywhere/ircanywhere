@@ -24,7 +24,6 @@ HomeModule = (function() {
 					// it seems there was an error, possibly user not found
 					// or password was incorrect, lets notify the user
 				} else {
-					Session.set('loggedIn', true);
 					Session.set('login.errors', '');
 
 					Meteor.call('onUserLogin');

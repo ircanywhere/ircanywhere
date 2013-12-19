@@ -205,7 +205,7 @@ ChannelManager = function() {
 			}
 
 			if (type == 'nick' || type == 'quit') {
-				var s = {network: network};
+				var s = {network: client.network};
 					s['users.' + message.nickname] = {$exists: true},
 					chans = Channels.find(q);
 					// find the channel, we gotta construct a query (kinda messy)
