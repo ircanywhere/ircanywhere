@@ -86,8 +86,8 @@ IRCHandler = function() {
 		},
 
 		quit: function(client, message) {
-			channelManager.removeUsers(client.network, [message.nickname]);
 			channelManager.insertEvent(client, message, 'quit');
+			channelManager.removeUsers(client.network, [message.nickname]);
 		},
 
 		nick: function(client, message) {
@@ -96,9 +96,9 @@ IRCHandler = function() {
 				Networks.update(client.key, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
-
-			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
+			
 			channelManager.insertEvent(client, message, 'nick');
+			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
 		},
 
 		who: function(client, message) {

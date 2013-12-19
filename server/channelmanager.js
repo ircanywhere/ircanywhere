@@ -193,14 +193,38 @@ ChannelManager = function() {
 		},
 
 		insertEvent: function(client, message, type) {
-			var output = {
-				type: type,
-				user: client.userId,
-				tab: client.tabs[message.channel || message.target].key || client.key,
-				message: message
-			};
+			function insert(client, message, type, tab) {
+				var output = {
+					type: type,
+					user: client.userId,
+					tab: client.tabs[message.channel || message.target].key || client.key,
+					message: message
+				};
 
-			Events.insert(output);
+				Events.insert(output);
+			}
+
+			if (type == 'nick' || type == 'quit') {
+				var s = {network: network};
+					s['users.' + message.nickname] = {$exists: true},
+					chans = Channels.find(q);
+					// find the channel, we gotta construct a query (kinda messy)
+
+				chans.forEach(function(chan) {
+					insert(client, message, type, chan._id);
+					// we're in here because the user either changing their nick
+					// or quitting, exists in this channel, lets add it to the event
+				});
+
+				if (_.has(client.tabs, message.nickname)) {
+					insert(client, message, type, client.tabs[message.nickname]);
+				}
+				// these two types wont have a target, or a channel, so
+				// we'll have to do some calculating to determine where we want them
+				// we shall put them in channel and privmsg tab events
+			} else {
+				insert(client, message, type, client.tabs[message.target] || client.key);
+			}
 		}
 	};
 
