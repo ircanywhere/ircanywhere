@@ -1,9 +1,9 @@
 Template.main.data = function() {
-	return JSON.stringify(Channels.find().fetch(), undefined, 2);
+	return Channels.find();
 };
 
 Template.main.events = function() {
-	return Events.find().fetch();
+	return Events.find();
 }
 
 Template.main.event = function(json) {

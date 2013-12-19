@@ -30,12 +30,11 @@ NetworkManager = function() {
 
 		getClients: function() {
 			var clients = {},
-				networks = Networks.find({}).fetch();
+				networks = Networks.find({});
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
-			for (var netId in networks) {
-				var network = networks[netId],
-					me = Meteor.users.findOne(network.internal.userId),
+			networks.forEach(function(network) {
+				var me = Meteor.users.findOne(network.internal.userId),
 					reconnect = false;
 
 				if (network.internal.status !== this.flags.disconnected) {
@@ -48,7 +47,7 @@ NetworkManager = function() {
 					this.addClient(me, network);
 					// add the client into our local cache
 				}
-			}
+			});
 			// here we just mark them for connection by passing them into this.reconnect
 
 			return clients;

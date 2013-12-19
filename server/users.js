@@ -113,7 +113,7 @@ UserManager = function() {
 			}
 
 			var networks = Networks.find({'internal.userId': userId}).fetch();
-			// find user's networks
+			// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
 			if (me.profile.flags.newUser && networks.length === 0) {
 				var network = networkManager.addNetwork(me, application.config.defaultNetwork);
