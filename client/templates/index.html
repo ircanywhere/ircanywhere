@@ -1,0 +1,27 @@
+<template name="index">
+	<html>
+		<head>
+			<title>{{#if title}}IRCAnywhere - {{title}}{{else}}IRCAnywhere{{/if}}</title>
+
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+			<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
+			<meta name="keywords" content="IRC, Bouncer, Webclient, IRC Client, BNC" />
+		</head>
+		<body>
+			<div id="main-holder" class="clear">
+				<div class="topbar clear main">
+					<ul id="main-menu">
+						<li class="logo"><a href="{{pathFor 'home'}}">IRCAnywhere</a></li>
+						<li><a href="{{pathFor 'signup'}}">Signup</a></li>
+					</ul>
+					<div class="topbar inner"></div>
+				</div>
+				{{yield}}
+				<div id="main-footer">
+					<p><a href="{{pathFor 'signup'}}">Signup</a> &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
+					<p>© 2013 IRCAnywhere. All rights reserved.</p>
+				</div>
+			</div>
+		</body>
+	</html>
+</template>

@@ -6,7 +6,9 @@
 	<div class="wire-container clear">
 		<div class="move-left">
 			{{#each events}}
+				{{#isolate}}
 				<pre>{{event this}}</pre>
+				{{/isolate}}
 			{{/each}}
 		</div>
 		<div class="move-right">

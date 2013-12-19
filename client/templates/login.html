@@ -1,0 +1,49 @@
+<template name="login">
+	<div id="banner">
+		<div id="banner-inner" class="clear">
+			<div class="banner-left">
+				<h1>IRCAnywhere</h1>
+				<h3>IRC on the web, no matter where you are.</h3>
+				<a href="{{pathFor 'signup'}}" class="btn primary large">Sign up for a free account now</a>
+			</div>
+			<div class="banner-right">
+				<div id="login-box">
+					<form method="post" id="login-form"><fieldset>
+						<div class="box">
+							<h5>Login</h5>
+							
+							<div id="login-error" class="{{#if errors}}show{{else}}hide{{/if}}">
+								<div class="alert-message block-message error">{{errors}}</div>
+							</div>
+							
+							<div class="field"><input class="login-input" id="login-email" name="login-email" type="text" value="Email Address" /></div>
+							<div class="field"><input class="login-input" id="login-password" name="login-password" type="password" value="Password" /></div>
+						</div>
+						<div class="actions">
+							<input class="btn primary" id="login" name="login" value="Login" type="submit" /><a href="#" id="forgot-password-link" class="btn secondary">Forgot password?</a>
+						</div>
+					</fieldset></form>
+					<form method="post" id="reset-form"><fieldset>
+						<div id="forgot-password" class="box {{forgotPassword}}">
+							<h5>Forgot Password</h5>
+
+							<div id="reset-response">
+								{{#if resetErrors}}
+								<div class="alert-message block-message error">{{resetErrors}}</div>
+								{{/if}}
+								{{#if resetSuccess}}
+								<div class="alert-message block-message success">{{resetSuccess}}</div>
+								{{/if}}
+							</div>
+
+							<div class="field"><input class="login-input" id="reset-email" name="reset-email" type="text" value="Email Address" /></div>
+						</div>
+						<div id="forgot-password-actions" class="actions {{forgotPassword}}">
+							<input class="btn primary" id="reset" name="reset" value="Reset" type="submit" />
+						</div>
+					</fieldset></form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
