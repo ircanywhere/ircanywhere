@@ -89,8 +89,9 @@ Router.map(function () {
 	});
 
 	this.route('logout', {
-		data: function() {
-			return 'null';
+		path: '/logout',
+		action: function() {
+			Meteor.logout();
 		}
 	});
 	// ===================================
