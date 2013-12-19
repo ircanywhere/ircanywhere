@@ -11,8 +11,8 @@ NetworkManager = function() {
 		},
 
 		init: function() {
-			Meteor.publish('networks', function() {
-				return Networks.find({'internal.userId': this.userId});
+			Meteor.publish('networks', function(uid) {
+				return Networks.find({'internal.userId': uid});
 			});
 		},
 
@@ -29,7 +29,8 @@ NetworkManager = function() {
 		},
 
 		getClients: function() {
-			var clients = {},
+			var self = this,
+				clients = {},
 				networks = Networks.find({});
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
@@ -37,14 +38,13 @@ NetworkManager = function() {
 				var me = Meteor.users.findOne(network.internal.userId),
 					reconnect = false;
 
-				if (network.internal.status !== this.flags.disconnected) {
+				if (network.internal.status !== self.flags.disconnected) {
 					reconnect = true;
 				}
 
 				if (reconnect) {
 					clients[network._id] = {user: me, network: network};
-					
-					this.addClient(me, network);
+					self.addClient(me, network);
 					// add the client into our local cache
 				}
 			});

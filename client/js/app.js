@@ -9,9 +9,9 @@ if (Meteor.user() !== null) {
 
 Deps.autorun(function(c) {
 	if (Session.equals('loggedIn', true)) {
-		Meteor.subscribe('networks');
-		Meteor.subscribe('channels');
-		Meteor.subscribe('tabs');
-		Meteor.subscribe('events');
+		Meteor.subscribe('networks', Meteor.userId);
+		Meteor.subscribe('channels', Meteor.userId);
+		Meteor.subscribe('tabs', Meteor.userId);
+		Meteor.subscribe('events', Meteor.userId);
 	}
 });

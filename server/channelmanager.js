@@ -14,8 +14,8 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
-			Meteor.publish('channels', function() {
-				var networks = Networks.find({'internal.userId': this.userId}),
+			Meteor.publish('channels', function(uid) {
+				var networks = Networks.find({'internal.userId': uid}),
 					ids = [];
 
 				networks.forEach(function(network) {
@@ -32,8 +32,8 @@ ChannelManager = function() {
 				return Channels.find({_id: {$in: ids}});
 			});
 
-			Meteor.publish('tabs', function() {
-				var networks = Networks.find({'internal.userId': this.userId}),
+			Meteor.publish('tabs', function(uid) {
+				var networks = Networks.find({'internal.userId': uid}),
 					ids = [];
 
 				networks.forEach(function(network) {
@@ -47,7 +47,7 @@ ChannelManager = function() {
 				return Tabs.find({_id: {$in: ids}});
 			});
 
-			Meteor.publish('events', function() {
+			Meteor.publish('events', function(uid) {
 				return Events.find({});
 			});
 		},
