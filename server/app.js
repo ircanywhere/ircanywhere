@@ -172,10 +172,10 @@ Application = function(fs, raw) {
 				data = fs.readFileSync(this.config.assetPath + 'node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
 
-				var node = Nodes.findOne(json.nodeId);
+				var node = Nodes.findOne({_id: json.nodeId});
 
 				json = defaultJson;
-				Nodes.update(json.nodeId, defaultJson);
+				Nodes.update({_id: json.nodeId}, defaultJson);
 
 				json.nodeId = node._id;
 			} catch (e) {			

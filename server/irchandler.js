@@ -7,7 +7,7 @@ IRCHandler = function() {
 	var Handler = {
 		registered: function(client, message) {
 			var channels = {},
-				network = Networks.findOne(client.key);
+				network = Networks.findOne({_id: client.key});
 			// firstly we grab the network record from the database
 
 			// XXX - send our connect commands, things that the user defines
@@ -29,7 +29,7 @@ IRCHandler = function() {
 			client.nickname = message.nickname;
 			// update client record on the fly
 
-			Networks.update(client.key, {$set: {
+			Networks.update({_id: client.key}, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
@@ -93,7 +93,7 @@ IRCHandler = function() {
 		nick: function(client, message) {
 			if (message.nickname == client.nickname) {
 				client.nickname = message.newnick;
-				Networks.update(client.key, {$set: {nick: message.newnick}});
+				Networks.update({_id: client.key}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
 			

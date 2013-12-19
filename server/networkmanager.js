@@ -35,7 +35,7 @@ NetworkManager = function() {
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 			networks.forEach(function(network) {
-				var me = Meteor.users.findOne(network.internal.userId),
+				var me = Meteor.users.findOne({_id: network.internal.userId}),
 					reconnect = false;
 
 				if (network.internal.status !== self.flags.disconnected) {
@@ -91,7 +91,7 @@ NetworkManager = function() {
 		},
 
 		addTab: function(client, target, type, id) {
-			var network = Networks.findOne(client.key),
+			var network = Networks.findOne({_id: client.key}),
 				obj = {
 					target: target.toLowerCase(),
 					title: target,
@@ -100,7 +100,7 @@ NetworkManager = function() {
 				};
 
 			network.internal.tabs[obj.target] = obj;
-			Networks.update(client.key, {$set: {'internal.tabs': network.internal.tabs}});
+			Networks.update({_id: client.key}, {$set: {'internal.tabs': network.internal.tabs}});
 			// insert to db
 
 			client.tabs = network.internal.tabs;
@@ -113,7 +113,7 @@ NetworkManager = function() {
 			// bit messy but create an object for mongodb query, if the target is 'ricki'
 			// this tells us to unset 'internal.tabs.ricki'
 
-			Networks.update(client.key, {$unset: obj});
+			Networks.update({_id: client.key}, {$unset: obj});
 
 			delete client.tabs[target];
 			// update tabs
@@ -129,7 +129,8 @@ NetworkManager = function() {
 				return;
 			}
 
-			Networks.update(networkId, {$set: {'internal.status': status}});
+			var query = (typeof networkId === 'object') ? networkId : {_id: networkId};
+			Networks.update(query, {$set: {'internal.status': status}});
 		}
 	};
 
