@@ -7,96 +7,96 @@ Application = function(fs, raw) {
 		jsonminify = Meteor.require('jsonminify');
 
 	var schema = new SimpleSchema({
-			'reverseDns': {
-				type: String,
-				optional: false
-			},
-			'enableRegistrations': {
-				type: Boolean,
-				optional: false
-			},
-			'ssl': {
-				type: Boolean,
-				optional: true
-			},
-			'forkProcess': {
-				type: Boolean,
-				optional: false
-			},
-			'email': {
-				type: Object,
-				optional: false
-			},
-			'email.forceValidation': {
-				type: Boolean,
-				optional: false
-			},
-			'email.siteName': {
-				type: String,
-				optional: true
-			},
-			'email.from': {
-				type: String,
-				optional: false
-			},
-			'clientSettings': {
-				type: Object,
-				optional: false
-			},
-			'clientSettings.networkLimit': {
-				type: Number,
-				min: 1,
-				max: 10,
-				optional: false
-			},
-			'clientSettings.networkRestriction': {
-				type: String,
-				optional: true
-			},
-			'clientSettings.userNamePrefix': {
-				type: String,
-				optional: false
-			},
-			'defaultNetwork': {
-				type: Object,
-				optional: false
-			},
-			'defaultNetwork.server': {
-				type: String,
-				optional: false
-			},
-			'defaultNetwork.port': {
-				type: Number,
-				min: 1,
-				max: 65535,
-				optional: false
-			},
-			'defaultNetwork.realname': {
-				type: String,
-				optional: false
-			},
-			'defaultNetwork.secure': {
-				type: Boolean,
-				optional: true
-			},
-			'defaultNetwork.password': {
-				type: String,
-				optional: true
-			},
-			'defaultNetwork.channels': {
-				type: [Object],
-				optional: true
-			},
-			'defaultNetwork.channels.$.channel': {
-				type: String,
-				optional: false,
-				regEx: /([#&][^\x07\x2C\s]{0,200})/
-			},
-			'defaultNetwork.channels.$.password': {
-				type: String,
-				optional: true
-			}
-		});
+		'reverseDns': {
+			type: String,
+			optional: false
+		},
+		'enableRegistrations': {
+			type: Boolean,
+			optional: false
+		},
+		'ssl': {
+			type: Boolean,
+			optional: true
+		},
+		'forkProcess': {
+			type: Boolean,
+			optional: false
+		},
+		'email': {
+			type: Object,
+			optional: false
+		},
+		'email.forceValidation': {
+			type: Boolean,
+			optional: false
+		},
+		'email.siteName': {
+			type: String,
+			optional: true
+		},
+		'email.from': {
+			type: String,
+			optional: false
+		},
+		'clientSettings': {
+			type: Object,
+			optional: false
+		},
+		'clientSettings.networkLimit': {
+			type: Number,
+			min: 1,
+			max: 10,
+			optional: false
+		},
+		'clientSettings.networkRestriction': {
+			type: String,
+			optional: true
+		},
+		'clientSettings.userNamePrefix': {
+			type: String,
+			optional: false
+		},
+		'defaultNetwork': {
+			type: Object,
+			optional: false
+		},
+		'defaultNetwork.server': {
+			type: String,
+			optional: false
+		},
+		'defaultNetwork.port': {
+			type: Number,
+			min: 1,
+			max: 65535,
+			optional: false
+		},
+		'defaultNetwork.realname': {
+			type: String,
+			optional: false
+		},
+		'defaultNetwork.secure': {
+			type: Boolean,
+			optional: true
+		},
+		'defaultNetwork.password': {
+			type: String,
+			optional: true
+		},
+		'defaultNetwork.channels': {
+			type: [Object],
+			optional: true
+		},
+		'defaultNetwork.channels.$.channel': {
+			type: String,
+			optional: false,
+			regEx: /([#&][^\x07\x2C\s]{0,200})/
+		},
+		'defaultNetwork.channels.$.password': {
+			type: String,
+			optional: true
+		}
+	});
 
 	var App = {
 		init: function() {
