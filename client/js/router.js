@@ -13,8 +13,9 @@ var before = function() {
 // this function is basically a blocker which will send the user back
 // to the homepage template when they're not logged in.
 
-
 Router.before(before, {except: ['login', 'signup', 'reset', 'verify']});
+// setup a before callback for all events but these, this will check if we're
+// logged in, if not we will be pushed to the login page
 
 Router.map(function () {
 	this.route('home', {
@@ -22,7 +23,13 @@ Router.map(function () {
 		template: 'main',
 		layoutTemplate: 'app'
 	});
+	// this route will display the app template if we're logged in
+	// if not it will display main
 
+	// ===================================
+	// the following routes will be displayed when a client
+	// is logged out, they're all account related
+	//
 	this.route('login', {
 		path: '/login',
 		layoutTemplate: 'index',
@@ -63,4 +70,29 @@ Router.map(function () {
 			Meteor.call('onUserLogin');
 		}
 	});
+	// ===================================
+
+	// ===================================
+	// the following routes are for logged in functions
+	// settings / addnetwork .. etc
+
+	this.route('settings', {
+		data: function() {
+			return 'null';
+		}
+	});
+
+	this.route('addnetwork', {
+		data: function() {
+			return 'null';
+		}
+	});
+
+	this.route('logout', {
+		data: function() {
+			return 'null';
+		}
+	});
+	// ===================================
 });
+// define all our router functions here

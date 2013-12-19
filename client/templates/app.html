@@ -2,13 +2,32 @@
 	<html>
 		<head>
 			<title>{{#if title}}IRCAnywhere - {{title}}{{else}}IRCAnywhere{{/if}}</title>
-
-			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-			<meta name="description" content="IRCAnywhere is an online web bouncer which keeps you connected to IRC at all times and gives you a sleek modern interface." />
-			<meta name="keywords" content="IRC, Bouncer, Webclient, IRC Client, BNC" />
 		</head>
 		<body>
-			{{yield}}
+			<div id="holder" class="clear">
+				<div class="sidebar">
+					<div class="header">
+						<h3>IRCAnywhere</h3>
+						<a href="{{pathFor 'settings'}}">Settings</a> &middot; <a href="{{pathFor 'logout'}}">Logout</a>
+					</div>
+					<div id="sidebar">
+						hi
+					</div>
+					<div id="footer">
+						<div class="link">
+							<a href="{{pathFor 'addnetwork'}}">Add a new network</a>
+						</div>
+						<div class="text">
+							&copy; IRCAnywhere 2013 &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a> &middot; <a href="https://github.com/ircanywhere/ircanywhere/issues" target="_blank">Issue tracker</a>
+						</div>
+					</div>
+				</div>
+				<div class="container clear" id="content-container">
+					{{#isolate}}
+						{{yield}}
+					{{/isolate}}
+				</div>
+			</div>
 		</body>
 	</html>
 </template>

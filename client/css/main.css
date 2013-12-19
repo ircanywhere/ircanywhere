@@ -11,7 +11,17 @@ body
 	height: 100%;
 }
 
+	.container
+	{
+		height: 100%;
+		float: left;
+		position: absolute;
+		left: 210px;
+		right: 0;
+	}
+
 	body.client { background: #EDEDED; }
+	div#holder { display: block; height: 100%; }
 
 	h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, address, cite, code, em, img, s, small, strike, strong, sub, tt, li, ol, ul, fieldset, form, label, legend, button, table, caption, tbody, tfoot, thead, tr, th, td
 	{
