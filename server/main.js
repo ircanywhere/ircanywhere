@@ -1,5 +1,4 @@
 var fs = Meteor.require('fs'),
-	axon = Meteor.require('axon'),
 	raw = Assets.getText('config.json'),
 	dependable = Meteor.require('dependable'),
     container = dependable.container();
@@ -24,6 +23,5 @@ networkManager = container.resolve(NetworkManager);
 ircHandler = container.resolve(IRCHandler);
 // setup irc handler
 
-container.register('axon', axon);
 ircFactory = container.resolve(IRCFactory);
 // setup irc factory with its dependencies

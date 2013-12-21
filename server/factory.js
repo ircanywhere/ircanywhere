@@ -1,4 +1,4 @@
-IRCFactory = function(axon) {
+IRCFactory = function() {
 	"use strict";
 
 	var crypto = Meteor.require('crypto'),
@@ -7,23 +7,21 @@ IRCFactory = function(axon) {
 
 	var Factory = {
 		api: new factory(),
-		incoming: axon.socket('pull'),
-		outgoing: axon.socket('pub-emitter'),
 		clients: {},
+		options: {
+			events: 31920,
+			rpc: 31930,
+			automaticSetup: true,
+			fork: application.config.forkProcess
+		},
 		// this object will store our irc clients
 
 		init: function() {
-			var self = this;
-			
-			axon.codec.define('json', {
-				encode: JSON.stringify,
-				decode: JSON.parse
-			});
-			// setup a json codec
+			var self = this,
+				interfaces = this.api.connect(this.options);
 
-			this.incoming.connect(31920);
-			this.incoming.format('json');
-			this.outgoing.connect(31930);
+			this.events = interfaces.events,
+			this.rpc = interfaces.rpc;
 			// connect to our uplinks
 
 			var messageHandler = Meteor.bindEnvironment(function(message) {
@@ -46,27 +44,8 @@ IRCFactory = function(axon) {
 				application.logger.log('error', err.stack);
 			});
 			// create an on message function but bind it in our meteor environment
-
-			var socketError = Meteor.bindEnvironment(function(e) {
-				application.logger.log('warn', 'factory socket error', e);
-
-				if (e.syscall === 'connect' && e.code === 'ECONNREFUSED') {
-					if (application.config.forkProcess) {
-						self.api.fork();
-					} else {
-						self.api.setupServer();
-					}
-					// fork the daemon
-				}
-				// we've tried our original connect and got ECONNREFUSED, it's highly
-				// likely that an irc-factory server isn't setup for us yet, lets try setting one up
-			}, function(err) {
-				application.logger.log('error', err.stack);
-			});
-			// create a socket error function
-
-			this.incoming.on('socket error', socketError);
-			this.incoming.on('message', messageHandler);
+			
+			this.events.on('message', messageHandler);
 		},
 
 		handleEvent: function(event, object) {
@@ -105,7 +84,7 @@ IRCFactory = function(axon) {
 			// no need to send a message to the client, live database YEAH BABY
 			// we need to do this here because if we do it when we're calling create, it may have failed.
 
-			this.outgoing.emit('createClient', key, network);
+			this.rpc.emit('createClient', key, network);
 
 			application.logger.log('info', 'creating irc client', this.clients[key]);
 		},
@@ -114,11 +93,11 @@ IRCFactory = function(axon) {
 			application.logger.log('info', 'destroying irc client', this.clients[key]);
 			// log it before we destroy it below
 
-			this.outgoing.emit('destroyClient', key);
+			this.rpc.emit('destroyClient', key);
 		},
 
 		send: function(key, command, args) {
-			this.outgoing.emit('call', key, command, args);
+			this.rpc.emit('call', key, command, args);
 		}
 	};
 
