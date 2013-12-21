@@ -58,7 +58,7 @@ IRCFactory = function() {
 				ircHandler[e].call(ircHandler, client, object);
 			}
 			
-			//console.log(event, object);
+			console.log(event, object);
 		},
 
 		create: function(user, network, skip) {

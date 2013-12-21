@@ -144,13 +144,10 @@ IRCHandler = function() {
 			}
 			// strip prefixes
 
-			function compare(arrays) {
-				return _.all(arrays, function(array) {
-					return array.length == arrays[0].length && _.difference(array, arrays[0]).length == 0;
-				});
-			};
+			keys.sort();
+			users.sort();
 
-			if (!compare([keys, users])) {
+			if (!_.isEqual(keys, users)) {
 				ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
 			}
 			// different lists.. lets do a /WHO
