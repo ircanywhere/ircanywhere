@@ -12,7 +12,8 @@ IRCFactory = function() {
 			events: 31920,
 			rpc: 31930,
 			automaticSetup: true,
-			fork: application.config.forkProcess
+			//fork: application.config.forkProcess
+			fork: false
 		},
 		// this object will store our irc clients
 
@@ -57,7 +58,7 @@ IRCFactory = function() {
 				ircHandler[e].call(ircHandler, client, object);
 			}
 			
-			console.log(event, object);
+			//console.log(event, object);
 		},
 
 		create: function(user, network, skip) {

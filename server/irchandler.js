@@ -130,10 +130,14 @@ IRCHandler = function() {
 		},
 
 		names: function(client, message) {
-			var channel = channelManager.getChannel(client.network, message.channel),
+			var channelUsers = ChannelUsers.find({network: client.network, channel: message.channel.toLowerCase()}),
 				users = [],
-				regex = new RegExp('[' + Meteor.Helpers.escape(client.capabilities.modes.prefixes) + ']', 'g'),
-				keys = _.keys(channel.users);
+				keys = [],
+				regex = new RegExp('[' + Meteor.Helpers.escape(client.capabilities.modes.prefixes) + ']', 'g');
+
+			channelUsers.forEach(function(u) {
+				keys.push(u.nickname);
+			});
 
 			for (var user in message.names) {
 				users.push(message.names[user].replace(regex, ''));

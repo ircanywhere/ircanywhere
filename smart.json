@@ -6,8 +6,20 @@
 	"version": "0.2.0-alpha",
 	"git": "https://github.com/ircanywhere/ircanywhere.git",
 	"packages": {
-		"npm": {},
-		"simple-schema": {},
-		"iron-router": {}
+		"npm": {
+			"git": "https://github.com/arunoda/meteor-npm.git",
+			"tag": "v0.2.6",
+			"commit": "177ab6118de5bf8cffb19481343d5762ff7a2aaf"
+		},
+		"simple-schema": {
+			"git": "https://github.com/aldeed/meteor-simple-schema.git",
+			"tag": "v0.2.23",
+			"commit": "ccdb1244ae3a38c70f53e04a2d68879ca89a4f9f"
+		},
+		"iron-router": {
+			"git": "https://github.com/EventedMind/iron-router.git",
+			"tag": "v0.6.1",
+			"commit": "4e1ee0581d68bff422a915dacb0bd30eae10fe08"
+		}
 	}
 }

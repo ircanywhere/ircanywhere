@@ -192,13 +192,11 @@ ModeParser = function() {
 
 		handleParams: function(capabilities, users, modeArray) {
 			var prefixModes = _.keys(capabilities.prefixmodes),
-				changedUsers = {};
+				changedUsers = [];
 
 			for (var param in modeArray.params) {
 				var user = users[param];
 				if (_.has(users, param)) {
-					var changed = false;
-
 					if (modeArray.params[param].plus != '') {
 						var plusSplit = modeArray.params[param].plus.split('');
 						for (var pmi in plusSplit) {
@@ -239,11 +237,13 @@ ModeParser = function() {
 				// user list for this channel looks like.
 
 				// XXX - Ban list and exception list etc another time. maybe? is this needed?
+
+				changedUsers.push(user);
 			}
 			// handle modes with required on and off parameters
 			// ie status modes and restriction modes, also keys
 
-			return users;
+			return changedUsers;
 		}
 	};
 

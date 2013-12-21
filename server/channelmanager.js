@@ -8,8 +8,7 @@ ChannelManager = function() {
 			network: '',
 			channel: '',
 			topic: {},
-			modes: '',
-			users: {}
+			modes: ''
 		},
 		// a default channel object
 
@@ -72,7 +71,7 @@ ChannelManager = function() {
 		insertUsers: function(key, network, channel, users, force) {
 			var force = force || false,
 				channel = channel.toLowerCase(),
-				update = {},
+				find = [],
 				chan = this.getChannel(network, channel);
 
 			if (!chan) {
@@ -85,40 +84,41 @@ ChannelManager = function() {
 			}
 
 			_.each(users, function(u) {
-				var field = (force) ? u.nickname : 'users.' + u.nickname;
-				update[field] = u;
+				u.network = network;
+				u.channel = channel;
+				find.push(u.nickname);
 			});
-			// create an update record
+			// turn this into an array of nicknames
 
 			if (force) {
-				Channels.update({network: network, channel: channel}, {$set: {users: update}});
+				ChannelUsers.remove({network: network, channel: channel});
 			} else {
-				Channels.update({network: network, channel: channel}, {$set: update});
+				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}});
 			}
+			// ok so here we've gotta remove any users in the channel already
+			// and all of them if we're being told to force the update
+
+			_.each(users, function(u) {
+				ChannelUsers.insert(u);
+			});
 			// send the update out
 
 			return chan._id;
 		},
 
 		removeUsers: function(network, channel, users) {
-			var update = {},
-				channel = (_.isArray(channel)) ? channel : channel.toLowerCase(),
+			var channel = (_.isArray(channel)) ? channel : channel.toLowerCase(),
 				users = (_.isArray(channel)) ? channel : users;
 			// basically we check if channel is an array, if it is we're being told to
 			// jsut remove the user from the entire network (on quits etc)
 
-			_.each(users, function(u) {
-				update['users.' + u] = 1;
-			});
-			// create an update record
-
 			if (_.isArray(channel)) {
-				Channels.update({network: network}, {$unset: update});
+				ChannelUsers.remove({network: network, nickname: {$in: users}});
 			} else {
-				Channels.update({network: network, channel: channel}, {$unset: update});
+				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
 				// update
 
-				if (Channels.findOne({network: network, channel: channel}).users.length == 0) {
+				if (ChannelUsers.find({network: network, channel: channel}).count() == 0) {
 					Channels.remove({network: network, channel: channel});
 				}
 				// check if the user list is empty
@@ -127,27 +127,16 @@ ChannelManager = function() {
 		},
 
 		updateUsers: function(network, users, values) {
-			var query = {network: network},
-				update = {};
+			var update = {};
 
 			_.each(users, function(u) {
-				var s = {network: network};
-					s['users.' + u] = {$exists: true};
-				var q = _.extend(query, s),
-					records = Channels.find(q);
+				var s = {network: network, nickname: u},
+					records = ChannelUsers.find(s);
 
-				records.forEach(function (record) {
-					var user = record.users[u],
-						updated = _.extend(user, values);
+				records.forEach(function (user) {
+					var updated = _.extend(user, values);
 
-					if ('nickname' in values) {
-						record.users[values.nickname] = updated;
-						delete record.users[u];
-					} else {
-						record.users[record.nickname] = updated;
-					}
-
-					Channels.update({network: network, channel: record.channel}, {$set: {users: record.users}});
+					ChannelUsers.update(s, _.omit(updated, '_id'));
 					// update the record
 				});
 			});
@@ -157,22 +146,33 @@ ChannelManager = function() {
 
 		updateModes: function(capab, network, channel, mode) {
 			var channel = channel.toLowerCase(),
-				chan = this.getChannel(network, channel);
+				chan = this.getChannel(network, channel),
+				us = {};
 
 			if (!chan) {
 				var chan = this.createChannel(network, channel);
 				// create the channel
 			}
 
-			var parsedModes = modeParser.sortModes(capab, mode);
+			var users = ChannelUsers.find({network: network, channel: channel}),
+				parsedModes = modeParser.sortModes(capab, mode);
 			// we're not arsed about the channel or network here
 
 			chan.modes = modeParser.changeModes(capab, chan.modes, parsedModes);
-			chan.users = modeParser.handleParams(capab, chan.users, parsedModes);
 			// we need to attempt to update the record now with the new info
 
-			Channels.update({network: network, channel: channel}, {$set: {users: chan.users, modes: chan.modes}});
+			Channels.update({network: network, channel: channel}, {$set: {modes: chan.modes}});
 			// update the record
+
+			users.forEach(function(u) {
+				delete u._id;
+				us[u.nickname] = u;
+			});
+
+			modeParser.handleParams(capab, us, parsedModes).forEach(function(u) {
+				ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
+			});
+			// update users now
 		},
 
 		updateTopic: function(network, channel, topic, setby) {
@@ -197,7 +197,7 @@ ChannelManager = function() {
 				var output = {
 					type: type,
 					user: client.userId,
-					tab: client.tabs[message.channel || message.target].key || client.key,
+					tab: client.tabs[message.channel].key || client.key,
 					message: message
 				};
 
@@ -205,12 +205,11 @@ ChannelManager = function() {
 			}
 
 			if (type == 'nick' || type == 'quit') {
-				var s = {network: client.network};
-					s['users.' + message.nickname] = {$exists: true},
-					chans = Channels.find(q);
-					// find the channel, we gotta construct a query (kinda messy)
+				var chans = ChannelUsers.find({network: client.network, nickname: message.nickname});
+				// find the channel, we gotta construct a query (kinda messy)
 
 				chans.forEach(function(chan) {
+					message.channel = chan.channel;
 					insert(client, message, type, chan._id);
 					// we're in here because the user either changing their nick
 					// or quitting, exists in this channel, lets add it to the event
