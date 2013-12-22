@@ -185,6 +185,8 @@ IRCHandler = function() {
 				var version = 'IRCAnywhere v' + smartjson.version + ' ' + smartjson.homepage;
 				ircFactory.send(client.key, 'ctcp', [message.nickname, 'VERSION', version]);
 			}
+
+			channelManager.insertEvent(client, message, 'ctcp_request');
 		}
 	};
 

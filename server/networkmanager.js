@@ -99,6 +99,11 @@ NetworkManager = function() {
 					key: id
 				};
 
+			if (obj.target.trim() == '') {
+				return false;
+			}
+			// empty, bolt it
+
 			network.internal.tabs[obj.target] = obj;
 			Networks.update({_id: client.key}, {$set: {'internal.tabs': network.internal.tabs}});
 			// insert to db

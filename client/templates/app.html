@@ -42,7 +42,11 @@
 			{{/each}}
 		</div>
 		<div class="move-right">
-			<pre>{{event data}}</pre>
+			{{#each data}}
+				{{#isolate}}
+				<pre>{{event this}}</pre>
+				{{/isolate}}
+			{{/each}}
 		</div>
 	</div>
 </template>

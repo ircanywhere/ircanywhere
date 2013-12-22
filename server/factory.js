@@ -68,16 +68,7 @@ IRCFactory = function() {
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
 			if (!_.has(this.clients, key)) {
-				this.clients[key] = {
-					key: key,
-					userId: user._id,
-					network: network.name || network.server,
-					nickname: network.nick,
-					capabilities: network.internal.capabilities || {},
-					tabs: network.internal.tabs
-				};
-				// add a client
-				// XXX - refactor this and the code in network manager together
+				networkManager.addClient(user, network);
 			}
 
 			networkManager.changeStatus(key, networkManager.flags.connecting);
@@ -86,7 +77,6 @@ IRCFactory = function() {
 			// we need to do this here because if we do it when we're calling create, it may have failed.
 
 			this.rpc.emit('createClient', key, network);
-
 			application.logger.log('info', 'creating irc client', this.clients[key]);
 		},
 

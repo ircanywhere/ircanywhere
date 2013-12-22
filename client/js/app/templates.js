@@ -1,5 +1,5 @@
 Template.main.data = function() {
-	return Channels.find();
+	return ChannelUsers.find();
 };
 
 Template.main.events = function() {

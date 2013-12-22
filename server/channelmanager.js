@@ -2,6 +2,27 @@ ChannelManager = function() {
 	"use strict";
 
 	var _ = Meteor.require('underscore');
+	var getPublishedTabs = function(collection, uid, strict) {
+		var strict = strict || false,
+			networks = Networks.find({'internal.userId': uid}),
+			ids = [];
+
+		networks.forEach(function(network) {
+			_.each(network.internal.tabs, function(tab) {
+				if ('key' in tab && (strict && tab.type == 'channel')) {
+					ids.push(tab.key);
+				}
+			});
+		});
+		// XXX - Look into this, maybe bad design? :/
+		//       i cant think of a better way of doing it because tabs are stored in network.internal
+		//       which is MUCH better than the previous implementation in the old ircanywhere..
+
+		return collection.find({_id: {$in: ids}});
+		// this is a private method not exposed outside of ChannelManager
+		// which is just simply used to prevent code duplication in Meteor.publish()
+		// it's basically a permission checker
+	};
 
 	var Manager = {
 		channel: {
@@ -14,36 +35,27 @@ ChannelManager = function() {
 
 		init: function() {
 			Meteor.publish('channels', function(uid) {
+				getPublishedTabs(Channels, uid, true);
+			});
+
+			Meteor.publish('channelUsers', function(uid) {
 				var networks = Networks.find({'internal.userId': uid}),
-					ids = [];
+					match = [];
 
 				networks.forEach(function(network) {
 					_.each(network.internal.tabs, function(tab) {
 						if ('key' in tab && tab.type == 'channel') {
-							ids.push(tab.key);
+							match.push({network: network.name, channel: tab.target});
 						}
 					});
 				});
-				// XXX - Look into this, maybe bad design? :/
-				//       i cant think of a better way of doing it because tabs are stored in network.internal
-				//       which is MUCH better than the previous implementation in the old ircanywhere..
+				// XXX - As in getPublishedTabs also take a look at this.
 
-				return Channels.find({_id: {$in: ids}});
+				return ChannelUsers.find({$or: match});
 			});
 
 			Meteor.publish('tabs', function(uid) {
-				var networks = Networks.find({'internal.userId': uid}),
-					ids = [];
-
-				networks.forEach(function(network) {
-					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab && tab.type !== 'channel') {
-							ids.push(tab.key);
-						}
-					});
-				});
-
-				return Tabs.find({_id: {$in: ids}});
+				getPublishedTabs(Tabs, uid);
 			});
 
 			Meteor.publish('events', function(uid) {
