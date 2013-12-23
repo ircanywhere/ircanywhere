@@ -1,18 +1,25 @@
 EventManager = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
+	var hooks = Meteor.require('hooks'),
+		_ = Meteor.require('underscore'),
 		_insert = function(client, message, type, tab) {
-		var output = {
-			type: type,
-			user: client.userId,
-			tab: client.tabs[message.channel].key || client.key,
-			message: message,
-			read: false,
-			extra: {
-				highlight: false,
-				prefix: ''
+			if (!message.channel && !message.target) {
+				var id = client.key;
+			} else {
+				var id = (!message.channel) ? client.tabs[message.target].key : client.tabs[message.channel].key;
 			}
+			
+			var output = {
+				type: type,
+				user: client.userId,
+				tab: id,
+				message: message,
+				read: false,
+				extra: {
+					highlight: false,
+					prefix: ''
+				}
 		};
 
 		Events.insert(output);
@@ -56,6 +63,9 @@ EventManager = function() {
 	};
 
 	Manager.init();
+
+	Manager = _.extend(Manager, hooks);
+	// add the event hooker
 
 	return Manager;
 };

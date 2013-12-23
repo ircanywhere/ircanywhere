@@ -109,7 +109,7 @@ ModeParser = function() {
 
 						for (var rmi = 0; rmi < splitParts.length; rmi++) {
 							var rm = splitParts[rmi];
-		                    if (capabilities.c.indexOf(rm) >= 0) {
+		                    if (capabilities.types.c.indexOf(rm) >= 0) {
 								nStr += rm;
 		                    }
 						}
