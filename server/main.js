@@ -17,6 +17,9 @@ userManager = container.resolve(UserManager);
 channelManager = container.resolve(ChannelManager);
 // channel manager
 
+eventManager = container.resolve(EventManager);
+// event manager
+
 networkManager = container.resolve(NetworkManager);
 // setup network manager
 

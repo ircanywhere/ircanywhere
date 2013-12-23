@@ -109,6 +109,8 @@ Application = function(fs, raw) {
 			this.setupNode();
 			// next thing to do if we're all alright is setup our node
 			// this has been implemented now in the way for clustering
+
+			this.smartjson = JSON.parse(fs.readFileSync(this.config.assetPath + '/../smart.json'));
 		},
 
 		getPath: function() {

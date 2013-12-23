@@ -1,9 +1,6 @@
 IRCHandler = function() {
 	"use strict";
 
-	var fs = Meteor.require('fs'),
-		smartjson = JSON.parse(fs.readFileSync(application.config.assetPath + '/../smart.json'));
-
 	var Handler = {
 		registered: function(client, message) {
 			var channels = {},
@@ -71,22 +68,22 @@ IRCHandler = function() {
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
 
-			channelManager.insertEvent(client, message, 'join');
+			eventManager.insertEvent(client, message, 'join');
 			// event
 		},
 
 		part: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
-			channelManager.insertEvent(client, message, 'part');
+			eventManager.insertEvent(client, message, 'part');
 		},
 
 		kick: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
-			channelManager.insertEvent(client, message, 'kick');
+			eventManager.insertEvent(client, message, 'kick');
 		},
 
 		quit: function(client, message) {
-			channelManager.insertEvent(client, message, 'quit');
+			eventManager.insertEvent(client, message, 'quit');
 			channelManager.removeUsers(client.network, [message.nickname]);
 		},
 
@@ -97,7 +94,7 @@ IRCHandler = function() {
 			}
 			// update the nickname because its us changing our nick
 			
-			channelManager.insertEvent(client, message, 'nick');
+			eventManager.insertEvent(client, message, 'nick');
 			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
 		},
 
@@ -159,7 +156,7 @@ IRCHandler = function() {
 
 		mode_change: function(client, message) {
 			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
-			channelManager.insertEvent(client, message, 'mode');
+			eventManager.insertEvent(client, message, 'mode');
 		},
 
 		topic: function(client, message) {
@@ -168,25 +165,25 @@ IRCHandler = function() {
 
 		topic_change: function(client, message) {
 			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
-			channelManager.insertEvent(client, message, 'topic');
+			eventManager.insertEvent(client, message, 'topic');
 		},
 
 		privmsg: function(client, message) {
-			channelManager.insertEvent(client, message, 'privmsg');
+			eventManager.insertEvent(client, message, 'privmsg');
 		},
 
 		/*notice: function(client, message) {
-			channelManager.insertEvent(client, message, 'notice');
+			eventManager.insertEvent(client, message, 'notice');
 		},*/
 		// XXX - Change * target to be dumped in the server log
 
 		ctcp_request: function(client, message) {
 			if (message.type.toUpperCase() == 'VERSION') {
-				var version = 'IRCAnywhere v' + smartjson.version + ' ' + smartjson.homepage;
+				var version = 'IRCAnywhere v' + application.smartjson.version + ' ' + application.smartjson.homepage;
 				ircFactory.send(client.key, 'ctcp', [message.nickname, 'VERSION', version]);
 			}
 
-			channelManager.insertEvent(client, message, 'ctcp_request');
+			eventManager.insertEvent(client, message, 'ctcp_request');
 		}
 	};
 

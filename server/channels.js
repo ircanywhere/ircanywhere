@@ -1,8 +1,8 @@
 ChannelManager = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore');
-	var getPublishedTabs = function(collection, uid, strict) {
+	var _ = Meteor.require('underscore'),
+		_getPublishedTabs = function(collection, uid, strict) {
 		var strict = strict || false,
 			networks = Networks.find({'internal.userId': uid}),
 			ids = [];
@@ -35,7 +35,7 @@ ChannelManager = function() {
 
 		init: function() {
 			Meteor.publish('channels', function(uid) {
-				getPublishedTabs(Channels, uid, true);
+				_getPublishedTabs(Channels, uid, true);
 			});
 
 			Meteor.publish('channelUsers', function(uid) {
@@ -55,7 +55,7 @@ ChannelManager = function() {
 			});
 
 			Meteor.publish('tabs', function(uid) {
-				getPublishedTabs(Tabs, uid);
+				_getPublishedTabs(Tabs, uid);
 			});
 
 			Meteor.publish('events', function(uid) {
@@ -87,7 +87,7 @@ ChannelManager = function() {
 				chan = this.getChannel(network, channel);
 
 			if (!chan) {
-				var chan = this.createChannel(network, channel);
+				chan = this.createChannel(network, channel);
 				// create the channel
 
 				ircFactory.send(key, 'raw', ['WHO', channel]);
@@ -130,7 +130,7 @@ ChannelManager = function() {
 				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
 				// update
 
-				if (ChannelUsers.find({network: network, channel: channel}).count() == 0) {
+				if (ChannelUsers.find({network: network, channel: channel}).count() === 0) {
 					Channels.remove({network: network, channel: channel});
 				}
 				// check if the user list is empty
@@ -162,7 +162,7 @@ ChannelManager = function() {
 				us = {};
 
 			if (!chan) {
-				var chan = this.createChannel(network, channel);
+				chan = this.createChannel(network, channel);
 				// create the channel
 			}
 
@@ -192,7 +192,7 @@ ChannelManager = function() {
 				chan = this.getChannel(network, channel);
 
 			if (!chan) {
-				var chan = this.createChannel(network, channel);
+				chan = this.createChannel(network, channel);
 				// create the channel
 			}
 
@@ -202,40 +202,6 @@ ChannelManager = function() {
 
 			Channels.update({network: network, channel: channel}, {$set: {topic: chan.topic}});
 			// update the record
-		},
-
-		insertEvent: function(client, message, type) {
-			function insert(client, message, type, tab) {
-				var output = {
-					type: type,
-					user: client.userId,
-					tab: client.tabs[message.channel].key || client.key,
-					message: message
-				};
-
-				Events.insert(output);
-			}
-
-			if (type == 'nick' || type == 'quit') {
-				var chans = ChannelUsers.find({network: client.network, nickname: message.nickname});
-				// find the channel, we gotta construct a query (kinda messy)
-
-				chans.forEach(function(chan) {
-					message.channel = chan.channel;
-					insert(client, message, type, chan._id);
-					// we're in here because the user either changing their nick
-					// or quitting, exists in this channel, lets add it to the event
-				});
-
-				if (_.has(client.tabs, message.nickname)) {
-					insert(client, message, type, client.tabs[message.nickname]);
-				}
-				// these two types wont have a target, or a channel, so
-				// we'll have to do some calculating to determine where we want them
-				// we shall put them in channel and privmsg tab events
-			} else {
-				insert(client, message, type, client.tabs[message.target] || client.key);
-			}
 		}
 	};
 
