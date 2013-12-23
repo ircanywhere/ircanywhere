@@ -20,7 +20,6 @@ Router.before(before, {except: ['login', 'signup', 'reset', 'verify']});
 Router.map(function () {
 	this.route('home', {
 		path: '/',
-		template: 'main',
 		layoutTemplate: 'app'
 	});
 	// this route will display the app template if we're logged in
@@ -99,18 +98,16 @@ Router.map(function () {
 	// ===================================
 	// these routes are for networks/channels/lists and other irc related stuff
 
-	this.route('network', {
-		path: '/:url',
-		data: function() {
-			alert(this.params.url);
-			return 'null';
-		}
-	});
-
 	this.route('tab', {
-		path: '/:url/:title',
-		data: function() {
-			alert(this.params.title);
+		path: '/:url/:network?',
+		layoutTemplate: 'app',
+		action: function() {
+			/*if (!this.params.hash) {
+				alert(this.params.url);
+			} else {
+				alert('#' + this.params.hash);
+			}*/
+			
 			return 'null';
 		}
 	});

@@ -71,7 +71,7 @@ div.sidebar
 		div.sidebar div#footer div.link.selected
 		{
 			width: 210px;
-			z-index: 7000;
+			z-index: 2000;
 			position: relative;
 		}
 
@@ -215,7 +215,6 @@ div.sidebar
 				padding: 0 5px 0 22px;
 			}
 
-			div#sidebar ul li a.locked { margin: 0; }
 			div#sidebar ul li.selected a span.net-loader,
 			div#sidebar ul li.selected a:hover span.net-loader { background: url('/images/loader-1.gif') no-repeat 0 0; }
 			div#sidebar ul li a:hover span.net-loader { background: url('/images/loader-3.gif') no-repeat 0 0; }
