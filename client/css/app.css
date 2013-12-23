@@ -211,14 +211,14 @@ div.sidebar
 			div#sidebar ul li a span.net-loader
 			{
 				display: inline-block;
-				background: url('/static/images/loader-2.gif') no-repeat 0 0;
+				background: url('/images/loader-2.gif') no-repeat 0 0;
 				padding: 0 5px 0 22px;
 			}
 
 			div#sidebar ul li a.locked { margin: 0; }
 			div#sidebar ul li.selected a span.net-loader,
-			div#sidebar ul li.selected a:hover span.net-loader { background: url('/static/images/loader-1.gif') no-repeat 0 0; }
-			div#sidebar ul li a:hover span.net-loader { background: url('/static/images/loader-3.gif') no-repeat 0 0; }
+			div#sidebar ul li.selected a:hover span.net-loader { background: url('/images/loader-1.gif') no-repeat 0 0; }
+			div#sidebar ul li a:hover span.net-loader { background: url('/images/loader-3.gif') no-repeat 0 0; }
 
 			div#sidebar ul span.net-loaded { padding: 0; }
 

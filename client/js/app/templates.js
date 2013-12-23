@@ -1,5 +1,9 @@
 application = Object.create(Application);
 
+Template.app.networks = function() {
+	return application.networks;
+};
+
 Template.main.data = function() {
 	return ChannelUsers.find();
 };

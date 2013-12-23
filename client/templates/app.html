@@ -11,7 +11,39 @@
 						<a href="{{pathFor 'settings'}}">Settings</a> &middot; <a href="{{pathFor 'logout'}}">Logout</a>
 					</div>
 					<div id="sidebar">
-						hi
+						<div class="content">
+							{{#each networks}}
+								<div id="network" class="network"><ul id="network-{{_id}}">
+									<li class="title clear">
+										<a href="{{pathFor 'network'}}" title="{{name}}" class="locked">
+											<span class="link net-loader">{{name}}</span>
+										</a>
+									</li>
+									{{#each tabs}}
+									<li class="clear">
+										<a href="{{pathFor 'tab'}}" title="{{title}}">
+											<span class="link">{{title}}</span>
+										</a>
+									</li>
+									{{/each}}
+								</ul></div>
+							{{/each}}
+						
+							<!-- <div id="network" class="network">
+								<ul id="network-123">
+									<li class="title clear" id="link-${id}" data-type="window">
+										<a href="${hash}" title="${title}" class="locked">
+											<span class="link net-loader">${chan}</span>
+										</a>
+									</li>
+									<li class="clear" id="link-${id}" data-type="${type}">
+										<a href="${hash}" title="${title}">
+											<span class="link ${cssClass}">${chan}</span>
+										</a>
+									</li>
+								</ul>
+							</div> -->
+						</div>
 					</div>
 					<div id="footer">
 						<div class="link">

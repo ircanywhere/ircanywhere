@@ -95,5 +95,25 @@ Router.map(function () {
 		}
 	});
 	// ===================================
+
+	// ===================================
+	// these routes are for networks/channels/lists and other irc related stuff
+
+	this.route('network', {
+		path: '/:url',
+		data: function() {
+			alert(this.params.url);
+			return 'null';
+		}
+	});
+
+	this.route('tab', {
+		path: '/:url/:title',
+		data: function() {
+			alert(this.params.title);
+			return 'null';
+		}
+	});
+	// ===================================
 });
 // define all our router functions here
