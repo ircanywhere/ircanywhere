@@ -36,7 +36,7 @@ ChannelManager = function() {
 
 		init: function() {
 			Meteor.publish('channels', function(uid) {
-				_getPublishedTabs(Channels, uid, true);
+				return _getPublishedTabs(Channels, uid, true);
 			});
 
 			Meteor.publish('channelUsers', function(uid) {
@@ -56,7 +56,7 @@ ChannelManager = function() {
 			});
 
 			Meteor.publish('tabs', function(uid) {
-				_getPublishedTabs(Tabs, uid);
+				return _getPublishedTabs(Tabs, uid);
 			});
 
 			Meteor.publish('events', function(uid) {

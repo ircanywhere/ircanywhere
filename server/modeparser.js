@@ -90,7 +90,7 @@ ModeParser = function() {
 				var arr = modeArray.plus.split();
 				for (var pos = 0; pos < arr.length; pos++) {
 					var mode = arr[pos];
-		            if (modes.indexOf(mode) == -1) {
+					if (modes.indexOf(mode) == -1) {
 						modes += mode;
 		            }
 				}

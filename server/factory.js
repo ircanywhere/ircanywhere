@@ -13,8 +13,7 @@ IRCFactory = function() {
 			events: 31920,
 			rpc: 31930,
 			automaticSetup: true,
-			//fork: application.config.forkProcess
-			fork: false
+			fork: application.config.forkProcess
 		},
 		// this object will store our irc clients
 

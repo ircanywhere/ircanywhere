@@ -1,4 +1,4 @@
-HomeModule = (function() {
+Home = (function() {
 	"use strict";
 
 	var Module = {
@@ -118,6 +118,8 @@ HomeModule = (function() {
 			});
 		}
 	};
+
+	Module.init();
 
 	return Module;
 }());

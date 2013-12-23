@@ -1,6 +1,4 @@
-var homeModule = Object.create(HomeModule);
-	homeModule.init();
-// create and initialise a home module
+home = Object.create(Home);
 
 Template.login.forgotPassword = function() {
 	return (Session.get('login.forgotPasswordBox')) ? 'show' : 'hide';
@@ -85,12 +83,12 @@ Template.login.events({
 
 	'submit form#login-form': function(e, t) {
 		e.preventDefault();
-		homeModule.loginFormSubmit($('form#login-form').serializeObject());
+		home.loginFormSubmit($('form#login-form').serializeObject());
 	},
 
 	'submit form#reset-form': function(e, t) {
 		e.preventDefault();
-		homeModule.resetFormSubmit($('form#reset-form').serializeObject());
+		home.resetFormSubmit($('form#reset-form').serializeObject());
 	}
 });
 
@@ -98,7 +96,7 @@ Template.login.events({
 Template.signup.events({
 	'submit form#signup-form': function(e, t) {
 		e.preventDefault();
-		homeModule.signupFormSubmit($('form#signup-form').serializeObject());
+		home.signupFormSubmit($('form#signup-form').serializeObject());
 	}
 });
 
@@ -106,7 +104,7 @@ Template.signup.events({
 Template.reset.events({
 	'submit form#reset-password-form': function(e, t) {
 		e.preventDefault();
-		homeModule.resetPassFormSubmit($('form#reset-password-form').serializeObject());
+		home.resetPassFormSubmit($('form#reset-password-form').serializeObject());
 	}
 });
 // bind all our events, notice most are submit events which go to functions
