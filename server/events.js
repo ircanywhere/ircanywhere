@@ -1,8 +1,8 @@
 EventManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks'),
-		_ = Meteor.require('underscore'),
+	var _ = Meteor.require('underscore'),
+		hooks = Meteor.require('hooks'),
 		_insert = function(client, message, type, tab) {
 			if (!message.channel && !message.target) {
 				var id = client.key;
@@ -64,8 +64,5 @@ EventManager = function() {
 
 	Manager.init();
 
-	Manager = _.extend(Manager, hooks);
-	// add the event hooker
-
-	return Manager;
+	return _.extend(Manager, hooks);
 };

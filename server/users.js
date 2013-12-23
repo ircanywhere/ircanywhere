@@ -1,6 +1,9 @@
 UserManager = function() {
 	"use strict";
 
+	var _ = Meteor.require('underscore'),
+		hooks = Meteor.require('hooks');
+		
 	var Manager = {
 		init: function() {
 			Accounts.config({
@@ -148,5 +151,5 @@ UserManager = function() {
 
 	Manager.init();
 
-	return Manager;
+	return _.extend(Manager, hooks);
 };

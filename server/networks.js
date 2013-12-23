@@ -1,5 +1,8 @@
 NetworkManager = function() {
 	"use strict";
+	
+	var _ = Meteor.require('underscore'),
+		hooks = Meteor.require('hooks');
 
 	var Manager = {
 		flags: {
@@ -141,5 +144,5 @@ NetworkManager = function() {
 
 	Manager.init();
 
-	return Manager;
+	return _.extend(Manager, hooks);
 };

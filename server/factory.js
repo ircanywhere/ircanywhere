@@ -1,9 +1,10 @@
 IRCFactory = function() {
 	"use strict";
 
-	var crypto = Meteor.require('crypto'),
-		factory = Meteor.require('irc-factory').Api,
-		_ = Meteor.require('underscore');
+	var _ = Meteor.require('underscore'),
+		hooks = Meteor.require('hooks'),
+		crypto = Meteor.require('crypto'),
+		factory = Meteor.require('irc-factory').Api;
 
 	var Factory = {
 		api: new factory(),

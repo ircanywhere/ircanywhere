@@ -1,7 +1,9 @@
 Application = function(fs, raw) {
 	"use strict";
 
-	var winston = Meteor.require('winston'),
+	var _ = Meteor.require('underscore'),
+		hooks = Meteor.require('hooks'),
+		winston = Meteor.require('winston'),
 		os = Meteor.require('os'),
 		path = Meteor.require('path'),
 		jsonminify = Meteor.require('jsonminify');
@@ -204,5 +206,5 @@ Application = function(fs, raw) {
 	App.init();
 	// initiate the module if need be
 
-	return App;
+	return _.extend(App, hooks);
 };
