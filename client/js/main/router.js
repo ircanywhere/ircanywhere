@@ -108,7 +108,7 @@ Router.map(function () {
 				alert('#' + this.params.hash);
 			}*/
 			
-			return 'null';
+			return this.render('main');
 		}
 	});
 	// ===================================

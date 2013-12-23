@@ -28,3 +28,6 @@ ircHandler = container.resolve(IRCHandler);
 
 ircFactory = container.resolve(IRCFactory);
 // setup irc factory with its dependencies
+
+commandManager = container.resolve(CommandManager);
+// setup command manager

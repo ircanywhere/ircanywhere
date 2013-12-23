@@ -27,6 +27,8 @@ IRCHandler = function() {
 			client.capabilities = message.capabilities;
 			client.network = message.capabilities.network.name;
 			client.nickname = message.nickname;
+			client.hostname = network.hostname || '';
+			client.user = network.user;
 			// update client record on the fly
 
 			Networks.update({_id: client.key}, {$set: {
