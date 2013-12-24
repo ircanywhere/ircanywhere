@@ -1,4 +1,4 @@
-Template.app.networks = function() {
+Template.sidebar.networks = function() {
 	return Networks.find({}, {
 		reactive: true,
 		fields: {
