@@ -1,5 +1,3 @@
-application = Object.create(Application);
-
 Template.app.networks = function() {
 	return Networks.find({}, {
 		reactive: true,
@@ -40,7 +38,6 @@ Template.network.isSelected = function(tab) {
 };
 
 Template.network.getClass = function(tab) {
-	console.log(tab);
 	if (tab.type == 'network' && tab.status == 'connecting') {
 		return 'net-loader';
 	} else if (tab.type == 'network' && tab.status !== 'connecting') {
