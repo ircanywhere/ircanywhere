@@ -200,26 +200,28 @@ div#sidebar {
 	.footer {
 		.snap-notop();
 
+		.link {
+			a {
+				display: block;
+				padding: 9px;
+				margin: 0;
+				text-decoration: none;
+				font-weight: bold;
+				color: @side-text;
+				background: @side-background;
+			}
+		}
+
 		.link.selected {
 			width: 210px;
 			z-index: 2000;
 			position: relative;
-		}
 
-		.link.selected a {
-			color: @side-background;
-			background: @white;
-			border-left: 5px solid @border-left;
-		}
-
-		.link a {
-			display: block;
-			padding: 9px;
-			margin: 0;
-			text-decoration: none;
-			font-weight: bold;
-			color: @side-text;
-			background: @side-background;
+			a {
+				color: @side-background;
+				background: @white;
+				border-left: 5px solid @border-left;
+			}
 		}
 
 		.link:not(.selected) a:hover {
