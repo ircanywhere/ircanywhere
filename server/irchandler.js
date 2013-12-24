@@ -79,11 +79,23 @@ IRCHandler = function() {
 
 		part: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
+
+			if (message.nickname == client.nickname) {
+				networkManager.activeTab(client, message.channel, false);
+			}
+			// we're leaving, remove the tab
+
 			eventManager.insertEvent(client, message, 'part');
 		},
 
 		kick: function(client, message) {
 			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
+
+			if (message.nickname == client.nickname) {
+				networkManager.activeTab(client, message.channel, false);
+			}
+			// we're leaving, remove the tab
+
 			eventManager.insertEvent(client, message, 'kick');
 		},
 

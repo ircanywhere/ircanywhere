@@ -13,6 +13,7 @@ Template.app.networks = function() {
 			var tab = doc.internal.tabs[title];
 			tab.status = doc.internal.status;
 			tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + tab.target;
+			tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
 			tabs.push(tab);
 		};
 		// re-construct tabs, because #each in Spark doesn't like objects

@@ -99,6 +99,7 @@ NetworkManager = function() {
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
+					active: true,
 					key: id
 				};
 
@@ -113,6 +114,15 @@ NetworkManager = function() {
 
 			client.tabs = network.internal.tabs;
 			// update tabs
+		},
+
+		activeTab: function(client, target, activate) {
+			var obj = {};
+			obj['internal.tabs.' + target + '.active'] = activate;
+
+			Networks.update({_id: client.key}, {$set: obj});
+			client.tabs[target].active = activate;
+			// update the activation flag
 		},
 
 		removeTab: function(client, target) {
