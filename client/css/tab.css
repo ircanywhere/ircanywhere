@@ -1,0 +1,384 @@
+/* content container styles */
+
+div#channel-window
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+div#channel-window-data
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+}
+
+div.content-holder
+{
+	background: #fff;
+	position: absolute;
+	left: 0;
+	top: 37px;
+	right: 0;
+	bottom: 0;
+	-webkit-box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
+	box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
+}
+
+	div#inner-content
+	{
+		background: #fff;
+		position: relative;
+	}
+
+	div.tab
+	{
+		position: relative;
+		height: 100%;
+		width: 100%;
+	}
+
+	div.msg_container
+	{
+		color: #000;
+		background: #fff;
+		padding: 0;
+		overflow-y: auto;
+		position: absolute;
+		top: 0;
+		bottom: 44px;
+		left: 0;
+		right: 172px;
+	}
+
+	div.wmsg_container
+	{
+		color: #000;
+		background: #fff;
+		padding: 0;
+		overflow-y: auto;
+		position: absolute;
+		top: 0;
+		bottom: 44px;
+		left: 0;
+		right: 0;
+	}
+
+	div.wmsg_container.t_container { bottom: 0; }
+
+		div.mcontainer
+		{
+			padding: 0;
+			margin-bottom: 5px;
+			position: relative;
+		}
+
+		div.overlay-bar
+		{
+			z-index: 20;
+			position: fixed;
+			border-bottom: 1px solid #B8DBFF;
+			background: #F7FEFF;
+			padding: 8px;
+			display: none;
+			zoom: 1;
+			filter: alpha(opacity=90);
+			opacity: 0.9;
+			line-height: 150%;
+			font-size: 13px;
+		}
+
+			div.overlay-bar span.channel-name
+			{
+				font-weight: bold;
+				display: inline-block;
+				padding-right: 10px;
+			}
+
+			div.overlay-bar span.modes
+			{
+				display: inline-block;
+				padding-right: 10px;
+			}
+
+		div.message-bar
+		{
+			z-index: 15;
+			position: fixed;
+			background: #70AFC4;
+			color: #fff;
+			padding: 6px 8px;
+			display: none;
+			zoom: 1;
+			line-height: 150%;
+			font-size: 12px;
+			cursor: pointer;
+		}
+
+		div.message-bar:hover
+		{
+			background: #7AC1C4;
+		}
+
+			div.message-bar span { font-weight: bold; }
+			div.message-bar span.left { float: left; }
+			div.message-bar span.right { float: right; display: inline-block; }
+
+			div.message-bar span.right a
+			{
+				background: #7AC1C4;
+				color: white;
+				padding: 3px 5px;
+				margin: 6px 0px;
+				content: "Mark as read";
+				border-radius: 3px;
+				-webkit-border-radius: 3px;
+				-moz-border-radius: 3px;
+				-ms-border-radius: 3px;
+				-o-border-radius: 3px;
+			}
+
+			div.message-bar span.right a:hover
+			{
+				text-decoration: none;
+				color: #404040;
+				background: #ADD8C7;
+			}
+
+			div.message-bar span.alert.highlight
+			{
+				padding: 2px 4px 3px 4px;
+				margin: 0 4px;
+				background: red;
+				color: #fff;
+				border-radius: 3px;
+				-webkit-border-radius: 3px;
+				-moz-border-radius: 3px;
+				-ms-border-radius: 3px;
+				-o-border-radius: 3px;
+			}
+
+		div.historyLoad
+		{
+			z-index: 15;
+			position: absolute!important;
+			background: #fff;
+			filter: alpha(opacity=80);
+			opacity: 0.8;
+			zoom: 1;
+			height: 100%;
+			width: 100%;
+		}
+
+			div.historyLoad div.loader { text-align: center; }
+			div.historyLoad div.loader img
+			{
+				position: absolute;
+				clip: rect(0, 16px, 16px, 0);
+				overflow: hidden;
+				border: 0;
+				margin-top: 10px;
+			}
+
+		div.not-connected { padding: 10px 20px; }
+		div.wmsg_container table
+		{
+			padding: 0;
+			margin: 0;
+			border: 0;
+		}
+
+			div.wmsg_container tr th,
+			div.wmsg_container tr td { border: 0; padding: 4px 8px!important; margin: 0; }
+
+		div.wmsg_container tr td.column1
+		{
+			width: 15.4%;
+			font-weight: bold;
+			word-wrap: break-word;
+		}
+
+		div.wmsg_container tr td.column2 { width: 6%; }
+		div.wmsg_container tr td.column3 { width: 76%; }
+		div.wmsg_container tr td.column4 { width: 35%; }
+		div.wmsg_container tr td.column5 { width: 65%; }
+
+			div.wmsg_container tr.heading
+			{
+				background: #fcfcfc;
+				background: -moz-linear-gradient(top, #fcfcfc 0%, #ededed 99%);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fcfcfc), color-stop(99%,#ededed));
+				background: -webkit-linear-gradient(top, #fcfcfc 0%, #ededed 99%);
+				background: -o-linear-gradient(top, #fcfcfc 0%, #ededed 99%);
+				background: -ms-linear-gradient(top, #fcfcfc 0%, #ededed 99%);
+				background: linear-gradient(top, #fcfcfc 0%, #ededed 99%);
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed', GradientType=0);
+			}
+
+			div.wmsg_container tr.heading th
+			{
+				font-weight: bold;
+				border: 0;
+				border-bottom: 1px solid #D9D9D9;
+			}
+
+		div.row
+		{
+			margin: 0;
+			position: relative;
+		}
+
+		div.row span { line-height: 155%; }
+		div.otherRow { color: #000; background: #f3f3f3; }
+
+			div.otherRow a[rel=user-link] { text-decoration: underline; }
+			div.otherRow span.column3 { color: #9C9C9C; }
+
+			div.row[data-highlight=true] { background: palegreen; }
+			div.row[data-type=notice] { background: lavender; }
+			div.row[data-self=true] { background: linen; }
+
+			span.ht
+			{
+				display: inline-block;
+				padding-right: 10px;
+			}
+
+			div.otherRow.collapsed-head
+			{
+				background: #fff;
+				cursor: pointer;
+			}
+
+				div.otherRow.collapsed-head.open,
+				div.otherRow.collapsed-head:hover { background: #f3f3f3; }
+
+		div.msg_container div.row span.column2,
+		div.wmsg_container div.row span.column2
+		{
+			float: left;
+			display: inline-block;
+			padding-top: 3px;
+			padding-bottom: 3px;
+			font-size: 13px;
+		}
+
+		div.msg_container div.row span.column3,
+		div.wmsg_container div.row span.column3
+		{
+			float: left;
+			display: inline-block;
+			padding-top: 5px;
+			padding-bottom: 3px;
+			width: 50px;
+		}
+
+		div.row fieldset
+		{
+			margin: 0;
+			padding: 11px 0;
+			position: relative;
+			text-align: center;
+			text-shadow: 1px 1px 1px #fff;
+			background: #f7f7f7;
+			background: -moz-linear-gradient(top, #f7f7f7 0%, #e5e5e5 100%);
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(100%,#e5e5e5));
+			background: -webkit-linear-gradient(top, #f7f7f7 0%,#e5e5e5 100%);
+			background: -o-linear-gradient(top, #f7f7f7 0%,#e5e5e5 100%);
+			background: -ms-linear-gradient(top, #f7f7f7 0%,#e5e5e5 100%);
+			background: linear-gradient(to bottom, #f7f7f7 0%,#e5e5e5 100%);
+			border-top: 1px solid #EDEDED;
+			border-bottom: 1px solid #D6D6D6;
+		}
+
+			div.row fieldset legend
+			{
+				position: absolute;
+				margin: auto;
+				left: 1px;
+				right: 1px;
+				top: 5px;
+				bottom: 0;
+				padding: 0;
+				font-size: 12px;
+				color: #000;
+			}
+		
+		div.row div.divider
+		{
+			border-top: 3px double #D9D9D9;
+			border-bottom: 3px double #D9D9D9;
+			background: #FAFAFA;
+			margin: 7px 8px 7px 8px;
+			padding: 3px 0;
+			position: relative;
+		}
+
+			div.row div.divider p
+			{
+				font-size: 11px;
+				padding: 3px 10px;
+				margin: 0 0 0 57px;
+			}
+
+		div.row:not(.otherRow) span.column2 a[rel=user-link]
+		{
+			color: #383838;
+			font-weight: bold;
+			margin: 0 8px 0 -19px;
+			text-align: right;
+		}
+
+			div.row:not(.otherRow) span.column2 a[rel=user-link]:hover { text-decoration: none; }
+			div.row:not(.otherRow) span.column2 a[rel=user-link]:hover span.nick { text-decoration: underline; }
+		
+		div.row span.notice
+		{
+			font-weight: normal;
+			color: #9C9C9C;
+		}
+		
+		div.row span.message,
+		div.row span.action
+		{
+			color: #383838;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			padding: 5px 8px 5px 19px;
+		}
+		
+		div.row span.event
+		{
+			color: #383838;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			padding: 5px;
+		}
+		
+		div.row span.motd
+		{
+			font-family: "Consolas", "Courier", monospace, serif;
+			color: #383838;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			padding: 5px;
+		}
+
+		div.row span.time
+		{
+			padding: 5px 12px 5px 8px;
+			text-align: right;
+		}
+ 
+		div.row span.action a { color: inherit!important; padding-right: 5px; }
+		div.row span.action a span.prefix { font-weight: bold; }
+		div.row span.action a span.nick { color: #383838; font-weight: bold; }
+		div.row span.action a:hover span.prefix { text-decoration: none; }
+
+		div.row span.event a { color: inherit!important; text-decoration: underline; }

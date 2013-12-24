@@ -1,11 +1,44 @@
 <template name="tabs">
-	{{#each tabs}}
-		{{> tab}}
-	{{/each}}
+	<div id="loading"><img src="/images/loader-1.gif" alt="Loading..." /></div>
+	<div id="channel-window">
+		<!-- <div id="not-connected" class="hide">
+			<h3>Oh-oh!</h3>
+			<p>IRCAnywhere is currently unable to connect at the moment, Please wait around, we will attempt to reconnect you in <span id="second-timer">30</span> seconds.</p>
+		</div> -->
+		<div id="no-networks" class="hide">
+			<h3>Hello there!</h3>
+			<p>You are seeing this page because you are not connected to any networks, perhaps you are new?</p>
+			<p>Well, if thats the case then consider <a href="{{pathFor 'addnetwork'}}">adding a network</a>.</p>
+			<p>If you are not sure why you are here then you may have been disconnected from your networks for an unknown reason.</p>
+		</div>
+		<div id="channel-window-data">	
+			{{#each tabs}}
+				{{> tab}}
+			{{/each}}
+		</div>
+	</div>
+	<div id="channel-input" class="clear">
+		<label for="chat" id="nick-button"></label>
+		<span></span>
+	</div>
 </template>
 
 <template name="tab">
-	<div class="tb">
-		yaldi
+	<div id="tab-{{_id}}" class="tab clear hide">
+		<div id="msgs-{{_id}}" class="wmsg_container">
+			<div class="mcontainer content">
+				<div class="overlay-bar"></div>
+				<div class="top-message-bar message-bar clear">
+					<span class="left">
+						<span class="last hide">0</span>
+						<span class="message-number"></span>
+					</span>
+					<span class="right">
+						<a href="#" id="read-backlog">Mark as read</a>
+					</span>
+				</div>
+				<div class="row clear hide" data-type="initial-divider"></div>
+			</div>
+		</div>
 	</div>
 </template>

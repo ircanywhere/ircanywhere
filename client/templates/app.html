@@ -27,7 +27,20 @@
 					</div>
 				</div>
 				<div class="container clear" id="content-container">
-					{{yield}}
+						<div class="topbar clear">
+						<div class="top-bar-left">
+							<div class="topic-wrap"><p class="topic-bar">
+								<span class="chan-title"></span><span class="chan-modes"></span>
+								<span class="chan-desc"></span>
+							</p></div>
+						</div>
+						<ul id="options-menu" style="">
+							
+						</ul>
+					<div class="topbar inner"></div></div>
+					<div class="content-holder" id="content"><div id="inner-content">
+						{{yield}}
+					</div></div>
 				</div>
 			</div>
 		</body>
