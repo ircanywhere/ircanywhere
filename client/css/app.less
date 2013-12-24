@@ -1,0 +1,251 @@
+@black: #000000;
+@white: #FFFFFF;
+@red: #FF0000;
+@light-gray: lightGrey;
+@dark-gray: #404040;
+
+@background: #EDEDED;
+@side-background: #1B1E25;
+@side-head-bg: #23262F;
+@side-text: #919598;
+@side-hover-bg: #22252E;
+@side-hover-text: #E7E9E8;
+@selected-hover-bg: #22252E;
+@border-left: #4E98EC;
+@border-left-inv: #7DB7F8;
+@unread-bg: #3B3F4A;
+
+// Variable definitions
+
+.border-radius (@value: 5px) {
+	-webkit-border-radius: @value;
+	-moz-border-radius: @value;
+	-ms-border-radius: @value;
+	-o-border-radius: @value;
+	border-radius: @value;
+}
+
+.transition (@value: none) {
+	-webkit-transition: @value;
+	-moz-transition: @value;
+	-ms-transition: @value;
+	-o-transition: @value;
+	transition: @value;
+}
+
+.padding-margin (@size: 0px) {
+	padding: @size;
+	margin: @size;
+}
+
+.snap () {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.snap-notop () {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+// Mixins
+
+body.holder {
+	height: 100%;
+	background: @background;
+}
+
+// template.app styles
+
+div#sidebar {
+	height: 100%;
+	width: 210px;
+	float: left;
+	position: relative;
+	font-size: 12px;
+	background: @side-background;
+	.padding-margin(0px);
+
+	.header {
+		background: @side-head-bg;
+		padding: 10px;
+		color: @side-text;
+
+		h3 {
+			.padding-margin(0px);
+			padding-bottom: 8px;
+			line-height: 1;
+			color: @white;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+			text-rendering: optimizeLegibility;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.items {
+
+		ul {
+			.padding-margin(0px);
+			list-style-type: none;
+			position: relative;
+
+			li {
+				.padding-margin(0px);
+				list-style-type: none;
+				position: relative;
+
+				a {
+					display: block;
+					padding: 6px 6px 6px 15px;
+					text-decoration: none;
+					font-weight: bold;
+					color: @side-text;
+					.transition(none);
+
+					span.net-loader {
+						display: inline-block;
+						background: url('/images/loader-2.gif') no-repeat 0 0;
+						padding: 0 5px 0 22px;
+					}
+				}
+
+				a > span.alert:nth-last-child(2):not(:first-child) {
+					margin: 0 6px 0 0;
+				}
+
+				a:hover {
+					span.net-loader {
+						background: url('/images/loader-3.gif') no-repeat 0 0;
+					}
+				}
+			}
+
+			li:not(.selected) a:hover {
+				color: @side-hover-text;
+				background: @selected-hover-bg;
+			}
+
+			.title {
+				a {
+					padding: 6px 9px;
+				}
+			}
+
+			.selected {
+				width: 210px;
+				z-index: 7000;
+
+				a {
+					color: @side-background;
+					background: @white;
+					border-left: 5px solid @border-left;
+
+					span.net-loader {
+						background: url('/images/loader-1.gif') no-repeat 0 0;
+					}
+				}
+
+				a:hover {
+					span.net-loader {
+						background: url('/images/loader-1.gif') no-repeat 0 0;
+					}
+				}
+
+				span.alert.unread {
+					background: @light-gray;
+					color: @dark-gray;
+				}
+			}
+
+			span.alert {
+				padding: 2px 5px 2px 5px;
+				margin: 0 7px 0 0;
+				.border-radius(3px);
+			}
+
+			span.alert.unread {
+				background: @unread-bg;
+				color: @side-hover-text;
+			}
+
+			span.alert.unread:hover {
+				background: @side-hover-text;
+				color: @unread-bg;
+			}
+
+			span.alert.highlight {
+				background: @red;
+				color: @white;
+			}
+
+			span.net-loaded {
+				.padding-margin(0px);
+			}
+		}
+	}
+
+	.footer {
+		.snap-notop();
+
+		.link.selected {
+			width: 210px;
+			z-index: 2000;
+			position: relative;
+		}
+
+		.link.selected a {
+			color: @side-background;
+			background: @white;
+			border-left: 5px solid @border-left;
+		}
+
+		.link a {
+			display: block;
+			padding: 9px;
+			margin: 0;
+			text-decoration: none;
+			font-weight: bold;
+			color: @side-text;
+			background: @side-background;
+		}
+
+		.link:not(.selected) a:hover {
+			color: @side-hover-text;
+			background: @side-hover-bg;
+			border-left: 5px solid @border-left-inv;
+		}
+
+		.text {
+			font-size: 11px;
+			line-height: 150%;
+			padding: 8px 10px;
+			color: @side-text;
+			background: @side-head-bg;
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: inherit;
+				text-decoration: underline;
+			}
+		}
+	}
+}
+
+// template.app.sidebar styles

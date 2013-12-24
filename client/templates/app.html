@@ -3,45 +3,41 @@
 		<head>
 			<title>{{#if title}}IRCAnywhere - {{title}}{{else}}IRCAnywhere{{/if}}</title>
 		</head>
-		<body>
-			<div id="holder" class="clear">
-				<div class="sidebar">
-					<div class="header">
-						<h3>IRCAnywhere</h3>
-						<a href="{{pathFor 'settings'}}">Settings</a> &middot; <a href="{{pathFor 'logout'}}">Logout</a>
+		<body class="holder clear">
+			<div id="sidebar">
+				<div class="header">
+					<h3>IRCAnywhere</h3>
+					<a href="{{pathFor 'settings'}}">Settings</a> &middot; <a href="{{pathFor 'logout'}}">Logout</a>
+				</div>
+				<div class="items">
+					{{#each networks}}
+						{{> network}}
+					{{/each}}
+				</div>
+				<div class="footer">
+					<div class="link">
+						<a href="{{pathFor 'addnetwork'}}">Add a new network</a>
 					</div>
-					<div id="sidebar">
-						<div class="content">
-							{{#each networks}}
-								{{> network}}
-							{{/each}}
-						</div>
-					</div>
-					<div id="footer">
-						<div class="link">
-							<a href="{{pathFor 'addnetwork'}}">Add a new network</a>
-						</div>
-						<div class="text">
-							&copy; IRCAnywhere 2013 &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a> &middot; <a href="https://github.com/ircanywhere/ircanywhere/issues" target="_blank">Issue tracker</a>
-						</div>
+					<div class="text">
+						&copy; IRCAnywhere 2013 &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a> &middot; <a href="https://github.com/ircanywhere/ircanywhere/issues" target="_blank">Issue tracker</a>
 					</div>
 				</div>
-				<div class="container clear" id="content-container">
-						<div class="topbar clear">
-						<div class="top-bar-left">
-							<div class="topic-wrap"><p class="topic-bar">
-								<span class="chan-title"></span><span class="chan-modes"></span>
-								<span class="chan-desc"></span>
-							</p></div>
-						</div>
-						<ul id="options-menu" style="">
-							
-						</ul>
-					<div class="topbar inner"></div></div>
-					<div class="content-holder" id="content"><div id="inner-content">
-						{{yield}}
-					</div></div>
-				</div>
+			</div>
+			<div class="container clear" id="content-container">
+					<div class="topbar clear">
+					<div class="top-bar-left">
+						<div class="topic-wrap"><p class="topic-bar">
+							<span class="chan-title"></span><span class="chan-modes"></span>
+							<span class="chan-desc"></span>
+						</p></div>
+					</div>
+					<ul id="options-menu" style="">
+						
+					</ul>
+				<div class="topbar inner"></div></div>
+				<div class="content-holder" id="content"><div id="inner-content">
+					{{yield}}
+				</div></div>
 			</div>
 		</body>
 	</html>
@@ -49,16 +45,14 @@
 
 <template name="network">
 	{{#isolate}}
-	<div id="network" class="network">
-		<ul id="network-{{_id}}">
-			{{#each tabs}}
-			<li class="clear {{isSelected this}}">
-				<a href="{{pathFor 'tab'}}" title="{{title}}">
-					<span class="link {{getClass this}}">{{title}}</span>
-				</a>
-			</li>
-			{{/each}}
-		</ul>
-	</div>
+	<ul id="network-{{_id}}">
+		{{#each tabs}}
+		<li class="clear {{isSelected this}}">
+			<a href="{{pathFor 'tab'}}" title="{{title}}">
+				<span class="link {{getClass this}}">{{title}}</span>
+			</a>
+		</li>
+		{{/each}}
+	</ul>
 	{{/isolate}}
 </template>
