@@ -27,9 +27,7 @@
 					</div>
 				</div>
 				<div class="container clear" id="content-container">
-					{{#isolate}}
-						{{yield}}
-					{{/isolate}}
+					{{yield}}
 				</div>
 			</div>
 		</body>
@@ -37,32 +35,17 @@
 </template>
 
 <template name="network">
-	<div id="network" class="network"><ul id="network-{{_id}}">
-		{{#each tabs}}
-		<li class="clear {{isSelected this}}">
-			<a href="{{pathFor 'tab'}}" title="{{title}}">
-				<span class="link {{getClass this}}">{{title}}</span>
-			</a>
-		</li>
-		{{/each}}
-	</ul></div>
-</template>
-
-<template name="main">
-	<div class="wire-container clear">
-		<div class="move-left">
-			{{#each events}}
-				{{#isolate}}
-				<pre>{{event this}}</pre>
-				{{/isolate}}
+	{{#isolate}}
+	<div id="network" class="network">
+		<ul id="network-{{_id}}">
+			{{#each tabs}}
+			<li class="clear {{isSelected this}}">
+				<a href="{{pathFor 'tab'}}" title="{{title}}">
+					<span class="link {{getClass this}}">{{title}}</span>
+				</a>
+			</li>
 			{{/each}}
-		</div>
-		<div class="move-right">
-			{{#each data}}
-				{{#isolate}}
-				<pre>{{event this}}</pre>
-				{{/isolate}}
-			{{/each}}
-		</div>
+		</ul>
 	</div>
+	{{/isolate}}
 </template>

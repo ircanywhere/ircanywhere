@@ -101,6 +101,7 @@ Router.map(function () {
 	this.route('tab', {
 		path: '/:url/:network?',
 		layoutTemplate: 'app',
+		template: 'tabs',
 		action: function() {
 			/*if (!this.params.hash) {
 				alert(this.params.url);
@@ -108,7 +109,7 @@ Router.map(function () {
 				alert('#' + this.params.hash);
 			}*/
 			
-			return this.render('main');
+			return this.render('tabs');
 		}
 	});
 	// ===================================

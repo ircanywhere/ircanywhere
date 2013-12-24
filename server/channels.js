@@ -2,28 +2,7 @@ ChannelManager = function() {
 	"use strict";
 
 	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks'),
-		_getPublishedTabs = function(collection, uid, strict) {
-			var strict = strict || false,
-				networks = Networks.find({'internal.userId': uid}),
-				ids = [];
-
-			networks.forEach(function(network) {
-				_.each(network.internal.tabs, function(tab) {
-					if ('key' in tab && (strict && tab.type == 'channel')) {
-						ids.push(tab.key);
-					}
-				});
-			});
-			// XXX - Look into this, maybe bad design? :/
-			//       i cant think of a better way of doing it because tabs are stored in network.internal
-			//       which is MUCH better than the previous implementation in the old ircanywhere..
-
-			return collection.find({_id: {$in: ids}});
-			// this is a private method not exposed outside of ChannelManager
-			// which is just simply used to prevent code duplication in Meteor.publish()
-			// it's basically a permission checker
-		};
+		hooks = Meteor.require('hooks');
 
 	var Manager = {
 		channel: {
@@ -35,8 +14,39 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
-			Meteor.publish('channels', function(uid) {
-				return _getPublishedTabs(Channels, uid, true);
+			Meteor.publish('tabs', function(uid) {
+				var self = this,
+					networks = Networks.find({'internal.userId': uid}),
+					types = {'network': [], 'channel': [], 'query': []};
+
+				networks.forEach(function(network) {
+					_.each(network.internal.tabs, function(tab) {
+						if ('key' in tab) {
+							types[tab.type].push(tab.key);
+						}
+					});
+				});
+				// generate a bunch of tabs to look for
+				// this is generally to generate our tab windows, we don't really have to
+				// make sure its in order
+
+				for (var type in types) {
+					var ids = types[type];
+					if (type == 'network') {
+						var collection = Networks;
+					} else if (type == 'channel') {
+						var collection = Channels;
+					} else {
+						var collection = Tabs;
+					}
+
+					collection.find({_id: {$in: ids}}).forEach(function(doc) {
+						doc.type = type;
+						self.added('tabCollections', doc._id, doc);
+					});
+				}
+
+				this.ready();
 			});
 
 			Meteor.publish('channelUsers', function(uid) {
@@ -57,10 +67,6 @@ ChannelManager = function() {
 				} else {
 					return ChannelUsers.find({$or: match});
 				}
-			});
-
-			Meteor.publish('tabs', function(uid) {
-				return _getPublishedTabs(Tabs, uid);
 			});
 
 			Meteor.publish('events', function(uid) {

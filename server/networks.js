@@ -99,6 +99,7 @@ NetworkManager = function() {
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
+					selected: false,
 					active: true,
 					key: id
 				};
