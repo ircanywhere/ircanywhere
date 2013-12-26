@@ -17,13 +17,13 @@ ChannelManager = function() {
 			Meteor.publish('tabs', function(uid) {
 				var self = this,
 					networks = Networks.find({'internal.userId': uid}),
-					types = {'network': [], 'channel': [], 'query': []};
+					types = {'network': [], 'channel': [], 'query': []},
+					tabs = {};
 
 				networks.forEach(function(network) {
 					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab) {
-							types[tab.type].push(tab.key);
-						}
+						types[tab.type].push(tab.key);
+						tabs[tab.key] = tab;
 					});
 				});
 				// generate a bunch of tabs to look for
@@ -42,6 +42,10 @@ ChannelManager = function() {
 
 					collection.find({_id: {$in: ids}}).forEach(function(doc) {
 						doc.type = type;
+						doc.selected = tabs[doc._id].selected;
+						doc.active = tabs[doc._id].active;
+						// alter the document
+
 						self.added('tabCollections', doc._id, doc);
 					});
 				}

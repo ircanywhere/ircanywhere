@@ -33,6 +33,7 @@ Template.network.isSelected = function(tab) {
 		var split = tab.url.split('/');
 		Router.go('tab', {url: split[0], network: split[1] || undefined});
 	}
+	// re-route the user to the selected tab
 
 	return (tab.selected) ? 'selected' : '';
 };
