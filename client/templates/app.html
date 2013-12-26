@@ -7,14 +7,26 @@
 			{{> sidebar}}
 			<div class="container clear">
 				<div class="topbar clear">
-					<div class="info-left">
-						<div class="topic-wrap"><p class="topic-bar">
-							<span class="chan-title"></span><span class="chan-modes"></span>
-							<span class="chan-desc"></span>
-						</p></div>
+					<div class="topic-wrap">
+						<span class="chan-title">#ircanywhere</span>
+						<span class="chan-modes">+cnt</span>
+						<span class="chan-desc">IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch</span>
 					</div>
-					<ul id="options-menu" style="">
-						
+					<ul id="options-menu">
+						<li class="dropdown"><a href data-toggle="dropdown" class="dropdown-toggle">Options</a>
+							<ul class="dropdown-menu">
+								<li><a href id="edit-network-link">Edit Network</a></li>
+								<li><a href id="set-topic-link">Set Topic</a></li>
+								<li class="divider"><span id="divider1"></span></li>
+								<li><a href id="hide-users-link">Hide Users</a></li>
+								<li><a href id="hide-extra-link">Hide Joins/Parts</a></li>
+								<li><a href id="view-logs-link" target="_blank">View Logs</a></li>
+								<li class="divider"><span id="divider2"></span></li>
+								<li><a href id="leave-chan-link">Leave</a></li>
+								<li class="hide"><a href id="connect-link" class="connect-link">Disconnect</a></li>
+							</ul>
+						</li>
+						<li><a href id="close-link">Close</a></li>
 					</ul>
 					<div class="topbar inner"></div>
 				</div>

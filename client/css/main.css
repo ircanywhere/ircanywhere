@@ -625,7 +625,6 @@ body
 	}
 
 	.alert-message.block-message
-
 	{
 		background-color: #fdf5d9;
 		background-image: none;
@@ -673,41 +672,6 @@ body
 	.alert-message.block-message.error p a,
 	.alert-message.block-message.success p a,
 	.alert-message.block-message.info p a { color: #404040; }
-
-/* topbar and other bootstrap styles */
-
-	.topbar .dropdown-menu
-	{
-		margin-top: 2px;
-	}
-
-	.topbar .dropdown-menu:after
-	{
-		content: "";
-		display: inline-block;
-		border-left: 6px solid transparent;
-		border-right: 6px solid transparent;
-		border-bottom: 6px solid #f7f7f7;
-		position: absolute;
-		top: -6px;
-		right: 10px;
-	}
-
-	.open .menu,
-	.dropdown.open .menu,
-	.open .dropdown-toggle,
-	.dropdown.open .dropdown-toggle
-	{
-		color: #ffffff;
-		background: #ccc;
-		background: rgba(0, 0, 0, 0.3);
-		outline: none;
-	}
-
-	.open .menu-dropdown,
-	.dropdown.open .menu-dropdown,
-	.open .dropdown-menu,
-	.dropdown.open .dropdown-menu { display: block; }
 
 /* footer styles */
 
