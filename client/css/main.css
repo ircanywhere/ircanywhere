@@ -11,8 +11,6 @@ body
 	height: 100%;
 }
 
-	
-
 	h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, address, cite, code, em, img, s, small, strike, strong, sub, tt, li, ol, ul, fieldset, form, label, legend, button, table, caption, tbody, tfoot, thead, tr, th, td
 	{
 		border: 0;
@@ -100,8 +98,8 @@ body
 		vertical-align: top;
 	}
 
-	p
-	{
+	
+	/*p {
 		font-size: 13px;
 		font-weight: normal;
 		line-height: 18px;
@@ -189,7 +187,7 @@ body
 		line-height: 1;
 		padding: 0 0 5px 145px;
 		padding-left: 150px;
-	}
+	}*/
 
 	div.field, div.s-field
 	{
