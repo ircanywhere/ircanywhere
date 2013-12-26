@@ -16,18 +16,6 @@ Template.login.resetSuccess = function() {
 	return Session.get('login.resetSuccess');
 };
 
-Template.signup.yourName = function(t) {
-	return Session.get('signup.yourName');
-};
-
-Template.signup.ircNickname = function(t) {
-	return Session.get('signup.ircNickname');
-};
-
-Template.signup.emailAddress = function(t) {
-	return Session.get('signup.emailAddress');
-};
-
 Template.signup.errors = function(t) {
 	return Session.get('signup.errors');
 };
@@ -100,6 +88,19 @@ Template.signup.events({
 	}
 });
 
+Template.signup.preserve({
+	'input#your-name': function(node) {
+		return node.id;
+	},
+
+	'input#irc-nickname': function(node) {
+		return node.id;
+	},
+
+	'input#email-address': function(node) {
+		return node.id;
+	},
+});
 
 Template.reset.events({
 	'submit form#reset-password-form': function(e, t) {

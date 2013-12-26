@@ -102,8 +102,7 @@ Router.map(function () {
 		path: '/:url/:network?',
 		layoutTemplate: 'app',
 		template: 'tabs',
-		action: function() {
-			console.log(this.params);
+		before: function() {
 			if (this.params.network === undefined) {
 				Meteor.call('selectTab', this.params.url, this.params.url, true);
 			} else {
@@ -112,6 +111,12 @@ Router.map(function () {
 			// send the changetab function to the backend
 			// this effectively updates the database and then the change will bubble back to us
 			// and the UI will update automagically
+
+			/*if ($('div#tabs').length == 0) {
+				this.render('tabs');
+			}*/
+			// only render when we need to
+			// XXX - bit hacky, look into it in the future - maybe a variable to determine whether we're rendered
 		}
 	});
 	// ===================================

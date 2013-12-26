@@ -21,20 +21,11 @@ Tabs = (function() {
 					for (var title in doc.internal.tabs) {
 						var tab = doc.internal.tabs[title];
 						
-						if (tab.type == 'network') {
-							var collection = Networks;
-						} else if (tab.type == 'channel') {
-							var collection = Channels;
-						} else {
-							var collection = Tabs;
-						}
-						// determine what type of collection it is
-
 						tab.status = doc.internal.status;
 						tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + encodeURIComponent(tab.target);
 						tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
 						tab.networkId = doc._id;
-						tab.document = collection.findOne({_id: tab.key});
+						tab._id = tab.key;
 						// reset some values
 
 						tabs.push(tab);

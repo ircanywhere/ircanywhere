@@ -69,9 +69,6 @@ Home = (function() {
 
 			Meteor.call('registerUser', name, nickname, email, password, confirmPassword, function(err, result) {
 				if (result.failed) {
-					Session.set('signup.yourName', name);
-					Session.set('signup.ircNickname', nickname);
-					Session.set('signup.emailAddress', email);
 					Session.set('signup.errors', result.errors);
 					Session.set('signup.success', '');
 					// reset some fields to keep our user happy

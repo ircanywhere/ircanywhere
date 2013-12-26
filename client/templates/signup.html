@@ -15,16 +15,16 @@
 
 					<div id="message-holder">
 						{{#if errors}}
-						<div class="alert-message block-message error">
-							<ul>
-								{{#each errors}}
-								<li>{{this.error}}</li>
-								{{/each}}
-							</ul>
-						</div>
+							<div class="alert-message block-message error">
+								<ul>
+									{{#each errors}}
+									<li>{{this.error}}</li>
+									{{/each}}
+								</ul>
+							</div>
 						{{/if}}
 						{{#if success}}
-						<div class="alert-message block-message success"><p>{{success}}</p></div>
+							<div class="alert-message block-message success"><p>{{success}}</p></div>
 						{{/if}}
 					</div>
 
@@ -32,7 +32,7 @@
 						<label for="your-name">Your Name</label>
 						<div class="input">
 							<div class="field">
-								<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" value="{{yourName}}" />
+								<input class="xlarge" id="your-name" name="your-name" type="text" tabindex="1" />
 							</div><span class="tooltip"><a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a></span>
 						</div>
 					</div>
@@ -41,7 +41,7 @@
 						<label for="irc-nickname">IRC Nickname</label>
 						<div class="input">
 							<div class="field">
-								<input class="xlarge" id="irc-nickname" name="irc-nickname" type="text" tabindex="2" value="{{ircNickname}}" />
+								<input class="xlarge" id="irc-nickname" name="irc-nickname" type="text" tabindex="2" />
 							</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a></span>
 						</div>
 					</div>
@@ -50,7 +50,7 @@
 						<label for="email-address">Email Address</label>
 						<div class="input">
 							<div class="field">
-								<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="3" value="{{emailAddress}}" />
+								<input class="xlarge" id="email-address" name="email-address" type="text" tabindex="3" />
 							</div><span class="tooltip"><a href="#" rel="twipsy" title="A valid email address.">?</a></span>
 						</div>
 					</div>
