@@ -5,6 +5,7 @@ Tabs = (function() {
 		networks: {
 			rewind: function() {}
 		},
+		urls: {},
 		
 		getNetworks: function() {
 			this.networks = Networks.find({}, {
@@ -12,8 +13,8 @@ Tabs = (function() {
 				fields: {
 					'_id': 1,
 					'internal.tabs': 1,
-					'internal.url': 1,
 					'internal.status': 1,
+					'internal.url': 1,
 					'name': 1
 				}, transform: function(doc) {
 					var tabs = [];
@@ -30,7 +31,7 @@ Tabs = (function() {
 						// determine what type of collection it is
 
 						tab.status = doc.internal.status;
-						tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + tab.target;
+						tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + encodeURIComponent(tab.target);
 						tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
 						tab.networkId = doc._id;
 						tab.document = collection.findOne({_id: tab.key});

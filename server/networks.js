@@ -132,18 +132,22 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(client, target, selected) {
-			var network = Networks.findOne({_id: client});
+		selectTab: function(url, target, selected) {
+			if (this.userId === null) {
+				return false;
+			}
+			// no uid, bail
 
+			var network = Networks.findOne({'internal.userId': this.userId, 'internal.url': url});
+			
 			for (var tab in network.internal.tabs) {
 				network.internal.tabs[tab].selected = false;
-
-				if (target == tab) {
+				if (target == tab || (network.internal.tabs[tab].title == network.name && url == target)) {
 					network.internal.tabs[tab].selected = true;
 				}
 			}
 
-			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
+			Networks.update({'internal.userId': this.userId, 'internal.url': url}, {$set: {'internal.tabs': network.internal.tabs}});
 			// what tab to mark selected
 			// this IS different from active
 		},
@@ -174,7 +178,6 @@ NetworkManager = function() {
 	};
 
 	Meteor.methods({
-		activeTab: Manager.activeTab,
 		selectTab: Manager.selectTab
 	});
 	// expose some methods to the frontend

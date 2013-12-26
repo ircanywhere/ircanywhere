@@ -103,13 +103,15 @@ Router.map(function () {
 		layoutTemplate: 'app',
 		template: 'tabs',
 		action: function() {
-			/*if (!this.params.hash) {
-				alert(this.params.url);
+			console.log(this.params);
+			if (this.params.network === undefined) {
+				Meteor.call('selectTab', this.params.url, this.params.url, true);
 			} else {
-				alert('#' + this.params.hash);
-			}*/
-			
-			return this.render('tabs');
+				Meteor.call('selectTab', this.params.url, this.params.network, true);
+			}
+			// send the changetab function to the backend
+			// this effectively updates the database and then the change will bubble back to us
+			// and the UI will update automagically
 		}
 	});
 	// ===================================

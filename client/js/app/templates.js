@@ -6,10 +6,10 @@ Template.sidebar.networks = function() {
 };
 
 Template.network.isSelected = function(tab) {
-	if (tab.selected && window.document.location != tab.url) {
+	/*if (tab.selected && window.document.location.pathname != '/' + tab.url) {
 		var split = tab.url.split('/');
-		Router.go('tab', {url: split[0], network: split[1] || undefined});
-	}
+		Router.go('/' + tab.url);
+	}*/
 	// re-route the user to the selected tab
 
 	return (tab.selected) ? 'selected' : '';
