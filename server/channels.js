@@ -99,8 +99,8 @@ ChannelManager = function() {
 				u.channel = channel;
 				find.push(u.nickname);
 
-				if (u.nickname == ircFactory.clients[key].nickname) {
-					ircFactory.clients[key].hostname = u.hostname;
+				if (u.nickname == Clients[key].nickname) {
+					Clients[key].hostname = u.hostname;
 					Networks.update({_id: key}, {$set: {hostname: u.hostname}});
 				}
 				// update hostname

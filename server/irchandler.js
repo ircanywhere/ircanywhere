@@ -7,7 +7,7 @@ IRCHandler = function() {
 	var Handler = {
 		registered: function(client, message) {
 			var channels = {},
-				network = Networks.findOne({_id: client.key});
+				network = Networks.findOne({_id: client._id});
 			// firstly we grab the network record from the database
 
 			// XXX - send our connect commands, things that the user defines
@@ -18,8 +18,8 @@ IRCHandler = function() {
 					chan = channel.channel,
 					password = channel.password || '';
 
-				ircFactory.send(client.key, 'join', [chan, password]);
-				ircFactory.send(client.key, 'mode', [chan]);
+				ircFactory.send(client._id, 'join', [chan, password]);
+				ircFactory.send(client._id, 'mode', [chan]);
 				// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 			}
 			// find our channels to automatically join from the network setup
@@ -31,22 +31,22 @@ IRCHandler = function() {
 			client.user = network.user;
 			// update client record on the fly
 
-			Networks.update({_id: client.key}, {$set: {
+			Networks.update({_id: client._id}, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
 				'internal.capabilities': message.capabilities
 			}});
-			//networkManager.changeStatus(client.key, networkManager.flags.connected);
+			//networkManager.changeStatus(client._id, networkManager.flags.connected);
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-			networkManager.addTab(client.key, client.network, 'network', client.key);
+			networkManager.addTab(client._id, client.network, 'network', client._id);
 			// add the tab
 		},
 
 		closed: function(client, message) {
-			networkManager.changeStatus({_id: client.key, 'internal.status': {$ne: networkManager.closed}}, networkManager.flags.closed);
+			networkManager.changeStatus({_id: client._id, 'internal.status': {$ne: networkManager.closed}}, networkManager.flags.closed);
 			// a bit of sorcery here, strictly speaking .changeStatus takes a networkId. But because of meteor's beauty
 			// we can pass in an ID, or a selector. So instead of getting the status and checking it, we just do a mongo update
 			// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
@@ -54,7 +54,7 @@ IRCHandler = function() {
 		},
 
 		failed: function(client, message) {
-			networkManager.changeStatus(client.key, networkManager.flags.failed);
+			networkManager.changeStatus(client._id, networkManager.flags.failed);
 		},
 
 		join: function(client, message) {
@@ -66,10 +66,10 @@ IRCHandler = function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			var id = channelManager.insertUsers(client.key, client.network, message.channel, [user]);
+			var id = channelManager.insertUsers(client._id, client.network, message.channel, [user]);
 
 			if (message.nickname == client.nickname) {
-				networkManager.addTab(client.key, message.channel, 'channel', id);
+				networkManager.addTab(client._id, message.channel, 'channel', id);
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
 
@@ -81,7 +81,7 @@ IRCHandler = function() {
 			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
 
 			if (message.nickname == client.nickname) {
-				networkManager.activeTab(client.key, message.channel, false);
+				networkManager.activeTab(client._id, message.channel, false);
 			}
 			// we're leaving, remove the tab
 
@@ -92,7 +92,7 @@ IRCHandler = function() {
 			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
 
 			if (message.nickname == client.nickname) {
-				networkManager.activeTab(client.key, message.channel, false);
+				networkManager.activeTab(client._id, message.channel, false);
 			}
 			// we're leaving, remove the tab
 
@@ -107,7 +107,7 @@ IRCHandler = function() {
 		nick: function(client, message) {
 			if (message.nickname == client.nickname) {
 				client.nickname = message.newnick;
-				Networks.update({_id: client.key}, {$set: {nick: message.newnick}});
+				Networks.update({_id: client._id}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
 			
@@ -137,9 +137,9 @@ IRCHandler = function() {
 				users.push(user);
 			});
 
-			var id = channelManager.insertUsers(client.key, client.network, message.channel, users, true);
+			var id = channelManager.insertUsers(client._id, client.network, message.channel, users, true);
 
-			networkManager.addTab(client.key, message.channel, 'channel', id);
+			networkManager.addTab(client._id, message.channel, 'channel', id);
 			// we'll update our internal channels cause we might be reconnecting after inactivity
 		},
 
@@ -162,7 +162,7 @@ IRCHandler = function() {
 			users.sort();
 
 			if (!_.isEqual(keys, users)) {
-				ircFactory.send(client.key, 'raw', ['WHO', message.channel]);
+				ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
 			}
 			// different lists.. lets do a /WHO
 		},
@@ -197,7 +197,7 @@ IRCHandler = function() {
 		ctcp_request: function(client, message) {
 			if (message.type.toUpperCase() == 'VERSION') {
 				var version = 'IRCAnywhere v' + application.smartjson.version + ' ' + application.smartjson.homepage;
-				ircFactory.send(client.key, 'ctcp', [message.nickname, 'VERSION', version]);
+				ircFactory.send(client._id, 'ctcp', [message.nickname, 'VERSION', version]);
 			}
 
 			eventManager.insertEvent(client, message, 'ctcp_request');

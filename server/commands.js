@@ -19,7 +19,7 @@ CommandManager = function() {
 			Commands.find({sent: false}).observe({
 				added: function(doc) {
 					var user = Meteor.users.find({_id: doc.user}),
-						client = ircFactory.clients[doc.network];
+						client = Clients[doc.network];
 
 					self.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
 					Commands.update({_id: doc._id}, {$set: {sent: true}});
@@ -49,8 +49,8 @@ CommandManager = function() {
 				command = (command.charAt(1) === '/') ? command.substr(1) : command;
 				// strip one of the /'s off if it has two at the start
 
-				ircFactory.send(client.key, 'privmsg', [target, command]);
-				ircFactory.send(client.key, '_parseLine', [':' + client.nickname + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + command]);
+				ircFactory.send(client._id, 'privmsg', [target, command]);
+				ircFactory.send(client._id, '_parseLine', [':' + client.nickname + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + command]);
 				// nope this is a message, lets just send it straight out because if the target
 				// is empty then it won't have been accepted into the collection
 				// bit of hackery here but we also send it to _parseLine so it comes right
@@ -59,11 +59,11 @@ CommandManager = function() {
 		},
 
 		'/join': function(user, client, target, params) {
-			ircFactory.send(client.key, 'join', params);
+			ircFactory.send(client._id, 'join', params);
 		},
 
 		'/part': function(user, client, target, params) {
-			ircFactory.send(client.key, 'part', params);
+			ircFactory.send(client._id, 'part', params);
 		},
 
 		raw: function(user, client, target, params) {

@@ -17,18 +17,23 @@ NetworkManager = function() {
 			Meteor.publish('networks', function(uid) {
 				return Networks.find({'internal.userId': uid});
 			});
-		},
 
-		addClient: function(user, network) {
-			ircFactory.clients[network._id] = {
-				key: network._id,
-				userId: user._id,
-				network: network.name || network.server,
-				nickname: network.nick,
-				capabilities: network.internal.capabilities,
-				tabs: network.internal.tabs
-			};
-			// add the record into this.clients
+			Networks.find({}).observe({
+				added: function(doc) {
+					Clients[doc._id] = doc;
+				},
+
+				changed: function(doc, old) {
+					Clients[doc._id] = doc;
+				},
+
+				removed: function(doc) {
+					delete Clients[doc._id];
+				}
+			});
+			// just sync clients up to this, instead of manually doing it
+			// we're asking for problems that way doing it this way means
+			// this object will be identical to the network list
 		},
 
 		getClients: function() {
@@ -47,7 +52,6 @@ NetworkManager = function() {
 
 				if (reconnect) {
 					clients[network._id] = {user: me, network: network};
-					self.addClient(me, network);
 					// add the client into our local cache
 				}
 			});
@@ -112,9 +116,6 @@ NetworkManager = function() {
 			network.internal.tabs[obj.target] = obj;
 			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
 			// insert to db
-
-			ircFactory.clients[client].tabs = network.internal.tabs;
-			// update tabs
 		},
 
 		activeTab: function(client, target, activate) {
@@ -122,7 +123,6 @@ NetworkManager = function() {
 			obj['internal.tabs.' + target + '.active'] = activate;
 
 			Networks.update({_id: client}, {$set: obj});
-			ircFactory.clients[client].tabs[target].active = activate;
 			// update the activation flag
 		},
 
@@ -138,7 +138,6 @@ NetworkManager = function() {
 			}
 
 			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
-			ircFactory.clients[client].tabs = network.internal.tabs;
 			// what tab to mark selected
 			// this IS different from active
 		},
@@ -150,7 +149,6 @@ NetworkManager = function() {
 			// this tells us to unset 'internal.tabs.ricki'
 
 			Networks.update({_id: client}, {$unset: obj});
-			delete ircFactory.clients[client].tabs[target];
 			// update tabs
 		},
 

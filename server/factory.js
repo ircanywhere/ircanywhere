@@ -8,7 +8,6 @@ IRCFactory = function() {
 
 	var Factory = {
 		api: new factory(),
-		clients: {},
 		options: {
 			events: 31920,
 			rpc: 31930,
@@ -52,7 +51,7 @@ IRCFactory = function() {
 		handleEvent: function(event, object) {
 			var key = event[0],
 				e = event[1],
-				client = this.clients[key];
+				client = Clients[key];
 
 			if (_.isFunction(ircHandler[e])) {
 				ircHandler[e].call(ircHandler, client, object);
@@ -67,21 +66,17 @@ IRCFactory = function() {
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
-			if (!_.has(this.clients, key)) {
-				networkManager.addClient(user, network);
-			}
-
 			networkManager.changeStatus(key, networkManager.flags.connecting);
 			// mark the network as connecting, the beauty of meteor comes into play here
 			// no need to send a message to the client, live database YEAH BABY
 			// we need to do this here because if we do it when we're calling create, it may have failed.
 
 			this.rpc.emit('createClient', key, network);
-			application.logger.log('info', 'creating irc client', this.clients[key]);
+			application.logger.log('info', 'creating irc client', Clients[key]);
 		},
 
 		destroy: function(key) {
-			application.logger.log('info', 'destroying irc client', this.clients[key]);
+			application.logger.log('info', 'destroying irc client', Clients[key]);
 			// log it before we destroy it below
 
 			this.rpc.emit('destroyClient', key);

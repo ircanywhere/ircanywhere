@@ -3,6 +3,9 @@ var fs = Meteor.require('fs'),
 	dependable = Meteor.require('dependable'),
     container = dependable.container();
 
+Clients = {};
+// clients
+
 container.register('fs', fs);
 container.register('raw', raw);
 application = container.resolve(Application);

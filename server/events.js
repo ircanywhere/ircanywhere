@@ -5,7 +5,7 @@ EventManager = function() {
 		hooks = Meteor.require('hooks'),
 		_insert = function(client, message, type, tab) {
 			if (!message.channel && !message.target) {
-				var id = client.key;
+				var id = client._id;
 			} else {
 				var id = (!message.channel) ? client.tabs[message.target].key : client.tabs[message.channel].key;
 			}
@@ -57,7 +57,7 @@ EventManager = function() {
 				// we'll have to do some calculating to determine where we want them
 				// we shall put them in channel and privmsg tab events
 			} else {
-				_insert(client, message, type, client.tabs[message.target] || client.key);
+				_insert(client, message, type, client.tabs[message.target] || client._id);
 			}
 		}
 	};
