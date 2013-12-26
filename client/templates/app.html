@@ -63,7 +63,7 @@
 <template name="network">
 	{{#isolate}}
 	<ul id="network-{{_id}}">
-		{{#each tabs}}
+		{{#each tabArray}}
 		<li class="clear {{isSelected this}}">
 			<a href="{{pathFor 'tab'}}" title="{{title}}">
 				<span class="link {{getClass this}}">{{title}}</span>

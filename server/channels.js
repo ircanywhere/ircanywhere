@@ -2,7 +2,26 @@ ChannelManager = function() {
 	"use strict";
 
 	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks');
+		hooks = Meteor.require('hooks'),
+		_getTabs = function(uid, type, collection) {
+			var networks = Networks.find({'internal.userId': uid}),
+				match = [];
+
+			networks.forEach(function(network) {
+				_.each(network.internal.tabs, function(tab) {
+					if ('key' in tab && tab.type === type) {
+						match.push(tab.key);
+					}
+				});
+			});
+			// XXX - As in getPublishedTabs also take a look at this.
+
+			if (match.length === 0) {
+				return false;
+			} else {
+				return collection.find({_id: {$in: match}});
+			}
+		};
 
 	var Manager = {
 		channel: {
@@ -14,43 +33,12 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
+			Meteor.publish('channels', function(uid) {
+				return _getTabs(uid, 'channel', Channels);
+			});
+
 			Meteor.publish('tabs', function(uid) {
-				var self = this,
-					networks = Networks.find({'internal.userId': uid}),
-					types = {'network': [], 'channel': [], 'query': []},
-					tabs = {};
-
-				networks.forEach(function(network) {
-					_.each(network.internal.tabs, function(tab) {
-						types[tab.type].push(tab.key);
-						tabs[tab.key] = tab;
-					});
-				});
-				// generate a bunch of tabs to look for
-				// this is generally to generate our tab windows, we don't really have to
-				// make sure its in order
-
-				for (var type in types) {
-					var ids = types[type];
-					if (type == 'network') {
-						var collection = Networks;
-					} else if (type == 'channel') {
-						var collection = Channels;
-					} else {
-						var collection = Tabs;
-					}
-
-					collection.find({_id: {$in: ids}}).forEach(function(doc) {
-						doc.type = type;
-						doc.selected = tabs[doc._id].selected;
-						doc.active = tabs[doc._id].active;
-						// alter the document
-
-						self.added('tabCollections', doc._id, doc);
-					});
-				}
-
-				this.ready();
+				return _getTabs(uid, 'query', Tabs);
 			});
 
 			Meteor.publish('channelUsers', function(uid) {
@@ -146,11 +134,6 @@ ChannelManager = function() {
 			} else {
 				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
 				// update
-
-				if (ChannelUsers.find({network: network, channel: channel}).count() === 0) {
-					Channels.remove({network: network, channel: channel});
-				}
-				// check if the user list is empty
 			}
 			// send the update out
 		},

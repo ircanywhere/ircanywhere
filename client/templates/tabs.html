@@ -7,18 +7,17 @@
 	</div>
 	<div id="tabs">	
 		{{#each tabs}}
-			{{> tab}}
+			{{#each tabArray}}
+				{{> tab}}
+			{{/each}}
 		{{/each}}
 	</div>
-	<!-- <div id="channel-input" class="clear">
-		<label for="chat" id="nick-button"></label>
-		<span></span>
-	</div> -->
 </template>
 
 <template name="tab">
 	<div id="tab-{{_id}}" class="tab clear {{isSelected this}}" data-type="{{type}}">
-		<div class="messages history-load">
+		{{#constant}}
+		<div class="messages">
 			<div class="loading">
 				<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
 			</div>
@@ -31,10 +30,17 @@
 					<span class="message-number"></span>
 				</span>
 				<span class="right">
-					<a href="#" id="read-backlog">Mark as read</a>
+					<a href="#" class="read-backlog">Mark as read</a>
 				</span>
 			</div>
-			<div class="row clear hide" data-type="initial-divider"></div>
+			<div class="backlog">
+			
+			</div>
+			<div class="channel-input" class="clear">
+				<label for="chat" class="nick-button">{{getNickname networkId}}</label>
+				<span><input name="chat" type="text" tabindex="1" /></span>
+			</div>
 		</div>
+		{{/constant}}
 	</div>
 </template>

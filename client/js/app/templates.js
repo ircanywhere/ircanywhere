@@ -1,31 +1,8 @@
+tabEngine = Object.create(Tabs);
+
 Template.sidebar.networks = function() {
-	return Networks.find({}, {
-		reactive: true,
-		fields: {
-			'_id': 1,
-			'internal.tabs': 1,
-			'internal.url': 1,
-			'internal.status': 1,
-			'name': 1
-		}, transform: function(doc) {
-			var tabs = [];
-			for (var title in doc.internal.tabs) {
-				var tab = doc.internal.tabs[title];
-				tab.status = doc.internal.status;
-				tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + tab.target;
-				tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
-				tabs.push(tab);
-			};
-			// re-construct tabs, because #each in Spark doesn't like objects
-
-			doc.tabs = tabs;
-			doc.url = doc.internal.url;
-			delete doc.internal;
-			// reorganise and clean up the document
-
-			return doc;
-		}
-	});
+	tabEngine.networks.rewind();
+	return tabEngine.networks;
 };
 
 Template.network.isSelected = function(tab) {
