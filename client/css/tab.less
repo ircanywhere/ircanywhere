@@ -1,10 +1,8 @@
 @import "library.lessimport";
 
 #no-networks {
-	background: @white;
 	padding: 10px 20px;
 	.snap;
-	top: 40px;
 
 	h3 {
 		font-size: 18px;
@@ -21,80 +19,172 @@
 
 #tabs {
 	.snap;
+	top: 3px;
 
-}
-
-/*div#channel-window
-{
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-}
-
-div#channel-window-data
-{
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	top: 0;
-}
-
-div.content-holder
-{
-	background: #fff;
-	position: absolute;
-	left: 0;
-	top: 37px;
-	right: 0;
-	bottom: 0;
-	-webkit-box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
-	-moz-box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
-	box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.3);
-}
-
-	div#inner-content
-	{
-		background: #fff;
-		position: relative;
-	}
-
-	div.tab
-	{
+	.tab {
 		position: relative;
 		height: 100%;
 		width: 100%;
-	}
 
-	div.msg_container
-	{
-		color: #000;
-		background: #fff;
-		padding: 0;
-		overflow-y: auto;
-		position: absolute;
-		top: 0;
-		bottom: 44px;
-		left: 0;
-		right: 172px;
-	}
+		.messages {
+			color: @black;
+			background: @white;
+			padding: 0;
+			overflow-y: auto;
+			position: relative;
+			height: 100%;
+			width: 100%;
 
-	div.wmsg_container
-	{
-		color: #000;
-		background: #fff;
-		padding: 0;
-		overflow-y: auto;
-		position: absolute;
-		top: 0;
-		bottom: 44px;
-		left: 0;
-		right: 0;
-	}
+			.overlay-bar {
+				z-index: 20;
+				position: fixed;
+				border-bottom: 1px solid #B8DBFF;
+				background: #F7FEFF;
+				padding: 8px;
+				zoom: 1;
+				filter: alpha(opacity=90);
+				opacity: 0.9;
+				line-height: 150%;
+				font-size: 13px;
+				display: none;
 
-	div.wmsg_container.t_container { bottom: 0; }
+				span.channel-name {
+					font-weight: bold;
+					display: inline-block;
+					padding-right: 10px;
+				}
+
+				span.modes {
+					display: inline-block;
+					padding-right: 10px;
+				}
+			}
+
+			.message-bar {
+				z-index: 15;
+				position: relative;
+				background: #70AFC4;
+				color: @white;
+				padding: 6px 8px;
+				display: none;
+				zoom: 1;
+				line-height: 150%;
+				font-size: 12px;
+				cursor: pointer;
+
+				&:hover {
+					background: @message-bar-bg;
+				}
+
+				span {
+					font-weight: bold;
+
+					&.left {
+						float: left;
+					}
+
+					&.right {
+						float: right;
+						display: inline-block;
+
+						a {
+							background: @message-bar-bg;
+							color: white;
+							padding: 3px 5px;
+							margin: 6px 0px;
+							content: "Mark as read";
+							.border-radius(3px);
+
+							&:hover {
+								text-decoration: none;
+								color: @dark-gray;
+								background: #ADD8C7;
+							}
+						}
+					}
+
+					&.alert.highlight {
+						padding: 2px 4px 3px 4px;
+						margin: 0 4px;
+						background: @red;
+						color: @white;
+						.border-radius(3px);
+					}
+				}
+			}
+
+			&.history-load {
+				z-index: 15;
+				position: absolute!important;
+				background: @white;
+				filter: alpha(opacity=80);
+				opacity: 0.5;
+				zoom: 1;
+				height: 100%;
+				width: 100%;
+
+				.loading {
+					margin: 100px auto;
+					width: 50px;
+					height: 35px;
+					text-align: center;
+					font-size: 10px;
+
+					> div {
+						background-color: @black;
+						height: 100%;
+						width: 6px;
+						display: inline-block;
+						margin: 1px;
+						-webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+						animation: stretchdelay 1.2s infinite ease-in-out;
+					}
+
+					.rect2 {
+						-webkit-animation-delay: -1.1s;
+						animation-delay: -1.1s;
+					}
+
+					.rect3 {
+						-webkit-animation-delay: -1.0s;
+						animation-delay: -1.0s;
+					}
+
+					.rect4 {
+						-webkit-animation-delay: -0.9s;
+						animation-delay: -0.9s;
+					}
+
+					.rect5 {
+						-webkit-animation-delay: -0.8s;
+						animation-delay: -0.8s;
+					}
+
+					@-webkit-keyframes stretchdelay {
+						0%, 40%, 100% { -webkit-transform: scaleY(0.4) }  
+						20% { -webkit-transform: scaleY(1.0) }
+					}
+
+					@keyframes stretchdelay {
+						0%, 40%, 100% { 
+							transform: scaleY(0.4);
+							-webkit-transform: scaleY(0.4);
+						} 20% { 
+							transform: scaleY(1.0);
+							-webkit-transform: scaleY(1.0);
+						}
+					}
+				}
+			}
+		}
+
+		.messages[data-type="network"] {
+			right: 172px;
+		}
+	}
+}
+
+/*
 
 		div.mcontainer
 		{
@@ -102,113 +192,6 @@ div.content-holder
 			margin-bottom: 5px;
 			position: relative;
 		}
-
-		div.overlay-bar
-		{
-			z-index: 20;
-			position: fixed;
-			border-bottom: 1px solid #B8DBFF;
-			background: #F7FEFF;
-			padding: 8px;
-			display: none;
-			zoom: 1;
-			filter: alpha(opacity=90);
-			opacity: 0.9;
-			line-height: 150%;
-			font-size: 13px;
-		}
-
-			div.overlay-bar span.channel-name
-			{
-				font-weight: bold;
-				display: inline-block;
-				padding-right: 10px;
-			}
-
-			div.overlay-bar span.modes
-			{
-				display: inline-block;
-				padding-right: 10px;
-			}
-
-		div.message-bar
-		{
-			z-index: 15;
-			position: fixed;
-			background: #70AFC4;
-			color: #fff;
-			padding: 6px 8px;
-			display: none;
-			zoom: 1;
-			line-height: 150%;
-			font-size: 12px;
-			cursor: pointer;
-		}
-
-		div.message-bar:hover
-		{
-			background: #7AC1C4;
-		}
-
-			div.message-bar span { font-weight: bold; }
-			div.message-bar span.left { float: left; }
-			div.message-bar span.right { float: right; display: inline-block; }
-
-			div.message-bar span.right a
-			{
-				background: #7AC1C4;
-				color: white;
-				padding: 3px 5px;
-				margin: 6px 0px;
-				content: "Mark as read";
-				border-radius: 3px;
-				-webkit-border-radius: 3px;
-				-moz-border-radius: 3px;
-				-ms-border-radius: 3px;
-				-o-border-radius: 3px;
-			}
-
-			div.message-bar span.right a:hover
-			{
-				text-decoration: none;
-				color: #404040;
-				background: #ADD8C7;
-			}
-
-			div.message-bar span.alert.highlight
-			{
-				padding: 2px 4px 3px 4px;
-				margin: 0 4px;
-				background: red;
-				color: #fff;
-				border-radius: 3px;
-				-webkit-border-radius: 3px;
-				-moz-border-radius: 3px;
-				-ms-border-radius: 3px;
-				-o-border-radius: 3px;
-			}
-
-		div.historyLoad
-		{
-			z-index: 15;
-			position: absolute!important;
-			background: #fff;
-			filter: alpha(opacity=80);
-			opacity: 0.8;
-			zoom: 1;
-			height: 100%;
-			width: 100%;
-		}
-
-			div.historyLoad div.loader { text-align: center; }
-			div.historyLoad div.loader img
-			{
-				position: absolute;
-				clip: rect(0, 16px, 16px, 0);
-				overflow: hidden;
-				border: 0;
-				margin-top: 10px;
-			}
 
 		div.not-connected { padding: 10px 20px; }
 		div.wmsg_container table

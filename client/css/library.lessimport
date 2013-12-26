@@ -19,6 +19,7 @@
 @border-left: #4E98EC;
 @border-left-inv: #7DB7F8;
 @unread-bg: #3B3F4A;
+@message-bar-bg: #7AC1C4;
 
 // Variable definitions
 

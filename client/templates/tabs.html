@@ -1,11 +1,11 @@
 <template name="tabs">
-	<div id="no-networks" class="show">
+	<div id="no-networks" class="hide">
 		<h3>Hello there!</h3>
 		<p>You are seeing this page because you are not connected to any networks, perhaps you are new?</p>
 		<p>Well, if thats the case then consider <a href="{{pathFor 'addnetwork'}}">adding a network</a>.</p>
 		<p>If you are not sure why you are here then you may have been disconnected from your networks for an unknown reason.</p>
 	</div>
-	<div id="tabs" class="hide">	
+	<div id="tabs">	
 		{{#each tabs}}
 			{{> tab}}
 		{{/each}}
@@ -17,21 +17,24 @@
 </template>
 
 <template name="tab">
-	<div id="tab-{{_id}}" class="tab clear hide">
-		<div id="msgs-{{_id}}" class="wmsg_container">
-			<div class="mcontainer content">
-				<div class="overlay-bar"></div>
-				<div class="top-message-bar message-bar clear">
-					<span class="left">
-						<span class="last hide">0</span>
-						<span class="message-number"></span>
-					</span>
-					<span class="right">
-						<a href="#" id="read-backlog">Mark as read</a>
-					</span>
-				</div>
-				<div class="row clear hide" data-type="initial-divider"></div>
+	<div id="tab-{{_id}}" class="tab clear hide" data-type="{{type}}">
+		<div class="messages history-load">
+			<div class="loading">
+				<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
 			</div>
+			<div class="overlay-bar">
+				<span class="channel-name">#ircanywhere</span><span class="modes">+cnt</span>IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch
+			</div>
+			<div class="top-message-bar message-bar clear">
+				<span class="left">
+					<span class="last hide">0</span>
+					<span class="message-number"></span>
+				</span>
+				<span class="right">
+					<a href="#" id="read-backlog">Mark as read</a>
+				</span>
+			</div>
+			<div class="row clear hide" data-type="initial-divider"></div>
 		</div>
 	</div>
 </template>
