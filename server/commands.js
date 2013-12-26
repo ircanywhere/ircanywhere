@@ -50,7 +50,7 @@ CommandManager = function() {
 				// strip one of the /'s off if it has two at the start
 
 				ircFactory.send(client._id, 'privmsg', [target, command]);
-				ircFactory.send(client._id, '_parseLine', [':' + client.nickname + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + command]);
+				ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + command]);
 				// nope this is a message, lets just send it straight out because if the target
 				// is empty then it won't have been accepted into the collection
 				// bit of hackery here but we also send it to _parseLine so it comes right

@@ -18,7 +18,13 @@ NetworkManager = function() {
 				return Networks.find({'internal.userId': uid});
 			});
 
-			Networks.find({}).observe({
+			var networks = Networks.find();
+
+			networks.forEach(function(doc) {
+				Clients[doc._id] = doc;
+			});
+
+			networks.observe({
 				added: function(doc) {
 					Clients[doc._id] = doc;
 				},
@@ -39,7 +45,7 @@ NetworkManager = function() {
 		getClients: function() {
 			var self = this,
 				clients = {},
-				networks = Networks.find({});
+				networks = Networks.find();
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 			networks.forEach(function(network) {
@@ -61,7 +67,7 @@ NetworkManager = function() {
 		},
 
 		addNetwork: function(user, network) {
-			var userCount = Meteor.users.find({}).count(),
+			var userCount = Meteor.users.find().count(),
 				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;

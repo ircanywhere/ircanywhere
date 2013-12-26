@@ -24,13 +24,6 @@ IRCHandler = function() {
 			}
 			// find our channels to automatically join from the network setup
 
-			client.capabilities = message.capabilities;
-			client.network = message.capabilities.network.name;
-			client.nickname = message.nickname;
-			client.hostname = network.hostname || '';
-			client.user = network.user;
-			// update client record on the fly
-
 			Networks.update({_id: client._id}, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
@@ -41,7 +34,7 @@ IRCHandler = function() {
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-			networkManager.addTab(client._id, client.network, 'network', client._id);
+			networkManager.addTab(client._id, client.name, 'network', client._id);
 			// add the tab
 		},
 
@@ -66,9 +59,9 @@ IRCHandler = function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			var id = channelManager.insertUsers(client._id, client.network, message.channel, [user]);
+			var id = channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 
-			if (message.nickname == client.nickname) {
+			if (message.nickname == client.nick) {
 				networkManager.addTab(client._id, message.channel, 'channel', id);
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
@@ -78,7 +71,7 @@ IRCHandler = function() {
 		},
 
 		part: function(client, message) {
-			channelManager.removeUsers(client.network, message.channel, [message.nickname]);
+			channelManager.removeUsers(client.name, message.channel, [message.nickname]);
 
 			if (message.nickname == client.nickname) {
 				networkManager.activeTab(client._id, message.channel, false);
@@ -89,9 +82,9 @@ IRCHandler = function() {
 		},
 
 		kick: function(client, message) {
-			channelManager.removeUsers(client.network, message.channel, [message.kicked]);
+			channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
-			if (message.nickname == client.nickname) {
+			if (message.nickname == client.nick) {
 				networkManager.activeTab(client._id, message.channel, false);
 			}
 			// we're leaving, remove the tab
@@ -101,23 +94,23 @@ IRCHandler = function() {
 
 		quit: function(client, message) {
 			eventManager.insertEvent(client, message, 'quit');
-			channelManager.removeUsers(client.network, [message.nickname]);
+			channelManager.removeUsers(client.name, [message.nickname]);
 		},
 
 		nick: function(client, message) {
-			if (message.nickname == client.nickname) {
+			if (message.nickname == client.nick) {
 				client.nickname = message.newnick;
 				Networks.update({_id: client._id}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
 			
 			eventManager.insertEvent(client, message, 'nick');
-			channelManager.updateUsers(client.network, [message.nickname], {nickname: message.newnick});
+			channelManager.updateUsers(client.name, [message.nickname], {nickname: message.newnick});
 		},
 
 		who: function(client, message) {
 			var users = [],
-				prefixes = _.invert(client.capabilities.modes.prefixmodes);
+				prefixes = _.invert(client.internal.capabilities.modes.prefixmodes);
 
 			_.each(message.who, function(u) {
 				var split = u.prefix.split('@'),
@@ -137,17 +130,17 @@ IRCHandler = function() {
 				users.push(user);
 			});
 
-			var id = channelManager.insertUsers(client._id, client.network, message.channel, users, true);
+			var id = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 
 			networkManager.addTab(client._id, message.channel, 'channel', id);
 			// we'll update our internal channels cause we might be reconnecting after inactivity
 		},
 
 		names: function(client, message) {
-			var channelUsers = ChannelUsers.find({network: client.network, channel: message.channel.toLowerCase()}),
+			var channelUsers = ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}),
 				users = [],
 				keys = [],
-				regex = new RegExp('[' + Meteor.Helpers.escape(client.capabilities.modes.prefixes) + ']', 'g');
+				regex = new RegExp('[' + Meteor.Helpers.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
 
 			channelUsers.forEach(function(u) {
 				keys.push(u.nickname);
@@ -168,20 +161,20 @@ IRCHandler = function() {
 		},
 
 		mode: function(client, message) {
-			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
 		},
 
 		mode_change: function(client, message) {
-			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
 			eventManager.insertEvent(client, message, 'mode');
 		},
 
 		topic: function(client, message) {
-			channelManager.updateTopic(client.network, message.channel, message.topic, message.topicBy);
+			channelManager.updateTopic(client.name, message.channel, message.topic, message.topicBy);
 		},
 
 		topic_change: function(client, message) {
-			channelManager.updateModes(client.capabilities.modes, client.network, message.channel, message.mode);
+			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
 			eventManager.insertEvent(client, message, 'topic');
 		},
 

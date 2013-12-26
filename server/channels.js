@@ -62,7 +62,7 @@ ChannelManager = function() {
 			});
 
 			Meteor.publish('events', function(uid) {
-				return Events.find({});
+				return Events.find();
 			});
 		},
 
@@ -99,8 +99,7 @@ ChannelManager = function() {
 				u.channel = channel;
 				find.push(u.nickname);
 
-				if (u.nickname == Clients[key].nickname) {
-					Clients[key].hostname = u.hostname;
+				if (u.nickname == Clients[key].nick) {
 					Networks.update({_id: key}, {$set: {hostname: u.hostname}});
 				}
 				// update hostname
