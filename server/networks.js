@@ -94,7 +94,7 @@ NetworkManager = function() {
 		},
 
 		addTab: function(client, target, type, id) {
-			var network = Networks.findOne({_id: client.key}),
+			var network = Networks.findOne({_id: client}),
 				obj = {
 					target: target.toLowerCase(),
 					title: target,
@@ -110,10 +110,10 @@ NetworkManager = function() {
 			// empty, bolt it
 
 			network.internal.tabs[obj.target] = obj;
-			Networks.update({_id: client.key}, {$set: {'internal.tabs': network.internal.tabs}});
+			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
 			// insert to db
 
-			client.tabs = network.internal.tabs;
+			ircFactory.clients[client].tabs = network.internal.tabs;
 			// update tabs
 		},
 
@@ -121,9 +121,26 @@ NetworkManager = function() {
 			var obj = {};
 			obj['internal.tabs.' + target + '.active'] = activate;
 
-			Networks.update({_id: client.key}, {$set: obj});
-			client.tabs[target].active = activate;
+			Networks.update({_id: client}, {$set: obj});
+			ircFactory.clients[client].tabs[target].active = activate;
 			// update the activation flag
+		},
+
+		selectTab: function(client, target, selected) {
+			var network = Networks.findOne({_id: client});
+
+			for (var tab in network.internal.tabs) {
+				network.internal.tabs[tab].selected = false;
+
+				if (target == tab) {
+					network.internal.tabs[tab].selected = true;
+				}
+			}
+
+			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
+			ircFactory.clients[client].tabs = network.internal.tabs;
+			// what tab to mark selected
+			// this IS different from active
 		},
 
 		removeTab: function(client, target) {
@@ -132,9 +149,8 @@ NetworkManager = function() {
 			// bit messy but create an object for mongodb query, if the target is 'ricki'
 			// this tells us to unset 'internal.tabs.ricki'
 
-			Networks.update({_id: client.key}, {$unset: obj});
-
-			delete client.tabs[target];
+			Networks.update({_id: client}, {$unset: obj});
+			delete ircFactory.clients[client].tabs[target];
 			// update tabs
 		},
 
@@ -152,6 +168,12 @@ NetworkManager = function() {
 			Networks.update(query, {$set: {'internal.status': status}});
 		}
 	};
+
+	Meteor.methods({
+		activeTab: Manager.activeTab,
+		selectTab: Manager.selectTab
+	});
+	// expose some methods to the frontend
 
 	Manager.init();
 
