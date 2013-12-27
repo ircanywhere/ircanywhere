@@ -1,8 +1,7 @@
 Application = function(fs, raw) {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks'),
+	var hooks = Meteor.require('hooks'),
 		winston = Meteor.require('winston'),
 		os = Meteor.require('os'),
 		path = Meteor.require('path'),

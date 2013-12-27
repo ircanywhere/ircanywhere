@@ -1,8 +1,7 @@
 ChannelManager = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks'),
+	var hooks = Meteor.require('hooks'),
 		_getTabs = function(uid, type, collection) {
 			var networks = Networks.find({'internal.userId': uid}),
 				match = [];

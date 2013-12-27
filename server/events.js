@@ -1,8 +1,7 @@
 EventManager = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks'),
+	var hooks = Meteor.require('hooks'),
 		_insert = function(client, message, type, tab) {
 			if (!message.channel && !message.target) {
 				var id = client._id;

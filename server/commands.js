@@ -1,8 +1,7 @@
 CommandManager = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks');
+	var hooks = Meteor.require('hooks');
 
 	var Manager = {
 		init: function() {

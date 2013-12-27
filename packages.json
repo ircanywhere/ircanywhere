@@ -3,6 +3,5 @@
 	"hooks": "0.3.2",
 	"irc-factory": "1.2.2",
 	"jsonminify": "0.2.2",
-	"underscore": "1.5.2",
 	"winston": "0.7.2"
 }

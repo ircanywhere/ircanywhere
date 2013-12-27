@@ -1,8 +1,7 @@
 IRCHandler = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore'),
-		hooks = Meteor.require('hooks');
+	var hooks = Meteor.require('hooks');
 
 	var Handler = {
 		registered: function(client, message) {

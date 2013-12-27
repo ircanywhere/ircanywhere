@@ -1,8 +1,6 @@
 ModeParser = function() {
 	"use strict";
 
-	var _ = Meteor.require('underscore');
-
 	var Parser = {
 		sortModes: function(capabilities, modes) {
 			var params = [],
