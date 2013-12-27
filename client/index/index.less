@@ -1,5 +1,361 @@
 @import "library.lessimport";
 
+html, body {
+	.padding-margin;
+}
+
+html {
+	overflow: auto;
+	height: 100%;
+}
+
+/*
+ * All the resets and major global styles go under this body namespace
+ * anything more specific in it's own
+ */
+body {
+	background: @body-background;
+	font-family: 'Segoe UI', 'Segoe UI Web Regular', 'Segoe UI Symbol', 'Helvetica Neue', 'BBAlpha Sans', 'S60 Sans', Arial, sans-serif;
+	font-size: 11px;
+	height: 100%;
+	.padding-margin;
+
+	h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, address, cite, code, em, img, s, small, strike, strong, sub, tt, li, ol, ul, fieldset, form, label, legend, button, table, caption, tbody, tfoot, thead, tr, th, td {
+		border: 0;
+		font-family: inherit;
+		font-size: 100%;
+		font-style: normal;
+		font-weight: normal;
+		line-height: 1;
+		.padding-margin;
+	}
+	// reset elements from bootstrap (removing this knocks a lot to shit unfortauntely)
+
+	.show { display: block; }
+	.hide { display: none; }
+
+	.clear {
+		zoom: 1;
+
+		&:before,
+		&:after {
+			content: "";
+			display: table;
+		}
+
+		&:after {
+			clear: both;
+		}
+	}
+
+	form .clearfix {
+		margin-bottom: 18px;
+		zoom: 1;
+
+		&:before,
+		&:after {
+			content: "";
+			display: table;
+		}
+
+		&:after {
+			clear: both;
+		}
+	}
+	// clear fixes/show/hides
+
+	a {
+		color: #0069D6;
+		font-weight: inherit;
+		line-height: inherit;
+		text-decoration: none;
+		.transition(.5s);
+
+		&:hover {
+			color: #00438A;
+			text-decoration: underline;
+		}
+	}
+
+	button, input, select, textarea {
+		font-size: 100%;
+		margin: 0;
+		vertical-align: baseline;
+		vertical-align: middle;
+	}
+
+	button, input {
+		line-height: normal;
+		overflow: visible;
+	}
+
+	button, input[type="button"], input[type="reset"], input[type="submit"] {
+		cursor: pointer;
+		webkit-appearance: button;
+		height: auto;
+		width: auto;
+	}
+
+	input[type="checkbox"], input[type="radio"] {
+		cursor: pointer;
+		border: none;
+		height: auto;
+		line-height: normal;
+		margin: 3px 0;
+		margin-top: 0;
+		padding: 0;
+		width: auto;
+	}
+
+	input[type="file"] {
+		background: @white;
+		border: initial;
+		box-shadow: none;
+		line-height: initial;
+		moz-box-shadow: none;
+		padding: initial;
+		webkit-box-shadow: none;
+	}
+
+	select, input[type="file"] {
+		height: 27px;
+		height: auto;
+		line-height: 27px;
+		margin-top: 4px;
+	}
+
+	select[multiple] {
+		background: @white;
+		height: inherit;
+	}
+
+	textarea {
+		overflow: auto;
+		vertical-align: top;
+		height: auto;
+	}
+
+	input, textarea, select {
+		border: 1px solid #808080;
+		color: @black;
+		display: inline-block;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: normal;
+		height: 18px;
+		line-height: 18px;
+		padding: 5px;
+		width: 240px;
+		.border-radius(3px);
+	}
+
+	input, textarea {
+		.box-shadow(inset 0 1px 3px rgba(0, 0, 0, 0.2));
+		.transition(~"border linear 0.2s, box-shadow linear 0.2s"); 
+
+		&:focus {
+			border-color: #52A8EC;
+			.box-shadow(0 0 5px rgba(82, 168, 236, 0.8));
+			outline: 0;
+		}
+	}
+
+	input[type="file"]:focus, input[type="checkbox"]:focus, select:focus {
+		.box-shadow(none);
+		outline: 1px dotted #666;
+	}
+
+	input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
+		background-color: @body-background;
+		border-color: @disabled-input;
+		cursor: not-allowed;
+	}
+
+	label, input, select, textarea {
+		font-size: 13px;
+		font-weight: normal;
+		line-height: normal;
+	}
+
+	label {
+		color: @dark-gray;
+		float: left;
+		font-size: 13px;
+		line-height: 18px;
+		padding-top: 7px;
+		text-align: right;
+		width: 130px;
+	}
+	// the above styles are all defaults for mainly inputs and some resets
+
+	.field,
+	.s-field {
+		display: inline-block;
+		position: relative;
+		padding: 2px;
+		background: rgba(0, 0, 0, 0.06);
+		float: left;
+		.border-radius(3px);
+
+		> select {
+			margin-top: 0px;
+		}
+	}
+
+	.checkbox-field {
+		padding: 5px 5px 2px 5px;
+		margin: 5px 0;
+	}
+
+	.input {
+		margin-left: 150px;
+	}
+
+	.input-prepend .add-on, .input-append .add-on {
+		background: rgb(214, 214, 214);
+		border: 1px solid #808080;
+		color: #BFBFBF;
+		display: block;
+		float: left;
+		font-weight: normal;
+		height: 18px;
+		line-height: 18px;
+		margin-right: -1px;
+		min-width: 16px;
+		padding: 5px 4px 5px 5px;
+		position: relative;
+		text-align: center;
+		text-shadow: 0 1px 0 @white;
+		width: auto;
+		z-index: 2;
+		border-radius: 3px 0 0 3px;
+		-webkit-border-radius: 3px 0 0 3px;
+		-moz-border-radius: 3px 0 0 3px;
+		-o-border-radius: 3px 0 0 3px;
+	}
+
+	.input-prepend .active, .input-append .active {
+		background: #A9DBA9;
+		border-color: #46A546;
+	}
+
+	.input-append input {
+		float: left;
+	}
+
+	.input-append .add-on {
+		margin-left: -1px;
+		margin-right: 0;
+	}
+
+	.btn.danger,
+	.alert-message.danger,
+	.btn.danger:hover,
+	.alert-message.danger:hover,
+	.btn.error,
+	.alert-message.error,
+	.btn.error:hover,
+	.alert-message.error:hover,
+	.btn.success,
+	.alert-message.success,
+	.btn.success:hover,
+	.alert-message.success:hover,
+	.btn.info,
+	.alert-message.info,
+	.btn.info:hover,
+	.alert-message.info:hover { color: @white; }
+
+	.btn.danger, .alert-message.danger, .btn.error, .alert-message.error {
+		.gradient(top, #EE5F5B, #C43C35);
+		border-color: #C43C35 #C43C35 #882A25;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+		font-weight: bold;
+	}
+
+	.btn.success, .alert-message.success {
+		.gradient(top, #62C462, #57A957);
+		border-color: #57A957 #57A957 #3D773D;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+		font-weight: bold;
+	}
+
+	.btn.info, .alert-message.info {
+		.gradient(top, #5BC0DE, #339BB9);
+		border-color: #339BB9 #339BB9 #22697D;
+		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+		font-weight: bold;
+	}
+
+	.btn {
+		.border-radius(1px);
+		.box-shadow(~"inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)");
+		.transition(0.1s linear all);
+		.gradient(@white, @white 25%, #E6E6E6);
+		background-repeat: no-repeat;
+		color: #333;
+		border: 1px solid #CCCCCC;
+		border-bottom: 1px solid #BBBBBB;
+		text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+		font-weight: bold;
+		font-size: 13px;
+		font-weight: normal;
+		line-height: normal;
+		padding: 5px 14px 6px;
+		cursor: pointer;
+		display: inline-block;
+		text-decoration: none;
+
+		&:hover {
+			background-position: 0 -15px;
+			color: #333;
+			text-decoration: none;
+		}
+
+		&:focus {
+			outline: 1px dotted #666;
+		}
+
+		&.primary {
+			.gradient(top, #049CDB, #0064CD);
+			border-color: #0064CD #0064CD #003F81;
+			color: @white;
+			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+			font-weight: bold;
+		}
+
+		&.active,
+		&:active {
+			.box-shadow(~"inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.05)");
+		}
+
+		&.disabled,
+		&[disabled] {
+			background-image: none;
+			cursor: default;
+			opacity: 0.65;
+			.box-shadow(none);
+		}
+
+		&.large {
+			font-weight: normal;
+			font-size: 15px;
+			line-height: normal;
+			padding: 9px 14px 9px;
+			.border-radius(2px);
+		}
+
+		&.small {
+			font-size: 11px;
+			padding: 7px 9px 7px;
+		}
+	}
+	// default global styles (buttons, things)
+	// god forbid a lot of this is still horrible bootstrap trash. I've took a lot of it out
+	// but it's still full of old unused shite, it's difficult to get rid of the old stuff without
+	// a full CSS rewrite 
+	// Three can fix it when he gets round to doing it ^.^
+}
+
 #banner {
 	margin-top: 42px;
 	background: #2E323B;
@@ -48,5 +404,88 @@
 		float: right;
 		width: 320px;
 		padding: 20px 24px 30px 0;
+	}
+}
+
+#main {
+	border-top: 1px solid @index-border;
+	background: white;
+
+	#main-inner {
+		width: 922px;
+		margin: 0 auto;
+		padding: 20px 14px 30px 14px;
+
+		.body {
+
+			.left {
+				float: left;
+				width: 48%;
+				padding-right: 20px;
+				border-right: 1px solid @index-border;
+			}
+
+			.right {
+				float: left;
+				width: 46%;
+				padding-left: 20px;
+			}
+
+			.indent {
+				margin-left: 10px
+			}
+
+			ul {
+				list-style-type: disc;
+				margin: 0;
+				font-size: 12px;
+				line-height: 18px;
+			}
+
+			.block-message ul {
+				margin: 0 0 0 20px!important;
+
+				li {
+					color: @dark-gray;
+					padding: 3px;
+				}
+			}
+
+			.block-message p {
+				font-size: 12px;
+			}
+
+			> div > p {
+				font-size: 13px;
+				line-height: 18px;
+				margin: 15px 0 25px 0;
+				text-align: justify;
+			}
+
+			h5, h3 {
+				font-weight: bold;
+				line-height: 36px;
+				color: @dark-gray;
+			}
+
+			h5 {
+				font-size: 14px;
+			}
+
+			h3 {
+				font-size: 18px;
+			}
+
+			p {
+				font-size: 13px;
+				font-weight: normal;
+				line-height: 18px;
+				margin-bottom: 9px;
+
+				&.indent {
+					margin-left: 20px;
+				}
+			}
+		}
 	}
 }
