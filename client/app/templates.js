@@ -1,17 +1,9 @@
-tabEngine = Object.create(Tabs);
-
 Template.sidebar.networks = function() {
 	tabEngine.networks.rewind();
 	return tabEngine.networks;
 };
 
 Template.network.isSelected = function(tab) {
-	/*if (tab.selected && window.document.location.pathname != '/' + tab.url) {
-		var split = tab.url.split('/');
-		Router.go('/' + tab.url);
-	}*/
-	// re-route the user to the selected tab
-
 	return (tab.selected) ? 'selected' : '';
 };
 
