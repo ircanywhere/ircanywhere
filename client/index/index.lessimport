@@ -3,6 +3,7 @@
 @red: #FF0000;
 @light-gray: lightGrey;
 @dark-gray: #404040;
+@darker-gray: #808080;
 
 @disabled-input: #DDDDDD;
 @index-border: #EEEEEE;
