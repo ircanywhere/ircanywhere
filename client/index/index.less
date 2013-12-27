@@ -1,0 +1,52 @@
+@import "library.lessimport";
+
+#banner {
+	margin-top: 42px;
+	background: #2E323B;
+	z-index: 2000;
+
+	#banner-inner {
+		width: 950px;
+		margin: 0 auto;
+	}
+
+	.banner-left {
+		float: left;
+		padding: 0 0 0 14px;
+
+		h1, h2, h3 {
+			color: @white;
+			text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+			text-rendering: optimizeLegibility;
+		}
+
+		h1 {
+			font-size: 54px;
+			font-weight: 500;
+			margin: 35px 0 20px 30px;
+		}
+
+		h2 {
+			font-size: 34px;
+			font-weight: 500;
+			margin: 30px 0 35px 30px;
+		}
+
+		h3 {
+			font-size: 20px;
+			font-weight: 600;
+			margin: 0 30px;
+		}
+
+		a.btn {
+			margin: 30px;
+			.box-shadow(0 1px 3px rgba(0,0,0,0.5));
+		}
+	}
+
+	.banner-right {
+		float: right;
+		width: 320px;
+		padding: 20px 24px 30px 0;
+	}
+}
