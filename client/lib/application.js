@@ -10,9 +10,11 @@ function App() {
 // it's all based upon templates, although we can extend the template objects for more functionality
 
 App.prototype.subscribe = function() {
+	var self = this;
+
 	if (Meteor.user()) {
 		Meteor.subscribe('networks', Meteor.user()._id, function() {
-			Deps.autorun(tabEngine.getNetworks.bind(tabEngine));
+			Deps.autorun(self.getNetworks.bind(self));
 		});
 		Meteor.subscribe('tabs', Meteor.user()._id);
 		Meteor.subscribe('channels', Meteor.user()._id);
@@ -20,6 +22,40 @@ App.prototype.subscribe = function() {
 		Meteor.subscribe('events', Meteor.user()._id);
 	}
 	// this function handles the subscriptions
+};
+
+App.prototype.getNetworks = function() {
+	return Networks.find({}, {
+		fields: {
+			'_id': 1,
+			'internal.tabs': 1,
+			'internal.status': 1,
+			'internal.url': 1,
+			'name': 1
+		}, transform: function(doc) {
+			var tabs = [];
+			for (var title in doc.internal.tabs) {
+				var tab = doc.internal.tabs[title];
+				
+				tab.status = doc.internal.status;
+				tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + encodeURIComponent(tab.target);
+				tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
+				tab.networkId = doc._id;
+				tab._id = tab.key;
+				// reset some values
+
+				tabs.push(tab);
+			};
+			// re-construct tabs, because #each in Spark doesn't like objects
+
+			doc.tabArray = tabs;
+			doc.url = doc.internal.url;
+			delete doc.internal;
+			// reorganise and clean up the document
+
+			return doc;
+		}
+	});
 };
 // -------------------------------------
 

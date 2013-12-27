@@ -16,11 +16,11 @@ Template.signup.events({
 		e.preventDefault();
 		// prevent submit
 
-		var name = t.find('#your-name'),
-			nickname = t.find('#irc-nickname'),
-			email = t.find('#email-address'),
-			password = t.find('#password'),
-			confirmPassword = t.find('#confirm-password');
+		var name = t.find('#your-name').value,
+			nickname = t.find('#irc-nickname').value,
+			email = t.find('#email-address').value,
+			password = t.find('#password').value,
+			confirmPassword = t.find('#confirm-password').value;
 		// grab all our variables
 
 		Meteor.call('registerUser', name, nickname, email, password, confirmPassword, function(err, result) {

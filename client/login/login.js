@@ -62,8 +62,8 @@ Template.login.events({
 		e.preventDefault();
 		// prevent the submit straight away
 		
-		var email = t.find('#login-email'),
-			password = t.find('login-password');
+		var email = t.find('#login-email').value,
+			password = t.find('#login-password').value;
 		// retrieve input fields
 
 		email = Meteor.Helpers.trimInput(email);

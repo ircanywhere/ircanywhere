@@ -1,6 +1,5 @@
 Template.sidebar.networks = function() {
-	tabEngine.networks.rewind();
-	return tabEngine.networks;
+	return Application.getNetworks();
 };
 
 Template.network.isSelected = function(tab) {

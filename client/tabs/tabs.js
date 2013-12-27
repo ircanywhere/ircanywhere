@@ -1,6 +1,5 @@
 Template.tabs.tabs = function() {
-	tabEngine.networks.rewind();
-	return tabEngine.networks;
+	return Application.getNetworks();
 };
 
 Template.tab.isSelected = function(tab) {

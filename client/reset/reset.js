@@ -15,9 +15,9 @@ Template.reset.events({
 	'submit form#reset-password-form': function(e, t) {
 		e.preventDefault();
 		
-		var token = t.find('#token'),
-			password = t.find('#password'),
-			confirmPassword = t.find('#confirm-password'),
+		var token = t.find('#token').value,
+			password = t.find('#password').value,
+			confirmPassword = t.find('#confirm-password').value,
 			errors = [];
 
 		if (password == '' || confirmPassword == '' || token == '')
