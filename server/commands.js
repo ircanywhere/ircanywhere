@@ -7,10 +7,19 @@ CommandManager = function() {
 		init: function() {
 			var self = this;
 
+			Meteor.publish('commands', function(uid) {
+				return Commands.find({'user': uid});
+			});
+
 			Commands.allow({
 				insert: function(userId, doc) {
-					//return (userId && doc.user === userId && doc.command && doc.tab);
-					return (doc.command && doc.network && doc.target && (doc.sent === false));
+					doc.timestamp = +new Date();
+					// modify doc
+
+					return ((userId && doc.user === userId) && 
+							(doc.command && doc.network) &&
+							(doc.target !== '') &&
+							(doc.sent === false));
 				}
 			});
 			// setup allow rules for this collection
@@ -48,12 +57,8 @@ CommandManager = function() {
 				command = (command.charAt(1) === '/') ? command.substr(1) : command;
 				// strip one of the /'s off if it has two at the start
 
-				ircFactory.send(client._id, 'privmsg', [target, command]);
-				ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + command]);
-				// nope this is a message, lets just send it straight out because if the target
-				// is empty then it won't have been accepted into the collection
-				// bit of hackery here but we also send it to _parseLine so it comes right
-				// back through and looks like it's came from someone else.
+				this['/msg'](user, client, target, command.split(' '));
+				// just split it to follow standards with other commands, it'll be rejoined before sent out
 			}
 		},
 
@@ -63,6 +68,15 @@ CommandManager = function() {
 
 		'/part': function(user, client, target, params) {
 			ircFactory.send(client._id, 'part', params);
+		},
+
+		'/msg': function(user, client, target, params) {
+			ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
+			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + params.join(' ')]);
+			// nope this is a message, lets just send it straight out because if the target
+			// is empty then it won't have been accepted into the collection
+			// bit of hackery here but we also send it to _parseLine so it comes right
+			// back through and looks like it's came from someone else.
 		},
 
 		raw: function(user, client, target, params) {

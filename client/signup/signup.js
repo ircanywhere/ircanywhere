@@ -1,3 +1,7 @@
+// ----------------------------
+// Template.signup
+// - the signup page template
+
 Template.signup.created = function() {
 	Session.set('signup.errors', '');
 	Session.set('signup.success', '');
@@ -49,3 +53,4 @@ Template.signup.preserve({
 		return node.id;
 	},
 });
+// ----------------------------

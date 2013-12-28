@@ -1,0 +1,41 @@
+@import "../index/index.lessimport";
+
+.channel-input {
+	padding: 0;
+	border-top: 2px solid #D9D9D9;
+	background: @white;
+	.snap-notop;
+
+	.nick-button {
+		width: auto;
+		margin: 0;
+		padding: 13px 14px 10px 88px;
+		float: left;
+		font-size: 12px;
+		font-weight: bold;
+	}
+
+	span {
+		display: block;
+		overflow: hidden;
+		text-align: right;
+		padding: 7px 7px 7px 0;
+		background: @background;
+
+		input {
+			width: 98.8%;
+			border: 1px solid #0069D6;
+			color: @black;
+			display: inline-block;
+			font-size: 13px;
+			height: auto;
+			min-height: 18px;
+			line-height: 18px;
+			padding: 4px;
+			outline: none;
+			background: @white;
+			text-align: left;
+			resize: none;
+		}
+	}
+}

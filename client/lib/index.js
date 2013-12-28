@@ -16,6 +16,7 @@ App.prototype.subscribe = function() {
 		Meteor.subscribe('networks', Meteor.user()._id);
 		Meteor.subscribe('tabs', Meteor.user()._id);
 		Meteor.subscribe('channels', Meteor.user()._id);
+		Meteor.subscribe('commands', Meteor.user()._id);
 		Meteor.subscribe('channelUsers', Meteor.user()._id);
 		Meteor.subscribe('events', Meteor.user()._id);
 	}
@@ -29,12 +30,14 @@ App.prototype.getNetworks = function() {
 			'internal.tabs': 1,
 			'internal.status': 1,
 			'internal.url': 1,
+			'nick': 1,
 			'name': 1
 		}, transform: function(doc) {
 			var tabs = [];
 			for (var title in doc.internal.tabs) {
 				var tab = doc.internal.tabs[title];
 				
+				tab.nick = doc.nick;
 				tab.status = doc.internal.status;
 				tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + encodeURIComponent(tab.target);
 				tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';

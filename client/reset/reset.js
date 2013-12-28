@@ -1,3 +1,7 @@
+// ----------------------------
+// Template.reset
+// - the reset password page template
+
 Template.reset.created = function() {
 	Session.set('reset.errors', '');
 	Session.set('reset.success', '');
@@ -46,3 +50,4 @@ Template.reset.events({
 		});
 	}
 });
+// ----------------------------

@@ -1,13 +1,18 @@
+// ----------------------------
+// Template.tabs
+// - the tab windows
+
 Template.tabs.tabs = function() {
 	return Application.getNetworks();
 };
+// ----------------------------
+
+// ----------------------------
+// Template.tab
+// - everything outside of the .messages
 
 Template.tab.isSelected = function(tab) {
 	return (tab.selected) ? 'show' : 'hide';
-};
-
-Template.tabContent.getNickname = function(network) {
-	return Networks.findOne({_id: network}, {fields: {'nick': 1}}).nick;
 };
 
 Template.tab.preserve({
@@ -15,3 +20,10 @@ Template.tab.preserve({
 		return node.id;
 	}
 });
+// ----------------------------
+
+// ----------------------------
+// Template.tabContent
+// - everything inside .messages
+
+// ----------------------------

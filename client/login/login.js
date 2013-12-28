@@ -1,3 +1,7 @@
+// ----------------------------
+// Template.login
+// - the login template, also serves as the immediate index or /
+
 Template.login.created = function() {
 	Session.set('login.errors', '');
 	Session.set('login.resetErrors', '');
@@ -107,3 +111,4 @@ Template.login.events({
 		// request a password reset link
 	}
 });
+// ----------------------------
