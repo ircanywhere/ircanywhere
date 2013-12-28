@@ -28,6 +28,12 @@ IRCFactory = function() {
 					var users = networkManager.getClients(),
 						keys = _.keys(users),
 						difference = _.difference(keys, message.keys);
+
+					console.log(message);
+
+					_.each(message.keys, function(key) {
+						networkManager.changeStatus(key, networkManager.flags.connected);
+					});
 					
 					_.each(difference, function(key) {
 						var user = users[key];

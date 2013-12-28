@@ -3,7 +3,6 @@ Template.tabs.tabs = function() {
 };
 
 Template.tab.isSelected = function(tab) {
-	console.log(tab);
 	return (tab.selected) ? 'show' : 'hide';
 };
 
