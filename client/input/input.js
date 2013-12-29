@@ -4,22 +4,32 @@
 
 Template.input.created = function() {
 	var variableName = 'bufferTS.' + this.data.key;
-	Session.set(variableName, 0);
+	Session.set(variableName, {
+		query: {$lt: 0},
+		sort: {sort: {'timestamp': -1}}
+	});
+
+	this.lastCommand = {timestamp: 0};
 };
 
 Template.input.rendered = function() {
 	var inp = this.find('input');
 	
 	inp.focus();
-	inp.selectionEnd = inp.selectionStart;
+	inp.selectionEnd = 0;
 };
 
-Template.input.lastCommand = function(t) {
+Template.input.lastCommand = function() {
 	var variableName = 'bufferTS.' + this.key,
-		command = Commands.findOne({network: this.networkId, target: this.target, timestamp: {$lt: Session.get(variableName)}}, {sort: {'timestamp': -1}});
-	
+		variable = Session.get(variableName),
+		command = Commands.findOne({network: this.networkId, target: this.target, timestamp: variable.query}, variable.sort);
+
 	if (command === undefined) {
-		Session.set(variableName, 0);
+		Session.set(variableName, {
+			query: {$lt: 0},
+			sort: {sort: {'timestamp': -1}}
+		});
+		this.lastCommand = {timestamp: 0};
 		return '';
 	} else {
 		this.lastCommand = command;
@@ -48,18 +58,35 @@ Template.input.events({
 			// empty the input
 
 			e.preventDefault();
+			// prevent default
 		} else if (keyCode == key.tab) {
+
 			e.preventDefault();
+			// prevent default
 		} else if (keyCode == key.up) {
-			var variableName = 'bufferTS.' + t.data.key,
-				lastTs = Session.get(variableName);
+			var variableName = 'bufferTS.' + this.key,
+				newTs = (this.lastCommand.timestamp === 0) ? {$lt: +new Date()} : {$lt: this.lastCommand.timestamp - 1};
 
-			Session.set(variableName, (lastTs === 0) ? +new Date() : (this.lastCommand.timestamp - 1));
-			// alter the session variable to redraw lastCommand
+			Session.set(variableName, {
+				query: newTs,
+				sort: {sort: {'timestamp': -1}}
+			});
 
 			e.preventDefault();
+			// prevent default
 		} else if (keyCode == key.down) {
+			var variableName = 'bufferTS.' + this.key,
+				newTs = (this.lastCommand.timestamp === 0) ? {$gt: 0} : {$gt: this.lastCommand.timestamp + 1};
 
+			Session.set(variableName, {
+				query: newTs,
+				sort: {sort: {'timestamp': 1}}
+			});
+
+			e.preventDefault();
+			// prevent default
+
+			e.preventDefault();
 		}
 	}
 });
