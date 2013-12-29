@@ -7,8 +7,8 @@ CommandManager = function() {
 		init: function() {
 			var self = this;
 
-			Meteor.publish('commands', function(uid) {
-				return Commands.find({'user': uid});
+			Meteor.publish('commands', function() {
+				return Commands.find({'user': this.userId});
 			});
 
 			Commands.allow({

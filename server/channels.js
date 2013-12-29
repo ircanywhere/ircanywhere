@@ -32,16 +32,16 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
-			Meteor.publish('channels', function(uid) {
-				return _getTabs(uid, 'channel', Channels);
+			Meteor.publish('channels', function() {
+				return _getTabs(this.userId, 'channel', Channels);
 			});
 
-			Meteor.publish('tabs', function(uid) {
-				return _getTabs(uid, 'query', Tabs);
+			Meteor.publish('tabs', function() {
+				return _getTabs(this.userId, 'query', Tabs);
 			});
 
-			Meteor.publish('channelUsers', function(uid) {
-				var networks = Networks.find({'internal.userId': uid}),
+			Meteor.publish('channelUsers', function() {
+				var networks = Networks.find({'internal.userId': this.userId}),
 					match = [];
 
 				networks.forEach(function(network) {
@@ -60,7 +60,7 @@ ChannelManager = function() {
 				}
 			});
 
-			Meteor.publish('events', function(uid) {
+			Meteor.publish('events', function() {
 				return Events.find();
 			});
 		},

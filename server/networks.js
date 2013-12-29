@@ -13,8 +13,8 @@ NetworkManager = function() {
 		},
 
 		init: function() {
-			Meteor.publish('networks', function(uid) {
-				return Networks.find({'internal.userId': uid});
+			Meteor.publish('networks', function() {
+				return Networks.find({'internal.userId': this.userId});
 			});
 
 			var networks = Networks.find();

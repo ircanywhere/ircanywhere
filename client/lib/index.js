@@ -13,12 +13,12 @@ App.prototype.subscribe = function() {
 	var self = this;
 
 	if (Meteor.user()) {
-		Meteor.subscribe('networks', Meteor.user()._id);
-		Meteor.subscribe('tabs', Meteor.user()._id);
-		Meteor.subscribe('channels', Meteor.user()._id);
-		Meteor.subscribe('commands', Meteor.user()._id);
-		Meteor.subscribe('channelUsers', Meteor.user()._id);
-		Meteor.subscribe('events', Meteor.user()._id);
+		Meteor.subscribe('networks');
+		Meteor.subscribe('tabs');
+		Meteor.subscribe('channels');
+		Meteor.subscribe('commands');
+		Meteor.subscribe('channelUsers');
+		Meteor.subscribe('events');
 	}
 	// this function handles the subscriptions
 };
