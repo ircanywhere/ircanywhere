@@ -59,10 +59,6 @@ ChannelManager = function() {
 					return ChannelUsers.find({$or: match});
 				}
 			});
-
-			Meteor.publish('events', function() {
-				return Events.find();
-			});
 		},
 
 		createChannel: function(network, channel) {
@@ -114,6 +110,7 @@ ChannelManager = function() {
 			// and all of them if we're being told to force the update
 
 			_.each(users, function(u) {
+				u.sort = eventManager.getPrefix(Clients[key], u).sort;
 				ChannelUsers.insert(u);
 			});
 			// send the update out
@@ -136,7 +133,7 @@ ChannelManager = function() {
 			// send the update out
 		},
 
-		updateUsers: function(network, users, values) {
+		updateUsers: function(key, network, users, values) {
 			var update = {};
 
 			_.each(users, function(u) {
@@ -145,6 +142,7 @@ ChannelManager = function() {
 
 				records.forEach(function (user) {
 					var updated = _.extend(user, values);
+						updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
 
 					ChannelUsers.update(s, _.omit(updated, '_id'));
 					// update the record
@@ -154,7 +152,7 @@ ChannelManager = function() {
 			// comply with all the other functions in this class
 		},
 
-		updateModes: function(capab, network, channel, mode) {
+		updateModes: function(key, capab, network, channel, mode) {
 			var channel = channel.toLowerCase(),
 				chan = this.getChannel(network, channel),
 				us = {};
@@ -180,6 +178,7 @@ ChannelManager = function() {
 			});
 
 			modeParser.handleParams(capab, us, parsedModes).forEach(function(u) {
+				u.sort = eventManager.getPrefix(Clients[key], u).sort;
 				ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
 			});
 			// update users now

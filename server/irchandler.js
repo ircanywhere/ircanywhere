@@ -104,7 +104,7 @@ IRCHandler = function() {
 			// update the nickname because its us changing our nick
 			
 			eventManager.insertEvent(client, message, 'nick');
-			channelManager.updateUsers(client.name, [message.nickname], {nickname: message.newnick});
+			channelManager.updateUsers(client._id, client.name, [message.nickname], {nickname: message.newnick});
 		},
 
 		who: function(client, message) {
@@ -160,11 +160,11 @@ IRCHandler = function() {
 		},
 
 		mode: function(client, message) {
-			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
+			channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
 		},
 
 		mode_change: function(client, message) {
-			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
+			channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
 			eventManager.insertEvent(client, message, 'mode');
 		},
 
@@ -173,7 +173,7 @@ IRCHandler = function() {
 		},
 
 		topic_change: function(client, message) {
-			channelManager.updateModes(client.internal.capabilities.modes, client.name, message.channel, message.mode);
+			channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
 			eventManager.insertEvent(client, message, 'topic');
 		},
 
