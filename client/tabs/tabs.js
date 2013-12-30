@@ -22,8 +22,6 @@ Template.tab.rendered = function() {
 		modes: (this.data.type == 'channel') ? '+' + this.data.document.modes : '',
 		desc: (this.data.type == 'channel') ? this.data.document.topic.topic : this.data.title
 	});
-
-	console.log(Session.get('topicBarData'));
 };
 
 Template.tab.isSelected = function() {

@@ -7,24 +7,7 @@
 			{{> sidebar}}
 			<div class="container clear">
 				<div class="topbar clear">
-					{{> titleBar titleInfo}}
-					<ul id="options-menu">
-						<li class="dropdown"><a href data-toggle="dropdown" class="dropdown-toggle">Options</a>
-							<ul class="dropdown-menu">
-								<li><a href id="edit-network-link">Edit Network</a></li>
-								<li><a href id="set-topic-link">Set Topic</a></li>
-								<li class="divider"><span id="divider1"></span></li>
-								<li><a href id="hide-users-link">Hide Users</a></li>
-								<li><a href id="hide-extra-link">Hide Joins/Parts</a></li>
-								<li><a href id="view-logs-link" target="_blank">View Logs</a></li>
-								<li class="divider"><span id="divider2"></span></li>
-								<li><a href id="leave-chan-link">Leave</a></li>
-								<li class="hide"><a href id="connect-link" class="connect-link">Disconnect</a></li>
-							</ul>
-						</li>
-						<li><a href id="close-link">Close</a></li>
-					</ul>
-					<div class="topbar inner"></div>
+					{{> titlebar titleInfo}}
 				</div>
 				<div class="content-holder" id="content">
 					{{yield}}
@@ -34,12 +17,29 @@
 	</html>
 </template>
 
-<template name="titleBar">
+<template name="titlebar">
 	<div class="topic-wrap">
 		<span class="chan-title">{{title}}</span>
 		<span class="chan-modes">{{modes}}</span>
 		<span class="chan-desc">{{desc}}</span>
 	</div>
+	<ul id="options-menu">
+		<li class="dropdown"><a href data-toggle="dropdown" class="dropdown-toggle">Options</a>
+			<ul class="dropdown-menu">
+				<li><a href id="edit-network-link">Edit Network</a></li>
+				<li><a href id="set-topic-link">Set Topic</a></li>
+				<li class="divider"><span id="divider1"></span></li>
+				<li><a href id="hide-users-link">Hide Users</a></li>
+				<li><a href id="hide-extra-link">Hide Joins/Parts</a></li>
+				<li><a href id="view-logs-link" target="_blank">View Logs</a></li>
+				<li class="divider"><span id="divider2"></span></li>
+				<li><a href id="leave-chan-link">Leave</a></li>
+				<li class="hide"><a href id="connect-link" class="connect-link">Disconnect</a></li>
+			</ul>
+		</li>
+		<li><a href id="close-link">Close</a></li>
+	</ul>
+	<div class="topbar inner"></div>
 </template>
 
 <template name="sidebar">
