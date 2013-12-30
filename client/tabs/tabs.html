@@ -15,7 +15,7 @@
 </template>
 
 <template name="tab">
-	<div id="tab-{{_id}}" class="tab clear {{isSelected this}}" data-type="{{type}}">
+	<div id="tab-{{_id}}" class="tab clear {{isSelected}}" data-type="{{type}}">
 		{{#constant}}
 			{{> tabContent this}}
 		{{/constant}}
@@ -28,7 +28,11 @@
 			<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
 		</div>
 		<div class="overlay-bar">
-			<span class="channel-name">#ircanywhere</span><span class="modes">+cnt</span>IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch
+			{{#if isChannel}}
+				<span class="channel-name">#ircanywhere</span><span class="modes">+cnt</span><span class="topic">IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch</span>
+			{{else}}
+				<span class="channel-name">{{title}}</span><span class="modes"></span><span class="topic">{{url}}</span>
+			{{/if}}
 		</div>
 		<div class="top-message-bar message-bar clear">
 			<span class="left">

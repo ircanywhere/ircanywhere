@@ -6,7 +6,11 @@ Template.app.rendered = function() {
 	$('body').on('keydown', function(e) {
 		$('input.command-field:visible').focus();
 	});
-}
+};
+
+Template.app.titleInfo = function() {
+	return Session.get('topicBarData');
+};
 // ----------------------------
 
 // ----------------------------
@@ -23,15 +27,15 @@ Template.sidebar.networks = function() {
 // - the individual network list on the sidebar
 
 Template.network.isSelected = function(tab) {
-	return (tab.selected) ? 'selected' : '';
+	return (this.selected) ? 'selected' : '';
 };
 
 Template.network.getClass = function(tab) {
-	if (tab.type == 'network' && tab.status == 'connecting') {
+	if (this.type == 'network' && this.status == 'connecting') {
 		return 'net-loader';
-	} else if (tab.type == 'network' && tab.status !== 'connecting') {
+	} else if (this.type == 'network' && this.status !== 'connecting') {
 		return 'net-loaded';
-	} else if (tab.type == 'channel' || tab.type == 'query') {
+	} else if (this.type == 'channel' || this.type == 'query') {
 		return ''
 	} else {
 		return 'net-loaded';

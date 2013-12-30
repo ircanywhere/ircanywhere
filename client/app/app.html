@@ -7,11 +7,7 @@
 			{{> sidebar}}
 			<div class="container clear">
 				<div class="topbar clear">
-					<div class="topic-wrap">
-						<span class="chan-title">#ircanywhere</span>
-						<span class="chan-modes">+cnt</span>
-						<span class="chan-desc">IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch</span>
-					</div>
+					{{> titleBar titleInfo}}
 					<ul id="options-menu">
 						<li class="dropdown"><a href data-toggle="dropdown" class="dropdown-toggle">Options</a>
 							<ul class="dropdown-menu">
@@ -36,6 +32,14 @@
 			</div>
 		</body>
 	</html>
+</template>
+
+<template name="titleBar">
+	<div class="topic-wrap">
+		<span class="chan-title">{{title}}</span>
+		<span class="chan-modes">{{modes}}</span>
+		<span class="chan-desc">{{desc}}</span>
+	</div>
 </template>
 
 <template name="sidebar">
@@ -64,9 +68,9 @@
 	{{#isolate}}
 	<ul id="network-{{_id}}">
 		{{#each tabArray}}
-		<li class="clear {{isSelected this}}">
+		<li class="clear {{isSelected}}">
 			<a href="/{{url}}" title="{{title}}">
-				<span class="link {{getClass this}}">{{title}}</span>
+				<span class="link {{getClass}}">{{title}}</span>
 			</a>
 		</li>
 		{{/each}}

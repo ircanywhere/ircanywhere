@@ -7,11 +7,11 @@ Template.reset.created = function() {
 	Session.set('reset.success', '');
 };
 
-Template.reset.errors = function(t) {
+Template.reset.errors = function() {
 	return Session.get('reset.errors');
 };
 
-Template.reset.success = function(t) {
+Template.reset.success = function() {
 	return Session.get('reset.success');
 };
 

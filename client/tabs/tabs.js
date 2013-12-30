@@ -11,8 +11,23 @@ Template.tabs.tabs = function() {
 // Template.tab
 // - everything outside of the .messages
 
-Template.tab.isSelected = function(tab) {
-	return (tab.selected) ? 'show' : 'hide';
+Template.tab.rendered = function() {
+	if (!this.data.selected) {
+		return false;
+	}
+	// bail on unselected tabs
+
+	Session.set('topicBarData', {
+		title: this.data.title,
+		modes: (this.data.type == 'channel') ? '+' + this.data.document.modes : '',
+		desc: (this.data.type == 'channel') ? this.data.document.topic.topic : this.data.title
+	});
+
+	console.log(Session.get('topicBarData'));
+};
+
+Template.tab.isSelected = function() {
+	return (this.selected) ? 'show' : 'hide';
 };
 
 Template.tab.preserve({
@@ -26,4 +41,7 @@ Template.tab.preserve({
 // Template.tabContent
 // - everything inside .messages
 
+Template.tabContent.isChannel = function() {
+	return (this.type == 'channel');
+};
 // ----------------------------

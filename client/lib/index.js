@@ -1,6 +1,13 @@
 function App() {
 	Deps.autorun(this.subscribe.bind(this));
 	// setup a dependency for the subscriptions
+
+	Handlebars.registerHelper('ifCond', function(v1, v2, options) {
+		if(v1 === v2) {
+			return options.fn(this);
+		}
+		return options.inverse(this);
+	});
 };
 
 // -------------------------------------
@@ -44,6 +51,15 @@ App.prototype.getNetworks = function() {
 				tab.networkId = doc._id;
 				tab._id = tab.key;
 				// reset some values
+
+				if (tab.type == 'network') {
+					tab.document = {};
+				} else if (tab.type == 'channel') {
+					tab.document = Channels.findOne({_id: tab.key});
+				} else {
+					tab.document = Tabs.findOne({_id: tab.key});
+				}
+				// get the document
 
 				tabs.push(tab);
 			};
