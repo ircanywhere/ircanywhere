@@ -11,19 +11,20 @@ Template.app.rendered = function() {
 Template.app.titleInfo = function() {
 	var selected = Session.get('selectedTab');
 
-	if (selected == undefined) {
-		//Application.reRoute();
-		// the router may not be at a tab, ie "/"
-		// we don't really want this, lets move it
+	if (selected !== undefined && ('/' + selected.url) !== document.location.pathname) {
+		Application.reRoute();
+	}
+	// the router may not be at a tab, ie "/"
+	// we don't really want this, lets move it
 
+	if (selected == undefined) {
 		return {title: '', modes: '', desc: ''};
 	}
 	// undefined tab
 
-	console.log(selected);
-
 	if (selected.type == 'network') {
 		var doc = {
+			key: selected.key,
 			title: selected.title,
 			modes: '',
 			desc: selected.url
@@ -32,6 +33,7 @@ Template.app.titleInfo = function() {
 		var doc = Channels.findOne({_id: selected.key}, {
 			transform: function(doc) {
 				return {
+					key: doc._id,
 					title: doc.channel,
 					modes: '+' + doc.modes,
 					desc: doc.topic.topic
