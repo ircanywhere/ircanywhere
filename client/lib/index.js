@@ -52,15 +52,6 @@ App.prototype.getNetworks = function() {
 				tab._id = tab.key;
 				// reset some values
 
-				if (tab.type == 'network') {
-					tab.document = {};
-				} else if (tab.type == 'channel') {
-					tab.document = Channels.findOne({_id: tab.key});
-				} else {
-					tab.document = Tabs.findOne({_id: tab.key});
-				}
-				// get the document
-
 				tabs.push(tab);
 			};
 			// re-construct tabs, because #each in Spark doesn't like objects

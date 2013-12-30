@@ -173,7 +173,15 @@ IRCHandler = function() {
 		},
 
 		topic_change: function(client, message) {
-			channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
+			var split = message.topicBy.split('!'),
+				splitAgain = split[1].split('@');
+
+			message.nickname = split[0];
+			message.username = splitAgain[0];
+			message.hostname = splitAgain[1];
+			// reform this object
+
+			channelManager.updateTopic(client.name, message.channel, message.topic, message.topicBy);
 			eventManager.insertEvent(client, message, 'topic');
 		},
 

@@ -17,12 +17,7 @@ Template.tab.rendered = function() {
 	}
 	// bail on unselected tabs
 
-	Session.set('topicBarData', {
-		key: this.data.key,
-		title: this.data.title,
-		modes: (this.data.type == 'channel') ? '+' + this.data.document.modes : '',
-		desc: (this.data.type == 'channel') ? this.data.document.topic.topic : this.data.title
-	});
+	Session.set('selectedTab', this.data);
 };
 
 Template.tab.isSelected = function() {

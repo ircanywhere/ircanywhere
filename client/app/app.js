@@ -9,7 +9,35 @@ Template.app.rendered = function() {
 };
 
 Template.app.titleInfo = function() {
-	return Session.get('topicBarData');
+	var selected = Session.get('selectedTab');
+
+	if (selected == undefined) {
+		return {title: '', modes: '', desc: ''};
+	}
+
+	if (selected.type == 'network') {
+		var doc = {
+			title: selected.title,
+			modes: '',
+			desc: selected.url
+		};
+	} else if (selected.type == 'channel') {
+		var doc = Channels.findOne({_id: selected.key}, {
+			transform: function(doc) {
+				return {
+					title: doc.channel,
+					modes: '+' + doc.modes,
+					desc: doc.topic.topic
+				};
+			}
+		});
+		// we're looking for a channel, transform it so it looks the same
+	} else {
+		var doc = Tabs.findOne({_id: selected.key});
+	}
+	// get the document
+
+	return doc;
 };
 // ----------------------------
 
