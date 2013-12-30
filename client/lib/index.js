@@ -1,13 +1,5 @@
 function App() {
-	Deps.autorun(this.subscribe.bind(this));
-	// setup a dependency for the subscriptions
-
-	Handlebars.registerHelper('ifCond', function(v1, v2, options) {
-		if(v1 === v2) {
-			return options.fn(this);
-		}
-		return options.inverse(this);
-	});
+	
 };
 
 // -------------------------------------
@@ -16,22 +8,42 @@ function App() {
 // managing it this way, plus Meteor doesn't promote a proper MVC architecture like Backbone does
 // it's all based upon templates, although we can extend the template objects for more functionality
 
-App.prototype.subscribe = function() {
-	var self = this;
+App.prototype.reRoute = function() {
+	var networks = this.getNetworks(false).fetch(),
+		selected = false;
 
-	if (Meteor.user()) {
-		Meteor.subscribe('networks');
-		Meteor.subscribe('tabs');
-		Meteor.subscribe('channels');
-		Meteor.subscribe('commands');
-		Meteor.subscribe('channelUsers');
-		Meteor.subscribe('events');
+	for (var i in networks) {
+		var network = networks[i];
+		
+		for (var x in network.tabArray) {
+			var tab = network.tabArray[x];
+
+			if (tab.selected) {
+				selected = tab.url;
+				break;
+			}
+		}
+
+		if (selected !== false) {
+			break;
+		}
 	}
-	// this function handles the subscriptions
+	// loop networks and then tabs to determine which one is selected
+	// it's a bit messy but this is the way the data structure is.. Maybe
+	// will be changed in the future..
+
+	if (selected !== false) {
+		Router.go('/' + selected);
+	}
+	// reroute the url
 };
 
-App.prototype.getNetworks = function() {
+App.prototype.getNetworks = function(reactive) {
+	reactive = reactive || true;
+	// an optional reactive argument?
+
 	return Networks.find({}, {
+		reactive: reactive,
 		fields: {
 			'_id': 1,
 			'internal.tabs': 1,

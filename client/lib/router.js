@@ -10,6 +10,17 @@ var before = function() {
 		// stop what we're doing and show the user the login template
 	}
 }
+
+var waitOn = function() {
+	return [
+		this.subscribe('networks'),
+		this.subscribe('tabs'),
+		this.subscribe('channels'),
+		this.subscribe('commands'),
+		this.subscribe('channelUsers'),
+		this.subscribe('events')
+	];
+}
 // this function is basically a blocker which will send the user back
 // to the homepage template when they're not logged in.
 
@@ -20,7 +31,8 @@ Router.before(before, {except: ['login', 'signup', 'reset', 'verify']});
 Router.map(function () {
 	this.route('home', {
 		path: '/',
-		layoutTemplate: 'app'
+		layoutTemplate: 'app',
+		waitOn: waitOn
 	});
 	// this route will display the app template if we're logged in
 	// if not it will display main
@@ -76,12 +88,14 @@ Router.map(function () {
 	// settings / addnetwork .. etc
 
 	this.route('settings', {
+		waitOn: waitOn,
 		data: function() {
 			return 'null';
 		}
 	});
 
 	this.route('addnetwork', {
+		waitOn: waitOn,
 		data: function() {
 			return 'null';
 		}
@@ -89,6 +103,7 @@ Router.map(function () {
 
 	this.route('logout', {
 		path: '/logout',
+		waitOn: waitOn,
 		action: function() {
 			Meteor.logout();
 		}
@@ -102,6 +117,7 @@ Router.map(function () {
 		path: '/:url/:network?',
 		layoutTemplate: 'app',
 		template: 'tabs',
+		waitOn: waitOn,
 		before: function() {
 			if (this.params.network === undefined) {
 				Meteor.call('selectTab', this.params.url, this.params.url, true);

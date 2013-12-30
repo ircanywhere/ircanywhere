@@ -11,15 +11,6 @@ Template.tabs.tabs = function() {
 // Template.tab
 // - everything outside of the .messages
 
-Template.tab.rendered = function() {
-	if (!this.data.selected) {
-		return false;
-	}
-	// bail on unselected tabs
-
-	Session.set('selectedTab', this.data);
-};
-
 Template.tab.isSelected = function() {
 	return (this.selected) ? 'show' : 'hide';
 };
