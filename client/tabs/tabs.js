@@ -38,6 +38,14 @@ Template.tabContent.isChannel = function() {
 };
 
 Template.tabContent.preserve({
+	'.overlay-bar': function(node) {
+		return node.id;
+	},
+
+	'.top-message-bar': function(node) {
+		return node.id;
+	},
+
 	'.backlog': function(node) {
 		return node.id;
 	}

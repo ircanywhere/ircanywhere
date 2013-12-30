@@ -16,9 +16,7 @@
 
 <template name="tab">
 	<div id="tab-{{_id}}" class="tab clear {{isSelected}}" data-type="{{type}}">
-		{{#constant}}
-			{{> tabContent}}
-		{{/constant}}
+		{{> tabContent}}
 	</div>
 </template>
 
@@ -43,9 +41,11 @@
 				<a href="#" class="read-backlog">Mark as read</a>
 			</span>
 		</div>
-		<div class="backlog">
-			{{> messages}}
-		</div>
+		{{#constant}}
+			<div class="backlog">
+				{{> messages}}
+			</div>
+		{{/constant}}
 		{{> input this}}
 	</div>
 </template>

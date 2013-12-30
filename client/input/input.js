@@ -23,12 +23,8 @@ Template.input.lastCommand = function() {
 	var variableName = 'bufferTS.' + this.key,
 		variable = Session.get(variableName),
 		command = Commands.findOne({network: this.networkId, target: this.target, timestamp: variable.query}, variable.sort);
-
+	
 	if (command === undefined) {
-		Session.set(variableName, {
-			query: {$lt: 0},
-			sort: {sort: {'timestamp': -1}}
-		});
 		this.lastCommand = {timestamp: 0};
 		return '';
 	} else {
@@ -82,11 +78,8 @@ Template.input.events({
 				query: newTs,
 				sort: {sort: {'timestamp': 1}}
 			});
-
 			e.preventDefault();
 			// prevent default
-
-			e.preventDefault();
 		}
 	}
 });
