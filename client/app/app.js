@@ -18,9 +18,8 @@ Template.app.titleInfo = function() {
 // - the titlebar template and its content (dropdown link, topic bar)
 
 Template.titlebar.events({
-	'mouseenter .topic-wrap': function(e, t) {
-		console.log('do something');
-	}
+	'mouseenter .topic-wrap': Application.mouseEnter,
+	'mouseleave .topic-wrap': Application.mouseLeave
 });
 // ----------------------------
 

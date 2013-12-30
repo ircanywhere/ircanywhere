@@ -74,6 +74,24 @@ App.prototype.getNetworks = function() {
 		}
 	});
 };
+
+App.prototype.mouseEnter = function(e, t) {
+	Application.timein = Meteor.setTimeout(function() {
+		$('#tab-' + t.data.key + ' .overlay-bar').slideDown('fast');
+	}, 500);
+	// create a timer to slide the overlay bar down
+
+	Meteor.clearTimeout(Application.timeout);
+};
+
+App.prototype.mouseLeave = function(e, t) {
+	Application.timeout = Meteor.setTimeout(function() {
+		$('#tab-' + t.data.key + ' .overlay-bar').slideUp('fast');
+	}, 500);
+	// create a timer to slide the overlay bar up
+
+	Meteor.clearTimeout(Application.timein);
+};
 // -------------------------------------
 
 Application = new App();

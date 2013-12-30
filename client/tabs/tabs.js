@@ -18,6 +18,7 @@ Template.tab.rendered = function() {
 	// bail on unselected tabs
 
 	Session.set('topicBarData', {
+		key: this.data.key,
 		title: this.data.title,
 		modes: (this.data.type == 'channel') ? '+' + this.data.document.modes : '',
 		desc: (this.data.type == 'channel') ? this.data.document.topic.topic : this.data.title
@@ -49,5 +50,10 @@ Template.tabContent.preserve({
 	'.backlog': function(node) {
 		return node.id;
 	}
+});
+
+Template.tabContent.events({
+	'mouseenter .overlay-bar': Application.mouseEnter,
+	'mouseleave .overlay-bar': Application.mouseLeave
 });
 // ----------------------------
