@@ -27,12 +27,6 @@ Template.tab.rendered = function() {
 Template.tab.isSelected = function() {
 	return (this.selected) ? 'show' : 'hide';
 };
-
-Template.tab.preserve({
-	'.messages': function(node) {
-		return node.id;
-	}
-});
 // ----------------------------
 
 // ----------------------------
@@ -42,4 +36,10 @@ Template.tab.preserve({
 Template.tabContent.isChannel = function() {
 	return (this.type == 'channel');
 };
+
+Template.tabContent.preserve({
+	'.backlog': function(node) {
+		return node.id;
+	}
+});
 // ----------------------------

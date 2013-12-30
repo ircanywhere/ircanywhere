@@ -17,11 +17,11 @@ Template.app.titleInfo = function() {
 // Template.titlebar
 // - the titlebar template and its content (dropdown link, topic bar)
 
-/*Template.titlebar.events({
+Template.titlebar.events({
 	'mouseenter .topic-wrap': function(e, t) {
 		console.log('do something');
 	}
-});*/
+});
 // ----------------------------
 
 // ----------------------------

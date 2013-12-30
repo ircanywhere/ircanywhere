@@ -17,7 +17,7 @@
 <template name="tab">
 	<div id="tab-{{_id}}" class="tab clear {{isSelected}}" data-type="{{type}}">
 		{{#constant}}
-			{{> tabContent this}}
+			{{> tabContent}}
 		{{/constant}}
 	</div>
 </template>
@@ -44,9 +44,7 @@
 			</span>
 		</div>
 		<div class="backlog">
-			{{#constant}}
-				{{> messages this}}
-			{{/constant}}
+			{{> messages}}
 		</div>
 		{{> input this}}
 	</div>
