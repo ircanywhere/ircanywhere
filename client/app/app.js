@@ -12,13 +12,15 @@ Template.app.titleInfo = function() {
 	var selected = Session.get('selectedTab');
 
 	if (selected == undefined) {
-		Application.reRoute();
+		//Application.reRoute();
 		// the router may not be at a tab, ie "/"
 		// we don't really want this, lets move it
 
 		return {title: '', modes: '', desc: ''};
 	}
 	// undefined tab
+
+	console.log(selected);
 
 	if (selected.type == 'network') {
 		var doc = {
@@ -60,15 +62,6 @@ Template.titlebar.events({
 // Template.sidebar
 // - the sidebar template, currently just includes the dynamic network list
 
-Template.sidebar.rendered = function() {
-	if (!this.data.selected) {
-		return false;
-	}
-	// bail on unselected tabs
-
-	Session.set('selectedTab', this.data);
-};
-
 Template.sidebar.networks = function() {
 	return Application.getNetworks();
 };
@@ -79,7 +72,12 @@ Template.sidebar.networks = function() {
 // - the individual network list on the sidebar
 
 Template.network.isSelected = function(tab) {
-	return (this.selected) ? 'selected' : '';
+	if (!this.selected) {
+		return '';
+	} else {
+		Session.set('selectedTab', this);
+		return 'selected';
+	}
 };
 
 Template.network.getClass = function(tab) {
