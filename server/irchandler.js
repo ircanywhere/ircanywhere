@@ -173,12 +173,11 @@ IRCHandler = function() {
 		},
 
 		topic_change: function(client, message) {
-			var split = message.topicBy.split('!'),
-				splitAgain = split[1].split('@');
+			var split = message.topicBy.split(/[!@]/);
 
 			message.nickname = split[0];
-			message.username = splitAgain[0];
-			message.hostname = splitAgain[1];
+			message.username = split[1];
+			message.hostname = split[2];
 			// reform this object
 
 			channelManager.updateTopic(client.name, message.channel, message.topic, message.topicBy);

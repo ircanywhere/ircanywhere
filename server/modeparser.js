@@ -81,16 +81,16 @@ ModeParser = function() {
 			return modes;
 		},
 
-        changeModes: function(capabilities, modes, modeArray) {
-		    var prefixModes = _.keys(capabilities.prefixmodes);
-		    
+		changeModes: function(capabilities, modes, modeArray) {
+			var prefixModes = _.keys(capabilities.prefixmodes);
+			
 			if (modeArray.plus != '') {
 				var arr = modeArray.plus.split();
 				for (var pos = 0; pos < arr.length; pos++) {
 					var mode = arr[pos];
 					if (modes.indexOf(mode) == -1) {
 						modes += mode;
-		            }
+					}
 				}
 			}
 			// we have plus modes? add them to the channel string
@@ -107,16 +107,16 @@ ModeParser = function() {
 
 						for (var rmi = 0; rmi < splitParts.length; rmi++) {
 							var rm = splitParts[rmi];
-		                    if (capabilities.types.c.indexOf(rm) >= 0) {
+							if (capabilities.types.c.indexOf(rm) >= 0) {
 								nStr += rm;
-		                    }
+							}
 						}
 						// build a string of modes to remove.
 
 						var strPos = nStr.indexOf(mode);
-		                if (strPos >= 0) {
+						if (strPos >= 0) {
 							parts.splice(strPos + 1, 1);
-		                }
+						}
 						// find the location of the parameter
 
 						parts[0] = parts[0].replace(mode, '');
@@ -136,7 +136,7 @@ ModeParser = function() {
 						
 						if (prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
 							continue;
-		                }
+						}
 						// ignore these modes, handled elsewhere
 
 						var parts = modes.split(' '),
@@ -163,15 +163,15 @@ ModeParser = function() {
 					for (var mmi in minusSplit) {
 						var mm = minusSplit[mmi];
 
-		                if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
+						if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
 							continue;
-		                }
+						}
 						// ignore these modes, handled elsewhere
-                        
-                        var parts = modes.split(' '),
+						
+						var parts = modes.split(' '),
 							strPos = parts[0].indexOf(mm);
 
-		                if (strPos >= 0) {
+						if (strPos >= 0) {
 							parts[0] = parts[0].replace(mm, '');
 							parts.splice(mmi + 1, 1);
 						}

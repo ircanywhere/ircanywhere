@@ -87,7 +87,7 @@ Template.login.events({
 			}
 		});
 		// supply the appropriate fields to the
-        // Meteor.loginWithPassword() function
+		// Meteor.loginWithPassword() function
 	},
 
 	'submit form#reset-form': function(e, t) {

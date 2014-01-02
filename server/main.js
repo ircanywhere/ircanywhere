@@ -1,7 +1,7 @@
 var fs = Meteor.require('fs'),
 	raw = Assets.getText('config.json'),
 	dependable = Meteor.require('dependable'),
-    container = dependable.container();
+	container = dependable.container();
 
 Clients = {};
 // clients
