@@ -117,6 +117,8 @@ ChannelManager = function() {
 			});
 			// send the update out
 
+			console.log(chan);
+
 			return chan._id;
 		},
 

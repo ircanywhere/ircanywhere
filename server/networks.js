@@ -133,6 +133,7 @@ NetworkManager = function() {
 		addTab: function(client, target, type) {
 			var obj = {
 					user: client.internal.userId,
+					url: (type === 'network') ? client.internal.url : client.internal.url + '/' + target.toLowerCase(),
 					network: client._id,
 					target: target.toLowerCase(),
 					title: target,
@@ -148,7 +149,7 @@ NetworkManager = function() {
 
 			var tab = Tabs.findOne({network: client._id, target: target});
 
-			if (tab !== undefined) {
+			if (tab === undefined) {
 				Tabs.insert(obj);
 			}
 			// insert to db
@@ -159,16 +160,14 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(url, target, selected) {
+		selectTab: function(url) {
 			if (this.userId === null || url === '') {
 				return false;
 			}
 			// no uid, bail
 
-			var network = Networks.findOne({'internal.userId': this.userId, 'internal.url': url});
-			
 			Tabs.update({user: this.userId}, {$set: {selected: false}});
-			Tabs.update({user: this.userId, network: network._id, target: target}, {$set: {selected: true}});
+			Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
 			// mark all as not selected apart from the one we've been told to select
 		},
 

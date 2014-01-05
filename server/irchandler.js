@@ -63,7 +63,7 @@ IRCHandler = function() {
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
 
-			var id = channelManager.insertUsers(client._id, client.name, message.channel, [user]);
+			channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 
 			eventManager.insertEvent(client, message, 'join');
 			// event
@@ -132,7 +132,7 @@ IRCHandler = function() {
 				users.push(user);
 			});
 
-			var id = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
+			channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 		},
 
 		names: function(client, message) {
