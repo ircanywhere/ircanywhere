@@ -16,16 +16,16 @@ Template.app.titleInfo = function() {
 	}
 	// undefined tab
 
-	if (selected.type == 'network') {
-		var doc = {
-			key: selected.key,
-			title: selected.title,
-			modes: '',
-			desc: selected.url
-		};
-	} else if (selected.type == 'channel') {
-		var doc = Channels.findOne({_id: selected.key}, {
-			transform: function(doc) {
+	var doc = TabCollections.findOne({_id: selected.key}, {
+		transform: function(doc) {
+			if (doc.type == 'network') {
+				return {
+					key: selected.key,
+					title: selected.title,
+					modes: '',
+					desc: selected.url
+				};
+			} else if (doc.type == 'channel') {
 				return {
 					key: doc._id,
 					title: doc.channel,
@@ -33,13 +33,10 @@ Template.app.titleInfo = function() {
 					desc: doc.topic.topic
 				};
 			}
-		});
-		// we're looking for a channel, transform it so it looks the same
-	} else {
-		var doc = Tabs.findOne({_id: selected.key});
-	}
-	// get the document
-
+		}
+	});
+	// we're looking for a channel, transform it so it looks the same
+	
 	return doc;
 };
 // ----------------------------

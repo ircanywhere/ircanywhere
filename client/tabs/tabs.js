@@ -3,7 +3,7 @@
 // - the tab windows
 
 Template.tabs.tabs = function() {
-	return Application.getNetworks();
+	return TabCollections.find({});
 };
 // ----------------------------
 

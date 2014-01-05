@@ -14,8 +14,7 @@ var before = function() {
 var waitOn = function() {
 	return [
 		this.subscribe('networks'),
-		this.subscribe('tabs'),
-		this.subscribe('channels'),
+		this.subscribe('tabCollections'),
 		this.subscribe('commands'),
 		this.subscribe('channelUsers'),
 		this.subscribe('events')
