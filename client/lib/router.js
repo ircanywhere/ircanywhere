@@ -32,7 +32,11 @@ Router.map(function () {
 	this.route('home', {
 		path: '/',
 		layoutTemplate: 'app',
-		waitOn: waitOn
+		template: 'tabs',
+		waitOn: waitOn,
+		before: function() {
+			Application.reRoute();
+		}
 	});
 	// this route will display the app template if we're logged in
 	// if not it will display main
@@ -119,7 +123,7 @@ Router.map(function () {
 		template: 'tabs',
 		waitOn: waitOn,
 		before: function() {
-			if (this.params.network === undefined) {
+			if (this.params.network === undefined || this.params.network === null) {
 				Meteor.call('selectTab', this.params.url, this.params.url, true);
 			} else {
 				Meteor.call('selectTab', this.params.url, this.params.network, true);

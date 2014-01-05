@@ -10,7 +10,8 @@ function App() {
 
 App.prototype.reRoute = function() {
 	var networks = this.getNetworks(false).fetch(),
-		selected = false;
+		selected = false,
+		first = '';
 
 	for (var i in networks) {
 		var network = networks[i];
@@ -21,6 +22,10 @@ App.prototype.reRoute = function() {
 			if (tab.selected) {
 				selected = tab.url;
 				break;
+			}
+
+			if (x == 0) {
+				first = tab.url;
 			}
 		}
 
@@ -34,8 +39,12 @@ App.prototype.reRoute = function() {
 
 	if (selected !== false) {
 		Router.go('/' + selected);
+	} else if (first !== '') {
+		Router.go('/' + first);
 	}
-	// reroute the url
+	// reroute the url if selected !== false, which means we've found a tab that needs to be selected
+	// else none of them are selected, which is unusual but possible. This function will only get called
+	// if the url needs to be rerouted, so we can assume that we need to select any tab, the first one will do.
 };
 
 App.prototype.getNetworks = function(reactive) {
