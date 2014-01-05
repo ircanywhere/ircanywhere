@@ -82,7 +82,8 @@ ModeParser = function() {
 		},
 
 		changeModes: function(capabilities, modes, modeArray) {
-			var prefixModes = _.keys(capabilities.prefixmodes);
+			var prefixModes = _.keys(capabilities.prefixmodes),
+				modes = modes || '';
 			
 			if (modeArray.plus != '') {
 				var arr = modeArray.plus.split();

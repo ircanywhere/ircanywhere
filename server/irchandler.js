@@ -33,7 +33,7 @@ IRCHandler = function() {
 			// commented this out because we do other changes to the network object here
 			// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-			networkManager.addTab(client._id, client.name, 'network', client._id);
+			networkManager.addTab(client, client.name, 'network');
 			// add the tab
 		},
 
@@ -58,12 +58,12 @@ IRCHandler = function() {
 			};
 			// just a standard user object, although with a modes object aswell
 
-			var id = channelManager.insertUsers(client._id, client.name, message.channel, [user]);
-
 			if (message.nickname == client.nick) {
-				networkManager.addTab(client._id, message.channel, 'channel', id);
+				networkManager.addTab(client, message.channel, 'channel');
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
+
+			var id = channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 
 			eventManager.insertEvent(client, message, 'join');
 			// event
@@ -111,6 +111,9 @@ IRCHandler = function() {
 			var users = [],
 				prefixes = _.invert(client.internal.capabilities.modes.prefixmodes);
 
+			networkManager.addTab(client, message.channel, 'channel');
+			// we'll update our internal channels cause we might be reconnecting after inactivity
+
 			_.each(message.who, function(u) {
 				var split = u.prefix.split('@'),
 					mode = u.mode.replace(/[a-z0-9]/i, ''),
@@ -130,9 +133,6 @@ IRCHandler = function() {
 			});
 
 			var id = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
-
-			networkManager.addTab(client._id, message.channel, 'channel', id);
-			// we'll update our internal channels cause we might be reconnecting after inactivity
 		},
 
 		names: function(client, message) {

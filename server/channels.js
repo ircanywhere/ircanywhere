@@ -14,7 +14,7 @@ ChannelManager = function() {
 
 		init: function() {
 			Meteor.publish('tabCollections', function() {
-				var self = this,
+				/*var self = this,
 					networks = Networks.find({'internal.userId': this.userId}),
 					types = {network: [], channel: [], query: []},
 					collections = {network: Networks, channel: Channels, query: Tabs},
@@ -43,8 +43,11 @@ ChannelManager = function() {
 							self.added('tabCollections', doc._id, doc);
 						},
 						changed: function(doc) {
-							doc = _.extend(doc, tabs[doc._id]);
-							if (doc.type !== 'network') {
+							if (doc.type === 'network') {
+								_.each(doc.internal.tabs, function(tab) {
+									console.log(tab);
+								});
+							} else {
 								self.changed('tabCollections', doc._id, doc);
 							}
 						},
@@ -54,7 +57,7 @@ ChannelManager = function() {
 					})
 				}
 
-				this.ready();
+				this.ready();*/
 			});
 
 			Meteor.publish('channelUsers', function() {
@@ -78,33 +81,15 @@ ChannelManager = function() {
 			});
 		},
 
-		createChannel: function(network, channel) {
-			var chan = _.clone(this.channel);
-			// clone this.channel
-
-			chan.network = network;
-			chan.channel = channel.toLowerCase();
-
-			chan._id = Channels.insert(chan);
-			// insert into the db
-
-			return chan || false;
-		},
-
 		getChannel: function(network, channel) {
-			return Channels.findOne({network: network, channel: channel});
+			return Tabs.findOne({network: network, title: channel});
 		},
 
 		insertUsers: function(key, network, channel, users, force) {
 			var force = force || false,
 				channel = channel.toLowerCase(),
 				find = [],
-				chan = this.getChannel(network, channel);
-
-			if (!chan) {
-				chan = this.createChannel(network, channel);
-				// create the channel
-			}
+				chan = this.getChannel(key, channel);
 
 			_.each(users, function(u) {
 				u.network = network;
@@ -171,13 +156,8 @@ ChannelManager = function() {
 
 		updateModes: function(key, capab, network, channel, mode) {
 			var channel = channel.toLowerCase(),
-				chan = this.getChannel(network, channel),
+				chan = this.getChannel(key, channel),
 				us = {};
-
-			if (!chan) {
-				chan = this.createChannel(network, channel);
-				// create the channel
-			}
 
 			var users = ChannelUsers.find({network: network, channel: channel}),
 				parsedModes = modeParser.sortModes(capab, mode);
@@ -186,7 +166,7 @@ ChannelManager = function() {
 			chan.modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 			// we need to attempt to update the record now with the new info
 
-			Channels.update({network: network, channel: channel}, {$set: {modes: chan.modes}});
+			Tabs.update({network: key, title: channel}, {$set: {modes: chan.modes}});
 			// update the record
 
 			users.forEach(function(u) {
@@ -203,18 +183,13 @@ ChannelManager = function() {
 
 		updateTopic: function(network, channel, topic, setby) {
 			var channel = channel.toLowerCase(),
-				chan = this.getChannel(network, channel);
-
-			if (!chan) {
-				chan = this.createChannel(network, channel);
-				// create the channel
-			}
+				chan = this.getChannel(key, channel);
 
 			chan.topic.topic = topic;
 			chan.topic.setter = setby || '';
 			// updat the topic record
 
-			Channels.update({network: network, channel: channel}, {$set: {topic: chan.topic}});
+			Tabs.update({network: key, title: channel}, {$set: {topic: chan.topic}});
 			// update the record
 		}
 	};

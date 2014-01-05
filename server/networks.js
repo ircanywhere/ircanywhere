@@ -17,19 +17,27 @@ NetworkManager = function() {
 				return Networks.find({'internal.userId': this.userId});
 			});
 
-			var networks = Networks.find();
+			var networks = Networks.find(),
+				tabs = Tabs.find();
 
 			networks.forEach(function(doc) {
 				Clients[doc._id] = doc;
+				Clients[doc._id].internal.tabs = {};
 			});
 
 			networks.observe({
 				added: function(doc) {
 					Clients[doc._id] = doc;
+					Clients[doc._id].internal.tabs = {};
 				},
 
 				changed: function(doc, old) {
 					Clients[doc._id] = doc;
+					Clients[doc._id].internal.tabs = {};
+					
+					Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
+						Clients[doc._id].internal.tabs[tab.target] = tab;
+					});
 				},
 
 				removed: function(doc) {
@@ -39,6 +47,26 @@ NetworkManager = function() {
 			// just sync clients up to this, instead of manually doing it
 			// we're asking for problems that way doing it this way means
 			// this object will be identical to the network list
+
+			tabs.forEach(function(doc) {
+				Clients[doc.network].internal.tabs[doc.target] = doc;
+			});
+
+			tabs.observe({
+				added: function(doc) {
+					Clients[doc.network].internal.tabs[doc.target] = doc;
+				},
+
+				changed: function(doc, old) {
+					Clients[doc.network].internal.tabs[doc.target] = doc;
+				},
+
+				removed: function(doc) {
+					delete Clients[doc.network].internal.tabs[doc.target];
+				}
+			});
+			// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
+			// instead of querying each time which is very inefficient
 		},
 
 		getClients: function() {
@@ -102,15 +130,15 @@ NetworkManager = function() {
 			return network;
 		},
 
-		addTab: function(client, target, type, id) {
-			var network = Networks.findOne({_id: client}),
-				obj = {
+		addTab: function(client, target, type) {
+			var obj = {
+					user: client.internal.userId,
+					network: client._id,
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
 					selected: false,
-					active: true,
-					key: id
+					active: true
 				};
 
 			if (obj.target.trim() == '') {
@@ -118,46 +146,34 @@ NetworkManager = function() {
 			}
 			// empty, bolt it
 
-			network.internal.tabs[obj.target] = obj;
-			Networks.update({_id: client}, {$set: {'internal.tabs': network.internal.tabs}});
+			var tab = Tabs.findOne({network: client._id, target: target});
+
+			if (tab !== undefined) {
+				Tabs.insert(obj);
+			}
 			// insert to db
 		},
 
 		activeTab: function(client, target, activate) {
-			var obj = {};
-			obj['internal.tabs.' + target + '.active'] = activate;
-
-			Networks.update({_id: client}, {$set: obj});
+			Tabs.update({user: client.userId, network: client._id, target: target}, {$set: {active: activate}});
 			// update the activation flag
 		},
 
 		selectTab: function(url, target, selected) {
-			if (this.userId === null) {
+			if (this.userId === null || url === '') {
 				return false;
 			}
 			// no uid, bail
 
 			var network = Networks.findOne({'internal.userId': this.userId, 'internal.url': url});
 			
-			for (var tab in network.internal.tabs) {
-				network.internal.tabs[tab].selected = false;
-				if (target == tab || (network.internal.tabs[tab].title == network.name && url == target)) {
-					network.internal.tabs[tab].selected = true;
-				}
-			}
-
-			Networks.update({'internal.userId': this.userId, 'internal.url': url}, {$set: {'internal.tabs': network.internal.tabs}});
-			// what tab to mark selected
-			// this IS different from active
+			Tabs.update({user: this.userId}, {$set: {selected: false}});
+			Tabs.update({user: this.userId, network: network._id, target: target}, {$set: {selected: true}});
+			// mark all as not selected apart from the one we've been told to select
 		},
 
 		removeTab: function(client, target) {
-			var obj = {};
-			obj['internal.tabs.' + target] = 1;
-			// bit messy but create an object for mongodb query, if the target is 'ricki'
-			// this tells us to unset 'internal.tabs.ricki'
-
-			Networks.update({_id: client}, {$unset: obj});
+			Tabs.remove({user: client.internal.userId, network: client._id, target: target});
 			// update tabs
 		},
 
