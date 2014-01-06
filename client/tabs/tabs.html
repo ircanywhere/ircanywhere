@@ -20,7 +20,7 @@
 			</div>
 			<div class="overlay-bar">
 				{{#if isChannel}}
-					<span class="channel-name">{{title}}</span><span class="modes">+cnt</span><span class="topic">IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch || IRCAnywhere, moved to freenode. Development has restarted using meteor.js in master/development branches - https://github.com/ircanywhere/ircanywhere - For old version please look at the 0.1.0-unstable branch</span>
+					<span class="channel-name">{{title}}</span><span class="modes">+{{modes}}</span><span class="topic">{{topic.topic}}</span>
 				{{else}}
 					<span class="channel-name">{{title}}</span><span class="modes"></span><span class="topic">{{url}}</span>
 				{{/if}}

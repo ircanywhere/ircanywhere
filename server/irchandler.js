@@ -169,7 +169,7 @@ IRCHandler = function() {
 		},
 
 		topic: function(client, message) {
-			channelManager.updateTopic(client.name, message.channel, message.topic, message.topicBy);
+			channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
 		},
 
 		topic_change: function(client, message) {
@@ -180,7 +180,7 @@ IRCHandler = function() {
 			message.hostname = split[2];
 			// reform this object
 
-			channelManager.updateTopic(client.name, message.channel, message.topic, message.topicBy);
+			channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
 			eventManager.insertEvent(client, message, 'topic');
 		},
 

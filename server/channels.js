@@ -70,8 +70,6 @@ ChannelManager = function() {
 			});
 			// send the update out
 
-			console.log(chan);
-
 			return chan._id;
 		},
 
@@ -136,15 +134,17 @@ ChannelManager = function() {
 			// update users now
 		},
 
-		updateTopic: function(network, channel, topic, setby) {
+		updateTopic: function(key, channel, topic, setby) {
 			var channel = channel.toLowerCase(),
 				chan = this.getChannel(key, channel);
 
-			chan.topic.topic = topic;
-			chan.topic.setter = setby || '';
+			var topic = {
+				topic: topic,
+				setter: setby || ''
+			};
 			// updat the topic record
 
-			Tabs.update({network: key, title: channel}, {$set: {topic: chan.topic}});
+			Tabs.update({network: key, title: channel}, {$set: {topic: topic}});
 			// update the record
 		}
 	};
