@@ -3,7 +3,7 @@
 // - the tab windows
 
 Template.tabs.tabs = function() {
-	return TabCollections.find({});
+	return Tabs.find({});
 };
 // ----------------------------
 
@@ -14,32 +14,13 @@ Template.tabs.tabs = function() {
 Template.tab.isSelected = function() {
 	return (this.selected) ? 'show' : 'hide';
 };
-// ----------------------------
 
-// ----------------------------
-// Template.tabContent
-// - everything inside .messages
-
-Template.tabContent.isChannel = function() {
+Template.tab.isChannel = function() {
 	return (this.type == 'channel');
 };
 
-Template.tabContent.preserve({
-	'.overlay-bar': function(node) {
-		return node.id;
-	},
-
-	'.top-message-bar': function(node) {
-		return node.id;
-	},
-
-	'.backlog': function(node) {
-		return node.id;
-	}
-});
-
-Template.tabContent.events({
+/*Template.tab.events({
 	'mouseenter .overlay-bar': Application.mouseEnter,
 	'mouseleave .overlay-bar': Application.mouseLeave
-});
+});*/
 // ----------------------------

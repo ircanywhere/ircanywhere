@@ -4,3 +4,4 @@ logs
 .build
 *.sublime*
 smart.lock
+.build*

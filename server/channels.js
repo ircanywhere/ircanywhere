@@ -13,53 +13,6 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
-			Meteor.publish('tabCollections', function() {
-				/*var self = this,
-					networks = Networks.find({'internal.userId': this.userId}),
-					types = {network: [], channel: [], query: []},
-					collections = {network: Networks, channel: Channels, query: Tabs},
-					tabs = {},
-					match = [];
-
-				networks.forEach(function(network) {
-					_.each(network.internal.tabs, function(tab) {
-						types[tab.type].push(tab.key);
-						tabs[tab.key] = tab;
-					});
-				});
-				
-				for (var collection in collections) {
-					var ids = types[collection],
-						query = collections[collection].find({_id: {$in: ids}});
-
-					query.forEach(function(doc) {
-						doc = _.extend(doc, tabs[doc._id]);
-						self.added('tabCollections', doc._id, doc);
-					});
-
-					query.observe({
-						added: function(doc) {
-							doc = _.extend(doc, tabs[doc._id]);
-							self.added('tabCollections', doc._id, doc);
-						},
-						changed: function(doc) {
-							if (doc.type === 'network') {
-								_.each(doc.internal.tabs, function(tab) {
-									console.log(tab);
-								});
-							} else {
-								self.changed('tabCollections', doc._id, doc);
-							}
-						},
-						removed: function(doc) {
-							self.removed('tabCollections', doc._id, doc);
-						}
-					})
-				}
-
-				this.ready();*/
-			});
-
 			Meteor.publish('channelUsers', function() {
 				var networks = Networks.find({'internal.userId': this.userId}),
 					match = [];

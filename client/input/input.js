@@ -3,7 +3,7 @@
 // - the input bar, this is unique per tab
 
 Template.input.created = function() {
-	var variableName = 'bufferTS.' + this.data.key;
+	var variableName = 'bufferTS.' + this.data._id;
 	Session.set(variableName, {
 		query: {$lt: 0},
 		sort: {sort: {'timestamp': -1}}
@@ -19,8 +19,12 @@ Template.input.rendered = function() {
 	inp.selectionEnd = 0;
 };
 
+Template.input.nick = function() {
+	return Networks.findOne({_id: this.network}, {fields: {'nick': 1}}).nick;
+};
+
 Template.input.lastCommand = function() {
-	var variableName = 'bufferTS.' + this.key,
+	var variableName = 'bufferTS.' + this._id,
 		variable = Session.get(variableName),
 		command = Commands.findOne({network: this.networkId, target: this.target, timestamp: variable.query}, variable.sort);
 	
@@ -60,7 +64,7 @@ Template.input.events({
 			e.preventDefault();
 			// prevent default
 		} else if (keyCode == key.up) {
-			var variableName = 'bufferTS.' + this.key,
+			var variableName = 'bufferTS.' + this._id,
 				newTs = (this.lastCommand.timestamp === 0) ? {$lt: +new Date()} : {$lt: this.lastCommand.timestamp - 1};
 
 			Session.set(variableName, {
@@ -71,7 +75,7 @@ Template.input.events({
 			e.preventDefault();
 			// prevent default
 		} else if (keyCode == key.down) {
-			var variableName = 'bufferTS.' + this.key,
+			var variableName = 'bufferTS.' + this._id,
 				newTs = (this.lastCommand.timestamp === 0) ? {$gt: 0} : {$gt: this.lastCommand.timestamp + 1};
 
 			Session.set(variableName, {

@@ -10,7 +10,7 @@
 					{{> titlebar titleInfo}}
 				</div>
 				<div class="content-holder" id="content">
-					{{yield}}
+					{{> yield}}
 				</div>
 			</div>
 		</body>
@@ -49,9 +49,11 @@
 			<a href="{{pathFor 'settings'}}">Settings</a> &middot; <a href="{{pathFor 'logout'}}">Logout</a>
 		</div>
 		<div class="items">
+			<ul>
 			{{#each networks}}
 				{{> network}}
 			{{/each}}
+			</ul>
 		</div>
 		<div class="footer">
 			<div class="link">
@@ -65,13 +67,9 @@
 </template>
 
 <template name="network">
-	<ul id="network-{{_id}}">
-		{{#each tabArray}}
-		<li class="clear {{isSelected}}">
-			<a href="/{{url}}" title="{{title}}">
-				<span class="link {{getClass}}">{{title}}</span>
-			</a>
-		</li>
-		{{/each}}
-	</ul>
+	<li class="clear {{isSelected}}">
+		<a href="/{{getURL}}" title="{{title}}">
+			<span class="link {{getClass}}">{{title}}</span>
+		</a>
+	</li>
 </template>

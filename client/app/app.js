@@ -16,21 +16,21 @@ Template.app.titleInfo = function() {
 	}
 	// undefined tab
 
-	var doc = TabCollections.findOne({_id: selected.key}, {
+	var doc = Tabs.findOne({_id: selected._id}, {
 		transform: function(doc) {
 			if (doc.type == 'network') {
 				return {
-					key: selected.key,
-					title: selected.title,
+					key: selected._id,
+					title: selected.target,
 					modes: '',
 					desc: selected.url
 				};
 			} else if (doc.type == 'channel') {
 				return {
 					key: doc._id,
-					title: doc.channel,
+					title: doc.target,
 					modes: '+' + doc.modes,
-					desc: doc.topic.topic
+					desc: (doc.topic !== undefined) ? doc.topic.topic : ''
 				};
 			}
 		}
@@ -45,10 +45,10 @@ Template.app.titleInfo = function() {
 // Template.titlebar
 // - the titlebar template and its content (dropdown link, topic bar)
 
-Template.titlebar.events({
+/*Template.titlebar.events({
 	'mouseenter .topic-wrap': Application.mouseEnter,
 	'mouseleave .topic-wrap': Application.mouseLeave
-});
+});*/
 // ----------------------------
 
 // ----------------------------
@@ -56,7 +56,7 @@ Template.titlebar.events({
 // - the sidebar template, currently just includes the dynamic network list
 
 Template.sidebar.networks = function() {
-	return Application.getNetworks(true);
+	return Tabs.find({});
 };
 // ----------------------------
 
@@ -64,7 +64,13 @@ Template.sidebar.networks = function() {
 // Template.network
 // - the individual network list on the sidebar
 
-Template.network.isSelected = function(tab) {
+Template.network.getURL = function() {
+	var split = this.url.split('/');
+
+	return (split.length == 1) ? split[0] : split[0] + '/' + encodeURIComponent(split[1]);
+};
+
+Template.network.isSelected = function() {
 	if (!this.selected) {
 		return '';
 	} else {
@@ -73,7 +79,7 @@ Template.network.isSelected = function(tab) {
 	}
 };
 
-Template.network.getClass = function(tab) {
+Template.network.getClass = function() {
 	if (this.type == 'network' && this.status == 'connecting') {
 		return 'net-loader';
 	} else if (this.type == 'network' && this.status !== 'connecting') {

@@ -10,7 +10,7 @@ EventManager = function() {
 			if (!message.channel && !message.target) {
 				var id = client._id;
 			} else {
-				var id = (!message.channel) ? client.internal.tabs[message.target].key : client.internal.tabs[message.channel].key;
+				var id = (!message.channel) ? client.internal.tabs[message.target]._id : client.internal.tabs[message.channel]._id;
 			}
 			// get the tab id
 			

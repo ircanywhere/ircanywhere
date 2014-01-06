@@ -14,7 +14,7 @@ var before = function() {
 var waitOn = function() {
 	return [
 		this.subscribe('networks'),
-		this.subscribe('tabCollections'),
+		this.subscribe('tabs'),
 		this.subscribe('commands'),
 		this.subscribe('channelUsers'),
 		this.subscribe('events')
@@ -117,15 +117,15 @@ Router.map(function () {
 	// these routes are for networks/channels/lists and other irc related stuff
 
 	this.route('tab', {
-		path: '/:url/:network?',
+		path: '/:network/:channel?',
 		layoutTemplate: 'app',
 		template: 'tabs',
 		waitOn: waitOn,
 		before: function() {
-			if (this.params.network === undefined || this.params.network === null) {
-				Meteor.call('selectTab', this.params.url, this.params.url, true);
+			if (this.params.channel === undefined) {
+				Meteor.call('selectTab', this.params.network);
 			} else {
-				Meteor.call('selectTab', this.params.url, this.params.network, true);
+				Meteor.call('selectTab', this.params.network + '/' + this.params.channel);
 			}
 			// send the changetab function to the backend
 			// this effectively updates the database and then the change will bubble back to us

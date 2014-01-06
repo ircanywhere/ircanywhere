@@ -17,6 +17,10 @@ NetworkManager = function() {
 				return Networks.find({'internal.userId': this.userId});
 			});
 
+			Meteor.publish('tabs', function() {
+				return Tabs.find({user: this.userId});
+			});
+
 			var networks = Networks.find(),
 				tabs = Tabs.find();
 
@@ -166,7 +170,7 @@ NetworkManager = function() {
 			}
 			// no uid, bail
 
-			Tabs.update({user: this.userId}, {$set: {selected: false}});
+			Tabs.update({user: this.userId, selected: true}, {$set: {selected: false}});
 			Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
 			// mark all as not selected apart from the one we've been told to select
 		},

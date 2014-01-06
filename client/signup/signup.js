@@ -39,18 +39,4 @@ Template.signup.events({
 		});
 	}
 });
-
-Template.signup.preserve({
-	'input#your-name': function(node) {
-		return node.id;
-	},
-
-	'input#irc-nickname': function(node) {
-		return node.id;
-	},
-
-	'input#email-address': function(node) {
-		return node.id;
-	},
-});
 // ----------------------------

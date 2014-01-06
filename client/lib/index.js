@@ -9,7 +9,7 @@ function App() {
 // it's all based upon templates, although we can extend the template objects for more functionality
 
 App.prototype.reRoute = function() {
-	var networks = this.getNetworks(false).fetch(),
+	var networks = Tabs.find({}, {reactive: false}).fetch(),
 		selected = false,
 		first = '';
 
@@ -47,49 +47,9 @@ App.prototype.reRoute = function() {
 	// if the url needs to be rerouted, so we can assume that we need to select any tab, the first one will do.
 };
 
-App.prototype.getNetworks = function(reactive) {
-	reactive = reactive || true;
-	// an optional reactive argument?
-
-	return Networks.find({}, {
-		reactive: reactive,
-		fields: {
-			'_id': 1,
-			'internal.tabs': 1,
-			'internal.status': 1,
-			'internal.url': 1,
-			'nick': 1,
-			'name': 1
-		}, transform: function(doc) {
-			var tabs = [];
-			for (var title in doc.internal.tabs) {
-				var tab = doc.internal.tabs[title];
-				
-				tab.nick = doc.nick;
-				tab.status = doc.internal.status;
-				tab.url = (tab.type == 'network') ? doc.internal.url : doc.internal.url + '/' + encodeURIComponent(tab.target);
-				tab.title = (tab.active) ? tab.title : '(' + tab.title + ')';
-				tab.networkId = doc._id;
-				tab._id = tab.key;
-				// reset some values
-
-				tabs.push(tab);
-			};
-			// re-construct tabs, because #each in Spark doesn't like objects
-
-			doc.tabArray = tabs;
-			doc.url = doc.internal.url;
-			delete doc.internal;
-			// reorganise and clean up the document
-
-			return doc;
-		}
-	});
-};
-
 App.prototype.mouseEnter = function(e, t) {
 	Application.timein = Meteor.setTimeout(function() {
-		$('#tab-' + t.data.key + ' .overlay-bar').slideDown('fast');
+		$('#tab-' + t.data._id + ' .overlay-bar').slideDown('fast');
 	}, 500);
 	// create a timer to slide the overlay bar down
 
@@ -98,7 +58,7 @@ App.prototype.mouseEnter = function(e, t) {
 
 App.prototype.mouseLeave = function(e, t) {
 	Application.timeout = Meteor.setTimeout(function() {
-		$('#tab-' + t.data.key + ' .overlay-bar').slideUp('fast');
+		$('#tab-' + t.data._id + ' .overlay-bar').slideUp('fast');
 	}, 500);
 	// create a timer to slide the overlay bar up
 
