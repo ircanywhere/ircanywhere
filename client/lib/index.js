@@ -48,6 +48,11 @@ App.prototype.reRoute = function() {
 };
 
 App.prototype.mouseEnter = function(e, t) {
+	var target = e.currentTarget.className;
+	if (target !== 'topic-wrap' && target !== 'overlay-bar') {
+		return false;
+	}
+
 	Application.timein = Meteor.setTimeout(function() {
 		$('#tab-' + t.data._id + ' .overlay-bar').slideDown('fast');
 	}, 500);
@@ -57,6 +62,11 @@ App.prototype.mouseEnter = function(e, t) {
 };
 
 App.prototype.mouseLeave = function(e, t) {
+	var target = e.currentTarget.className;
+	if (target !== 'topic-wrap' && target !== 'overlay-bar') {
+		return false;
+	}
+	
 	Application.timeout = Meteor.setTimeout(function() {
 		$('#tab-' + t.data._id + ' .overlay-bar').slideUp('fast');
 	}, 500);

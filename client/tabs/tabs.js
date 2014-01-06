@@ -19,8 +19,8 @@ Template.tab.isChannel = function() {
 	return (this.type == 'channel');
 };
 
-/*Template.tab.events({
+Template.tab.events({
 	'mouseenter .overlay-bar': Application.mouseEnter,
 	'mouseleave .overlay-bar': Application.mouseLeave
-});*/
+});
 // ----------------------------

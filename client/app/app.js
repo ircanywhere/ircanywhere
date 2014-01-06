@@ -1,12 +1,12 @@
+UI.body.events({
+	'keydown': function() {
+		$('input.command-field:visible').focus();
+	}
+});
+
 // ----------------------------
 // Template.app
 // - main application template
-
-Template.app.rendered = function() {
-	$('body').on('keydown', function(e) {
-		$('input.command-field:visible').focus();
-	});
-};
 
 Template.app.titleInfo = function() {
 	var selected = Session.get('selectedTab');
@@ -45,10 +45,10 @@ Template.app.titleInfo = function() {
 // Template.titlebar
 // - the titlebar template and its content (dropdown link, topic bar)
 
-/*Template.titlebar.events({
+Template.titlebar.events({
 	'mouseenter .topic-wrap': Application.mouseEnter,
 	'mouseleave .topic-wrap': Application.mouseLeave
-});*/
+});
 // ----------------------------
 
 // ----------------------------
