@@ -51,21 +51,21 @@
 <template name="mode">
 	<div class="clear row other" data-type="mode">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">&ndash; {{userLink this .. false}} sets mode {{message.mode}}</span>
+		<span class="column event">&ndash;  {{userLink this .. false}} sets mode {{message.mode}}</span>
 	</div>
 </template>
 
 <template name="topic">
 	<div class="clear row other" data-type="topic">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">&ndash; {{userLink this .. false}} has changed the topic to: {{message.topic}}</span>
+		<span class="column event">&ndash;  {{userLink this .. false}} has changed the topic to: {{message.topic}}</span>
 	</div>
 </template>
 
 <template name="nick">
 	<div class="clear row other" data-type="nick">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">&ndash; {{userLink this .. false}} has changed their nickname to {{message.newnick}}</span>
+		<span class="column event">&ndash;  {{userLink this .. false}} has changed their nickname to {{message.newnick}}</span>
 	</div>
 </template>
 

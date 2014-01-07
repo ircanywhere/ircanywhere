@@ -1,12 +1,12 @@
+// ----------------------------
+// Template.app
+// - main application template
+
 Template.app.rendered = function() {
 	$('body').on('keydown', function() {
 		$('input.command-field:visible').focus();
 	});
 };
-
-// ----------------------------
-// Template.app
-// - main application template
 
 Template.app.titleInfo = function() {
 	var selected = Session.get('selectedTab');
@@ -23,14 +23,16 @@ Template.app.titleInfo = function() {
 					key: selected._id,
 					title: selected.target,
 					modes: '',
-					desc: selected.url
+					desc: selected.url,
+					network: selected.target
 				};
 			} else if (doc.type == 'channel') {
 				return {
 					key: doc._id,
 					title: doc.target,
 					modes: '+' + doc.modes,
-					desc: (doc.topic !== undefined) ? doc.topic.topic : ''
+					desc: (doc.topic !== undefined) ? doc.topic.topic : '',
+					network: Networks.findOne({_id: doc.network}).name
 				};
 			}
 		}
@@ -39,6 +41,40 @@ Template.app.titleInfo = function() {
 	
 	return doc;
 };
+
+Template.app.events({
+	'click .dropdown-toggle': function(e, t) {
+		e.preventDefault();
+		$('.dropdown-menu').toggle();
+		return false;
+	},
+
+	'click #set-topic-link': function(e, t) {
+		e.preventDefault();
+		$('input.command-field:visible').val('/topic ').focus();
+		return false;
+	},
+
+	'click #hide-users-link': function(e, t) {
+		e.preventDefault();
+		return false;
+	},
+
+	'click #hide-extra-link': function(e, t) {
+		e.preventDefault();
+		return false;
+	},
+
+	'click #leave-chan-link': function(e, t) {
+		e.preventDefault();
+		return false;
+	},
+
+	'click #connect-link': function(e, t) {
+		e.preventDefault();
+		return false;
+	}
+});
 // ----------------------------
 
 // ----------------------------

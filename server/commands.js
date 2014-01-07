@@ -89,6 +89,15 @@ CommandManager = function() {
 			ircFactory.send(client._id, 'part', params);
 		},
 
+		'/topic': function(user, client, target, params) {
+			console.log(client.internal.capabilities.channel);
+			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'topic', params);
+			} else {
+				ircFactory.send(client._id, 'topic', [target].concat(params));
+			}
+		},
+
 		'/msg': function(user, client, target, params) {
 			ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + params.join(' ')]);

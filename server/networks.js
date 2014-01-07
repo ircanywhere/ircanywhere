@@ -31,14 +31,15 @@ NetworkManager = function() {
 
 			networks.observe({
 				added: function(doc) {
-					Clients[doc._id] = doc;
-					Clients[doc._id].internal.tabs = {};
+					if (!_.has(Clients, doc._id)) {
+						Clients[doc._id] = doc;
+						Clients[doc._id].internal.tabs = {};
+					}
 				},
 
 				changed: function(doc, old) {
 					Clients[doc._id] = doc;
 					Clients[doc._id].internal.tabs = {};
-					
 					Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
 						Clients[doc._id].internal.tabs[tab.target] = tab;
 					});
@@ -51,10 +52,6 @@ NetworkManager = function() {
 			// just sync clients up to this, instead of manually doing it
 			// we're asking for problems that way doing it this way means
 			// this object will be identical to the network list
-
-			tabs.forEach(function(doc) {
-				Clients[doc.network].internal.tabs[doc.target] = doc;
-			});
 
 			tabs.observe({
 				added: function(doc) {
@@ -170,9 +167,13 @@ NetworkManager = function() {
 			}
 			// no uid, bail
 
-			Tabs.update({user: this.userId, selected: true}, {$set: {selected: false}});
-			Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
-			// mark all as not selected apart from the one we've been told to select
+			var tab = Tabs.findOne({user: this.userId, url: url});
+
+			if (!tab.selected) {
+				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false}});
+				Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
+				// mark all as not selected apart from the one we've been told to select
+			}
 		},
 
 		removeTab: function(client, target) {

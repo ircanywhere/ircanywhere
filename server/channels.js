@@ -68,7 +68,9 @@ ChannelManager = function() {
 			// and all of them if we're being told to force the update
 
 			_.each(users, function(u) {
-				u.sort = eventManager.getPrefix(Clients[key], u).sort;
+				var prefix = eventManager.getPrefix(Clients[key], u);
+				u.sort = prefix.sort;
+				u.prefix = prefix.prefix;
 				ChannelUsers.insert(u);
 			});
 			// send the update out
