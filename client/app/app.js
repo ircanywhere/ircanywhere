@@ -79,6 +79,10 @@ Template.network.isSelected = function() {
 	}
 };
 
+Template.network.isChild = function() {
+	return (this.type == 'network') ? '' : 'child';
+};
+
 Template.network.getClass = function() {
 	if (this.type == 'network' && this.status == 'connecting') {
 		return 'net-loader';

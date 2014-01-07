@@ -36,16 +36,23 @@ CommandManager = function() {
 			// loop for inserts to this collection
 
 			this.createAlias('/join', '/j');
+			this.createAlias('/part', '/p', '/leave');
 			// setup aliases
 		},
 
-		createAlias: function(original, alias) {
+		createAlias: function() {
+			var self = this,
+				original = arguments[0],
+				aliases = Array.prototype.slice.call(arguments, 1);
+
 			if (!_.isFunction(this[original])) {
 				return false;
 			}
 			// isn't a valid function anyway
 
-			this[alias] = this[original];
+			aliases.forEach(function(alias) {
+				self[alias] = self[original];
+			});
 		},
 
 		parseCommand: function(user, client, target, command) {
