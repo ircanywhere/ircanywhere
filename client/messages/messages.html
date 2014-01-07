@@ -20,6 +20,13 @@
 	</div>
 </template>
 
+<template name="quit">
+	<div class="clear row other" data-type="quit">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has quit: {{message.message}}</span>
+	</div>
+</template>
+
 <template name="mode">
 	<div class="clear row other" data-type="mode">
 		<span class="time">{{time message.time}}</span>
@@ -31,6 +38,13 @@
 	<div class="clear row other" data-type="topic">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">&ndash; {{userLink this .. false}} has changed the topic to: {{message.topic}}</span>
+	</div>
+</template>
+
+<template name="nick">
+	<div class="clear row other" data-type="nick">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&ndash; {{userLink this .. false}} has changed their nickname to {{message.newnick}}</span>
 	</div>
 </template>
 
