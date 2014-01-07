@@ -41,7 +41,7 @@ Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 	// setup a different colour for different prefixes
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
-		prefixSpan = (show && prefix !== '') ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
+		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		html = '<a href="/' + url + '/' + nickname + '" rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
 	
 	return new Handlebars.SafeString(html);
