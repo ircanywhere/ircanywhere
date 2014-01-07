@@ -2,8 +2,7 @@
 
 .backlog {
 	.snap;
-	bottom: 44px;
-	padding-bottom: 4px;
+	bottom: 42px;
 	overflow-y: auto;
 
 	.row {
@@ -19,7 +18,8 @@
 		a[rel=user-link] {
 			color: #383838;
 			font-weight: bold;
-			margin: 0 10px 0 0;
+			margin: 0 10px 0 -14px;
+			text-align: right;
 		}
 
 		span {
@@ -39,8 +39,15 @@
 			&.message,
 			&.action,
 			&.event {
-				padding: 3px 12px;
+				padding: 3px 10px 3px 6px;
 				font-size: 13px;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+			}
+
+			&.message,
+			&.action {
+				padding: 3px 10px 3px 20px;
 			}
 
 			&.prefix {
@@ -59,7 +66,7 @@
 				font-weight: normal;
 				text-decoration: underline;
 				color: inherit!important;
-				margin: 0;
+				margin: 0!important;
 			}
 
 			span.time {

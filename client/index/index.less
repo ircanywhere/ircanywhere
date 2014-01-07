@@ -89,8 +89,12 @@ body {
 			}
 
 			span[aria-hidden=true] {
-				text-indent:-9999px;
-				float:left;
+				display: block;
+				position: absolute;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+				left: -999px;
+				top: -999px;
 			}
 		}
 	}
