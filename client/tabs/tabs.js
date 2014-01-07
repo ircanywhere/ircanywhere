@@ -12,7 +12,7 @@ Template.tabs.tabs = function() {
 // - everything outside of the .messages
 
 Template.tab.isSelected = function() {
-	return (this.selected) ? 'show' : 'hide';
+	return (this.selected) ? 'selected' : '';
 };
 
 Template.tab.isChannel = function() {

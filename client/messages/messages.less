@@ -5,15 +5,16 @@
 	bottom: 44px;
 	padding-bottom: 4px;
 	overflow-y: auto;
-	display: -webkit-flex;
-	display: flex;
-	flex-direction: column-reverse;
 
 	.row {
 		margin: 0;
 		position: relative;
 		display: -webkit-flex;
 		display: flex;
+
+		&[data-self=true] {
+			background: linen;
+		}
 
 		a[rel=user-link] {
 			color: #383838;
@@ -70,7 +71,8 @@
 			}
 
 			&[data-type=part],
-			&[data-type=quit] {
+			&[data-type=quit],
+			&[data-type=kick] {
 				color: darkRed;
 			}
 

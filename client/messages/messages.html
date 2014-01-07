@@ -1,24 +1,27 @@
 <template name="messages">
 	{{#each getMessages}}
-		{{#if typeEquals type 'join'}}
+		{{#if equals type 'join'}}
 			{{> join}}
 		{{/if}}
-		{{#if typeEquals type 'part'}}
+		{{#if equals type 'part'}}
 			{{> part}}
 		{{/if}}
-		{{#if typeEquals type 'quit'}}
+		{{#if equals type 'quit'}}
 			{{> quit}}
 		{{/if}}
-		{{#if typeEquals type 'mode'}}
+		{{#if equals type 'mode'}}
 			{{> mode}}
 		{{/if}}
-		{{#if typeEquals type 'topic'}}
+		{{#if equals type 'topic'}}
 			{{> topic}}
 		{{/if}}
-		{{#if typeEquals type 'nick'}}
+		{{#if equals type 'nick'}}
 			{{> nick}}
 		{{/if}}
-		{{#if typeEquals type 'privmsg'}}
+		{{#if equals type 'kick'}}
+			{{> kick}}
+		{{/if}}
+		{{#if equals type 'privmsg'}}
 			{{> privmsg}}
 		{{/if}}
 	{{/each}}
@@ -66,8 +69,15 @@
 	</div>
 </template>
 
+<template name="kick">
+	<div class="clear row other" data-type="kick">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&larr; {{userLink this .. false}} has kicked {{message.kicked}} ({{message.message}})</span>
+	</div>
+</template>
+
 <template name="privmsg">
-	<div class="clear row" data-type="privmsg">
+	<div class="clear row" data-type="privmsg" data-self="{{extra.self}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column message">{{userLink this .. true}}{{message.message}}</span>
 	</div>

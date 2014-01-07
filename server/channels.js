@@ -14,17 +14,20 @@ ChannelManager = function() {
 
 		init: function() {
 			Meteor.publish('channelUsers', function() {
-				var networks = Networks.find({'internal.userId': this.userId}),
+				var tabs = Tabs.find({user: this.userId}),
+					networks = Networks.find({'internal.userId': this.userId}),
+					nets = {},
 					match = [];
 
 				networks.forEach(function(network) {
-					_.each(network.internal.tabs, function(tab) {
-						if ('key' in tab && tab.type == 'channel') {
-							match.push({network: network.name, channel: tab.target});
-						}
-					});
+					nets[network._id] = network.name;
 				});
-				// XXX - As in getPublishedTabs also take a look at this.
+
+				tabs.forEach(function(tab) {
+					if (tab.type == 'channel') {
+						match.push({network: nets[tab.network], channel: tab.target});
+					}
+				});
 
 				if (match.length === 0) {
 					return false;
@@ -128,7 +131,10 @@ ChannelManager = function() {
 			});
 
 			modeParser.handleParams(capab, us, parsedModes).forEach(function(u) {
-				u.sort = eventManager.getPrefix(Clients[key], u).sort;
+				var prefix = eventManager.getPrefix(Clients[key], u).sort;
+				u.sort = prefix.sort;
+				u.prefix = prefix.prefix;
+				
 				ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
 			});
 			// update users now

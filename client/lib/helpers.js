@@ -22,7 +22,10 @@ Handlebars.registerHelper('time', function(context, options) {
 });
 
 Handlebars.registerHelper('userLink', function(context, tab, show, options) {
-	var prefix = context.extra.prefix,
+	var prefix = (!context.extra) ? context.prefix : context.extra.prefix,
+		nickname = context.nickname || context.message.nickname,
+		username = context.username || context.message.username,
+		hostname = context.hostname || context.message.hostname,
 		prefixClass = '',
 		url = Networks.findOne({_id: tab.network}).internal.url;
 	
@@ -39,7 +42,7 @@ Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show && prefix !== '') ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
-		html = '<a href="/' + url + '/' + context.message.nickname + '" rel="user-link" data-nick="' + context.message.nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + context.message.username + '" data-hostname="' + context.message.hostname + '">' + prefixSpan + '<span class="name">' + context.message.nickname + '</span><span aria-hidden="true">&gt; </span></a>';
+		html = '<a href="/' + url + '/' + nickname + '" rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
 	
 	return new Handlebars.SafeString(html);
 	// return the element

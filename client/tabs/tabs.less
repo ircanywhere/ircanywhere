@@ -25,6 +25,11 @@
 		position: relative;
 		height: 100%;
 		width: 100%;
+		display: none;
+
+		&.selected {
+			display: flex;
+		}
 
 		.messages {
 			color: @black;
@@ -34,6 +39,7 @@
 			position: relative;
 			height: 100%;
 			width: 100%;
+			flex: 1;
 
 			.overlay-bar {
 				z-index: 20;
@@ -185,10 +191,6 @@
 					display: none
 				}
 			}
-		}
-
-		.messages[data-type="network"] {
-			right: 172px;
 		}
 	}
 }

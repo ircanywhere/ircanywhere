@@ -128,6 +128,10 @@ IRCHandler = function() {
 					var prefix = mode.charAt(i);
 					user.modes[prefix] = prefixes[prefix];
 				}
+				// set the modes
+
+				user.prefix = eventManager.getPrefix(client, user).prefix;
+				// set the current most highest ranking prefix
 
 				users.push(user);
 			});
