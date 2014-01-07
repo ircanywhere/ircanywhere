@@ -1,8 +1,26 @@
 <template name="messages">
 	{{#each getMessages}}
-		{{#parseEvent}}
-			{{> content}}
-		{{/parseEvent}}
+		{{#if typeEquals type 'join'}}
+			{{> join}}
+		{{/if}}
+		{{#if typeEquals type 'part'}}
+			{{> part}}
+		{{/if}}
+		{{#if typeEquals type 'quit'}}
+			{{> quit}}
+		{{/if}}
+		{{#if typeEquals type 'mode'}}
+			{{> mode}}
+		{{/if}}
+		{{#if typeEquals type 'topic'}}
+			{{> topic}}
+		{{/if}}
+		{{#if typeEquals type 'nick'}}
+			{{> nick}}
+		{{/if}}
+		{{#if typeEquals type 'privmsg'}}
+			{{> privmsg}}
+		{{/if}}
 	{{/each}}
 </template>
 
