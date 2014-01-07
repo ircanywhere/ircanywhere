@@ -47,3 +47,7 @@ Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 	return new Handlebars.SafeString(html);
 	// return the element
 });
+
+Handlebars.registerHelper('equals', function(type, equals, options) {
+	return (type == equals);
+});

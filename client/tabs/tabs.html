@@ -39,8 +39,10 @@
 			</div>
 			{{> input this}}
 		</div>
-		<div class="userlist">
-			{{> userlist}}
-		</div>
+		{{#if equals type 'channel'}}
+			<div class="userlist">
+				{{> userlist}}
+			</div>
+		{{/if}}
 	</div>
 </template>

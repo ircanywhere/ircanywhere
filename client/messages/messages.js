@@ -9,12 +9,4 @@ Template.messages.getMessages = function() {
 		return Events.find({network: Networks.findOne({_id: this.network}).name, target: this.target}, {sort: {'message.time': 1}});
 	}
 };
-
-Template.messages.equals = function(type, equals) {
-	if (type == equals) {
-		return true;
-	}
-
-	
-};
 // ----------------------------
