@@ -95,7 +95,20 @@ CommandManager = function() {
 			// nope this is a message, lets just send it straight out because if the target
 			// is empty then it won't have been accepted into the collection
 			// bit of hackery here but we also send it to _parseLine so it comes right
-			// back through and looks like it's came from someone else.
+			// back through and looks like it's came from someone else - it's actually 99.9% more cleaner than the
+			// last buggy implementation so I'm very happy with this, don't fuck about it with it.
+		},
+
+		'/notice': function(user, client, target, params) {
+			ircFactory.send(client._id, 'notice', [target, params.join(' ')]);
+			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' NOTICE ' + target + ' :' + params.join(' ')]);
+			// same as above, we don't get a reciept for notices so we push it back through our buffer
+		},
+
+		'/me': function(user, client, target, params) {
+			ircFactory.send(client._id, 'me', [target, params.join(' ')]);
+			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :ACTION ' + params.join(' ') + '']);
+			// same as above, we don't get a reciept for /me so we push it back through our buffer
 		},
 
 		raw: function(user, client, target, params) {

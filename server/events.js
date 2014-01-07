@@ -3,22 +3,23 @@ EventManager = function() {
 
 	var hooks = Meteor.require('hooks'),
 		_insert = function(client, message, type, tab, user) {
-			var channel = (message.channel && !message.target) ? message.channel : message.target,
+			var network = client.name,
+				channel = (message.channel && !message.target) ? message.channel : message.target,
 				user = user || ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname});
 			// get a channel user object if we've not got one
 
 			if (!message.channel && !message.target) {
-				var id = client._id;
-			} else {
-				var id = (!message.channel) ? client.internal.tabs[message.target]._id : client.internal.tabs[message.channel]._id;
+				var channel = null;
 			}
-			// get the tab id
+			// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
+			// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 			
 			var prefixObject = Manager.getPrefix(client, user),
 				output = {
 					type: type,
 					user: client.internal.userId,
-					tab: id,
+					network: network,
+					target: channel,
 					message: message,
 					read: false,
 					extra: {
