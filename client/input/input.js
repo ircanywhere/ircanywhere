@@ -46,7 +46,7 @@ Template.input.events({
 			Commands.insert({
 				user: Meteor.user()._id,
 				command: e.currentTarget.value,
-				network: this.networkId,
+				network: this.network,
 				target: this.target,
 				sent: false
 			});
