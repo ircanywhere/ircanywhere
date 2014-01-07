@@ -7,7 +7,7 @@ Template.messages.getMessages = function() {
 };
 
 Template.messages.parseEvent = function() {
-	console.log(this);
+	//console.log(this);
 
 	return Template[this.type];
 };

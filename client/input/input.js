@@ -26,8 +26,8 @@ Template.input.nick = function() {
 Template.input.lastCommand = function() {
 	var variableName = 'bufferTS.' + this._id,
 		variable = Session.get(variableName),
-		command = Commands.findOne({network: this.networkId, target: this.target, timestamp: variable.query}, variable.sort);
-	
+		command = Commands.findOne({network: this.network, target: this.target, timestamp: variable.query}, variable.sort);
+	console.log(command);
 	if (command === undefined) {
 		this.lastCommand = {timestamp: 0};
 		return '';
