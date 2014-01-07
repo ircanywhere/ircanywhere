@@ -3,12 +3,12 @@
 // - everything inside .backlog (this is all the messages)
 
 Template.messages.getMessages = function() {
-	return Events.find({tab: this._id});
+	return Events.find({tab: this._id}, {sort: {'message.time': -1}});
 };
 
 Template.messages.parseEvent = function() {
-	if (this.type == 'privmsg') {
-		return Template.message;
-	}
+	console.log(this);
+
+	return Template[this.type];
 };
 // ----------------------------

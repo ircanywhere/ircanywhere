@@ -6,9 +6,37 @@
 	{{/each}}
 </template>
 
-<template name="message">
+<template name="join">
+	<div class="clear row other" data-type="join">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&rarr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has joined</span>
+	</div>
+</template>
+
+<template name="part">
+	<div class="clear row other" data-type="part">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has left</span>
+	</div>
+</template>
+
+<template name="mode">
+	<div class="clear row other" data-type="mode">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&ndash; {{userLink this .. false}} sets mode {{message.mode}}</span>
+	</div>
+</template>
+
+<template name="topic">
+	<div class="clear row other" data-type="topic">
+		<span class="time">{{time message.time}}</span>
+		<span class="column event">&ndash; {{userLink this .. false}} has changed the topic to: {{message.topic}}</span>
+	</div>
+</template>
+
+<template name="privmsg">
 	<div class="clear row" data-type="privmsg">
 		<span class="time">{{time message.time}}</span>
-		<span class="column message">{{userLink this ..}}{{message.message}}</span>
+		<span class="column message">{{userLink this .. true}}{{message.message}}</span>
 	</div>
 </template>

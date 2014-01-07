@@ -15,6 +15,12 @@
 		display: -webkit-flex;
 		display: flex;
 
+		a[rel=user-link] {
+			color: #383838;
+			font-weight: bold;
+			margin: 0 10px 0 0;
+		}
+
 		span {
 			line-height: 155%;
 
@@ -36,10 +42,6 @@
 				font-size: 13px;
 			}
 
-			&.message {
-
-			}
-
 			&.prefix {
 				display: inline-block;
 				margin: 0 3px;
@@ -48,6 +50,33 @@
 				&.op { color: darkRed; }
 				&.halfop { color: darkOrange; }
 				&.voice { color: blue; }
+			}
+		}
+
+		&.other {
+			a[rel=user-link] {
+				font-weight: normal;
+				text-decoration: underline;
+				color: inherit!important;
+				margin: 0;
+			}
+
+			span.time {
+				color: #9C9C9C!important;
+			}
+
+			&[data-type=join] {
+				color: darkGreen;
+			}
+
+			&[data-type=part] {
+				color: darkRed;
+			}
+
+			&[data-type=mode],
+			&[data-type=nick],
+			&[data-type=topic] {
+				color: darkBlue;
 			}
 		}
 	}

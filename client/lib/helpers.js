@@ -21,7 +21,7 @@ Handlebars.registerHelper('time', function(context, options) {
 	return hour + ':' + minute + ' ' + ap;
 });
 
-Handlebars.registerHelper('userLink', function(context, tab, options) {
+Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 	var prefix = context.extra.prefix,
 		prefixClass = '',
 		url = Networks.findOne({_id: tab.network}).internal.url;
@@ -38,7 +38,7 @@ Handlebars.registerHelper('userLink', function(context, tab, options) {
 	// setup a different colour for different prefixes
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
-		prefixSpan = '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>',
+		prefixSpan = (show && prefix !== '') ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		html = '<a href="/' + url + '/' + context.message.nickname + '" rel="user-link" data-nick="' + context.message.nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + context.message.username + '" data-hostname="' + context.message.hostname + '">' + prefixSpan + '<span class="name">' + context.message.nickname + '</span><span aria-hidden="true">&gt; </span></a>';
 	
 	return new Handlebars.SafeString(html);
