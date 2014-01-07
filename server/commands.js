@@ -34,6 +34,18 @@ CommandManager = function() {
 				}
 			});
 			// loop for inserts to this collection
+
+			this.createAlias('/join', '/j');
+			// setup aliases
+		},
+
+		createAlias: function(original, alias) {
+			if (!_.isFunction(this[original])) {
+				return false;
+			}
+			// isn't a valid function anyway
+
+			this[alias] = this[original];
 		},
 
 		parseCommand: function(user, client, target, command) {
