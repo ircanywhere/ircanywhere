@@ -22,6 +22,7 @@ EventManager = function() {
 					message: message,
 					read: false,
 					extra: {
+						self: (client.nick === message.nickname) ? true : false,
 						highlight: false,
 						prefix: prefixObject.prefix
 					}

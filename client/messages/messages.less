@@ -3,5 +3,52 @@
 .backlog {
 	.snap;
 	bottom: 44px;
+	padding-bottom: 4px;
 	overflow-y: auto;
+	display: -webkit-flex;
+	display: flex;
+	flex-direction: column-reverse;
+
+	.row {
+		margin: 0;
+		position: relative;
+		display: -webkit-flex;
+		display: flex;
+
+		span {
+			line-height: 155%;
+
+			&.column {
+				-webkit-flex: 1;
+				flex: 1;
+			}
+
+			&.time {
+				padding: 5px 10px;
+				text-align: right;
+				width: 50px;
+			}
+
+			&.message,
+			&.action,
+			&.event {
+				padding: 3px 12px;
+				font-size: 13px;
+			}
+
+			&.message {
+
+			}
+
+			&.prefix {
+				display: inline-block;
+				margin: 0 3px;
+				width: 12px;
+
+				&.op { color: darkRed; }
+				&.halfop { color: darkOrange; }
+				&.voice { color: blue; }
+			}
+		}
+	}
 }

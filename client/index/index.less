@@ -75,6 +75,27 @@ body {
 			color: #00438A;
 			text-decoration: underline;
 		}
+
+		&[rel=user-link] {
+			white-space: nowrap;
+			display: inline-block;
+			color: #383838;
+			font-weight: bold;
+			margin: 0 10px 0 0;
+
+			&:hover {
+				text-decoration: none;
+			}
+
+			span.nick {
+				text-decoration: underline;
+			}
+
+			span[aria-hidden=true] {
+				text-indent:-9999px;
+				float:left;
+			}
+		}
 	}
 
 	button, input, select, textarea {

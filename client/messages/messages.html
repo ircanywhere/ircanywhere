@@ -1,5 +1,14 @@
 <template name="messages">
 	{{#each getMessages}}
-		<pre>{{parse this}}</pre>
+		{{#parseEvent}}
+			{{> content}}
+		{{/parseEvent}}
 	{{/each}}
+</template>
+
+<template name="message">
+	<div class="clear row" data-type="privmsg">
+		<span class="time">{{time message.time}}</span>
+		<span class="column message">{{userLink this ..}}{{message.message}}</span>
+	</div>
 </template>

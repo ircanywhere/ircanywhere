@@ -6,7 +6,9 @@ Template.messages.getMessages = function() {
 	return Events.find({tab: this._id});
 };
 
-Template.messages.parse = function(json) {
-	return JSON.stringify(json, undefined, 2);
+Template.messages.parseEvent = function() {
+	if (this.type == 'privmsg') {
+		return Template.message;
+	}
 };
 // ----------------------------
