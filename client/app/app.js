@@ -1,8 +1,8 @@
-UI.body.events({
-	'keydown': function() {
+Template.app.rendered = function() {
+	$('body').on('keydown', function() {
 		$('input.command-field:visible').focus();
-	}
-});
+	});
+};
 
 // ----------------------------
 // Template.app
