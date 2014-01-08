@@ -40,9 +40,11 @@
 			{{> input this}}
 		</div>
 		{{#if equals type 'channel'}}
+			{{#if active}}
 			<div class="userlist">
 				{{> userlist}}
 			</div>
+			{{/if}}
 		{{/if}}
 	</div>
 </template>

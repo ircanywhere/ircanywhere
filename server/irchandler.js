@@ -72,8 +72,8 @@ IRCHandler = function() {
 		part: function(client, message) {
 			channelManager.removeUsers(client.name, message.channel, [message.nickname]);
 
-			if (message.nickname == client.nickname) {
-				networkManager.activeTab(client._id, message.channel, false);
+			if (message.nickname == client.nick) {
+				networkManager.activeTab(client, message.channel, false);
 			}
 			// we're leaving, remove the tab
 
@@ -84,7 +84,7 @@ IRCHandler = function() {
 			channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
 			if (message.nickname == client.nick) {
-				networkManager.activeTab(client._id, message.channel, false);
+				networkManager.activeTab(client, message.channel, false);
 			}
 			// we're leaving, remove the tab
 
@@ -98,7 +98,6 @@ IRCHandler = function() {
 
 		nick: function(client, message) {
 			if (message.nickname == client.nick) {
-				client.nickname = message.newnick;
 				Networks.update({_id: client._id}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick

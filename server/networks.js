@@ -180,7 +180,7 @@ NetworkManager = function() {
 
 			var tab = Tabs.findOne({user: this.userId, url: url});
 
-			if (!tab.selected) {
+			if (tab !== undefined && !tab.selected) {
 				Tabs.update({user: this.userId, prevSelected: true}, {$set: {prevSelected: false}});
 				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
 				Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});

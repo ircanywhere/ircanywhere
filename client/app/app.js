@@ -100,12 +100,6 @@ Template.sidebar.networks = function() {
 // Template.network
 // - the individual network list on the sidebar
 
-Template.network.getURL = function() {
-	var split = this.url.split('/');
-
-	return (split.length == 1) ? split[0] : split[0] + '/' + encodeURIComponent(split[1]);
-};
-
 Template.network.isSelected = function() {
 	if (!this.selected) {
 		return '';
@@ -129,5 +123,15 @@ Template.network.getClass = function() {
 	} else {
 		return 'net-loaded';
 	}
+};
+
+Template.network.getURL = function() {
+	var split = this.url.split('/');
+
+	return (split.length == 1) ? split[0] : split[0] + '/' + encodeURIComponent(split[1]);
+};
+
+Template.network.getTitle = function() {
+	return (!this.active) ? '(' + this.title + ')' : this.title;
 };
 // ----------------------------

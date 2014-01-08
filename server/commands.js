@@ -86,7 +86,11 @@ CommandManager = function() {
 		},
 
 		'/part': function(user, client, target, params) {
-			ircFactory.send(client._id, 'part', params);
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'part', params);
+			} else {
+				ircFactory.send(client._id, 'part', [target].concat(params));
+			}
 		},
 
 		'/topic': function(user, client, target, params) {
