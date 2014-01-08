@@ -23,7 +23,7 @@ EventManager = function() {
 					message: message,
 					read: false,
 					extra: {
-						self: (client.nick === message.nickname) ? true : false,
+						self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
 						highlight: Manager.determineHighlight(client, message, type, (client.nick === message.nickname)),
 						prefix: prefixObject.prefix
 					}

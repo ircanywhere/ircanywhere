@@ -54,7 +54,7 @@ Template.app.channelLink = function() {
 
 Template.app.connectionLink = function() {
 	var selected = Session.get('selectedTab'),
-		network = Networks.findOne({_id: selected.network});
+		network = (selected !== undefined) ? Networks.findOne({_id: selected.network}) : undefined;
 
 	if (network !== undefined && (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed')) {
 		return 'Connect';
