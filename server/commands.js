@@ -223,6 +223,15 @@ CommandManager = function() {
 			}
 		},
 
+		'/away': function(user, client, target, params) {
+			var message = (params.length === 0) ? 'Away from client' : params.join(' ');
+			ircFactory.send(client._id, 'raw', ['AWAY', message]);
+		},
+
+		'/unaway': function(user, client, target, params) {
+			ircFactory.send(client._id, 'raw', ['AWAY']);
+		},
+
 		'/close': function(user, client, target, params) {
 			var tab = Tabs.findOne({target: target, network: client._id});
 			// get the tab in question
