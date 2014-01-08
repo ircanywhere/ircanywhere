@@ -3,7 +3,17 @@
 // - main application template
 
 Template.app.rendered = function() {
-	$('body').on('keydown', function() {
+	$('body').on('click', function(e) {
+		if (e.target.className === 'dropdown-toggle' || e.target.className === 'dropdown-menu') {
+			return false;
+		}
+		// don't handle clicks if they're clicking the dropdown button
+
+		if ($('.dropdown-menu:visible').length) {
+			$('.dropdown-menu').hide();
+		}
+		// close the popup if its open
+	}).on('keydown', function() {
 		$('input.command-field:visible').focus();
 	});
 };
@@ -95,9 +105,6 @@ Template.app.events({
 			Meteor.call('execCommand', selected.network, selected.title, '/join');
 		}
 		// execute the equivalent of /leave or /join, but doing it this way means it wont be in the backlog
-
-		$('.dropdown-menu').hide();
-		// close the menu
 
 		e.preventDefault();
 	},
