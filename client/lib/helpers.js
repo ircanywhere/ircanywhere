@@ -48,6 +48,10 @@ Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 	// return the element
 });
 
+Handlebars.registerHelper('showEvent', function(tab, options) {
+	return (tab.hiddenEvents) ? 'hide' : '';
+});
+
 Handlebars.registerHelper('equals', function(v1, v2, options) {
 	return (v1 == v2);
 });

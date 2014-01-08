@@ -107,7 +107,7 @@ Template.app.events({
 		e.preventDefault();
 	},
 
-	'click #toggle-extra-link': function(e, t) {
+	'click #toggle-events-link': function(e, t) {
 		var selected = Session.get('selectedTab'),
 			attribute = (selected && selected.hiddenEvents) ? true : false;
 
