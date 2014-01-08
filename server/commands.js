@@ -143,7 +143,7 @@ CommandManager = function() {
 				// if its a query just remove tab
 			} else if (tab.type === 'network') {
 				if (tab.active) {
-					ircFactory.send(client._id, 'disconnect', ['Closing network']);
+					ircFactory.destroy(client._id);
 				}
 
 				//networkManager.removeTab(client);

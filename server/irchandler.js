@@ -43,10 +43,17 @@ IRCHandler = function() {
 			// we can pass in an ID, or a selector. So instead of getting the status and checking it, we just do a mongo update
 			// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
 			// which means someone has clicked disconnected, if not, just set it as closed (means we've disconnected for whatever reason)
+		
+			networkManager.activeTab(client, false);
+			// now lets update the tabs to inactive
 		},
 
 		failed: function(client, message) {
 			networkManager.changeStatus(client._id, networkManager.flags.failed);
+			// mark tab as failed
+			
+			networkManager.activeTab(client, false);
+			// now lets update the tabs to inactive
 		},
 
 		join: function(client, message) {

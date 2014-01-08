@@ -75,12 +75,12 @@ EventManager = function() {
 
 		determineHighlight: function(client, message, type, ours) {
 			if (!ours || (type !== 'privmsg' && type !== 'action')) {
-				return faslse;
+				return false;
 			}
 
 			var escape = function(text) {
-					return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
-				};
+				return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
+			};
 
 			if (message.message.match('(' + escape(client.nick) + ')')) {
 				return true;

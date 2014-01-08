@@ -170,7 +170,11 @@ NetworkManager = function() {
 		},
 
 		activeTab: function(client, target, activate) {
-			Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
+			if (typeof target !== "boolean") {
+				Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
+			} else {
+				Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
+			}
 			// update the activation flag
 		},
 
