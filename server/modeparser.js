@@ -194,8 +194,9 @@ ModeParser = function() {
 				changedUsers = [];
 
 			for (var param in modeArray.params) {
-				var user = users[param];
 				if (_.has(users, param)) {
+					var user = users[param];
+				
 					if (modeArray.params[param].plus != '') {
 						var plusSplit = modeArray.params[param].plus.split('');
 						for (var pmi in plusSplit) {
@@ -231,13 +232,13 @@ ModeParser = function() {
 						}
 					}
 					// loop through the plus modes
+
+					changedUsers.push(user);
 				}
 				// determine if the parameter is a nick, based on what our
 				// user list for this channel looks like.
 
 				// XXX - Ban list and exception list etc another time. maybe? is this needed?
-
-				changedUsers.push(user);
 			}
 			// handle modes with required on and off parameters
 			// ie status modes and restriction modes, also keys

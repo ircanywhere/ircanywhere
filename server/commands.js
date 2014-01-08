@@ -1,7 +1,23 @@
 CommandManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks');
+	var hooks = Meteor.require('hooks'),
+		_ban = function(client, target, nickname, ban) {
+			var nickname = params[0],
+				mode = (ban) ? '+b' : '-b',
+				user = ChannelUsers.findOne({
+					network: client.name,
+					channel: new RegExp('^' + target + '$', 'i'),
+					nickname: new RegExp('^' + nickname + '$', 'i')
+				});
+
+			if (user === undefined) {
+				return false;
+			} else {
+				ircFactory.send(client._id, 'mode', [target, mode, '*@' + user.hostname]);
+			}
+			// cant find a user
+		};
 
 	var Manager = {
 		init: function() {
@@ -85,6 +101,10 @@ CommandManager = function() {
 
 
 		'/msg': function(user, client, target, params) {
+			if (params.length == 0) {
+				return false;
+			}
+
 			ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + params.join(' ')]);
 			// nope this is a message, lets just send it straight out because if the target
@@ -95,12 +115,20 @@ CommandManager = function() {
 		},
 
 		'/notice': function(user, client, target, params) {
+			if (params.length == 0) {
+				return false;
+			}
+
 			ircFactory.send(client._id, 'notice', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' NOTICE ' + target + ' :' + params.join(' ')]);
 			// same as above, we don't get a reciept for notices so we push it back through our buffer
 		},
 
 		'/me': function(user, client, target, params) {
+			if (params.length == 0) {
+				return false;
+			}
+
 			ircFactory.send(client._id, 'me', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :ACTION ' + params.join(' ') + '']);
 			// same as above, we don't get a reciept for /me so we push it back through our buffer
@@ -133,6 +161,10 @@ CommandManager = function() {
 		},
 
 		'/topic': function(user, client, target, params) {
+			if (params.length == 0) {
+				return false;
+			}
+
 			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
 				var topic = [params.slice(1).join(' ')];
 				ircFactory.send(client._id, 'topic', [params[0]].concat(topic));
@@ -151,6 +183,38 @@ CommandManager = function() {
 				console.log('no target', [target].concat(params));
 				ircFactory.send(client._id, 'mode', [target].concat(params));
 			}
+		},
+
+		'/invite': function(user, client, target, params) {
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'raw', ['INVITE'].concat(params));
+			} else {
+				ircFactory.send(client._id, 'raw', ['INVITE', params[0], target]);
+			}
+		},
+
+		'/kick': function(user, client, target, params) {
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'raw', ['KICK'].concat(params));
+			} else {
+				ircFactory.send(client._id, 'raw', ['KICK', target].concat(params));
+			}
+		},
+
+		'/kickban': function(user, client, target, params) {
+			this['/ban'](user, client, target, params);
+			this['/kick'](user, client, target, params);
+			// just straight up alias the commands
+		},
+
+		'/ban': function(user, client, target, params) {
+			_ban(client, target, nickname, ban, '+b');
+			// +b
+		},
+
+		'/unban': function(user, client, target, params) {
+			_ban(client, target, nickname, ban, '-b');
+			// -b
 		},
 
 		'/nick': function(user, client, target, params) {

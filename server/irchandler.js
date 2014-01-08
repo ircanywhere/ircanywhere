@@ -91,7 +91,7 @@ IRCHandler = function() {
 		kick: function(client, message) {
 			channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
-			if (message.nickname == client.nick) {
+			if (message.kicked == client.nick) {
 				networkManager.activeTab(client, message.channel, false);
 			}
 			// we're leaving, remove the tab
