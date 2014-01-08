@@ -121,10 +121,10 @@ ChannelManager = function() {
 				parsedModes = modeParser.sortModes(capab, mode);
 			// we're not arsed about the channel or network here
 
-			chan.modes = modeParser.changeModes(capab, chan.modes, parsedModes);
+			var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 			// we need to attempt to update the record now with the new info
 
-			Tabs.update({network: key, title: channel}, {$set: {modes: chan.modes}});
+			Tabs.update({network: key, title: channel}, {$set: {modes: modes}});
 			// update the record
 
 			users.forEach(function(u) {

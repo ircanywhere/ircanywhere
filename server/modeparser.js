@@ -97,7 +97,7 @@ ModeParser = function() {
 			// we have plus modes? add them to the channel string
 
 			if (modeArray.minus != '') {
-				var arr = modeArray.plus.split();
+				var arr = modeArray.minus.split();
 				for (var pos = 0; pos < arr.length; pos++) {
 					var mode = arr[pos],
 						parts = modes.split(' ');
