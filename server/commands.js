@@ -37,6 +37,8 @@ CommandManager = function() {
 
 			this.createAlias('/join', '/j');
 			this.createAlias('/part', '/p', '/leave');
+			this.createAlias('/quit', '/disconnect');
+			this.createAlias('/connect', '/reconnect');
 			// setup aliases
 		},
 
@@ -149,6 +151,17 @@ CommandManager = function() {
 				//networkManager.removeTab(client);
 				// if it's a network /quit and remove tab(s)
 			}
+		},
+
+		'/quit': function(user, client, target, params) {
+			ircFactory.send(client._id, 'disconnect', [params]);
+			// it's important we don't destroy the network here, because
+			// doing a .connect to try and reconnect wont work, if the user closes the network
+			// tab then we can call destroy then remove the tab and network record
+		},
+
+		'/connect': function(user, client, target, params) {
+			ircFactory.send(client._id, 'reconnect', []);
 		},
 
 		raw: function(user, client, target, params) {

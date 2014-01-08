@@ -114,9 +114,12 @@ Template.network.isChild = function() {
 };
 
 Template.network.getClass = function() {
-	if (this.type == 'network' && this.status == 'connecting') {
+	var network = Networks.findOne({_id: this.network}, {fields: {'internal.status': 1}});
+	// get network so we can get its status
+
+	if (this.type == 'network' && network.internal.status == 'connecting') {
 		return 'net-loader';
-	} else if (this.type == 'network' && this.status !== 'connecting') {
+	} else if (this.type == 'network' && network.internal.status !== 'connecting') {
 		return 'net-loaded';
 	} else if (this.type == 'channel' || this.type == 'query') {
 		return ''
