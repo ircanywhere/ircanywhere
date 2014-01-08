@@ -90,7 +90,6 @@ CommandManager = function() {
 		},
 
 		'/topic': function(user, client, target, params) {
-			console.log(client.internal.capabilities.channel);
 			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
 				ircFactory.send(client._id, 'topic', params);
 			} else {
@@ -118,6 +117,30 @@ CommandManager = function() {
 			ircFactory.send(client._id, 'me', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :ACTION ' + params.join(' ') + '']);
 			// same as above, we don't get a reciept for /me so we push it back through our buffer
+		},
+
+		'/close': function(user, client, target, params) {
+			var tab = Tabs.findOne({target: target, network: client._id});
+			// get the tab in question
+
+			if (tab.type === 'channel') {
+				if (tab.active) {
+					ircFactory.send(client._id, 'part', [target]);
+				}
+
+				networkManager.removeTab(client, target);
+				// determine what to do with it, if it's a channel /part and remove tab
+			} else if (tab.type === 'query') {
+				networkManager.removeTab(client, target);
+				// if its a query just remove tab
+			} else if (tab.type === 'network') {
+				if (tab.active) {
+					ircFactory.send(client._id, 'disconnect', ['Closing network']);
+				}
+
+				networkManager.removeTab(client);
+				// if it's a network /quit and remove tab(s)
+			}
 		},
 
 		raw: function(user, client, target, params) {

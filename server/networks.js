@@ -28,6 +28,9 @@ NetworkManager = function() {
 				Clients[doc._id] = doc;
 				Clients[doc._id].internal.tabs = {};
 			});
+			// XXX - This can be changed when the changes in release/oplog-operators
+			//       get merged into the new release. Because of us requiring the new template
+			//       engine this needs to be here as a fallback until the changes are core.
 
 			networks.observe({
 				added: function(doc) {
@@ -35,6 +38,7 @@ NetworkManager = function() {
 						Clients[doc._id] = doc;
 						Clients[doc._id].internal.tabs = {};
 					}
+					// XXX - See above
 				},
 
 				changed: function(doc, old) {
@@ -131,15 +135,17 @@ NetworkManager = function() {
 			return network;
 		},
 
-		addTab: function(client, target, type) {
-			var obj = {
+		addTab: function(client, target, type, select) {
+			var select = select || false,
+				obj = {
 					user: client.internal.userId,
 					url: (type === 'network') ? client.internal.url : client.internal.url + '/' + target.toLowerCase(),
 					network: client._id,
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
-					selected: false,
+					selected: select,
+					prevSelected: false,
 					active: true
 				};
 
@@ -147,6 +153,11 @@ NetworkManager = function() {
 				return false;
 			}
 			// empty, bolt it
+
+			if (select) {
+				Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
+			}
+			// are they requesting a new selected tab?
 
 			var tab = Tabs.findOne({network: client._id, target: target});
 
@@ -170,15 +181,23 @@ NetworkManager = function() {
 			var tab = Tabs.findOne({user: this.userId, url: url});
 
 			if (!tab.selected) {
-				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false}});
+				Tabs.update({user: this.userId, prevSelected: true}, {$set: {prevSelected: false}});
+				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
 				Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
 				// mark all as not selected apart from the one we've been told to select
 			}
 		},
 
 		removeTab: function(client, target) {
-			Tabs.remove({user: client.internal.userId, network: client._id, target: target});
-			// update tabs
+			if (target) {
+				Tabs.remove({user: client.internal.userId, network: client._id, target: target});
+			} else {
+				Tabs.remove({user: client.internal.userId, network: client._id});
+			}
+			// remove tabs
+
+			Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
+			// re-select 
 		},
 
 		connectNetwork: function(user, network) {

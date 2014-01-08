@@ -92,7 +92,7 @@ Template.titlebar.events({
 // - the sidebar template, currently just includes the dynamic network list
 
 Template.sidebar.networks = function() {
-	return Tabs.find({});
+	return Tabs.find({}, {sort: {url: 1}});
 };
 // ----------------------------
 
