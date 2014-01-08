@@ -159,12 +159,14 @@ NetworkManager = function() {
 			}
 			// are they requesting a new selected tab?
 
-			var tab = Tabs.findOne({network: client._id, target: target});
+			var tab = Tabs.findOne({user: client.internal.userId, network: client._id, target: target});
 
 			if (tab === undefined) {
 				Tabs.insert(obj);
+			} else {
+				Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
 			}
-			// insert to db
+			// insert to db, or update old record
 		},
 
 		activeTab: function(client, target, activate) {
