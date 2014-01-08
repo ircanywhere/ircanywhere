@@ -20,13 +20,17 @@
 		<li class="dropdown"><a href class="dropdown-toggle">Options</a>
 			<ul class="dropdown-menu">
 				<li><a href="/editnetwork/{{network}}" id="edit-network-link">Edit Network</a></li>
-				<li><a href id="set-topic-link">Set Topic</a></li>
-				<li class="divider"><span id="divider1"></span></li>
-				<li><a href id="hide-users-link">Hide Users</a></li>
-				<li><a href id="hide-extra-link">Hide Joins/Parts</a></li>
-				<li class="divider"><span id="divider2"></span></li>
-				<li><a href id="leave-chan-link">Leave</a></li>
-				<li class="hide"><a href id="connect-link" class="connect-link">Disconnect</a></li>
+				{{#if equals selectedType 'channel'}}
+					<li><a href id="set-topic-link">Set Topic</a></li>
+					<li class="divider"></li>
+					<li><a href id="toggle-users-link">Hide Users</a></li>
+					<li><a href id="toggle-extra-link">Hide Joins/Parts</a></li>
+				{{/if}}
+				<li class="divider"></li>
+				{{#if equals selectedType 'channel'}}
+					<li><a href id="toggle-chan-link">{{channelLink}}</a></li>
+				{{/if}}
+				<li class="hide"><a href id="connection-link">{{connectionLink}}</a></li>
 			</ul>
 		</li>
 		<li><a href id="close-link">Close</a></li>

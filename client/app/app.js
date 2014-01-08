@@ -42,37 +42,68 @@ Template.app.titleInfo = function() {
 	return doc;
 };
 
+Template.app.selectedType = function() {
+	var selected = Session.get('selectedTab');
+	return (selected) ? selected.type : '';
+};
+
+Template.app.channelLink = function() {
+	var selected = Session.get('selectedTab');
+	return (selected.active) ? 'Leave' : 'Rejoin';
+};
+
+Template.app.connectionLink = function() {
+	var selected = Session.get('selectedTab'),
+		network = Networks.findOne({_id: selected.network});
+
+	if (network !== undefined && (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed')) {
+		return 'Connect';
+	} else {
+		return 'Disconnect';
+	}
+};
+
 Template.app.events({
 	'click .dropdown-toggle': function(e, t) {
-		e.preventDefault();
 		$('.dropdown-menu').toggle();
-		return false;
+
+		e.preventDefault();
 	},
 
 	'click #set-topic-link': function(e, t) {
-		e.preventDefault();
 		$('input.command-field:visible').val('/topic ').focus();
-		return false;
+		// input topic into the command bar
+
+		e.preventDefault();
 	},
 
-	'click #hide-users-link': function(e, t) {
+	'click #toggle-users-link': function(e, t) {
 		e.preventDefault();
-		return false;
 	},
 
-	'click #hide-extra-link': function(e, t) {
+	'click #toggle-extra-link': function(e, t) {
 		e.preventDefault();
-		return false;
 	},
 
-	'click #leave-chan-link': function(e, t) {
+	'click #toggle-chan-link': function(e, t) {
+		var selected = Session.get('selectedTab');
+		// get the selected tab
+		
+		if (selected.active) {
+			Meteor.call('execCommand', selected.network, selected.title, '/leave');
+		} else {
+			Meteor.call('execCommand', selected.network, selected.title, '/join');
+		}
+		// execute the equivalent of /leave or /join, but doing it this way means it wont be in the backlog
+
+		$('.dropdown-menu').hide();
+		// close the menu
+
 		e.preventDefault();
-		return false;
 	},
 
-	'click #connect-link': function(e, t) {
+	'click #connection-link': function(e, t) {
 		e.preventDefault();
-		return false;
 	}
 });
 // ----------------------------

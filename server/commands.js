@@ -87,7 +87,7 @@ CommandManager = function() {
 				if (_.isFunction(this[execute])) {
 					this[execute].call(this, user, client, target, params);
 				} else {
-					this.raw(user, client, target, params);
+					this['/raw'](user, client, target, params);
 				}
 				// is this a command? if it's prefixed with one / then yes
 			} else {
@@ -268,10 +268,26 @@ CommandManager = function() {
 			ircFactory.send(client._id, 'reconnect', []);
 		},
 
-		raw: function(user, client, target, params) {
-			console.log(arguments);
+		'/raw': function(user, client, target, params) {
+			if (params.length > 0) {
+				ircFactory.send(client._id, 'raw', params);
+			}
 		}
 	};
+
+	Meteor.methods({
+		execCommand: function(network, target, command) {
+			var user = Meteor.users.find({_id: this.userId}),
+				client = Clients[network];
+
+			Manager.parseCommand(user, client, target.toLowerCase(), command);
+		}
+	});
+	// create a method so the frontend can silently execute commands
+	// so if you call execCommand(netid, '#channel', '/kick ricki'); will
+	// be exactly the same as typing a command in the box with the difference being its
+	// not in the command backlog. This is good if we want to hook certain actions up to commands
+	// to save on duplicate code.
 
 	Manager.init();
 
