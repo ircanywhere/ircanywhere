@@ -130,6 +130,8 @@ EventManager = function() {
 				}
 			}
 			// loop through the modes in a normal for loop so we can return
+
+			return {prefix: '', sort: 6};
 		}
 	};
 

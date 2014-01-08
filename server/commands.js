@@ -135,9 +135,22 @@ CommandManager = function() {
 
 		'/topic': function(user, client, target, params) {
 			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
-				ircFactory.send(client._id, 'topic', params);
+				var topic = [params.slice(1).join(' ')];
+				ircFactory.send(client._id, 'topic', [params[0]].concat(topic));
 			} else {
-				ircFactory.send(client._id, 'topic', [target].concat(params));
+				var topic = [params.join(' ')];
+				ircFactory.send(client._id, 'topic', [target].concat(topic));
+			}
+			// we need to do some altering on the topic becasue it has multiple spaces
+		},
+
+		'/mode': function(user, client, target, params) {
+			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				console.log('target exists', params);
+				ircFactory.send(client._id, 'mode', params);
+			} else {
+				console.log('no target', [target].concat(params));
+				ircFactory.send(client._id, 'mode', [target].concat(params));
 			}
 		},
 
@@ -168,6 +181,7 @@ CommandManager = function() {
 
 				//networkManager.removeTab(client);
 				// if it's a network /quit and remove tab(s)
+				// XXX - finish this
 			}
 		},
 

@@ -133,7 +133,7 @@ ChannelManager = function() {
 			});
 
 			modeParser.handleParams(capab, us, parsedModes).forEach(function(u) {
-				var prefix = eventManager.getPrefix(Clients[key], u).sort;
+				var prefix = eventManager.getPrefix(Clients[key], u);
 				u.sort = prefix.sort;
 				u.prefix = prefix.prefix;
 				
