@@ -39,7 +39,6 @@ CommandManager = function() {
 			this.createAlias('/part', '/p', '/leave');
 			this.createAlias('/cycle', '/hop');
 			this.createAlias('/quit', '/disconnect');
-			this.createAlias('/connect', '/reconnect');
 			// setup aliases
 		},
 
@@ -192,7 +191,7 @@ CommandManager = function() {
 			// tab then we can call destroy then remove the tab and network record
 		},
 
-		'/connect': function(user, client, target, params) {
+		'/reconnect': function(user, client, target, params) {
 			ircFactory.send(client._id, 'reconnect', []);
 		},
 
