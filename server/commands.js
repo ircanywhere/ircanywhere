@@ -266,6 +266,11 @@ CommandManager = function() {
 
 		'/reconnect': function(user, client, target, params) {
 			ircFactory.send(client._id, 'reconnect', []);
+			// send the go ahead
+
+			networkManager.activeTab(client, client.name, true);
+			networkManager.changeStatus(client._id, networkManager.flags.connecting);
+			// mark as connecting and mark the tab as active again
 		},
 
 		'/raw': function(user, client, target, params) {

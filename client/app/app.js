@@ -110,6 +110,17 @@ Template.app.events({
 	},
 
 	'click #connection-link': function(e, t) {
+		var selected = Session.get('selectedTab'),
+			network = (selected !== undefined) ? Networks.findOne({_id: selected.network}) : undefined;
+		// get the selected tab
+		
+		if (network !== undefined && network.active) {
+			Meteor.call('execCommand', selected.network, selected.title, '/disconnect');
+		} else {
+			Meteor.call('execCommand', selected.network, selected.title, '/reconnect');
+		}
+		// execute the equivalent of /disconnect and /reconnect
+
 		e.preventDefault();
 	}
 });
