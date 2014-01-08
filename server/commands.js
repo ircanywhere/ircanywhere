@@ -37,6 +37,7 @@ CommandManager = function() {
 
 			this.createAlias('/join', '/j');
 			this.createAlias('/part', '/p', '/leave');
+			this.createAlias('/cycle', '/hop');
 			this.createAlias('/quit', '/disconnect');
 			this.createAlias('/connect', '/reconnect');
 			// setup aliases
@@ -83,29 +84,6 @@ CommandManager = function() {
 			}
 		},
 
-		'/join': function(user, client, target, params) {
-			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
-				ircFactory.send(client._id, 'join', params);
-			} else {
-				ircFactory.send(client._id, 'join', [target].concat(params));
-			}
-		},
-
-		'/part': function(user, client, target, params) {
-			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
-				ircFactory.send(client._id, 'part', params);
-			} else {
-				ircFactory.send(client._id, 'part', [target].concat(params));
-			}
-		},
-
-		'/topic': function(user, client, target, params) {
-			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
-				ircFactory.send(client._id, 'topic', params);
-			} else {
-				ircFactory.send(client._id, 'topic', [target].concat(params));
-			}
-		},
 
 		'/msg': function(user, client, target, params) {
 			ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
@@ -127,6 +105,46 @@ CommandManager = function() {
 			ircFactory.send(client._id, 'me', [target, params.join(' ')]);
 			ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :ACTION ' + params.join(' ') + '']);
 			// same as above, we don't get a reciept for /me so we push it back through our buffer
+		},
+
+		'/join': function(user, client, target, params) {
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'join', params);
+			} else {
+				ircFactory.send(client._id, 'join', [target].concat(params));
+			}
+		},
+
+		'/part': function(user, client, target, params) {
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'part', params);
+			} else {
+				ircFactory.send(client._id, 'part', [target].concat(params));
+			}
+		},
+
+		'/cycle': function(user, client, target, params) {
+			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'part', params);
+				ircFactory.send(client._id, 'join', params);
+			} else {
+				ircFactory.send(client._id, 'part', [target].concat(params));
+				ircFactory.send(client._id, 'join', [target].concat(params));
+			}
+		},
+
+		'/topic': function(user, client, target, params) {
+			if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'topic', params);
+			} else {
+				ircFactory.send(client._id, 'topic', [target].concat(params));
+			}
+		},
+
+		'/nick': function(user, client, target, params) {
+			if (params.length > 0) {
+				ircFactory.send(client._id, 'raw', ['NICK'].concat(params));
+			}
 		},
 
 		'/close': function(user, client, target, params) {
