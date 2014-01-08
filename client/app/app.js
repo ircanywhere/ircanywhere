@@ -57,6 +57,16 @@ Template.app.selectedType = function() {
 	return (selected) ? selected.type : '';
 };
 
+Template.app.toggleUsersText = function() {
+	var selected = Session.get('selectedTab');
+	return (selected.hiddenUsers) ? 'Show Users' : 'Hide Users';
+};
+
+Template.app.toggleEventsText = function() {
+	var selected = Session.get('selectedTab');
+	return (selected.hiddenEvents) ? 'Show Joins/Parts' : 'Hide Joins/Parts';
+};
+
 Template.app.channelLink = function() {
 	var selected = Session.get('selectedTab');
 	return (selected.active) ? 'Leave' : 'Rejoin';
@@ -88,10 +98,22 @@ Template.app.events({
 	},
 
 	'click #toggle-users-link': function(e, t) {
+		var selected = Session.get('selectedTab'),
+			attribute = (selected && selected.hiddenUsers) ? true : false;
+
+		Tabs.update({_id: selected._id}, {$set: {hiddenUsers: !attribute}});
+		// reverse the current value
+
 		e.preventDefault();
 	},
 
 	'click #toggle-extra-link': function(e, t) {
+		var selected = Session.get('selectedTab'),
+			attribute = (selected && selected.hiddenEvents) ? true : false;
+
+		Tabs.update({_id: selected._id}, {$set: {hiddenEvents: !attribute}});
+		// reverse the current value
+
 		e.preventDefault();
 	},
 

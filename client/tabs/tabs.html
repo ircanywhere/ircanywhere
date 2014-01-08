@@ -39,12 +39,10 @@
 			</div>
 			{{> input this}}
 		</div>
-		{{#if equals type 'channel'}}
-			{{#if active}}
-			<div class="userlist">
+		{{#if showUserlist}}
+			<div class="userlist {{userlistClass}}">
 				{{> userlist}}
 			</div>
-			{{/if}}
 		{{/if}}
 	</div>
 </template>

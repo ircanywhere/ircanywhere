@@ -21,6 +21,14 @@ NetworkManager = function() {
 				return Tabs.find({user: this.userId});
 			});
 
+			Tabs.allow({
+				update: function(userId, doc, fieldNames, modifier) {
+					return ((_.difference(fieldNames, ['hiddenUsers']) == 0) ||
+							(_.difference(fieldNames, ['hiddenEvents']) == 0));
+				}
+			});
+			// setup allow rules for this collection
+
 			var networks = Networks.find(),
 				tabs = Tabs.find();
 
