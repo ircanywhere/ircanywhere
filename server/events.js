@@ -24,7 +24,7 @@ EventManager = function() {
 					read: false,
 					extra: {
 						self: (client.nick === message.nickname) ? true : false,
-						highlight: Manager.determineHighlight(client, message, (client.nick === message.nickname)),
+						highlight: Manager.determineHighlight(client, message, type, (client.nick === message.nickname)),
 						prefix: prefixObject.prefix
 					}
 				};
@@ -73,20 +73,23 @@ EventManager = function() {
 			}
 		},
 
-		determineHighlight: function(client, message, ours) {
-			var highlight = false,
-				escape = function(text) {
+		determineHighlight: function(client, message, type, ours) {
+			if (!ours || (type !== 'privmsg' && type !== 'action')) {
+				return faslse;
+			}
+
+			var escape = function(text) {
 					return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 				};
 
-			if (!ours && message.message.match('(' + escape(client.nick) + ')')) {
-				highlight = true;
+			if (message.message.match('(' + escape(client.nick) + ')')) {
+				return true;
 			}
 			// does this match our nick?
 
 			// XXX - does this match our highlight words
 
-			return highlight;
+			return false;
 		},
 
 		getPrefix: function(client, user) {

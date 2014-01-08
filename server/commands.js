@@ -82,7 +82,11 @@ CommandManager = function() {
 		},
 
 		'/join': function(user, client, target, params) {
-			ircFactory.send(client._id, 'join', params);
+			if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+				ircFactory.send(client._id, 'join', params);
+			} else {
+				ircFactory.send(client._id, 'join', [target].concat(params));
+			}
 		},
 
 		'/part': function(user, client, target, params) {
@@ -142,7 +146,7 @@ CommandManager = function() {
 					ircFactory.send(client._id, 'disconnect', ['Closing network']);
 				}
 
-				networkManager.removeTab(client);
+				//networkManager.removeTab(client);
 				// if it's a network /quit and remove tab(s)
 			}
 		},

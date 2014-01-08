@@ -59,6 +59,7 @@ IRCHandler = function() {
 			// just a standard user object, although with a modes object aswell
 
 			if (message.nickname == client.nick) {
+				ircFactory.send(client._id, 'mode', [message.channel]);
 				networkManager.addTab(client, message.channel, 'channel', true);
 			}
 			// if it's us joining a channel we'll mark it in internal.tabs
@@ -75,7 +76,7 @@ IRCHandler = function() {
 			if (message.nickname == client.nick) {
 				networkManager.activeTab(client, message.channel, false);
 			}
-			// we're leaving, remove the tab
+			// we're leaving, mark the tab as inactive
 
 			eventManager.insertEvent(client, message, 'part');
 		},
