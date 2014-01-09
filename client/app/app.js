@@ -21,6 +21,9 @@ Template.app.rendered = function() {
 Template.app.titleInfo = function() {
 	var selected = Session.get('selectedTab');
 
+	document.title = selected.title + ' - ' + Application.title;
+	// change the title
+
 	if (selected == undefined) {
 		return {title: '', modes: '', desc: ''};
 	}

@@ -1,5 +1,5 @@
 function App() {
-	
+	this.title = 'IRCAnywhere';
 };
 
 // -------------------------------------

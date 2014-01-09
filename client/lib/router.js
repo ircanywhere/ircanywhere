@@ -48,6 +48,8 @@ Router.map(function () {
 		path: '/login',
 		layoutTemplate: 'index',
 		before: function() {
+			document.title = Application.title;
+
 			if (Meteor.user()) {
 				this.stop();
 				Router.go('home');
@@ -58,9 +60,8 @@ Router.map(function () {
 	this.route('signup', {
 		path: '/signup',
 		template: 'signup',
-		data: {
-			title: 'Sign up',
-			errors: Session.get('signup.errors')
+		before: function() {
+			document.title = 'Sign up - ' + Application.title;
 		}
 	});
 
@@ -68,6 +69,8 @@ Router.map(function () {
 		path: '/reset-password/:token',
 		template: 'reset',
 		data: function() {
+			document.title = 'Reset Password - ' + Application.title;
+
 			var token = this.params['token'];
 			return {
 				title: 'Reset Password',
@@ -93,6 +96,7 @@ Router.map(function () {
 	this.route('settings', {
 		waitOn: waitOn,
 		data: function() {
+			document.title = 'Settings - ' + Application.title;
 			return 'null';
 		}
 	});
@@ -100,6 +104,7 @@ Router.map(function () {
 	this.route('addnetwork', {
 		waitOn: waitOn,
 		data: function() {
+			document.title = 'Add network - ' + Application.title;
 			return 'null';
 		}
 	});
