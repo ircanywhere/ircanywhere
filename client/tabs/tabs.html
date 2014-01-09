@@ -20,7 +20,7 @@
 			</div>
 			<div class="overlay-bar">
 				{{#if isChannel}}
-					<span class="channel-name">{{title}}</span><span class="modes">+{{modes}}</span><span class="topic">{{topic.topic}}</span>
+					<span class="channel-name">{{title}}</span><span class="modes">+{{modes}}</span><span class="topic">{{ircParse topic.topic this}}</span>
 				{{else}}
 					<span class="channel-name">{{title}}</span><span class="modes"></span><span class="topic">{{url}}</span>
 				{{/if}}

@@ -46,7 +46,7 @@
 <template name="quit">
 	<div class="clear row other {{showEvent ..}}" data-type="quit">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&larr; You have disconnected{{else}}&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has quit: {{message.message}}{{/if}}</span>
+		<span class="column event">{{#if extra.self}}&larr; You have disconnected{{else}}&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has quit: {{ircParse message.message ..}}{{/if}}</span>
 	</div>
 </template>
 
@@ -60,7 +60,7 @@
 <template name="topic">
 	<div class="clear row other" data-type="topic">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{message.topic}}{{else}}&ndash;  {{userLink this .. false}} has changed the topic to: {{message.topic}}{{/if}}</span>
+		<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{ircParse message.topic ..}}{{else}}&ndash;  {{userLink this .. false}} has changed the topic to: {{ircParse message.topic ..}}{{/if}}</span>
 	</div>
 </template>
 
@@ -74,7 +74,7 @@
 <template name="kick">
 	<div class="clear row other" data-type="kick">
 		<span class="time">{{time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&larr; You have been kicked from {{message.channel}}{{else}}&larr; {{userLink this .. false}} has kicked {{message.kicked}} ({{message.message}}){{/if}}</span>
+		<span class="column event">{{#if extra.self}}&larr; You have been kicked from {{message.channel}} ({{ircParse message.message ..}}){{else}}&larr; {{userLink this .. false}} has kicked {{message.kicked}} ({{ircParse message.message ..}}){{/if}}</span>
 	</div>
 </template>
 

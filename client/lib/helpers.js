@@ -60,7 +60,5 @@ Handlebars.registerHelper('ircParse', function(text, tab, options) {
 	var network = Networks.findOne({_id: tab.network}),
 		message = IRCParser.exec(text, network);
 
-	console.log(network, message);
-
 	return new Handlebars.SafeString(message);
 });

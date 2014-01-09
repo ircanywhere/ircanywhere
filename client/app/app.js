@@ -37,7 +37,7 @@ Template.app.titleInfo = function() {
 					title: selected.target,
 					modes: '',
 					desc: selected.url,
-					network: selected.target
+					network: selected.network
 				};
 			} else if (doc.type == 'channel') {
 				return {
@@ -45,7 +45,7 @@ Template.app.titleInfo = function() {
 					title: doc.target,
 					modes: '+' + doc.modes,
 					desc: (doc.topic !== undefined) ? doc.topic.topic : '',
-					network: Networks.findOne({_id: doc.network}).name
+					network: selected.network
 				};
 			}
 		}
