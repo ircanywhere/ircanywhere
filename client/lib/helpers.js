@@ -55,3 +55,12 @@ Handlebars.registerHelper('showEvent', function(tab, options) {
 Handlebars.registerHelper('equals', function(v1, v2, options) {
 	return (v1 == v2);
 });
+
+Handlebars.registerHelper('ircParse', function(text, tab, options) {
+	var network = Networks.findOne({_id: tab.network}),
+		message = IRCParser.exec(text, network);
+
+	console.log(network, message);
+
+	return new Handlebars.SafeString(message);
+});

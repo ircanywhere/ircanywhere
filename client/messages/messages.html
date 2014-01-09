@@ -81,6 +81,6 @@
 <template name="privmsg">
 	<div class="clear row" data-type="privmsg" data-self="{{extra.self}}" data-highlight="{{extra.highlight}}">
 		<span class="time">{{time message.time}}</span>
-		<span class="column message">{{userLink this .. true}}{{message.message}}</span>
+		<span class="column message">{{userLink this .. true}}{{ircParse message.message ..}}</span>
 	</div>
 </template>
