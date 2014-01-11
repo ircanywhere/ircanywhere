@@ -2,7 +2,7 @@ EventManager = function() {
 	"use strict";
 
 	var hooks = Meteor.require('hooks'),
-		_insert = function(client, message, type, tab, user) {
+		_insert = function(client, message, type, user) {
 			var network = client.name,
 				channel = (message.channel && !message.target) ? message.channel : message.target,
 				user = user || ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname});
@@ -57,19 +57,28 @@ EventManager = function() {
 
 				chans.forEach(function(chan) {
 					message.channel = chan.channel;
-					_insert(client, message, type, chan._id, chan);
+					_insert(client, message, type, chan);
 					// we're in here because the user either changing their nick
 					// or quitting, exists in this channel, lets add it to the event
 				});
 
 				if (_.has(client.internal.tabs, message.nickname)) {
-					_insert(client, message, type, client.internal.tabs[message.nickname], chan);
+					_insert(client, message, type, chan);
 				}
 				// these two types wont have a target, or a channel, so
 				// we'll have to do some calculating to determine where we want them
 				// we shall put them in channel and privmsg tab events
+			} else if (type == 'privmsg' || type == 'action') {
+				var tab = client.internal.tabs[message.nickname];
+
+				if (tab === undefined) {
+					networkManager.addTab(client, message.nickname, 'query', false);
+				}
+				// create the tab if its undefined
+
+				_insert(client, message, type);
 			} else {
-				_insert(client, message, type, client.internal.tabs[message.target] || client._id);
+				_insert(client, message, type);
 			}
 		},
 

@@ -109,6 +109,12 @@ IRCHandler = function() {
 				Networks.update({_id: client._id}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
+
+			if (_.has(client.internal.tabs, message.nickname)) {
+				var mlower = message.nickname.toLowerCase();
+				Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
+			}
+			// is this a client we're chatting to whos changed their nickname?
 			
 			eventManager.insertEvent(client, message, 'nick');
 			channelManager.updateUsers(client._id, client.name, [message.nickname], {nickname: message.newnick});

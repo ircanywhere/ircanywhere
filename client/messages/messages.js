@@ -30,10 +30,24 @@ Template.messages.rendered = function() {
 };
 
 Template.messages.getMessages = function() {
+	var network = Networks.findOne({_id: this.network}),
+		options = {sort: {'message.time': 1}};
+
 	if (this.type == 'network') {
-		return Events.find({network: this.name, target: null}, {sort: {'message.time': 1}});
+		return Events.find({
+			network: this.name,
+			target: null
+		}, options);
+	} else if (this.type == 'channel') {
+		return Events.find({
+			network: network.name,
+			target: this.target
+		}, options);
 	} else {
-		return Events.find({network: Networks.findOne({_id: this.network}).name, target: this.target}, {sort: {'message.time': 1}});
+		return Events.find({
+			network: network.name,
+			$or: [{target: this.target}, {'message.nickname': this.target, target: network.nick}]
+		}, options);
 	}
 };
 // ----------------------------
