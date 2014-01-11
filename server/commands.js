@@ -24,7 +24,10 @@ CommandManager = function() {
 			var self = this;
 
 			Meteor.publish('commands', function() {
-				return Commands.find({'user': this.userId});
+				return Commands.find({user: this.userId}, {
+					sort: {timestamp: -1},
+					limit: 10
+				});
 			});
 
 			Commands.allow({
