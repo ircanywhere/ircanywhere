@@ -402,7 +402,7 @@ IRCParser = {
 		// parse http links and www. urls (http://jmrware.com/articles/2010/linkifyurl/linkify.html)
 
 		text = text.replace(/(^|[ ]+)(#\S+)/ig, function(input, match, match2) {
-			return (match == ' ') ? ' <a href="/#!/' + network.url + '/' + Helper.encodeChannel(match2) + '" rel="channel-link">' + match2 + '</a>' : '<a href="#!/' + network.url + '/' + Helper.encodeChannel(match2) + '" rel="channel-link">' + match2 + '</a>';
+			return (match == ' ') ? ' <a href="/' + network.internal.url + '/' + Meteor.Helpers.encodeChannel(match2) + '" rel="channel-link">' + match2 + '</a>' : '<a href="/' + network.url + '/' + Meteor.Helpers.encodeChannel(match2) + '" rel="channel-link">' + match2 + '</a>';
 		});
 		// parse channel into link
 

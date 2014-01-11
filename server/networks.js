@@ -192,13 +192,28 @@ NetworkManager = function() {
 			}
 			// no uid, bail
 
-			var tab = Tabs.findOne({user: this.userId, url: url});
+			var user = Networks.findOne({'internal.userId': this.userId}, {fields: {id: 1, internal: 1}}),
+				tab = Tabs.findOne({user: this.userId, url: url});
 
 			if (tab !== undefined && !tab.selected) {
 				Tabs.update({user: this.userId, prevSelected: true}, {$set: {prevSelected: false}});
 				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
 				Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
 				// mark all as not selected apart from the one we've been told to select
+			} else if (tab === undefined) {
+				var client = Clients[user._id],
+					target = url.split('/');
+
+				if (target.length <= 1) {
+					return false;
+				}
+				// we're not allowed to add a network like this
+
+				if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, target[1])) {
+					ircFactory.send(client._id, 'join', [target[1]]);
+				} else {
+					Manager.addTab(Clients[user._id], target[1], 'query', true);
+				}
 			}
 		},
 
