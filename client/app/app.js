@@ -220,6 +220,24 @@ Template.network.getTitle = function() {
 	return (!this.active) ? '(' + this.title + ')' : this.title;
 };
 
+Template.network.hasHighlight = function() {
+	Session.set('highlight.' + this._id, Application.getMessages(this, {'extra.highlight': true}).count());
+	return (Session.get('highlight.' + this._id) === 0) ? false : true;
+};
+
+Template.network.hasUnread = function() {
+	Session.set('unread.' + this._id, Application.getMessages(this, {read: false}).count());
+	return (Session.get('unread.' + this._id) === 0) ? false : true;
+};
+
+Template.network.highlight = function() {
+	return Session.get('highlight.' + this._id);
+};
+
+Template.network.unread = function() {
+	return Session.get('unread.' + this._id);
+};
+
 Template.network.destroyed = function() {
 	var selected = Tabs.findOne({selected: true});
 

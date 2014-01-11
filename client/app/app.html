@@ -65,7 +65,11 @@
 <template name="network">
 	<li class="clear {{isSelected}} {{isChild}}">
 		<a href="/{{getURL}}" title="{{title}}">
-			<span class="link {{getClass}}">{{getTitle}}</span>
+			<span class="link {{getClass}}">
+				{{#if hasHighlight}}<span class="alert highlight">{{highlight}}</span>{{/if}}
+				{{#if hasUnread}}<span class="alert unread">{{unread}}</span>{{/if}}
+				{{getTitle}}
+			</span>
 		</a>
 	</li>
 </template>

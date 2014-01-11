@@ -69,7 +69,7 @@ EventManager = function() {
 				// we'll have to do some calculating to determine where we want them
 				// we shall put them in channel and privmsg tab events
 			} else if (type == 'privmsg' || type == 'action') {
-				var tab = client.internal.tabs[message.nickname];
+				var tab = client.internal.tabs[message.target];
 
 				if (tab === undefined) {
 					networkManager.addTab(client, message.nickname, 'query', false);

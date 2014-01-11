@@ -47,6 +47,28 @@ App.prototype.reRoute = function() {
 	// if the url needs to be rerouted, so we can assume that we need to select any tab, the first one will do.
 };
 
+App.prototype.getMessages = function(tab, query) {
+	var network = Networks.findOne({_id: tab.network}),
+		options = {sort: {'message.time': 1}};
+
+	if (tab.type == 'network') {
+		return Events.find(_.extend(query, {
+			network: tab.name,
+			target: null
+		}), options);
+	} else if (tab.type == 'channel') {
+		return Events.find(_.extend(query, {
+			network: network.name,
+			target: tab.target,
+		}), options);
+	} else {
+		return Events.find(_.extend(query, {
+			network: network.name,
+			$or: [{target: tab.target}, {'message.nickname': tab.target, target: network.nick}]
+		}), options);
+	}
+};
+
 App.prototype.mouseEnter = function(e, t) {
 	var target = e.currentTarget.className;
 	if (target !== 'topic-wrap' && target !== 'overlay-bar') {
