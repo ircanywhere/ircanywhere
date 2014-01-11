@@ -39,6 +39,14 @@ Template.app.titleInfo = function() {
 					desc: selected.url,
 					network: selected.network
 				};
+			} else if (doc.type == 'query') {
+				return {
+					key: doc._id,
+					title: doc.target,
+					modes: '',
+					desc: '',
+					network: selected.network
+				};
 			} else if (doc.type == 'channel') {
 				return {
 					key: doc._id,
@@ -210,5 +218,16 @@ Template.network.getURL = function() {
 
 Template.network.getTitle = function() {
 	return (!this.active) ? '(' + this.title + ')' : this.title;
+};
+
+Template.network.destroyed = function() {
+	var selected = Tabs.findOne({selected: true});
+
+	if (selected !== undefined && '/' + selected.url !== document.location.pathname) {
+		var split = selected.url.split('/'),
+			uri = (split.length == 1) ? split[0] : split[0] + '/' + encodeURIComponent(split[1]);
+		Router.go('/' + uri);
+	}
+	// if the server has closed a tab, update the url
 };
 // ----------------------------

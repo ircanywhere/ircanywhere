@@ -58,6 +58,7 @@ CommandManager = function() {
 			this.createAlias('/part', '/p', '/leave');
 			this.createAlias('/cycle', '/hop');
 			this.createAlias('/quit', '/disconnect');
+			this.createAlias('/query', '/q');
 			// setup aliases
 		},
 
@@ -258,6 +259,10 @@ CommandManager = function() {
 				// if it's a network /quit and remove tab(s)
 				// XXX - finish this
 			}
+		},
+
+		'/query': function(user, client, target, params) {
+			networkManager.addTab(client, target, 'query', true);
 		},
 
 		'/quit': function(user, client, target, params) {

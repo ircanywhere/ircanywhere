@@ -218,15 +218,15 @@ NetworkManager = function() {
 		},
 
 		removeTab: function(client, target) {
+			Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
+			// re-select 
+			
 			if (target) {
 				Tabs.remove({user: client.internal.userId, network: client._id, target: target});
 			} else {
 				Tabs.remove({user: client.internal.userId, network: client._id});
 			}
 			// remove tabs
-
-			Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
-			// re-select 
 		},
 
 		connectNetwork: function(user, network) {

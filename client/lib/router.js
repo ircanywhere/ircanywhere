@@ -49,7 +49,6 @@ Router.map(function () {
 		layoutTemplate: 'index',
 		before: function() {
 			document.title = Application.title;
-
 			if (Meteor.user()) {
 				this.stop();
 				Router.go('home');
@@ -70,7 +69,6 @@ Router.map(function () {
 		template: 'reset',
 		data: function() {
 			document.title = 'Reset Password - ' + Application.title;
-
 			var token = this.params['token'];
 			return {
 				title: 'Reset Password',
