@@ -9,7 +9,7 @@ function App() {
 // it's all based upon templates, although we can extend the template objects for more functionality
 
 App.prototype.reRoute = function() {
-	var networks = Tabs.find({}, {reactive: false}).fetch(),
+	var networks = Tabs.find({}, {reactive: false, fields: {url: 1, selected: 1}}).fetch(),
 		selected = false,
 		first = '';
 
@@ -48,7 +48,7 @@ App.prototype.reRoute = function() {
 };
 
 App.prototype.getMessages = function(tab, query) {
-	var network = Networks.findOne({_id: tab.network}),
+	var network = Networks.findOne({_id: tab.network}, {fields: {name: 1, nick: 1}}),
 		options = {sort: {'message.time': 1}};
 
 	if (tab.type == 'network') {

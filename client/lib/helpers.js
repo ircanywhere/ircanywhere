@@ -27,7 +27,7 @@ Handlebars.registerHelper('userLink', function(context, tab, show, options) {
 		username = context.username || context.message.username,
 		hostname = context.hostname || context.message.hostname,
 		prefixClass = '',
-		url = Networks.findOne({_id: tab.network}).internal.url;
+		url = Networks.findOne({_id: tab.network}, {fields: {'internal.url': 1}}).internal.url;
 	
 	if (prefix == '') {
 		prefixClass = '';
@@ -57,7 +57,7 @@ Handlebars.registerHelper('equals', function(v1, v2, options) {
 });
 
 Handlebars.registerHelper('ircParse', function(text, tab, options) {
-	var network = Networks.findOne({_id: tab.network}),
+	var network = Networks.findOne({_id: tab.network}, {fields: {'internal.url': 1}}),
 		message = IRCParser.exec(text, network);
 
 	return new Handlebars.SafeString(message);

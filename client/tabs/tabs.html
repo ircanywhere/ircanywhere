@@ -25,10 +25,10 @@
 					<span class="channel-name">{{title}}</span><span class="modes"></span><span class="topic">{{url}}</span>
 				{{/if}}
 			</div>
-			<div class="top-message-bar message-bar clear">
+			<div class="top-message-bar message-bar clear {{#if hasUnread}}show{{/if}}">
 				<span class="left">
 					<span class="last hide">0</span>
-					<span class="message-number"></span>
+					<span class="message-number">There are <span class="alert unread">{{messageCount}}</span> unread messages{{#if hasHighlight}} and <span class="alert highlight">3</span> highlights{{/if}} since your last visit.</span>
 				</span>
 				<span class="right">
 					<a href="#" class="read-backlog">Mark as read</a>

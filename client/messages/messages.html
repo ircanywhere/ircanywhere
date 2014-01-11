@@ -30,56 +30,56 @@
 </template>
 
 <template name="join">
-	<div class="clear row other {{showEvent ..}}" data-type="join">
+	<div class="clear row other {{showEvent ..}}" data-type="join" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&rarr; You have joined {{message.channel}}{{else}}&rarr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has joined {{message.channel}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="part">
-	<div class="clear row other {{showEvent ..}}" data-type="part">
+	<div class="clear row other {{showEvent ..}}" data-type="part" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&larr; You have left {{message.channel}}{{else}}&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has left {{message.channel}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="quit">
-	<div class="clear row other {{showEvent ..}}" data-type="quit">
+	<div class="clear row other {{showEvent ..}}" data-type="quit" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&larr; You have disconnected{{else}}&larr; {{userLink this .. false}} ({{message.username}}@{{message.hostname}}) has quit: {{ircParse message.message ..}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="mode">
-	<div class="clear row other" data-type="mode">
+	<div class="clear row other" data-type="mode" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&ndash;  You have set the mode {{message.mode}}{{else}}&ndash;  {{userLink this .. false}} sets mode {{message.mode}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="topic">
-	<div class="clear row other" data-type="topic">
+	<div class="clear row other" data-type="topic" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{ircParse message.topic ..}}{{else}}&ndash;  {{userLink this .. false}} has changed the topic to: {{ircParse message.topic ..}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="nick">
-	<div class="clear row other {{showEvent ..}}" data-type="nick">
+	<div class="clear row other {{showEvent ..}}" data-type="nick" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&ndash;  You have changed your nickname to {{message.newnick}}{{else}}&ndash;  {{userLink this .. false}} has changed their nickname to {{message.newnick}}{{/if}}</span>
 	</div>
 </template>
 
 <template name="kick">
-	<div class="clear row other" data-type="kick">
+	<div class="clear row other" data-type="kick" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column event">{{#if extra.self}}&larr; You have been kicked from {{message.channel}} ({{ircParse message.message ..}}){{else}}&larr; {{userLink this .. false}} has kicked {{message.kicked}} ({{ircParse message.message ..}}){{/if}}</span>
 	</div>
 </template>
 
 <template name="privmsg">
-	<div class="clear row" data-type="privmsg" data-self="{{extra.self}}" data-highlight="{{extra.highlight}}">
+	<div class="clear row" data-type="privmsg" data-self="{{extra.self}}" data-highlight="{{extra.highlight}}" data-id="{{_id}}" data-read="{{read}}">
 		<span class="time">{{time message.time}}</span>
 		<span class="column message">{{userLink this .. true}}{{ircParse message.message ..}}</span>
 	</div>

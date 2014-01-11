@@ -85,7 +85,7 @@ Template.app.channelLink = function() {
 
 Template.app.connectionLink = function() {
 	var selected = Session.get('selectedTab'),
-		network = (selected !== undefined) ? Networks.findOne({_id: selected.network}) : undefined;
+		network = (selected !== undefined) ? Networks.findOne({_id: selected.network}, {fields: {'internal.status': 1}}) : undefined;
 
 	if (network !== undefined && (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed')) {
 		return 'Connect';
@@ -144,7 +144,7 @@ Template.app.events({
 
 	'click #connection-link': function(e, t) {
 		var selected = Session.get('selectedTab'),
-			network = (selected !== undefined) ? Networks.findOne({_id: selected.network}) : undefined;
+			network = (selected !== undefined) ? Networks.findOne({_id: selected.network}, {fields: {active: 1}}) : undefined;
 		// get the selected tab
 		
 		if (network !== undefined && network.active) {
@@ -174,7 +174,9 @@ Template.titlebar.events({
 // - the sidebar template, currently just includes the dynamic network list
 
 Template.sidebar.networks = function() {
-	return Tabs.find({}, {sort: {url: 1}});
+	return Tabs.find({}, {
+		sort: {url: 1}
+	});
 };
 // ----------------------------
 
@@ -239,7 +241,7 @@ Template.network.unread = function() {
 };
 
 Template.network.destroyed = function() {
-	var selected = Tabs.findOne({selected: true});
+	var selected = Tabs.findOne({selected: true}, {fields: {url: 1}});
 
 	if (selected !== undefined && '/' + selected.url !== document.location.pathname) {
 		var split = selected.url.split('/'),

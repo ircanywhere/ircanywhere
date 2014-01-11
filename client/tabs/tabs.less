@@ -73,7 +73,6 @@
 				background: #70AFC4;
 				color: @white;
 				padding: 6px 8px;
-				display: none;
 				zoom: 1;
 				line-height: 150%;
 				font-size: 12px;
@@ -110,12 +109,20 @@
 						}
 					}
 
-					&.alert.highlight {
+					&.alert {
 						padding: 2px 4px 3px 4px;
 						margin: 0 4px;
+						.border-radius(3px);
+					}
+
+					&.alert.unread {
+						background: @light-gray;
+						color: @dark-gray;
+					}
+
+					&.alert.highlight {
 						background: @red;
 						color: @white;
-						.border-radius(3px);
 					}
 				}
 			}
