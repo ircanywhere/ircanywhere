@@ -42,15 +42,15 @@ Application = function() {
 				type: 'object',
 				required: true
 			},
-			'email.forceValidation': {
-				type: 'boolean',
-				required: true
-			},
 			'email.siteName': {
 				type: 'string',
 				required: false
 			},
 			'email.from': {
+				type: 'string',
+				required: true
+			},
+			'email.smtp': {
 				type: 'string',
 				required: true
 			},
@@ -129,6 +129,7 @@ Application = function() {
 			this.mongo = new mongo.Server('127.0.0.1').db('ircanywhere');
 
 			App.Nodes = this.mongo.getCollection('nodes');
+			App.Users = this.mongo.getCollection('users');
 			App.Networks = this.mongo.getCollection('networks');
 			App.Tabs = this.mongo.getCollection('tabs');
 			App.ChannelUsers = this.mongo.getCollection('channelUsers');

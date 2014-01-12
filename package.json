@@ -11,8 +11,8 @@
 	],
 	"dependencies": {
 		"dependable": "0.2.5",
+		"emailjs": "0.3.6",
 		"express.io": "1.1.13",
-		"fibers": "*",
 		"hooks": "0.3.2",
 		"irc-factory": "1.2.5",
 		"node-static": "0.7.3",

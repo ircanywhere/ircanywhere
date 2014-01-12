@@ -1,12 +1,35 @@
-UserManager = function() {
+UserManager = function(application) {
 	"use strict";
 
 	var _ = require('lodash'),
+		crypto = require('crypto'),
+		fs = require('fs'),
 		hooks = require('hooks'),
-		helpers = require('../lib/helpers').Helpers;
+		emails = require('emailjs'),
+		helper = require('../lib/helpers').Helpers,
+		_generateSalt = function() {
+			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
+				string_length = 10,
+				randomstring = '';
+			
+			for (var i = 0; i < string_length; i++) {
+				var rnum = Math.floor(Math.random() * chars.length);
+				randomstring += chars.substring(rnum,rnum + 1);
+			}
+
+			return randomstring;
+		};
 		
 	var Manager = {
 		init: function() {
+			var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
+			this.server = emails.server.connect({
+				user: smtp[2], 
+				password: smtp[4], 
+				host: smtp[6], 
+				ssl: true
+			});
+
 			/*Accounts.config({
 				sendVerificationEmail: application.config.email.forceValidation,
 				forbidClientAccountCreation: true
@@ -37,20 +60,20 @@ UserManager = function() {
 			if (!application.config.enableRegistrations) {
 				output.errors.push({error: 'New registrations are currently closed'});
 			} else {
-				name = Helpers.trimInput(name);
-				nickname = Helpers.trimInput(nickname);
-				email = Helpers.trimInput(email);
+				name = helper.trimInput(name);
+				nickname = helper.trimInput(nickname);
+				email = helper.trimInput(email);
 
 				if (name == '' || nickname == '' || email == '' || password == '' || confirmPassword == '')
 					output.errors.push({error: 'All fields are required'});
 
-				if (!Helpers.isValidName(name))
+				if (!helper.isValidName(name))
 					output.errors.push({error: 'The name you have entered is too long'});
-				if (!Helpers.isValidNickname(nickname))
+				if (!helper.isValidNickname(nickname))
 					output.errors.push({error: 'The nickname you have entered is invalid'});
-				if (!Helpers.isValidEmail(email))
+				if (!helper.isValidEmail(email))
 					output.errors.push({error: 'The email address you have entered is invalid'});
-				if (!Helpers.isValidPassword(password))
+				if (!helper.isValidPassword(password))
 					output.errors.push({error: 'The password you have entered is invalid'});
 				if (password != confirmPassword)
 					output.errors.push({error: 'The passwords you have entered do not match'});
@@ -62,56 +85,52 @@ UserManager = function() {
 			}
 			// any errors?
 
-			var user = {
-				email: email,
-				password: password,
-				profile: {
-					name: name,
-					nickname: nickname,
-					flags: {
-						newUser: true
+			var salt = _generateSalt(),
+				user = {
+					email: email,
+					password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
+					salt: salt,
+					profile: {
+						name: name,
+						nickname: nickname,
+						flags: {
+							newUser: true
+						}
 					}
-				}
-			};
+				};
 			// the user record
 
-			try {
-				userId = Accounts.createUser(user);
-				delete user.password;
-			} catch (e) {
+			var find = application.Users.find({email: email}).toArray();
+			if (find.length > 0) {
 				output.failed = true;
 				output.errors.push({error: 'The email you have used is already in use'});
 
 				return output;
+			} else {
+				userId = application.Users.insert(user);
 			}
 			// it's failed, lets bail
 
-			if (!application.config.email.forceValidation) {
-				output.successMessage = 'Your account has been successfully created, you may now login';
-				return output;
-			}
-
-			application.logger.log('info', 'account created', user);
+			application.logger.log('info', 'account created', _.omit(user, '_id'));
 			// log this event
 
-			try {
-				Accounts.sendVerificationEmail(userId);
-			} catch (e) {
-				output.failed = true;
-				output.errors.push({error: 'The validation email could not be sent, please contact the site administrator'});
+			var message = {
+				text: this.parse('./private/signup.txt', {name: name}),
+				from: application.config.email.from,
+				to: email,
+				subject: 'Welcome to ' + application.config.email.siteName
+			};
+			
+			this.server.send(message);
+			// send a email
 
-				return output;
-			}
-			// did we send the email?
-
-			output.successMessage = 'Your account has been successfully created, you will get an email shortly';
-
+			output.successMessage = 'Your account has been successfully created, you may now login';
 			return output;
 		},
 
 		onUserLogin: function() {
 			var userId = this.userId,
-				me = Meteor.user();
+				me = Meteor.user(); 
 
 			if (me == null) {
 				return;
@@ -142,14 +161,22 @@ UserManager = function() {
 
 			application.logger.log('info', 'user logged in', {userId: userId});
 			// log this event
+		},
+
+		getLoggedIn: function() {
+			// XXX - Create a function to replace Meteor.user()
+		},
+
+		parse: function(file, replace) {
+			var template = fs.readFileSync('./private/emails/signup.txt').toString();
+
+			for (var key in replace) {
+				template.replace('{{' + key + '}}', replace[key]);
+			}
+
+			return template;
 		}
 	};
-
-	/*Meteor.methods({
-		registerUser: Manager.registerUser,
-		onUserLogin: Manager.onUserLogin
-	});*/
-	// open these methods up to the client side
 
 	Manager.init();
 

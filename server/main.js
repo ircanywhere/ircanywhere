@@ -19,8 +19,11 @@ application = container.resolve(Application);
 modeParser = container.resolve(ModeParser);
 // mode parsing engine, no dependencies, just a parser class
 
+container.register('application', application);
 userManager = container.resolve(UserManager);
 // user manager
+
+console.log(userManager.onUserLogin());
 
 /*channelManager = container.resolve(ChannelManager);
 // channel manager

@@ -34,21 +34,18 @@
 				 to only ever set this to false when developing */
 
 	"email": {
-		"forceValidation": true,
-		/* -- required
-		 * -- boolean 
-		 * -- usage: Whether to enable email validation for new users */
-
 		"siteName": "IRCAnywhere",
 		/* -- string 
 		 * -- usage: The title to use in validation/forgot password emails
 					 defaults to "IRCAnywhere" */
 
-		"from": "IRCAnywhere <no-reply@ircanywhere.com>"
+		"from": "IRCAnywhere <no-reply@ircanywhere.com>",
 		/* -- required
 		 * -- string 
 		 * -- usage: The email address to send emails from, can be either email@domain.tld
 					 or Name <email@domain.tld> */
+
+		"smtp": "smtp://username:password@smtp.gmail.com"
 	},
 
 	"clientSettings": {
