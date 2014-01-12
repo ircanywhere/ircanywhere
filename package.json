@@ -1,0 +1,42 @@
+{
+	"name": "ircanywhere",
+	"description": "IRCAnywhere web bnc system",
+	"version": "0.2.0-alpha",
+	"author": "Ricki Hastings <ricki@ircanywhere.com> (https://ircanywhere.com)",
+	"contributors": [
+		{
+			"name": "Ricki Hastings",
+			"email": "ricki@ircanywhere.com"
+		}
+	],
+	"dependencies": {
+		"express.io": "1.1.13",
+		"dependable": "0.2.5",
+		"hooks": "0.3.2",
+		"irc-factory": "1.2.5",
+		"jsonminify": "0.2.2",
+		"lodash": "2.4.1",
+		"winston": "0.7.2"
+	},
+	"keywords": [
+		"irc",
+		"web",
+		"client",
+		"bnc"
+	],
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/ircanywhere/ircanywhere"
+	},
+	"bugs": {
+		"mail": "support@ircanywhere.com",
+		"url": "http://github.com/ircanywhere/ircanywhere/issues"
+	},
+	"main": "server/main",
+	"licenses": [
+		{
+			"type": "GNU",
+			"url": "http://github.com/ircanywhere/ircanywhere/raw/master/LICENSE"
+		}
+	]
+}

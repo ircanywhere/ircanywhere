@@ -1,4 +1,5 @@
 *node.json
+node_modules
 packages
 logs
 .build
