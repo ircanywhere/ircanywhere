@@ -1,4 +1,9 @@
 {
+	"mongo": "mongodb://127.0.0.1:27017/ircanywhere",
+	/* -- required
+	 * -- string
+	 * -- usage: The mongodb database url */
+
 	"reverseDns": "localhost",
 	/* -- required
 	 * -- string

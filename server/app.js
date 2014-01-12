@@ -1,158 +1,156 @@
-Application = function(fs, raw) {
+Application = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks'),
-		winston = Meteor.require('winston'),
-		os = Meteor.require('os'),
-		path = Meteor.require('path'),
-		jsonminify = Meteor.require('jsonminify');
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		winston = require('winston'),
+		os = require('os'),
+		fs = require('fs'),
+		raw = fs.readFileSync('./private/config.json').toString(),
+		path = require('path'),
+		jsonminify = require('jsonminify'),
+		validate = require('simple-schema'),
+		mongo = require('mongo-sync').Server;
 
-	var schema = new SimpleSchema({
+	var schema = {
+		'mongo': {
+			type: 'string',
+			required: true
+		},
 		'reverseDns': {
-			type: String,
-			optional: false
+			type: 'string',
+			required: true
 		},
 		'enableRegistrations': {
-			type: Boolean,
-			optional: false
+			type: 'boolean',
+			required: true
 		},
 		'ssl': {
-			type: Boolean,
-			optional: true
+			type: 'boolean',
+			required: false
 		},
 		'forkProcess': {
-			type: Boolean,
-			optional: false
+			type: 'boolean',
+			required: true
 		},
 		'email': {
-			type: Object,
-			optional: false
+			type: 'object',
+			required: true
 		},
 		'email.forceValidation': {
-			type: Boolean,
-			optional: false
+			type: 'boolean',
+			required: true
 		},
 		'email.siteName': {
-			type: String,
-			optional: true
+			type: 'string',
+			required: false
 		},
 		'email.from': {
-			type: String,
-			optional: false
+			type: 'string',
+			required: true
 		},
 		'clientSettings': {
-			type: Object,
-			optional: false
+			type: 'object',
+			required: true
 		},
 		'clientSettings.networkLimit': {
-			type: Number,
+			type: 'number',
 			min: 1,
 			max: 10,
-			optional: false
+			required: true
 		},
 		'clientSettings.networkRestriction': {
-			type: String,
-			optional: true
+			type: 'string',
+			required: false
 		},
 		'clientSettings.userNamePrefix': {
-			type: String,
-			optional: false
+			type: 'string',
+			required: true
 		},
 		'defaultNetwork': {
-			type: Object,
-			optional: false
+			type: 'object',
+			required: true
 		},
 		'defaultNetwork.server': {
-			type: String,
-			optional: false
+			type: 'string',
+			required: true
 		},
 		'defaultNetwork.port': {
-			type: Number,
+			type: 'number',
 			min: 1,
 			max: 65535,
-			optional: false
+			required: true
 		},
 		'defaultNetwork.realname': {
-			type: String,
-			optional: false
+			type: 'string',
+			required: true
 		},
 		'defaultNetwork.secure': {
-			type: Boolean,
-			optional: true
+			type: 'boolean',
+			required: false
 		},
 		'defaultNetwork.password': {
-			type: String,
-			optional: true
+			type: 'string',
+			required: false
 		},
 		'defaultNetwork.channels': {
-			type: [Object],
-			optional: true
+			type: 'array',
+			required: false
 		},
 		'defaultNetwork.channels.$.channel': {
-			type: String,
-			optional: false,
+			type: 'string',
+			required: true,
 			regEx: /([#&][^\x07\x2C\s]{0,200})/
 		},
 		'defaultNetwork.channels.$.password': {
-			type: String,
-			optional: true
+			type: 'string',
+			required: false
 		}
-	});
+	};
 
 	var App = {
 		init: function() {
 			this.config = JSON.parse(jsonminify(raw));
-			check(this.config, schema);
+			validate(this.config, schema);
 			// attempt to validate our config file
 
-			this.getPath();
-			this.setupWinston();
-			this.setupNode();
+			this.mongo = new mongo('127.0.0.1').db('ircanywhere');
+
+			App.Nodes = this.mongo.getCollection('nodes');
+			App.Networks = this.mongo.getCollection('networks');
+			App.Tabs = this.mongo.getCollection('tabs');
+			App.ChannelUsers = this.mongo.getCollection('channelUsers');
+			App.Events = this.mongo.getCollection('events');
+			App.Commands = this.mongo.getCollection('commands');
+
+			App.setupWinston();
+			App.setupNode();
 			// next thing to do if we're all alright is setup our node
 			// this has been implemented now in the way for clustering
-
-			this.smartjson = JSON.parse(fs.readFileSync(this.config.assetPath + '/../smart.json'));
-		},
-
-		getPath: function() {
-			if (process.env.NODE_ENV == 'development') {
-				var realPath = __meteor_bootstrap__.serverDir.split('.meteor/'),
-					path = realPath[0] + 'private/';
-
-				this.config.rootPath = realPath[0];
-			} else {
-				var realPath = __meteor_bootstrap__.serverDir,
-					path = realPath + '/assets/app/';
-
-				this.config.rootPath = realPath;
-			}
-			// get the full url, depending on the environment, development or private
-			// This is a bit hacky, although meteor provides no better more reliable way.. atm
-
-			this.config.assetPath = path;
 		},
 
 		setupWinston: function() {
 			this.logger = new (winston.Logger)({
 				transports: [
+					new (winston.transports.Console)(),
 					new (winston.transports.File)({
 						name: 'error',
 						level: 'error',
-						filename: this.config.rootPath + 'logs/error.log',
+						filename: './logs/error.log',
 						json: false,
 						timestamp: true
 					}),
 					new (winston.transports.File)({
 						name: 'warn',
 						level: 'warn',
-						filename: this.config.rootPath + 'logs/warn.log',
+						filename: './logs/warn.log',
 						json: false,
 						timestamp: true
 					}),
 					new (winston.transports.File)({
 						name: 'info',
 						level: 'info',
-						filename: this.config.rootPath + 'logs/info.log',
+						filename: './logs/info.log',
 						json: false,
 						timestamp: true
 					})
@@ -163,41 +161,49 @@ Application = function(fs, raw) {
 		setupNode: function() {
 			var data = '',
 				json = {},
+				query = {_id: null},
+				ipAddr = (process.env.IP_ADDR) ? process.env.IP_ADDR : '0.0.0.0',
+				port = (process.env.PORT) ? process.env.PORT : 3000,
 				defaultJson = {
-					endpoint: Meteor.absoluteUrl('', this.config.ssl),
+					endpoint: (this.config.ssl) ? 'https://' + ipAddr + ':' + port : 'http://' + ipAddr + ':' + port,
 					hostname: os.hostname(),
 					reverseDns: this.config.reverseDns,
 					port: process.env.PORT,
-					ipAddress: (process.env.IP_ADDR) ? process.env.IP_ADDR : '0.0.0.0'
+					ipAddress: ipAddr
 				};
 
 			try {
-				data = fs.readFileSync(this.config.assetPath + 'node.json', {encoding: 'utf8'});
+				data = fs.readFileSync('./private/node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
-
-				var node = Nodes.findOne({_id: json.nodeId});
-
+				query = new mongo.ObjectId(json.nodeId);
+			} catch (e) {
 				json = defaultJson;
-				Nodes.update({_id: json.nodeId}, defaultJson);
-
-				json.nodeId = node._id;
-			} catch (e) {			
-				var nodeId = Nodes.insert(defaultJson);
-
-				json = defaultJson;
-				json.nodeId = nodeId;
 			}
 
-			Meteor.nodeId = json.nodeId;
-			
-			if (data === JSON.stringify(json))
-				return false;
+			var node = this.Nodes.find(query).toArray();
+			if (node.length > 0) {
+				this.Nodes.update(query, defaultJson, {safe: false});
+				json = defaultJson;
+				json.nodeId = node._id;
+			} else {
+				var nodeId = App.Nodes.insert(defaultJson, {safe: false});
+				
+				json = defaultJson;
+				json.nodeId = nodeId._id;
+			}
 
-			fs.writeFile(this.config.assetPath + 'node.json', JSON.stringify(json), function(err) {
-				if (err)
+			this.nodeId = json.nodeId;
+
+			if (data === JSON.stringify(json)) {
+				return false;
+			}
+
+			fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+				if (err) {
 					throw err;
-				else
-					console.log('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
+				} else {
+					App.logger.info('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
+				}
 			});
 		}
 	};
@@ -207,3 +213,5 @@ Application = function(fs, raw) {
 
 	return _.extend(App, hooks);
 };
+
+exports.Application = Application;

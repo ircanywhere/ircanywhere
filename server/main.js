@@ -1,13 +1,18 @@
-var fs = Meteor.require('fs'),
-	raw = Assets.getText('config.json'),
-	dependable = Meteor.require('dependable'),
+var Application = require('./app').Application,
+	ModeParser = require('./modeparser'),
+	UserManager = require('./users'),
+	ChannelManager = require('./channels'),
+	EventManager = require('./events'),
+	NetworkManager = require('./networks'),
+	IRCHandler = require('./irchandler'),
+	IRCFactory = require('./factory'),
+	CommandManager = require('./commands'),
+	dependable = require('dependable'),
 	container = dependable.container();
-
+	
 Clients = {};
 // clients
 
-container.register('fs', fs);
-container.register('raw', raw);
 application = container.resolve(Application);
 // inject the config so we can mimic it in tests if needed
 
