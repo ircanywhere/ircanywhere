@@ -1,6 +1,8 @@
 ModeParser = function() {
 	"use strict";
 
+	var _ = require('lodash');
+	
 	var Parser = {
 		sortModes: function(capabilities, modes) {
 			var params = [],
@@ -249,3 +251,5 @@ ModeParser = function() {
 
 	return Parser;
 };
+
+exports.ModeParser = ModeParser;

@@ -1,7 +1,8 @@
 UserManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks');
+	var _ = require('lodash'),
+		hooks = require('hooks');
 		
 	var Manager = {
 		init: function() {
@@ -142,13 +143,15 @@ UserManager = function() {
 		}
 	};
 
-	Meteor.methods({
+	/*Meteor.methods({
 		registerUser: Manager.registerUser,
 		onUserLogin: Manager.onUserLogin
-	});
+	});*/
 	// open these methods up to the client side
 
 	Manager.init();
 
 	return _.extend(Manager, hooks);
 };
+
+exports.UserManager = UserManager;

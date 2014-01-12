@@ -10,11 +10,16 @@ Application = function() {
 		path = require('path'),
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
+		express = require('express.io')(),
 		mongo = require('mongo-sync');
 
 	var schema = {
 		'mongo': {
 			type: 'string',
+			required: true
+		},
+		'port': {
+			type: 'number',
 			required: true
 		},
 		'reverseDns': {
@@ -127,6 +132,8 @@ Application = function() {
 			App.setupNode();
 			// next thing to do if we're all alright is setup our node
 			// this has been implemented now in the way for clustering
+
+			App.setupServer();
 		},
 
 		setupWinston: function() {
@@ -162,14 +169,12 @@ Application = function() {
 			var data = '',
 				json = {},
 				query = {_id: null},
-				ipAddr = (process.env.IP_ADDR) ? process.env.IP_ADDR : '0.0.0.0',
-				port = (process.env.PORT) ? process.env.PORT : 3000,
 				defaultJson = {
-					endpoint: (this.config.ssl) ? 'https://' + ipAddr + ':' + port : 'http://' + ipAddr + ':' + port,
+					endpoint: (this.config.ssl) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
 					hostname: os.hostname(),
 					reverseDns: this.config.reverseDns,
-					port: process.env.PORT,
-					ipAddress: ipAddr
+					port: this.config.port,
+					ipAddress: '0.0.0.0'
 				};
 
 			try {
@@ -204,6 +209,15 @@ Application = function() {
 					App.logger.info('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
 				}
 			});
+		}
+
+		setupServer: function() {
+			this.express = express;
+
+			this.express.http().io();
+			// setup the socket server
+
+			this.express.listen(this.config.port);
 		}
 	};
 

@@ -1,6 +1,6 @@
 var Application = require('./app').Application,
-	ModeParser = require('./modeparser'),
-	UserManager = require('./users'),
+	ModeParser = require('./modeparser').ModeParser,
+	UserManager = require('./users').UserManager,
 	ChannelManager = require('./channels'),
 	EventManager = require('./events'),
 	NetworkManager = require('./networks'),

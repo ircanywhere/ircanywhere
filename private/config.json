@@ -4,6 +4,11 @@
 	 * -- string
 	 * -- usage: The mongodb database url */
 
+	"port": 3000,
+	/* -- required
+	 * -- string
+	 * -- usage: The port to bind the webserver to */
+
 	"reverseDns": "localhost",
 	/* -- required
 	 * -- string
