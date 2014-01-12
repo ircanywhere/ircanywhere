@@ -11,7 +11,6 @@ Application = function() {
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
 		express = require('express.io'),
-		minify = require('minifyjs'),
 		mongo = require('mongo-sync');
 
 	var schema = {

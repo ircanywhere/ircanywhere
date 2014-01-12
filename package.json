@@ -18,7 +18,6 @@
 		"node-static": "0.7.3",
 		"jsonminify": "0.2.2",
 		"lodash": "2.4.1",
-		"minifyjs": "0.2.0",
 		"mongo-sync": "0.2.4",
 		"simple-schema": "1.1.0",
 		"winston": "0.7.2"
