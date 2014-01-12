@@ -22,7 +22,7 @@ modeParser = container.resolve(ModeParser);
 userManager = container.resolve(UserManager);
 // user manager
 
-channelManager = container.resolve(ChannelManager);
+/*channelManager = container.resolve(ChannelManager);
 // channel manager
 
 eventManager = container.resolve(EventManager);
@@ -37,5 +37,5 @@ ircHandler = container.resolve(IRCHandler);
 ircFactory = container.resolve(IRCFactory);
 // setup irc factory with its dependencies
 
-commandManager = container.resolve(CommandManager);
+commandManager = container.resolve(CommandManager);*/
 // setup command manager

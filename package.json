@@ -10,11 +10,12 @@
 		}
 	],
 	"dependencies": {
-		"express.io": "1.1.13",
 		"dependable": "0.2.5",
+		"express.io": "1.1.13",
 		"fibers": "*",
 		"hooks": "0.3.2",
 		"irc-factory": "1.2.5",
+		"node-static": "0.7.3",
 		"jsonminify": "0.2.2",
 		"lodash": "2.4.1",
 		"mongo-sync": "0.2.4",

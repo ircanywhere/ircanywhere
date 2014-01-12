@@ -10,7 +10,7 @@ Application = function() {
 		path = require('path'),
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
-		express = require('express.io')(),
+		express = require('express.io'),
 		mongo = require('mongo-sync');
 
 	var schema = {
@@ -188,17 +188,19 @@ Application = function() {
 			var node = this.Nodes.find(query).toArray();
 			if (node.length > 0) {
 				this.Nodes.update(query, defaultJson, {safe: false});
-				json = defaultJson;
+				json = _.extend(node[0], defaultJson);
+				json._id = json._id.toString();
 			} else {
-				var nodeId = App.Nodes.insert(defaultJson, {safe: false});
+				var node = App.Nodes.insert(defaultJson, {safe: false});
 				json = defaultJson;
 			}
 
-			this.nodeId = json.nodeId;
-
-			delete data._id;
-			delete json._id;
-			if (data === JSON.stringify(json)) {
+			json._id = json._id.toString();
+			this.nodeId = json._id;
+			data = (data == '') ? {} : JSON.parse(data);
+			// house keeping
+			
+			if (_.isEqual(data, json)) {
 				return false;
 			}
 
@@ -209,15 +211,18 @@ Application = function() {
 					App.logger.info('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
 				}
 			});
-		}
+		},
 
 		setupServer: function() {
-			this.express = express;
+			this.express = express();
 
-			this.express.http().io();
-			// setup the socket server
+			this.express.get('/js/*', function(req, res) {
+				res.sendfile('./client/' + req.params[0]);
+			});
+			// setup routes
 
 			this.express.listen(this.config.port);
+			// listen
 		}
 	};
 

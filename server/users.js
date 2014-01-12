@@ -2,11 +2,12 @@ UserManager = function() {
 	"use strict";
 
 	var _ = require('lodash'),
-		hooks = require('hooks');
+		hooks = require('hooks'),
+		helpers = require('../lib/helpers').Helpers;
 		
 	var Manager = {
 		init: function() {
-			Accounts.config({
+			/*Accounts.config({
 				sendVerificationEmail: application.config.email.forceValidation,
 				forbidClientAccountCreation: true
 			});
@@ -24,8 +25,9 @@ UserManager = function() {
 
 			Accounts.urls.enrollAccount = function (token) {
 				return Meteor.absoluteUrl('enroll-account/' + token);
-			};
+			};*/
 			// override the verify url functions etc to get our own link formats
+			// XXX - Re-design
 		},
 
 		registerUser: function(name, nickname, email, password, confirmPassword) {
@@ -35,20 +37,20 @@ UserManager = function() {
 			if (!application.config.enableRegistrations) {
 				output.errors.push({error: 'New registrations are currently closed'});
 			} else {
-				name = Meteor.Helpers.trimInput(name);
-				nickname = Meteor.Helpers.trimInput(nickname);
-				email = Meteor.Helpers.trimInput(email);
+				name = Helpers.trimInput(name);
+				nickname = Helpers.trimInput(nickname);
+				email = Helpers.trimInput(email);
 
 				if (name == '' || nickname == '' || email == '' || password == '' || confirmPassword == '')
 					output.errors.push({error: 'All fields are required'});
 
-				if (!Meteor.Helpers.isValidName(name))
+				if (!Helpers.isValidName(name))
 					output.errors.push({error: 'The name you have entered is too long'});
-				if (!Meteor.Helpers.isValidNickname(nickname))
+				if (!Helpers.isValidNickname(nickname))
 					output.errors.push({error: 'The nickname you have entered is invalid'});
-				if (!Meteor.Helpers.isValidEmail(email))
+				if (!Helpers.isValidEmail(email))
 					output.errors.push({error: 'The email address you have entered is invalid'});
-				if (!Meteor.Helpers.isValidPassword(password))
+				if (!Helpers.isValidPassword(password))
 					output.errors.push({error: 'The password you have entered is invalid'});
 				if (password != confirmPassword)
 					output.errors.push({error: 'The passwords you have entered do not match'});
