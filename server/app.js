@@ -10,7 +10,7 @@ Application = function() {
 		path = require('path'),
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
-		mongo = require('mongo-sync').Server;
+		mongo = require('mongo-sync');
 
 	var schema = {
 		'mongo': {
@@ -114,7 +114,7 @@ Application = function() {
 			validate(this.config, schema);
 			// attempt to validate our config file
 
-			this.mongo = new mongo('127.0.0.1').db('ircanywhere');
+			this.mongo = new mongo.Server('127.0.0.1').db('ircanywhere');
 
 			App.Nodes = this.mongo.getCollection('nodes');
 			App.Networks = this.mongo.getCollection('networks');
@@ -175,7 +175,7 @@ Application = function() {
 			try {
 				data = fs.readFileSync('./private/node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
-				query = new mongo.ObjectId(json.nodeId);
+				query = {_id: new mongo.ObjectId(json._id)};
 			} catch (e) {
 				json = defaultJson;
 			}
@@ -184,16 +184,15 @@ Application = function() {
 			if (node.length > 0) {
 				this.Nodes.update(query, defaultJson, {safe: false});
 				json = defaultJson;
-				json.nodeId = node._id;
 			} else {
 				var nodeId = App.Nodes.insert(defaultJson, {safe: false});
-				
 				json = defaultJson;
-				json.nodeId = nodeId._id;
 			}
 
 			this.nodeId = json.nodeId;
 
+			delete data._id;
+			delete json._id;
 			if (data === JSON.stringify(json)) {
 				return false;
 			}
