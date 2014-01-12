@@ -199,7 +199,7 @@ Application = function() {
 			this.nodeId = json._id;
 			data = (data == '') ? {} : JSON.parse(data);
 			// house keeping
-			
+
 			if (_.isEqual(data, json)) {
 				return false;
 			}
@@ -216,9 +216,7 @@ Application = function() {
 		setupServer: function() {
 			this.express = express();
 
-			this.express.get('/js/*', function(req, res) {
-				res.sendfile('./client/' + req.params[0]);
-			});
+			this.express.use(express.static('./client'));
 			// setup routes
 
 			this.express.listen(this.config.port);
