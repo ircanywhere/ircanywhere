@@ -32,7 +32,7 @@ UserManager = function() {
 				});
 				// setup email server
 
-				application.app.post('/register', function(req, res) {
+				application.app.post('/api/register', function(req, res) {
 					Fiber(function() {
 						var response = Manager.registerUser(req, res);
 
@@ -41,7 +41,7 @@ UserManager = function() {
 					}).run();
 				});
 
-				application.app.post('/login', function(req, res) {
+				application.app.post('/api/login', function(req, res) {
 					Fiber(function() {
 						var response = Manager.userLogin(req, res);
 

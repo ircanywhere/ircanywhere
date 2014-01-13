@@ -20,10 +20,10 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		ember_handlebars: {
+		emberTemplates: {
 			compile: {
 				options: {
-					namespace: 'Ember.TEMPLATES'
+					amd: false
 				},
 				files: {
 					'client/build/templates.js': 'client/templates/**/*.hbs'
@@ -34,6 +34,10 @@ module.exports = function(grunt) {
 			options: {
 				separator: ';'
 			},
+			dependency: {
+				src: ['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/socket.io*.js'],
+				dest: 'client/build/dependency.js'
+			},
 			dist: {
 				src: ['client/js/**/*.js'],
 				dest: 'client/build/<%= pkg.name %>.js'
@@ -43,19 +47,23 @@ module.exports = function(grunt) {
 			options: {
 				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 			},
-			build: {
+			dependency: {
+				src: 'client/build/dependency.js',
+				dest: 'client/build/dependency.min.js'
+			},
+			dist: {
 				src: 'client/build/<%= pkg.name %>.js',
 				dest: 'client/build/<%= pkg.name %>.min.js'
 			}
 		},
 		watch: {
-			ember_handlebars: {
+			emberTemplates: {
 				files: 'client/templates/**/*.hbs',
-				tasks: ['ember_handlebars']
+				tasks: ['emberTemplates']
 			},
 			scripts: {
 				files: 'client/js/**/*.js',
-				tasks: ['default'],
+				tasks: ['concat', 'uglify'],
 				options: {
 					event: ['all'],
 				},
@@ -64,12 +72,12 @@ module.exports = function(grunt) {
 	});
 	// Project configuration.
 
-	grunt.loadNpmTasks('grunt-ember-handlebars');
+	grunt.loadNpmTasks('grunt-ember-templates');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Default task(s).
-	grunt.registerTask('default', ['less', 'ember_handlebars', 'concat', 'uglify', 'watch']);
+	grunt.registerTask('default', ['less', 'emberTemplates', 'concat', 'uglify', 'watch']);
 };

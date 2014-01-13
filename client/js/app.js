@@ -1,1 +1,3 @@
-var hi = '1';
+App = Ember.Application.create({
+	LOG_TRANSITIONS: true
+});

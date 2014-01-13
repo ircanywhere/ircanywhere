@@ -292,13 +292,6 @@ Application = function() {
 			App.app.enable('trust proxy');
 			// express settings
 
-			App.app.io.configure(function() {
-				App.app.io.enable('browser client minification');
-				App.app.io.enable('browser client etag');
-        		App.app.io.enable('browser client gzip');
-			});
-			// socket.io settings
-
 			App.app.use(express.static('client'));
 			App.app.use(express.cookieParser(App.nodeId));
 			App.app.use(express.json());
