@@ -8,15 +8,13 @@ IRCHandler = function() {
 
 	var Handler = {
 		registered: function(client, message) {
-			var channels = {},
-				network = application.Networks.findOne({_id: client._id});
-			// firstly we grab the network record from the database
-
+			var channels = {};
+			
 			// XXX - send our connect commands, things that the user defines
 			// 		 nickserv identify or something
 
-			for (var key in network.channels) {
-				var channel = network.channels[key],
+			for (var key in client.channels) {
+				var channel = client.channels[key],
 					chan = channel.channel,
 					password = channel.password || '';
 

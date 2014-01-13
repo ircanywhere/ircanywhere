@@ -105,7 +105,7 @@ EventManager = function() {
 		},
 
 		getPrefix: function(client, user) {
-			if (user === undefined || _.isEmpty(user.modes)) {
+			if (user === null || _.isEmpty(user.modes)) {
 				return {prefix: '', sort: 6};
 			}
 			// empty object

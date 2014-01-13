@@ -214,7 +214,7 @@ NetworkManager = function() {
 
 			var tab = application.Tabs.findOne({user: client.internal.userId, network: client._id, target: target});
 
-			if (tab === undefined) {
+			if (tab === null) {
 				application.Tabs.insert(obj);
 			} else {
 				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});

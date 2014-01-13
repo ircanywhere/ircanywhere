@@ -64,7 +64,7 @@ IRCFactory = function() {
 
 		create: function(user, network, skip) {
 			var skip = skip || false,
-				key = network._id;
+				key = network._id.toString();
 			// generate a key, we just use the network id because it's unique per network
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
@@ -79,11 +79,11 @@ IRCFactory = function() {
 			application.logger.log('info', 'destroying irc client', Clients[key]);
 			// log it before we destroy it below
 
-			this.rpc.emit('destroyClient', key);
+			this.rpc.emit('destroyClient', key.toString());
 		},
 
 		send: function(key, command, args) {
-			this.rpc.emit('call', key, command, args);
+			this.rpc.emit('call', key.toString(), command, args);
 		}
 	};
 
