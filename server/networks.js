@@ -267,19 +267,19 @@ NetworkManager = function() {
 		},
 
 		removeTab: function(client, target) {
-			Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
+			application.Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
 			// re-select 
 			
 			if (target) {
-				Tabs.remove({user: client.internal.userId, network: client._id, target: target});
+				application.Tabs.remove({user: client.internal.userId, network: client._id, target: target});
 			} else {
-				Tabs.remove({user: client.internal.userId, network: client._id});
+				application.Tabs.remove({user: client.internal.userId, network: client._id});
 			}
 			// remove tabs
 		},
 
 		connectNetwork: function(user, network) {
-			//ircFactory.create(user, network);
+			ircFactory.create(user, network);
 		},
 
 		changeStatus: function(networkId, status) {
@@ -288,8 +288,7 @@ NetworkManager = function() {
 				return;
 			}
 
-			var query = (typeof networkId === 'object') ? networkId : {_id: networkId};
-			Networks.update(query, {$set: {'internal.status': status}});
+			application.Networks.update({_id: networkId}, {$set: {'internal.status': status}});
 		}
 	};
 

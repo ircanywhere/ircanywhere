@@ -117,7 +117,7 @@ UserManager = function() {
 			}
 			// it's failed, lets bail
 
-			application.logger.log('info', 'account created', _.omit(user, '_id'));
+			application.logger.log('info', 'account created', user);
 			// log this event
 
 			var message = {

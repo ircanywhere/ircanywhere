@@ -1,12 +1,14 @@
 IRCHandler = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks');
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		Fiber = require('fibers');
 
 	var Handler = {
 		registered: function(client, message) {
 			var channels = {},
-				network = Networks.findOne({_id: client._id});
+				network = application.Networks.findOne({_id: client._id});
 			// firstly we grab the network record from the database
 
 			// XXX - send our connect commands, things that the user defines
@@ -23,7 +25,7 @@ IRCHandler = function() {
 			}
 			// find our channels to automatically join from the network setup
 
-			Networks.update({_id: client._id}, {$set: {
+			application.Networks.update({_id: client._id}, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
@@ -112,7 +114,7 @@ IRCHandler = function() {
 
 			if (_.has(client.internal.tabs, message.nickname)) {
 				var mlower = message.nickname.toLowerCase();
-				Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
+				application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
 			}
 			// is this a client we're chatting to whos changed their nickname?
 			
@@ -222,3 +224,5 @@ IRCHandler = function() {
 
 	return _.extend(Handler, hooks);
 };
+
+exports.IRCHandler = IRCHandler;

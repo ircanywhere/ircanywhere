@@ -1,7 +1,10 @@
 ChannelManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks');
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		helper = require('../lib/helpers').Helpers,
+		Fiber = require('fibers');
 
 	var Manager = {
 		channel: {
@@ -13,7 +16,7 @@ ChannelManager = function() {
 		// a default channel object
 
 		init: function() {
-			Meteor.publish('channelUsers', function() {
+			/*Meteor.publish('channelUsers', function() {
 				var tabs = Tabs.find({user: this.userId}),
 					networks = Networks.find({'internal.userId': this.userId}),
 					nets = {},
@@ -34,11 +37,11 @@ ChannelManager = function() {
 				} else {
 					return ChannelUsers.find({$or: match});
 				}
-			});
+			});*/
 		},
 
 		getChannel: function(network, channel) {
-			return Tabs.findOne({network: network, title: channel});
+			return application.Tabs.findOne({network: network, title: channel});
 		},
 
 		insertUsers: function(key, network, channel, users, force) {
@@ -53,16 +56,16 @@ ChannelManager = function() {
 				find.push(u.nickname);
 
 				if (u.nickname == Clients[key].nick) {
-					Networks.update({_id: key}, {$set: {hostname: u.hostname}});
+					application.Networks.update({_id: key}, {$set: {hostname: u.hostname}});
 				}
 				// update hostname
 			});
 			// turn this into an array of nicknames
 
 			if (force) {
-				ChannelUsers.remove({network: network, channel: channel});
+				application.ChannelUsers.remove({network: network, channel: channel});
 			} else {
-				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}});
+				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}});
 			}
 			// ok so here we've gotta remove any users in the channel already
 			// and all of them if we're being told to force the update
@@ -71,7 +74,7 @@ ChannelManager = function() {
 				var prefix = eventManager.getPrefix(Clients[key], u);
 				u.sort = prefix.sort;
 				u.prefix = prefix.prefix;
-				ChannelUsers.insert(u);
+				application.ChannelUsers.insert(u);
 			});
 			// send the update out
 
@@ -85,9 +88,9 @@ ChannelManager = function() {
 			// jsut remove the user from the entire network (on quits etc)
 
 			if (_.isArray(channel)) {
-				ChannelUsers.remove({network: network, nickname: {$in: users}});
+				application.ChannelUsers.remove({network: network, nickname: {$in: users}});
 			} else {
-				ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
+				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
 				// update
 			}
 			// send the update out
@@ -98,13 +101,13 @@ ChannelManager = function() {
 
 			_.each(users, function(u) {
 				var s = {network: network, nickname: u},
-					records = ChannelUsers.find(s);
+					records = application.ChannelUsers.find(s);
 
 				records.forEach(function (user) {
 					var updated = _.extend(user, values);
 						updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
 
-					ChannelUsers.update(s, _.omit(updated, '_id'));
+					application.ChannelUsers.update(s, _.omit(updated, '_id'));
 					// update the record
 				});
 			});
@@ -117,14 +120,14 @@ ChannelManager = function() {
 				chan = this.getChannel(key, channel),
 				us = {};
 
-			var users = ChannelUsers.find({network: network, channel: channel}),
+			var users = application.ChannelUsers.find({network: network, channel: channel}),
 				parsedModes = modeParser.sortModes(capab, mode);
 			// we're not arsed about the channel or network here
 
 			var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 			// we need to attempt to update the record now with the new info
 
-			Tabs.update({network: key, title: channel}, {$set: {modes: modes}});
+			application.Tabs.update({network: key, title: channel}, {$set: {modes: modes}});
 			// update the record
 
 			users.forEach(function(u) {
@@ -137,7 +140,7 @@ ChannelManager = function() {
 				u.sort = prefix.sort;
 				u.prefix = prefix.prefix;
 				
-				ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
+				application.ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
 			});
 			// update users now
 		},
@@ -152,12 +155,14 @@ ChannelManager = function() {
 			};
 			// updat the topic record
 
-			Tabs.update({network: key, title: channel}, {$set: {topic: topic}});
+			application.Tabs.update({network: key, title: channel}, {$set: {topic: topic}});
 			// update the record
 		}
 	};
 
-	Manager.init();
+	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };
+
+exports.ChannelManager = ChannelManager;

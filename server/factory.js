@@ -1,9 +1,11 @@
 IRCFactory = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks'),
-		crypto = Meteor.require('crypto'),
-		factory = Meteor.require('irc-factory').Api;
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		crypto = require('crypto'),
+		factory = require('irc-factory').Api,
+		Fiber = require('fibers');
 
 	var Factory = {
 		api: new factory(),
@@ -16,41 +18,36 @@ IRCFactory = function() {
 		// this object will store our irc clients
 
 		init: function() {
-			var self = this,
-				interfaces = this.api.connect(this.options);
+			application.ee.on('ready', function() {
+				var interfaces = Factory.api.connect(Factory.options);
+				Factory.events = interfaces.events,
+				Factory.rpc = interfaces.rpc;
+				// connect to our uplinks
 
-			this.events = interfaces.events,
-			this.rpc = interfaces.rpc;
-			// connect to our uplinks
+				Factory.events.on('message', function(message) {
+					Fiber(function() {
+						if (message.event == 'synchronize') {
+							var users = networkManager.getClients(),
+								keys = _.keys(users),
+								difference = _.difference(keys, message.keys);
 
-			var messageHandler = Meteor.bindEnvironment(function(message) {
-				if (message.event == 'synchronize') {
-					var users = networkManager.getClients(),
-						keys = _.keys(users),
-						difference = _.difference(keys, message.keys);
+							_.each(message.keys, function(key) {
+								networkManager.changeStatus(key, networkManager.flags.connected);
+							});
+							
+							_.each(difference, function(key) {
+								var user = users[key];
+								networkManager.connectNetwork(user.user, user.network);
+							});
+							// the clients we're going to actually attempt to boot up
 
-					console.log(message);
-
-					_.each(message.keys, function(key) {
-						networkManager.changeStatus(key, networkManager.flags.connected);
-					});
-					
-					_.each(difference, function(key) {
-						var user = users[key];
-						networkManager.connectNetwork(user.user, user.network);
-					});
-					// the clients we're going to actually attempt to boot up
-
-					application.logger.log('warn', 'factory synchronize', message);
-				} else {
-					self.handleEvent(message.event, message.message);
-				}
-			}, function(err) {
-				application.logger.log('error', err.stack);
+							application.logger.log('warn', 'factory synchronize', message);
+						} else {
+							Factory.handleEvent(message.event, message.message);
+						}
+					}).run();
+				});
 			});
-			// create an on message function but bind it in our meteor environment
-			
-			this.events.on('message', messageHandler);
 		},
 
 		handleEvent: function(event, object) {
@@ -92,7 +89,9 @@ IRCFactory = function() {
 		}
 	};
 
-	Factory.init();
+	Fiber(Factory.init).run();
 
 	return Factory;
 };
+
+exports.IRCFactory = IRCFactory;

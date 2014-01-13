@@ -289,8 +289,6 @@ Application = function() {
 			fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
 				if (err) {
 					throw err;
-				} else {
-					App.logger.info('Node settings saved in private/node.json. Server might restart, it\'s advised not to edit or delete this file unless instructed to do so by the developers');
 				}
 			});
 		},
@@ -324,7 +322,8 @@ Application = function() {
 
 			App.app.use(express.static('client'));
 			App.app.use(express.cookieParser(App.nodeId));
-			App.app.use(express.bodyParser());
+			App.app.use(express.json());
+			App.app.use(express.urlencoded());
 			// setup middleware
 
 			App.app.get('/ircanywhere.min.js', function(req, res) {
