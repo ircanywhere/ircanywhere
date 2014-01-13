@@ -4,6 +4,7 @@ Application = function() {
 	var _ = require('lodash'),
 		hooks = require('hooks'),
 		winston = require('winston'),
+		events = require('events'),
 		os = require('os'),
 		fs = require('fs'),
 		raw = fs.readFileSync('./private/config.json').toString(),
@@ -16,6 +17,10 @@ Application = function() {
 
 	var schema = {
 			'mongo': {
+				type: 'string',
+				required: true
+			},
+			'oplog': {
 				type: 'string',
 				required: true
 			},
@@ -127,7 +132,15 @@ Application = function() {
 			validate(App.config, schema);
 			// attempt to validate our config file
 
-			App.mongo = new mongo.Server('127.0.0.1').db('ircanywhere');
+			App.database = {
+				mongo: App.config.mongo.split(/\//i),
+				oplog: App.config.oplog.split(/\//i)
+			};
+
+			App.mongo = new mongo.Server(App.database.mongo[2]).db(App.database.mongo[3]);
+			App.oplog = new mongo.Server(App.database.oplog[2]).db(App.database.oplog[3]);
+			// two db connections because we're greedy
+			// XXX - Make this configurable
 
 			App.Nodes = App.mongo.getCollection('nodes');
 			App.Users = App.mongo.getCollection('users');
@@ -136,6 +149,10 @@ Application = function() {
 			App.ChannelUsers = App.mongo.getCollection('channelUsers');
 			App.Events = App.mongo.getCollection('events');
 			App.Commands = App.mongo.getCollection('commands');
+			App.Oplog = App.oplog.getCollection('oplog.rs');
+
+			App.setupOplog();
+			// setup our oplog tailer, this gives us Meteor-like observes
 
 			App.setupWinston();
 			App.setupNode();
@@ -143,6 +160,59 @@ Application = function() {
 			// this has been implemented now in the way for clustering
 
 			App.setupServer();
+			// setup express.io server
+		},
+
+		setupOplog: function() {
+			App.observe = new events.EventEmitter();
+			// setup an event emitter
+
+			var start = Math.floor(+new Date() / 1000),
+				result = App.Oplog.find({}, {'tailable': true});
+
+			result._cursor.each(function(err, item) {
+				Fiber(function() {
+					if (err) {
+						throw err;
+					} else {
+						if (item.ts.high_ >= start) {
+							var collection = item.ns.split('.');
+							// get the collection name
+
+							if (collection[0] !== App.database.mongo[3]) {
+								return false;
+							}
+							// bail if this is a different database
+
+							switch(item.op) {
+								case 'i':
+									var mode = 'insert';
+									App.observe.emit(collection[1] + ':' + mode, item.o);
+									break;
+								case 'u':
+									var mode = 'update',
+										doc = App.mongo.getCollection(collection[1]).find(item.o2).toArray();
+									// get the new full document
+
+									App.observe.emit(collection[1] + ':' + mode, doc);
+									break;
+								case 'd':
+									var mode = 'delete';
+									App.observe.emit(collection[1] + ':' + mode, item.o._id);
+									break;
+								case 'c':
+									for (var cmd in item.o) {
+										App.observe.emit(item.o[cmd] + ':' + cmd);
+									}
+								default:
+									break;
+							}
+							// emit the event
+						}
+						// data has changed
+					}
+				}).run();
+			});
 		},
 
 		setupWinston: function() {
@@ -239,6 +309,9 @@ Application = function() {
 			App.app = express().http().io();
 			// setup a http server
 
+			App.app.enable('trust proxy');
+			// express settings
+
 			App.app.io.configure(function() {
 				App.app.io.enable('browser client minification');
 				App.app.io.enable('browser client etag');
@@ -247,7 +320,8 @@ Application = function() {
 			// socket.io settings
 
 			App.app.use(express.static('client'));
-			App.app.use(express.bodyParser())
+			App.app.use(express.cookieParser(App.nodeId));
+			App.app.use(express.bodyParser());
 			// setup middleware
 
 			App.app.get('/ircanywhere.min.js', function(req, res) {
@@ -257,7 +331,7 @@ Application = function() {
 
 			App.app.post('/register', function(req, res) {
 				Fiber(function() {
-					var response = userManager.registerUser(req.param('name', ''), req.param('nickname', ''), req.param('email', ''), req.param('password', ''), req.param('confirm-password', ''));
+					var response = userManager.registerUser(req, res);
 
 					res.header('Content-Type', 'application/json');
 					res.end(JSON.stringify(response));
@@ -266,7 +340,7 @@ Application = function() {
 
 			App.app.post('/login', function(req, res) {
 				Fiber(function() {
-					var response = userManager.userLogin(req.param('email', ''), req.param('pass', ''));
+					var response = userManager.userLogin(req, res);
 
 					res.header('Content-Type', 'application/json');
 					res.end(JSON.stringify(response));

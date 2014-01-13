@@ -27,12 +27,13 @@ userManager = container.resolve(UserManager);
 // channel manager
 
 eventManager = container.resolve(EventManager);
-// event manager
+// event manager*/
 
+container.register('application', application);
 networkManager = container.resolve(NetworkManager);
 // setup network manager
 
-ircHandler = container.resolve(IRCHandler);
+/*ircHandler = container.resolve(IRCHandler);
 // setup irc handler
 
 ircFactory = container.resolve(IRCFactory);

@@ -1,7 +1,8 @@
-NetworkManager = function() {
+NetworkManager = function(application) {
 	"use strict";
 	
-	var hooks = Meteor.require('hooks');
+	var _ = require('lodash'),
+		hooks = require('hooks');
 
 	var Manager = {
 		flags: {

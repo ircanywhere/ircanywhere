@@ -7,14 +7,13 @@ UserManager = function(application) {
 		hooks = require('hooks'),
 		emails = require('emailjs'),
 		helper = require('../lib/helpers').Helpers,
-		_generateSalt = function() {
+		_generateSalt = function(string_length) {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
-				string_length = 10,
 				randomstring = '';
 			
 			for (var i = 0; i < string_length; i++) {
 				var rnum = Math.floor(Math.random() * chars.length);
-				randomstring += chars.substring(rnum,rnum + 1);
+				randomstring += chars.substring(rnum, rnum + 1);
 			}
 
 			return randomstring;
@@ -32,8 +31,13 @@ UserManager = function(application) {
 			// setup email server
 		},
 
-		registerUser: function(name, nickname, email, password, confirmPassword) {
-			var output = {failed: false, successMessage: '', errors: []},
+		registerUser: function(req, res) {
+			var name = req.param('name', ''),
+				nickname = req.param('nickname', ''),
+				email = req.param('email', ''),
+				password = req.param('password', ''),
+				confirmPassword = req.param('confirm-password', ''),
+				output = {failed: false, successMessage: '', errors: []},
 				userId = null;
 
 			if (!application.config.enableRegistrations) {
@@ -64,11 +68,12 @@ UserManager = function(application) {
 			}
 			// any errors?
 
-			var salt = _generateSalt(),
+			var salt = _generateSalt(10),
 				user = {
 					email: email,
 					password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
 					salt: salt,
+					tokens: [],
 					profile: {
 						name: name,
 						nickname: nickname,
@@ -107,8 +112,12 @@ UserManager = function(application) {
 			return output;
 		},
 
-		userLogin: function(email, password) {
-			var output = {failed: false, successMessage: '', errors: []},
+		userLogin: function(req, res) {
+			var email = req.param('email', ''),
+				password = req.param('password', ''),
+				token = _generateSalt(25),
+				expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
+				output = {failed: false, successMessage: '', errors: []},
 				user = application.Users.find({email: email}).toArray();
 
 			if (user.length === 0) {
@@ -117,29 +126,41 @@ UserManager = function(application) {
 				// invalid user
 			} else {
 				var salt = user[0].salt,
-					password = crypto.createHmac('sha256', salt).update(password).digest('hex');
-
-				if (password != user[0].password) {
-					output.failed = true;
-					output.errors.push({error: 'Password incorrect'});
-				} else {
+					hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+				
+				if (req.cookies.token && _.find(user[0].tokens, {key: req.cookies.token}).length > 0) {
 					output.successMessage = 'Login successful';
+					// check for a token
+				} else {
+					if (hash != user[0].password) {
+						output.failed = true;
+						output.errors.push({error: 'Password incorrect'});
+					} else {
+						output.successMessage = 'Login successful';
+						// set the output
+
+						application.Users.update({email: email}, {$set: {tokens: {key: token, time: expire, ip: req.ip}}});
+						res.cookie('token', token, {expires: expire});
+						// set a login key and a cookie
+
+						//this.onUserLogin(user[0]);
+						// XXX - call the login event
+					}
+					// check if password matches
 				}
-				// check if password matches
 			}
 
 			return output;	
 		},
 
-		onUserLogin: function() {
-			var userId = this.userId,
-				me = Meteor.user(); 
+		onUserLogin: function(me) {
+			var userId = me._id; 
 
 			if (me == null) {
 				return;
 			}
 
-			var networks = Networks.find({'internal.userId': userId}).fetch();
+			var networks = application.Networks.find({'internal.userId': userId}).toArray();
 			// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
 			if (me.profile.flags.newUser && networks.length === 0) {
@@ -164,10 +185,6 @@ UserManager = function(application) {
 
 			application.logger.log('info', 'user logged in', {userId: userId});
 			// log this event
-		},
-
-		getLoggedIn: function() {
-			// XXX - Create a function to replace Meteor.user()
 		},
 
 		parse: function(file, replace) {

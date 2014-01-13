@@ -4,6 +4,11 @@
 	 * -- string
 	 * -- usage: The mongodb database url */
 
+	"oplog": "mongodb://127.0.0.1:27017/local",
+	/* -- required
+	 * -- string
+	 * -- usage: The mongodb oplog url - Note you may not have this available on shared mongohq and similar hosts */
+
 	"port": 3000,
 	/* -- required
 	 * -- number
