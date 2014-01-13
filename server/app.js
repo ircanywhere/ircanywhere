@@ -11,7 +11,8 @@ Application = function() {
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
 		express = require('express.io'),
-		mongo = require('mongo-sync');
+		mongo = require('mongo-sync'),
+		Fiber = require('fibers');
 
 	var schema = {
 			'mongo': {
@@ -122,19 +123,19 @@ Application = function() {
 
 	var App = {
 		init: function() {
-			this.config = JSON.parse(jsonminify(raw));
-			validate(this.config, schema);
+			App.config = JSON.parse(jsonminify(raw));
+			validate(App.config, schema);
 			// attempt to validate our config file
 
-			this.mongo = new mongo.Server('127.0.0.1').db('ircanywhere');
+			App.mongo = new mongo.Server('127.0.0.1').db('ircanywhere');
 
-			App.Nodes = this.mongo.getCollection('nodes');
-			App.Users = this.mongo.getCollection('users');
-			App.Networks = this.mongo.getCollection('networks');
-			App.Tabs = this.mongo.getCollection('tabs');
-			App.ChannelUsers = this.mongo.getCollection('channelUsers');
-			App.Events = this.mongo.getCollection('events');
-			App.Commands = this.mongo.getCollection('commands');
+			App.Nodes = App.mongo.getCollection('nodes');
+			App.Users = App.mongo.getCollection('users');
+			App.Networks = App.mongo.getCollection('networks');
+			App.Tabs = App.mongo.getCollection('tabs');
+			App.ChannelUsers = App.mongo.getCollection('channelUsers');
+			App.Events = App.mongo.getCollection('events');
+			App.Commands = App.mongo.getCollection('commands');
 
 			App.setupWinston();
 			App.setupNode();
@@ -145,7 +146,7 @@ Application = function() {
 		},
 
 		setupWinston: function() {
-			this.logger = new (winston.Logger)({
+			App.logger = new (winston.Logger)({
 				transports: [
 					new (winston.transports.Console)(),
 					new (winston.transports.File)({
@@ -178,10 +179,10 @@ Application = function() {
 				json = {},
 				query = {_id: null},
 				defaultJson = {
-					endpoint: (this.config.ssl) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
+					endpoint: (App.config.ssl) ? 'https://0.0.0.0:' + App.config.port : 'http://0.0.0.0:' + App.config.port,
 					hostname: os.hostname(),
-					reverseDns: this.config.reverseDns,
-					port: this.config.port,
+					reverseDns: App.config.reverseDns,
+					port: App.config.port,
 					ipAddress: '0.0.0.0'
 				};
 
@@ -193,9 +194,9 @@ Application = function() {
 				json = defaultJson;
 			}
 
-			var node = this.Nodes.find(query).toArray();
+			var node = App.Nodes.find(query).toArray();
 			if (node.length > 0) {
-				this.Nodes.update(query, defaultJson, {safe: false});
+				App.Nodes.update(query, defaultJson, {safe: false});
 				json = _.extend(node[0], defaultJson);
 				json._id = json._id.toString();
 			} else {
@@ -204,7 +205,7 @@ Application = function() {
 			}
 
 			json._id = json._id.toString();
-			this.nodeId = json._id;
+			App.nodeId = json._id;
 			data = (data == '') ? {} : JSON.parse(data);
 			// house keeping
 
@@ -222,7 +223,7 @@ Application = function() {
 		},
 
 		build: function() {
-			this.sources = {
+			App.sources = {
 				javascript: ''
 			};
 
@@ -233,22 +234,35 @@ Application = function() {
 		},
 
 		setupServer: function() {
-			this.build();
-			this.express = express();
+			App.build();
+			
+			App.app = express().http().io();
+			// setup a http server
 
-			this.express.use(express.static('./client'));
-			this.express.get('/ircanywhere.min.js', function(req, res) {
+			App.app.use(express.static('client'));
+			App.app.use(express.bodyParser())
+			// setup middleware
+
+			App.app.get('/ircanywhere.min.js', function(req, res) {
 				res.header('Content-Type', 'application/javascript');
 				res.end(App.sources.javascript);
 			});
+
+			App.app.post('/login', function(req, res) {
+				Fiber(function() {
+					var response = userManager.userLogin(req.param('email', ''), req.param('pass', ''));
+
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
+			});
 			// setup routes
 
-			this.express.listen(this.config.port);
-			// listen
+			App.app.listen(this.config.port);
 		}
 	};
 
-	App.init();
+	Fiber(App.init).run();
 	// initiate the module if need be
 
 	return _.extend(App, hooks);

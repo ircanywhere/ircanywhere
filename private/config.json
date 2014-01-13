@@ -6,8 +6,8 @@
 
 	"port": 3000,
 	/* -- required
-	 * -- string
-	 * -- usage: The port to bind the webserver to */
+	 * -- number
+	 * -- usage: The port to listen on */
 
 	"reverseDns": "localhost",
 	/* -- required

@@ -23,8 +23,6 @@ container.register('application', application);
 userManager = container.resolve(UserManager);
 // user manager
 
-console.log(userManager.onUserLogin());
-
 /*channelManager = container.resolve(ChannelManager);
 // channel manager
 

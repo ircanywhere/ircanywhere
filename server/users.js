@@ -29,28 +29,7 @@ UserManager = function(application) {
 				host: smtp[6], 
 				ssl: true
 			});
-
-			/*Accounts.config({
-				sendVerificationEmail: application.config.email.forceValidation,
-				forbidClientAccountCreation: true
-			});
-
-			Accounts.emailTemplates.siteName = application.config.email.siteName;
-			Accounts.emailTemplates.from = application.config.email.from;
-
-			Accounts.urls.resetPassword = function (token) {
-				return Meteor.absoluteUrl('reset-password/' + token);
-			};
-
-			Accounts.urls.verifyEmail = function (token) {
-				return Meteor.absoluteUrl('verify-email/' + token);
-			};
-
-			Accounts.urls.enrollAccount = function (token) {
-				return Meteor.absoluteUrl('enroll-account/' + token);
-			};*/
-			// override the verify url functions etc to get our own link formats
-			// XXX - Re-design
+			// setup email server
 		},
 
 		registerUser: function(name, nickname, email, password, confirmPassword) {
@@ -126,6 +105,30 @@ UserManager = function(application) {
 
 			output.successMessage = 'Your account has been successfully created, you may now login';
 			return output;
+		},
+
+		userLogin: function(email, password) {
+			var output = {failed: false, successMessage: '', errors: []},
+				user = application.Users.find({email: email}).toArray();
+
+			if (user.length === 0) {
+				output.failed = true;
+				output.errors.push({error: 'User not found'});
+				// invalid user
+			} else {
+				var salt = user[0].salt,
+					password = crypto.createHmac('sha256', salt).update(password).digest('hex');
+
+				if (password != user[0].password) {
+					output.failed = true;
+					output.errors.push({error: 'Password incorrect'});
+				} else {
+					output.successMessage = 'Login successful';
+				}
+				// check if password matches
+			}
+
+			return output;	
 		},
 
 		onUserLogin: function() {
