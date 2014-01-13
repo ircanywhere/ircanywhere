@@ -3,6 +3,7 @@ NetworkManager = function() {
 	
 	var _ = require('lodash'),
 		hooks = require('hooks'),
+		helper = require('../lib/helpers').Helpers,
 		Fiber = require('fibers');
 
 	var Manager = {
@@ -36,6 +37,8 @@ NetworkManager = function() {
 
 							if (user === null) {
 								return req.io.disconnect();
+							} else {
+								Sockets[req.socket.id] = user;
 							}
 						}
 						// validate the cookie
@@ -44,6 +47,13 @@ NetworkManager = function() {
 						// compile a load of data to send to the frontend
 					}).run();
 				});
+
+				application.app.io.route('selectTab', function(req) {
+					Fiber(function() {
+						Manager.selectTab(Sockets[req.socket.id], req.data.url || '');
+					}).run();
+				});
+
 				/*Meteor.publish('networks', function() {
 					return Networks.find({'internal.userId': this.userId});
 				});
@@ -125,11 +135,11 @@ NetworkManager = function() {
 		getClients: function() {
 			var self = this,
 				clients = {},
-				networks = Networks.find();
+				networks =  application.Networks.find();
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 			networks.forEach(function(network) {
-				var me = Meteor.users.findOne({_id: network.internal.userId}),
+				var me = application.Users.findOne({_id: network.internal.userId}),
 					reconnect = false;
 
 				if (network.internal.status !== self.flags.disconnected) {
@@ -168,7 +178,6 @@ NetworkManager = function() {
 				nodeId: application.nodeId,
 				userId: user._id,
 				status: this.flags.closed,
-				tabs: {},
 				url: network.server + ':' + ((network.secure) ? '+' : '') + network.port
 			}
 			// this stores internal information about the network, it will be available to
@@ -224,22 +233,24 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(url) {
-			if (this.userId === null || url === '') {
+		selectTab: function(user, url) {
+			var userId = user._id;
+			if (userId === null || url === '') {
 				return false;
 			}
 			// no uid, bail
 
-			var user = Networks.findOne({'internal.userId': this.userId}, {fields: {id: 1, internal: 1}}),
-				tab = Tabs.findOne({user: this.userId, url: url});
+			var net = application.Networks.findOne({'internal.userId': userId}, {fields: {id: 1, internal: 1}}),
+				tab = application.Tabs.findOne({user: userId, url: url});
 
-			if (tab !== undefined && !tab.selected) {
-				Tabs.update({user: this.userId, prevSelected: true}, {$set: {prevSelected: false}});
-				Tabs.update({user: this.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
-				Tabs.update({user: this.userId, url: url}, {$set: {selected: true}});
+			if (tab !== null && !tab.selected) {
+				application.Tabs.update({user: userId, prevSelected: true}, {$set: {prevSelected: false}});
+				application.Tabs.update({user: userId, selected: true}, {$set: {selected: false, prevSelected: true}});
+				application.Tabs.update({user: userId, url: url}, {$set: {selected: true}});
 				// mark all as not selected apart from the one we've been told to select
-			} else if (tab === undefined) {
-				var client = Clients[user._id],
+			} else if (tab === null) {
+				var netId = net._id.toString(),
+					client = Clients[netId],
 					target = url.split('/');
 
 				if (target.length <= 1) {
@@ -247,10 +258,10 @@ NetworkManager = function() {
 				}
 				// we're not allowed to add a network like this
 
-				if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, target[1])) {
+				if (helper.isChannel(client.internal.capabilities.channel.types, target[1])) {
 					ircFactory.send(client._id, 'join', [target[1]]);
 				} else {
-					Manager.addTab(Clients[user._id], target[1], 'query', true);
+					Manager.addTab(Clients[netId], target[1], 'query', true);
 				}
 			}
 		},
@@ -281,12 +292,6 @@ NetworkManager = function() {
 			Networks.update(query, {$set: {'internal.status': status}});
 		}
 	};
-
-	/*Meteor.methods({
-		selectTab: Manager.selectTab
-	});*/
-	// expose some methods to the frontend
-	// XXX - convert to socket.io command
 
 	Fiber(Manager.init).run();
 
