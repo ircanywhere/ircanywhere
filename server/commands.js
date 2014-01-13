@@ -54,6 +54,24 @@ CommandManager = function() {
 						}
 					}).run();
 				});
+
+				application.app.io.route('exec', function(req) {
+					var doc = req.data,
+						user = Sockets[req.socket.id];
+					// get the data being sent
+
+					if (!(doc.command && doc.network && doc.target !== '')) {
+						req.io.respond({success: false, error: 'invalid format'});
+						// validate it
+					} else {
+						Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
+					}
+				});
+				// create a method so the frontend can silently execute commands
+				// so if you call execCommand(netid, '#channel', '/kick ricki'); will
+				// be exactly the same as typing a command in the box with the difference being its
+				// not in the command backlog. This is good if we want to hook certain actions up to commands
+				// to save on duplicate code.
 			});
 			// we need to wait until everything is ready to setup our commands etc
 
@@ -290,21 +308,6 @@ CommandManager = function() {
 			}
 		}
 	};
-
-	/*Meteor.methods({
-		execCommand: function(network, target, command) {
-			var user = Meteor.users.find({_id: this.userId}),
-				client = Clients[network];
-
-			Manager.parseCommand(user, client, target.toLowerCase(), command);
-		}
-	});*/
-	// XXX - Convert this to socket.io
-	// create a method so the frontend can silently execute commands
-	// so if you call execCommand(netid, '#channel', '/kick ricki'); will
-	// be exactly the same as typing a command in the box with the difference being its
-	// not in the command backlog. This is good if we want to hook certain actions up to commands
-	// to save on duplicate code.
 
 	Fiber(Manager.init).run();
 
