@@ -239,6 +239,13 @@ Application = function() {
 			App.app = express().http().io();
 			// setup a http server
 
+			App.app.io.configure(function() {
+				App.app.io.enable('browser client minification');
+				App.app.io.enable('browser client etag');
+        		App.app.io.enable('browser client gzip');
+			});
+			// socket.io settings
+
 			App.app.use(express.static('client'));
 			App.app.use(express.bodyParser())
 			// setup middleware
@@ -246,6 +253,15 @@ Application = function() {
 			App.app.get('/ircanywhere.min.js', function(req, res) {
 				res.header('Content-Type', 'application/javascript');
 				res.end(App.sources.javascript);
+			});
+
+			App.app.post('/register', function(req, res) {
+				Fiber(function() {
+					var response = userManager.registerUser(req.param('name', ''), req.param('nickname', ''), req.param('email', ''), req.param('password', ''), req.param('confirm-password', ''));
+
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
 			});
 
 			App.app.post('/login', function(req, res) {
