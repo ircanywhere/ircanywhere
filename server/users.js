@@ -7,6 +7,7 @@ UserManager = function() {
 		hooks = require('hooks'),
 		emails = require('emailjs'),
 		helper = require('../lib/helpers').Helpers,
+		Fiber = require('fibers'),
 		_generateSalt = function(string_length) {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
 				randomstring = '';
@@ -30,6 +31,25 @@ UserManager = function() {
 					ssl: true
 				});
 				// setup email server
+
+				application.app.post('/register', function(req, res) {
+					Fiber(function() {
+						var response = Manager.registerUser(req, res);
+
+						res.header('Content-Type', 'application/json');
+						res.end(JSON.stringify(response));
+					}).run();
+				});
+
+				application.app.post('/login', function(req, res) {
+					Fiber(function() {
+						var response = Manager.userLogin(req, res);
+
+						res.header('Content-Type', 'application/json');
+						res.end(JSON.stringify(response));
+					}).run();
+				});
+				// setup routes
 			});
 		},
 
@@ -120,32 +140,38 @@ UserManager = function() {
 				token = _generateSalt(25),
 				expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
 				output = {failed: false, successMessage: '', errors: []},
-				user = application.Users.find({email: email}).toArray();
+				user = application.Users.findOne({email: email});
 
-			if (user.length === 0) {
+			if (user === null) {
 				output.failed = true;
 				output.errors.push({error: 'User not found'});
 				// invalid user
 			} else {
-				var salt = user[0].salt,
+				var salt = user.salt,
 					hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
-				
-				if (req.cookies.token && _.find(user[0].tokens, {key: req.cookies.token}).length > 0) {
+
+				if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
 					output.successMessage = 'Login successful';
 					// check for a token
 				} else {
-					if (hash != user[0].password) {
+					if (hash != user.password) {
 						output.failed = true;
 						output.errors.push({error: 'Password incorrect'});
 					} else {
 						output.successMessage = 'Login successful';
 						// set the output
 
-						application.Users.update({email: email}, {$set: {tokens: {key: token, time: expire, ip: req.ip}}});
+						var tokens = user.tokens;
+							tokens[token] = {
+								time: expire,
+								ip: req.ip
+							};
+
+						application.Users.update({email: email}, {$set: {tokens: tokens}});
 						res.cookie('token', token, {expires: expire});
 						// set a login key and a cookie
 
-						this.onUserLogin(user[0]);
+						this.onUserLogin(user);
 						// XXX - call the login event
 					}
 					// check if password matches
@@ -185,7 +211,7 @@ UserManager = function() {
 			}
 			// loop through our networks and connect them if need be
 
-			application.logger.log('info', 'user logged in', {userId: userId});
+			application.logger.log('info', 'user logged in', {userId: userId.toString()});
 			// log this event
 		},
 
@@ -200,7 +226,7 @@ UserManager = function() {
 		}
 	};
 
-	Manager.init();
+	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };

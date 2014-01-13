@@ -2,7 +2,8 @@ NetworkManager = function() {
 	"use strict";
 	
 	var _ = require('lodash'),
-		hooks = require('hooks');
+		hooks = require('hooks'),
+		Fiber = require('fibers');
 
 	var Manager = {
 		flags: {
@@ -15,6 +16,34 @@ NetworkManager = function() {
 
 		init: function() {
 			application.ee.on('ready', function() {
+				application.app.io.route('sync', function(req, res) {
+					Fiber(function() {
+						var parsed = req.headers.cookie.split('; '),
+							cookies = {};
+
+						parsed.forEach(function(cookie) {
+							var split = cookie.split('=');
+								cookies[split[0]] = split[1];
+						});
+						// get our cookies
+
+						if (!cookies.token) {
+							return req.io.disconnect();
+						} else {
+							var query = {};
+								query['tokens.' + cookies.token] = {$exists: true};
+							var user = application.Users.findOne(query);
+
+							if (user === null) {
+								return req.io.disconnect();
+							}
+						}
+						// validate the cookie
+						
+						req.io.emit('sync', {data: 123});
+						// compile a load of data to send to the frontend
+					}).run();
+				});
 				/*Meteor.publish('networks', function() {
 					return Networks.find({'internal.userId': this.userId});
 				});
@@ -118,7 +147,7 @@ NetworkManager = function() {
 		},
 
 		addNetwork: function(user, network) {
-			var userCount = Meteor.users.find().count(),
+			var userCount = application.Users.find().count(),
 				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;
@@ -136,7 +165,7 @@ NetworkManager = function() {
 			//		 if simple-schema could automatically cast these, maybe it can with cast: {}
 
 			network.internal = {
-				nodeId: Meteor.nodeId,
+				nodeId: application.nodeId,
 				userId: user._id,
 				status: this.flags.closed,
 				tabs: {},
@@ -146,12 +175,10 @@ NetworkManager = function() {
 			// the client but they wont be able to edit it, it also wont be able to be enforced
 			// by the config settings or network settings, it's overwritten every time.
 
-			network._id = Networks.insert(network);
+			return application.Networks.insert(network)[0];
 			// insert the network. Just doing this will propogate the change directly
 			// down the pipe to our client @ this.userId, also by calling insert without
 			// a callback meteor automatically sets up a fiber, blocking the code in users.js
-
-			return network;
 		},
 
 		addTab: function(client, target, type, select) {
@@ -174,25 +201,25 @@ NetworkManager = function() {
 			// empty, bolt it
 
 			if (select) {
-				Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
+				application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
 			}
 			// are they requesting a new selected tab?
 
-			var tab = Tabs.findOne({user: client.internal.userId, network: client._id, target: target});
+			var tab = application.Tabs.findOne({user: client.internal.userId, network: client._id, target: target});
 
 			if (tab === undefined) {
-				Tabs.insert(obj);
+				application.Tabs.insert(obj);
 			} else {
-				Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
+				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
 			}
 			// insert to db, or update old record
 		},
 
 		activeTab: function(client, target, activate) {
 			if (typeof target !== "boolean") {
-				Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
+				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
 			} else {
-				Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
+				application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
 			}
 			// update the activation flag
 		},
@@ -241,7 +268,7 @@ NetworkManager = function() {
 		},
 
 		connectNetwork: function(user, network) {
-			ircFactory.create(user, network);
+			//ircFactory.create(user, network);
 		},
 
 		changeStatus: function(networkId, status) {
@@ -261,7 +288,7 @@ NetworkManager = function() {
 	// expose some methods to the frontend
 	// XXX - convert to socket.io command
 
-	Manager.init();
+	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };

@@ -267,10 +267,10 @@ Application = function() {
 				json = defaultJson;
 			}
 
-			var node = App.Nodes.find(query).toArray();
-			if (node.length > 0) {
+			var node = App.Nodes.findOne(query);
+			if (node !== null) {
 				App.Nodes.update(query, defaultJson, {safe: false});
-				json = _.extend(node[0], defaultJson);
+				json = _.extend(node, defaultJson);
 				json._id = json._id.toString();
 			} else {
 				var node = App.Nodes.insert(defaultJson, {safe: false});
@@ -330,24 +330,6 @@ Application = function() {
 			App.app.get('/ircanywhere.min.js', function(req, res) {
 				res.header('Content-Type', 'application/javascript');
 				res.end(App.sources.javascript);
-			});
-
-			App.app.post('/register', function(req, res) {
-				Fiber(function() {
-					var response = userManager.registerUser(req, res);
-
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
-			});
-
-			App.app.post('/login', function(req, res) {
-				Fiber(function() {
-					var response = userManager.userLogin(req, res);
-
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
 			});
 			// setup routes
 

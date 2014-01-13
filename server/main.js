@@ -7,7 +7,8 @@ var Application = require('./app').Application,
 	IRCHandler = require('./irchandler'),
 	IRCFactory = require('./factory'),
 	CommandManager = require('./commands');
-	
+
+Sockets = {};
 Clients = {};
 // clients
 
