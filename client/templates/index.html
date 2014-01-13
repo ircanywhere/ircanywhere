@@ -1,6 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8">
 		<title>IRCAnywhere</title>
 
 		<script src="/build/dependency.min.js"></script>
@@ -10,6 +11,21 @@
 		<link rel="stylesheet" type="text/css" href="/build/ircanywhere.css" />
 	</head>
 	<body>
-		
+		<script type="text/x-handlebars">
+			<div id="main-holder" class="clear">
+				<div class="topbar clear main">
+					<ul id="main-menu">
+						<li class="logo">{{#link-to 'index'}}IRCAnywhere{{/link-to}}</li>
+						<li>{{#link-to 'signup'}}Signup{{/link-to}}</li>
+					</ul>
+					<div class="topbar inner"></div>
+				</div>
+				{{outlet}}
+				<div id="main-footer">
+					<p>{{#link-to 'signup'}}Signup{{/link-to}} &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
+					<p>© 2013 IRCAnywhere. All rights reserved.</p>
+				</div>
+			</div>
+		</script>
 	</body>
 </html>

@@ -1,3 +1,4 @@
 App.Router.map(function() {
-	this.resource('index', { path: '/' });
+	this.route('index', { path: '/' });
+	this.route('signup', { path: '/signup' });
 });
