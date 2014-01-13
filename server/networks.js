@@ -44,8 +44,23 @@ NetworkManager = function() {
 						}
 						// validate the cookie
 
+						var networks = application.Networks.find({'internal.userId': user._id}).toArray(),
+							tabs = application.Tabs.find({user: user._id}).toArray(),
+							netIds = {};
+
+						networks.forEach(function(network) {
+							netIds[network._id] = network.name;
+						});
+
+						tabs.forEach(function(tab) {
+							tab.users = application.ChannelUsers.find({network: netIds[tab.network], channel: tab.target}).toArray()
+						});
+						// loop tabs
+
 						req.io.respond({
-							data: 123
+							user: user,
+							networks: networks,
+							tabs: tabs
 						});
 						// compile a load of data to send to the frontend
 					}).run();
@@ -62,15 +77,6 @@ NetworkManager = function() {
 						Manager.updateTab(req);
 					}).run();
 				});
-
-				/*Meteor.publish('networks', function() {
-					return Networks.find({'internal.userId': this.userId});
-				});
-
-				Meteor.publish('tabs', function() {
-					return Tabs.find({user: this.userId});
-				});*/
-				// XXX - Convert to socket.io connect
 
 				var networks = application.Networks.find(),
 					tabs = application.Tabs.find();

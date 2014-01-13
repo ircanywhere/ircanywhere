@@ -1,0 +1,12 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect();
+
+  // Emit sync event.
+  socket.emit('sync', {}, function(data) {
+  	console.log(data);
+  	//socket.emit('selectTab', {url: 'irc.freenode.net:6667/#ircanywhere-test'});
+  	//socket.emit('updateTab', {tab: '52d4227307404dca7276c679', hiddenUsers: false});
+  	//socket.emit('exec', {command: '/msg hey there lol', network: '52d3fc718132f8486dcde1d0', target: '#ircanywhere-test'});
+  });
+</script>
