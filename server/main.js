@@ -3,7 +3,7 @@ var Application = require('./app').Application,
 	UserManager = require('./users').UserManager,
 	ChannelManager = require('./channels'),
 	EventManager = require('./events'),
-	NetworkManager = require('./networks'),
+	NetworkManager = require('./networks').NetworkManager,
 	IRCHandler = require('./irchandler'),
 	IRCFactory = require('./factory'),
 	CommandManager = require('./commands'),
@@ -29,6 +29,7 @@ userManager = container.resolve(UserManager);
 eventManager = container.resolve(EventManager);
 // event manager*/
 
+container.register('Clients', Clients);
 container.register('application', application);
 networkManager = container.resolve(NetworkManager);
 // setup network manager

@@ -21,14 +21,16 @@ UserManager = function(application) {
 		
 	var Manager = {
 		init: function() {
-			var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
-			this.server = emails.server.connect({
-				user: smtp[2], 
-				password: smtp[4], 
-				host: smtp[6], 
-				ssl: true
+			application.ee.on('ready', function() {
+				var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
+				this.server = emails.server.connect({
+					user: smtp[2], 
+					password: smtp[4], 
+					host: smtp[6], 
+					ssl: true
+				});
+				// setup email server
 			});
-			// setup email server
 		},
 
 		registerUser: function(req, res) {

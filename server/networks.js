@@ -1,4 +1,4 @@
-NetworkManager = function(application) {
+NetworkManager = function(Clients, application) {
 	"use strict";
 	
 	var _ = require('lodash'),
@@ -14,73 +14,83 @@ NetworkManager = function(application) {
 		},
 
 		init: function() {
-			Meteor.publish('networks', function() {
-				return Networks.find({'internal.userId': this.userId});
-			});
+			application.ee.on('ready', function() {
+				/*Meteor.publish('networks', function() {
+					return Networks.find({'internal.userId': this.userId});
+				});
 
-			Meteor.publish('tabs', function() {
-				return Tabs.find({user: this.userId});
-			});
+				Meteor.publish('tabs', function() {
+					return Tabs.find({user: this.userId});
+				});*/
+				// XXX - Convert to socket.io connect
 
-			Tabs.allow({
-				update: function(userId, doc, fieldNames, modifier) {
-					return ((_.difference(fieldNames, ['hiddenUsers']) == 0) ||
-							(_.difference(fieldNames, ['hiddenEvents']) == 0));
-				}
-			});
-			// setup allow rules for this collection
-
-			var networks = Networks.find(),
-				tabs = Tabs.find();
-
-			networks.forEach(function(doc) {
-				Clients[doc._id] = doc;
-				Clients[doc._id].internal.tabs = {};
-			});
-			// XXX - This can be changed when the changes in release/oplog-operators
-			//       get merged into the new release. Because of us requiring the new template
-			//       engine this needs to be here as a fallback until the changes are core.
-
-			networks.observe({
-				added: function(doc) {
-					if (!_.has(Clients, doc._id)) {
-						Clients[doc._id] = doc;
-						Clients[doc._id].internal.tabs = {};
+				/*Tabs.allow({
+					update: function(userId, doc, fieldNames, modifier) {
+						return ((_.difference(fieldNames, ['hiddenUsers']) == 0) ||
+								(_.difference(fieldNames, ['hiddenEvents']) == 0));
 					}
-					// XXX - See above
-				},
+				});*/
+				// XXX - Convert to socket.io method
+				// setup allow rules for this collection
 
-				changed: function(doc, old) {
-					Clients[doc._id] = doc;
-					Clients[doc._id].internal.tabs = {};
-					Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
-						Clients[doc._id].internal.tabs[tab.target] = tab;
+				var networks = application.Networks.find(),
+					tabs = application.Tabs.find();
+
+				networks.forEach(function(doc) {
+					var id = doc._id.toString();
+					if (!doc.internal) {
+						return false;
+					}
+
+					Clients[id] = doc;
+					Clients[id].internal.tabs = {};
+				});
+				// load up networks and push them into Clients
+
+				application.ee.on('networks:insert', function(doc) {
+					var id = doc._id.toString();
+					if (!doc.internal) {
+						return false;
+					}
+
+					Clients[id] = doc;
+					Clients[id].internal.tabs = {};
+				});
+
+				application.ee.on('networks:update', function(doc) {
+					var id = doc._id.toString();
+					Clients[id] = doc;
+					Clients[id].internal.tabs = {};
+					application.Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
+						Clients[id].internal.tabs[tab.target] = tab;
 					});
-				},
+				});
 
-				removed: function(doc) {
-					delete Clients[doc._id];
-				}
+				application.ee.on('networks:delete', function(id) {
+					delete Clients[id.toString()];
+				});
+				// just sync clients up to this, instead of manually doing it
+				// we're asking for problems that way doing it this way means
+				// this object will be identical to the network list
+				// this method is inspired by meteor's observe capabilities
+
+				application.ee.on('tabs:insert', function(doc) {
+					Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+				});
+
+				application.ee.on('tabs:update', function(doc) {
+					Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+				});
+
+				application.ee.on('tabs:delete', function(id) {
+					_.each(Clients, function(value, key) {
+						var network = _.find(value.internal.tabs, {'_id': id});
+						delete Clients[key].internal.tabs[network.title];
+					});
+				});
+				// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
+				// instead of querying each time which is very inefficient
 			});
-			// just sync clients up to this, instead of manually doing it
-			// we're asking for problems that way doing it this way means
-			// this object will be identical to the network list
-
-			tabs.observe({
-				added: function(doc) {
-					Clients[doc.network].internal.tabs[doc.target] = doc;
-				},
-
-				changed: function(doc, old) {
-					Clients[doc.network].internal.tabs[doc.target] = doc;
-				},
-
-				removed: function(doc) {
-					delete Clients[doc.network].internal.tabs[doc.target];
-				}
-			});
-			// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
-			// instead of querying each time which is very inefficient
 		},
 
 		getClients: function() {
@@ -245,12 +255,15 @@ NetworkManager = function(application) {
 		}
 	};
 
-	Meteor.methods({
+	/*Meteor.methods({
 		selectTab: Manager.selectTab
-	});
+	});*/
 	// expose some methods to the frontend
+	// XXX - convert to socket.io command
 
 	Manager.init();
 
 	return _.extend(Manager, hooks);
 };
+
+exports.NetworkManager = NetworkManager;

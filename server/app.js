@@ -128,6 +128,9 @@ Application = function() {
 
 	var App = {
 		init: function() {
+			App.ee = new events.EventEmitter();
+			// setup an event emitter
+
 			App.config = JSON.parse(jsonminify(raw));
 			validate(App.config, schema);
 			// attempt to validate our config file
@@ -161,12 +164,12 @@ Application = function() {
 
 			App.setupServer();
 			// setup express.io server
+
+			App.ee.emit('ready');
+			// initiate sub-objects
 		},
 
 		setupOplog: function() {
-			App.observe = new events.EventEmitter();
-			// setup an event emitter
-
 			var start = Math.floor(+new Date() / 1000),
 				result = App.Oplog.find({}, {'tailable': true});
 
@@ -187,22 +190,22 @@ Application = function() {
 							switch(item.op) {
 								case 'i':
 									var mode = 'insert';
-									App.observe.emit(collection[1] + ':' + mode, item.o);
+									App.ee.emit(collection[1] + ':' + mode, item.o);
 									break;
 								case 'u':
 									var mode = 'update',
-										doc = App.mongo.getCollection(collection[1]).find(item.o2).toArray();
+										doc = App.mongo.getCollection(collection[1]).find(item.o2).toArray()[0];
 									// get the new full document
 
-									App.observe.emit(collection[1] + ':' + mode, doc);
+									App.ee.emit(collection[1] + ':' + mode, doc);
 									break;
 								case 'd':
 									var mode = 'delete';
-									App.observe.emit(collection[1] + ':' + mode, item.o._id);
+									App.ee.emit(collection[1] + ':' + mode, item.o._id);
 									break;
 								case 'c':
 									for (var cmd in item.o) {
-										App.observe.emit(item.o[cmd] + ':' + cmd);
+										App.ee.emit(item.o[cmd] + ':' + cmd);
 									}
 								default:
 									break;
