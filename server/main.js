@@ -6,22 +6,24 @@ var Application = require('./app').Application,
 	NetworkManager = require('./networks').NetworkManager,
 	IRCHandler = require('./irchandler'),
 	IRCFactory = require('./factory'),
-	CommandManager = require('./commands'),
-	dependable = require('dependable'),
-	container = dependable.container();
+	CommandManager = require('./commands');
 	
 Clients = {};
 // clients
 
-application = container.resolve(Application);
+application = new Application();
 // inject the config so we can mimic it in tests if needed
 
-modeParser = container.resolve(ModeParser);
+modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class
 
-container.register('application', application);
-userManager = container.resolve(UserManager);
+networkManager = new NetworkManager();
+// setup network manager
+
+userManager = new UserManager();
 // user manager
+
+
 
 /*channelManager = container.resolve(ChannelManager);
 // channel manager
@@ -29,9 +31,9 @@ userManager = container.resolve(UserManager);
 eventManager = container.resolve(EventManager);
 // event manager*/
 
-container.register('Clients', Clients);
+/*container.register('Clients', Clients);
 container.register('application', application);
-networkManager = container.resolve(NetworkManager);
+networkManager = container.resolve(NetworkManager);*/
 // setup network manager
 
 /*ircHandler = container.resolve(IRCHandler);

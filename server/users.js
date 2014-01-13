@@ -1,4 +1,4 @@
-UserManager = function(application) {
+UserManager = function() {
 	"use strict";
 
 	var _ = require('lodash'),
@@ -145,7 +145,7 @@ UserManager = function(application) {
 						res.cookie('token', token, {expires: expire});
 						// set a login key and a cookie
 
-						//this.onUserLogin(user[0]);
+						this.onUserLogin(user[0]);
 						// XXX - call the login event
 					}
 					// check if password matches

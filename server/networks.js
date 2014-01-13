@@ -1,4 +1,4 @@
-NetworkManager = function(Clients, application) {
+NetworkManager = function() {
 	"use strict";
 	
 	var _ = require('lodash'),
