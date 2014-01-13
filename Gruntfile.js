@@ -1,6 +1,25 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		less: {
+			development: {
+				options: {
+					paths: ['client/less']
+				},
+				files: {
+					'client/build/ircanywhere.css': 'client/less/**/*.less'
+				}
+			},
+			production: {
+				options: {
+					paths: ['client/less'],
+					cleancss: true
+				},
+				files: {
+					'client/build/ircanywhere.css': 'client/less/**/*.less'
+				}
+			}
+		},
 		ember_handlebars: {
 			compile: {
 				options: {
@@ -47,9 +66,10 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-ember-handlebars');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Default task(s).
-	grunt.registerTask('default', ['ember_handlebars', 'concat', 'uglify', 'watch']);
+	grunt.registerTask('default', ['less', 'ember_handlebars', 'concat', 'uglify', 'watch']);
 };

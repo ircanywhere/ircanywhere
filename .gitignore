@@ -1,8 +1,5 @@
-*node.json
+private/node.json
+client/build/*
 node_modules
-packages
 logs
-.build
 *.sublime*
-smart.lock
-.build*
