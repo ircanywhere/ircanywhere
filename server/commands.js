@@ -1,11 +1,13 @@
 CommandManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks'),
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		Fiber = require('fibers'),
 		_ban = function(client, target, nickname, ban) {
 			var nickname = params[0],
 				mode = (ban) ? '+b' : '-b',
-				user = ChannelUsers.findOne({
+				user = application.ChannelUsers.findOne({
 					network: client.name,
 					channel: new RegExp('^' + target + '$', 'i'),
 					nickname: new RegExp('^' + nickname + '$', 'i')
@@ -21,44 +23,43 @@ CommandManager = function() {
 
 	var Manager = {
 		init: function() {
-			var self = this;
-
-			Meteor.publish('commands', function() {
+			/*Meteor.publish('commands', function() {
 				return Commands.find({user: this.userId}, {
 					sort: {timestamp: -1},
 					limit: 10
 				});
+			});*/
+			// XXX - Move into sync command
+
+			application.ee.on('ready', function() {
+				application.app.io.route('send', function(req) {
+					Fiber(function() {
+						var doc = req.data,
+							user = Sockets[req.socket.id];
+						// get the data being sent
+
+						if (!(doc.command && doc.network && doc.target !== '')) {
+							req.io.respond({success: false, error: 'invalid format'});
+							// validate it
+						} else {
+							var client = Clients[doc.network.toString()],
+								inserted = application.Commands.insert(_.extend(doc, {user: user._id}));
+
+							Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
+							// success
+
+							req.io.respond({success: true, id: inserted._id.toString()});
+						}
+					}).run();
+				});
 			});
+			// we need to wait until everything is ready to setup our commands etc
 
-			Commands.allow({
-				insert: function(userId, doc) {
-					doc.timestamp = +new Date();
-					// modify doc
-
-					return ((userId && doc.user === userId) && 
-							(doc.command && doc.network) &&
-							(doc.target !== '') &&
-							(doc.sent === false));
-				}
-			});
-			// setup allow rules for this collection
-
-			Commands.find({sent: false}).observe({
-				added: function(doc) {
-					var user = Meteor.users.find({_id: doc.user}),
-						client = Clients[doc.network];
-
-					self.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
-					Commands.update({_id: doc._id}, {$set: {sent: true}});
-				}
-			});
-			// loop for inserts to this collection
-
-			this.createAlias('/join', '/j');
-			this.createAlias('/part', '/p', '/leave');
-			this.createAlias('/cycle', '/hop');
-			this.createAlias('/quit', '/disconnect');
-			this.createAlias('/query', '/q');
+			Manager.createAlias('/join', '/j');
+			Manager.createAlias('/part', '/p', '/leave');
+			Manager.createAlias('/cycle', '/hop');
+			Manager.createAlias('/quit', '/disconnect');
+			Manager.createAlias('/query', '/q');
 			// setup aliases
 		},
 
@@ -288,21 +289,24 @@ CommandManager = function() {
 		}
 	};
 
-	Meteor.methods({
+	/*Meteor.methods({
 		execCommand: function(network, target, command) {
 			var user = Meteor.users.find({_id: this.userId}),
 				client = Clients[network];
 
 			Manager.parseCommand(user, client, target.toLowerCase(), command);
 		}
-	});
+	});*/
+	// XXX - Convert this to socket.io
 	// create a method so the frontend can silently execute commands
 	// so if you call execCommand(netid, '#channel', '/kick ricki'); will
 	// be exactly the same as typing a command in the box with the difference being its
 	// not in the command backlog. This is good if we want to hook certain actions up to commands
 	// to save on duplicate code.
 
-	Manager.init();
+	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };
+
+exports.CommandManager = CommandManager;

@@ -43,21 +43,23 @@ NetworkManager = function() {
 							}
 						}
 						// validate the cookie
-						
-						req.io.emit('sync', {data: 123});
+
+						req.io.respond({
+							data: 123
+						});
 						// compile a load of data to send to the frontend
 					}).run();
 				});
 
 				application.app.io.route('selectTab', function(req) {
 					Fiber(function() {
-						Manager.selectTab(Sockets[req.socket.id], req.data.url || '');
+						Manager.selectTab(req);
 					}).run();
 				});
 
 				application.app.io.route('updateTab', function(req) {
 					Fiber(function() {
-						Manager.updateTab(Sockets[req.socket.id], req.data);
+						Manager.updateTab(req);
 					}).run();
 				});
 
@@ -131,8 +133,7 @@ NetworkManager = function() {
 		},
 
 		getClients: function() {
-			var self = this,
-				clients = {},
+			var clients = {},
 				networks =  application.Networks.find();
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
@@ -140,7 +141,7 @@ NetworkManager = function() {
 				var me = application.Users.findOne({_id: network.internal.userId}),
 					reconnect = false;
 
-				if (network.internal.status !== self.flags.disconnected) {
+				if (network.internal.status !== Manager.flags.disconnected) {
 					reconnect = true;
 				}
 
@@ -229,15 +230,19 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(user, url) {
-			var userId = user._id;
-			if (userId === null || url === '') {
-				return false;
+		selectTab: function(req) {
+			var user = Sockets[req.socket.id],
+				url = req.data.url,
+				userId = user._id;
+
+			if (url === undefined || url === '') {
+				return req.io.respond({success: false, error: 'invalid url'});
 			}
-			// no uid, bail
+			// no url, bail
 
 			var net = application.Networks.findOne({'internal.userId': userId}, {fields: {id: 1, internal: 1}}),
-				tab = application.Tabs.findOne({user: userId, url: url});
+				tab = application.Tabs.findOne({user: userId, url: url}),
+				newTab = tab;
 
 			if (tab !== null && !tab.selected) {
 				application.Tabs.update({user: userId, prevSelected: true}, {$set: {prevSelected: false}});
@@ -259,12 +264,21 @@ NetworkManager = function() {
 				} else {
 					Manager.addTab(Clients[netId], target[1], 'query', true);
 				}
+				// create tab
 			}
+
+			return req.io.respond({success: true});
+			// respond - we don't send new tab info down the line, we'll get it when it's synced up
+			// we can safely change the tab if the response is true
 		},
 
-		updateTab: function(user, params) {
+		updateTab: function(req) {
+			var user = Sockets[req.socket.id],
+				params = req.data,
+				success = false;
+
 			if (!params.tab) {
-				return false;
+				return req.io.respond({success: false});
 			}
 
 			var tabId = params.tab,
@@ -273,11 +287,15 @@ NetworkManager = function() {
 			if (params.hiddenUsers !== undefined && typeof params.hiddenUsers === 'boolean') {
 				update['$set'] = {hiddenUsers: params.hiddenUsers};
 				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
+				success = true;
 			} else if (params.hiddenEvents !== undefined && typeof params.hiddenEvents === 'boolean') {
 				update['$set'] = {hiddenEvents: params.hiddenEvents};
 				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
+				success = true;
 			}
 			// we're only allowed to update these two properties via this method atm
+
+			return req.io.respond({success: success});
 		},
 
 		removeTab: function(client, target) {

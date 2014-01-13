@@ -6,7 +6,7 @@ var Application = require('./app').Application,
 	NetworkManager = require('./networks').NetworkManager,
 	IRCHandler = require('./irchandler').IRCHandler,
 	IRCFactory = require('./factory').IRCFactory,
-	CommandManager = require('./commands');
+	CommandManager = require('./commands').CommandManager;
 
 Sockets = {};
 Clients = {};
@@ -36,12 +36,5 @@ channelManager = new ChannelManager();
 eventManager = new EventManager();
 // event manager
 
-/*container.register('Clients', Clients);
-container.register('application', application);
-networkManager = container.resolve(NetworkManager);*/
-// setup network manager
-
-/*
-
-commandManager = container.resolve(CommandManager);*/
-// setup command manager
+commandManager = new CommandManager();
+// command manager

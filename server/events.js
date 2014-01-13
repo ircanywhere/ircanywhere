@@ -52,8 +52,6 @@ EventManager = function() {
 		},
 
 		insertEvent: function(client, message, type) {
-			var self = this;
-
 			if (type == 'nick' || type == 'quit') {
 				var chans = application.ChannelUsers.find({network: client.name, nickname: message.nickname});
 				// find the channel, we gotta construct a query (kinda messy)
