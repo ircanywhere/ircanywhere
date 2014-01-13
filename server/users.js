@@ -59,8 +59,7 @@ UserManager = function() {
 				email = req.param('email', ''),
 				password = req.param('password', ''),
 				confirmPassword = req.param('confirm-password', ''),
-				output = {failed: false, successMessage: '', errors: []},
-				userId = null;
+				output = {failed: false, successMessage: '', errors: []};
 
 			if (!application.config.enableRegistrations) {
 				output.errors.push({error: 'New registrations are currently closed'});
@@ -113,7 +112,7 @@ UserManager = function() {
 
 				return output;
 			} else {
-				userId = application.Users.insert(user);
+				application.Users.insert(user);
 			}
 			// it's failed, lets bail
 

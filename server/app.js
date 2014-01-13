@@ -272,7 +272,7 @@ Application = function() {
 				json = _.extend(node, defaultJson);
 				json._id = json._id.toString();
 			} else {
-				var node = App.Nodes.insert(defaultJson, {safe: false});
+				App.Nodes.insert(defaultJson, {safe: false});
 				json = defaultJson;
 			}
 

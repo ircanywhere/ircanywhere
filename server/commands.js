@@ -3,6 +3,7 @@ CommandManager = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
+		mongo = require('mongo-sync'),
 		Fiber = require('fibers'),
 		_ban = function(client, target, nickname, ban) {
 			var nickname = params[0],
@@ -42,8 +43,9 @@ CommandManager = function() {
 							req.io.respond({success: false, error: 'invalid format'});
 							// validate it
 						} else {
-							var client = Clients[doc.network.toString()],
-								inserted = application.Commands.insert(_.extend(doc, {user: user._id}));
+							var client = Clients[doc.network],
+								networkId = new mongo.ObjectId(doc.network),
+								inserted = application.Commands.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
 
 							Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
 							// success
