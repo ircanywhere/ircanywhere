@@ -4,6 +4,7 @@ NetworkManager = function() {
 	var _ = require('lodash'),
 		hooks = require('hooks'),
 		helper = require('../lib/helpers').Helpers,
+		mongo = require('mongo-sync'),
 		Fiber = require('fibers');
 
 	var Manager = {
@@ -54,6 +55,12 @@ NetworkManager = function() {
 					}).run();
 				});
 
+				application.app.io.route('updateTab', function(req) {
+					Fiber(function() {
+						Manager.updateTab(Sockets[req.socket.id], req.data);
+					}).run();
+				});
+
 				/*Meteor.publish('networks', function() {
 					return Networks.find({'internal.userId': this.userId});
 				});
@@ -62,15 +69,6 @@ NetworkManager = function() {
 					return Tabs.find({user: this.userId});
 				});*/
 				// XXX - Convert to socket.io connect
-
-				/*Tabs.allow({
-					update: function(userId, doc, fieldNames, modifier) {
-						return ((_.difference(fieldNames, ['hiddenUsers']) == 0) ||
-								(_.difference(fieldNames, ['hiddenEvents']) == 0));
-					}
-				});*/
-				// XXX - Convert to socket.io method
-				// setup allow rules for this collection
 
 				var networks = application.Networks.find(),
 					tabs = application.Tabs.find();
@@ -262,6 +260,24 @@ NetworkManager = function() {
 					Manager.addTab(Clients[netId], target[1], 'query', true);
 				}
 			}
+		},
+
+		updateTab: function(user, params) {
+			if (!params.tab) {
+				return false;
+			}
+
+			var tabId = params.tab,
+				update = {$set: {}};
+
+			if (params.hiddenUsers !== undefined && typeof params.hiddenUsers === 'boolean') {
+				update['$set'] = {hiddenUsers: params.hiddenUsers};
+				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
+			} else if (params.hiddenEvents !== undefined && typeof params.hiddenEvents === 'boolean') {
+				update['$set'] = {hiddenEvents: params.hiddenEvents};
+				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
+			}
+			// we're only allowed to update these two properties via this method atm
 		},
 
 		removeTab: function(client, target) {

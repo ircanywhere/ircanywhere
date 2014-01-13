@@ -172,7 +172,6 @@ UserManager = function() {
 						// set a login key and a cookie
 
 						this.onUserLogin(user);
-						// XXX - call the login event
 					}
 					// check if password matches
 				}

@@ -143,7 +143,6 @@ Application = function() {
 			App.mongo = new mongo.Server(App.database.mongo[2]).db(App.database.mongo[3]);
 			App.oplog = new mongo.Server(App.database.oplog[2]).db(App.database.oplog[3]);
 			// two db connections because we're greedy
-			// XXX - Make this configurable
 
 			App.Nodes = App.mongo.getCollection('nodes');
 			App.Users = App.mongo.getCollection('users');
