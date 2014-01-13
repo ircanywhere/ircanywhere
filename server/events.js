@@ -1,11 +1,13 @@
 EventManager = function() {
 	"use strict";
 
-	var hooks = Meteor.require('hooks'),
+	var _ = require('lodash'),
+		hooks = require('hooks'),
+		Fiber = require('fibers'),
 		_insert = function(client, message, type, user) {
 			var network = client.name,
 				channel = (message.channel && !message.target) ? message.channel : message.target,
-				user = user || ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname});
+				user = user || application.ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname});
 			// get a channel user object if we've not got one
 
 			if (!message.channel && !message.target) {
@@ -29,13 +31,13 @@ EventManager = function() {
 					}
 				};
 
-			Events.insert(output);
+			application.Events.insert(output);
 			// get the prefix, construct an output and insert it
 		};
 
 	var Manager = {
 		init: function() {
-			Meteor.publish('events', function() {
+			/*Meteor.publish('events', function() {
 				return Events.find({user: this.userId});
 			});
 
@@ -44,15 +46,16 @@ EventManager = function() {
 					return doc.user === userId;
 				},
 				fetch: ['user']
-			});
+			});*/
 			// allow our events documents to be changed by us
+			// XXX - Convert this to socket.io
 		},
 
 		insertEvent: function(client, message, type) {
 			var self = this;
 
 			if (type == 'nick' || type == 'quit') {
-				var chans = ChannelUsers.find({network: client.name, nickname: message.nickname});
+				var chans = application.ChannelUsers.find({network: client.name, nickname: message.nickname});
 				// find the channel, we gotta construct a query (kinda messy)
 
 				chans.forEach(function(chan) {
@@ -144,7 +147,9 @@ EventManager = function() {
 		}
 	};
 
-	Manager.init();
+	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };
+
+exports.EventManager = EventManager;

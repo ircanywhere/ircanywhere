@@ -3,7 +3,6 @@ ChannelManager = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
-		helper = require('../lib/helpers').Helpers,
 		Fiber = require('fibers');
 
 	var Manager = {

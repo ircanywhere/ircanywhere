@@ -3,6 +3,7 @@ IRCHandler = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
+		helper = require('../lib/helpers').Helpers,
 		Fiber = require('fibers');
 
 	var Handler = {
@@ -41,8 +42,6 @@ IRCHandler = function() {
 
 		closed: function(client, message) {
 			networkManager.changeStatus({_id: client._id, 'internal.status': {$ne: networkManager.closed}}, networkManager.flags.closed);
-			// a bit of sorcery here, strictly speaking .changeStatus takes a networkId. But because of meteor's beauty
-			// we can pass in an ID, or a selector. So instead of getting the status and checking it, we just do a mongo update
 			// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
 			// which means someone has clicked disconnected, if not, just set it as closed (means we've disconnected for whatever reason)
 		
@@ -155,10 +154,10 @@ IRCHandler = function() {
 		},
 
 		names: function(client, message) {
-			var channelUsers = ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}),
+			var channelUsers = application.ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}),
 				users = [],
 				keys = [],
-				regex = new RegExp('[' + Meteor.Helpers.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
+				regex = new RegExp('[' + helper.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
 
 			channelUsers.forEach(function(u) {
 				keys.push(u.nickname);

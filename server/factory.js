@@ -69,9 +69,7 @@ IRCFactory = function() {
 			// and doesn't need to be linked to a client, saves us hashing keys all the time
 
 			networkManager.changeStatus(key, networkManager.flags.connecting);
-			// mark the network as connecting, the beauty of meteor comes into play here
-			// no need to send a message to the client, live database YEAH BABY
-			// we need to do this here because if we do it when we're calling create, it may have failed.
+			// mark the network as connecting
 
 			this.rpc.emit('createClient', key, network);
 			application.logger.log('info', 'creating irc client', Clients[key]);

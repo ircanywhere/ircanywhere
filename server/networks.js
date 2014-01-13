@@ -185,9 +185,7 @@ NetworkManager = function() {
 			// by the config settings or network settings, it's overwritten every time.
 
 			return application.Networks.insert(network)[0];
-			// insert the network. Just doing this will propogate the change directly
-			// down the pipe to our client @ this.userId, also by calling insert without
-			// a callback meteor automatically sets up a fiber, blocking the code in users.js
+			// insert the network. Just doing this will propogate the change directly due to our observe driver
 		},
 
 		addTab: function(client, target, type, select) {
