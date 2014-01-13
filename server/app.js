@@ -117,14 +117,7 @@ Application = function() {
 				type: 'string',
 				required: false
 			}
-		},
-		jsSources = [
-			'./client/lib/helpers.js',
-			'./client/lib/parser.js',
-			'./client/lib/resizer.js',
-			'./client/lib/router.js',
-			'./client/lib/index.js'
-		];
+		};
 
 	var App = {
 		init: function() {
@@ -292,20 +285,7 @@ Application = function() {
 			});
 		},
 
-		build: function() {
-			App.sources = {
-				javascript: ''
-			};
-
-			jsSources.forEach(function(file) {
-				App.sources.javascript += fs.readFileSync(file);
-			});
-			// loop our source files
-		},
-
 		setupServer: function() {
-			App.build();
-			
 			App.app = express().http().io();
 			// setup a http server
 
@@ -325,9 +305,8 @@ Application = function() {
 			App.app.use(express.urlencoded());
 			// setup middleware
 
-			App.app.get('/ircanywhere.min.js', function(req, res) {
-				res.header('Content-Type', 'application/javascript');
-				res.end(App.sources.javascript);
+			App.app.get('/', function(req, res) {
+				res.sendfile('./client/templates/index.html');
 			});
 			// setup routes
 
