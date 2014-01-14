@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 				dest: 'client/build/dependency.js'
 			},
 			dist: {
-				src: ['client/js/**/*.js'],
+				src: ['lib/*.js', 'client/js/*.js', 'client/js/lib/*.js', 'client/js/helpers/*.js', 'client/js/routes/*.js', 'client/js/models/*.js', 'client/js/views/*.js', 'client/js/controllers/*.js'],
 				dest: 'client/build/<%= pkg.name %>.js'
 			}
 		},
@@ -58,7 +58,7 @@ module.exports = function(grunt) {
 				}
 			},
 			scripts: {
-				files: 'client/js/**/*.js',
+				files: ['lib/*.js', 'client/js/**/*.js'],
 				tasks: ['concat:dist', 'uglify:dist'],
 				options: {
 					event: ['all'],
