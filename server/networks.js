@@ -18,8 +18,66 @@ NetworkManager = function() {
 
 		init: function() {
 			application.ee.on('ready', function() {
-				application.app.io.route('sync', function(req, res) {
+				application.app.io.set('authorization', function(data, accept) {
 					Fiber(function() {
+						var parsed = data.headers.cookie.split('; '),
+							cookies = {};
+
+						parsed.forEach(function(cookie) {
+							var split = cookie.split('=');
+								cookies[split[0]] = split[1];
+						});
+						// get our cookies
+
+						if (!cookies.token) {
+							return accept(null, false);
+						} else {
+							var query = {};
+								query['tokens.' + cookies.token] = {$exists: true};
+							var user = application.Users.findOne(query);
+
+							if (user === null) {
+								return accept(null, false);
+							} else {
+								data.user = user;
+							}
+						}
+						// validate the cookie
+
+						accept(null, true);
+						// accept the connection
+					}).run();
+				});
+				// socket authorisation
+
+				application.app.io.on('connection', function (client) {
+					Fiber(function() {
+						var user = client.handshake.user,
+							networks = application.Networks.find({'internal.userId': user._id}).toArray(),
+							tabs = application.Tabs.find({user: user._id}).toArray(),
+							netIds = {};
+
+						Sockets[client.id] = user;
+						// remember the link between the socket and the user
+
+						networks.forEach(function(network) {
+							netIds[network._id] = network.name;
+						});
+
+						tabs.forEach(function(tab) {
+							tab.users = application.ChannelUsers.find({network: netIds[tab.network], channel: tab.target}).toArray()
+						});
+						// loop tabs
+
+						client.emit('sync', {
+							user: user,
+							networks: networks,
+							tabs: tabs
+						});
+						// compile a load of data to send to the frontend
+					}).run();
+
+					/*Fiber(function() {
 						var parsed = req.headers.cookie.split('; '),
 							cookies = {};
 
@@ -63,7 +121,7 @@ NetworkManager = function() {
 							tabs: tabs
 						});
 						// compile a load of data to send to the frontend
-					}).run();
+					}).run();*/
 				});
 
 				application.app.io.route('selectTab', function(req) {

@@ -4,10 +4,17 @@
 		<title>{{title}}</title>
 
 		<script src="/build/dependency.min.js"></script>
-		<script src="/build/templates.js"></script>
-		<script src="/build/ircanywhere.min.js"></script>
+		<!-- <script src="/build/templates.js"></script>
+		<script src="/build/ircanywhere.min.js"></script> -->
 
 		<link rel="stylesheet" type="text/css" href="/build/ircanywhere.css" />
+		<script>
+		var socket = io.connect();
+		/*socket.on('news', function (data) {
+			console.log(data);
+			socket.emit('my other event', { my: 'data' });
+		});*/
+		</script>
 	</head>
 	<body>
 
