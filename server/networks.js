@@ -203,7 +203,6 @@ NetworkManager = function() {
 					title: target,
 					type: type,
 					selected: select,
-					prevSelected: false,
 					active: true
 				};
 
@@ -213,7 +212,7 @@ NetworkManager = function() {
 			// empty, bolt it
 
 			if (select) {
-				application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false, prevSelected: true}});
+				application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}});
 			}
 			// are they requesting a new selected tab?
 
@@ -251,8 +250,7 @@ NetworkManager = function() {
 				newTab = tab;
 
 			if (tab !== null && !tab.selected) {
-				application.Tabs.update({user: userId, prevSelected: true}, {$set: {prevSelected: false}});
-				application.Tabs.update({user: userId, selected: true}, {$set: {selected: false, prevSelected: true}});
+				application.Tabs.update({user: userId}, {$set: {selected: false}});
 				application.Tabs.update({user: userId, url: url}, {$set: {selected: true}});
 				// mark all as not selected apart from the one we've been told to select
 			} else if (tab === null) {
@@ -305,8 +303,8 @@ NetworkManager = function() {
 		},
 
 		removeTab: function(client, target) {
-			application.Tabs.update({user: client.internal.userId, prevSelected: true}, {$set: {prevSelected: false, selected: true}});
-			// re-select 
+			// it's now up to the client to re-select the tab when they get a message saying it's been
+			// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
 			
 			if (target) {
 				application.Tabs.remove({user: client.internal.userId, network: client._id, target: target});
