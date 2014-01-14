@@ -11,8 +11,8 @@
 					<div class="box">
 						<h5>Login</h5>
 						
-						<div id="login-error" {{bind-attr class="errors:show:hide"}}>
-							<div class="alert-message block-message error">{{loginErrors}}</div>
+						<div {{bind-attr class="errors:show:hide"}}>
+							<div class="alert-message block-message error">{{errors}}</div>
 						</div>
 						
 						<div class="field">
@@ -31,13 +31,11 @@
 					<div id="forgot-password" {{bind-attr class=":box forgotPassword:show:hide"}}>
 						<h5>Forgot Password</h5>
 
-						<div id="reset-response">
-							{{#if resetErrors}}
-								<div class="alert-message block-message error">{{resetErrors}}</div>
-							{{/if}}
-							{{#if resetSuccess}}
-								<div class="alert-message block-message success">{{resetSuccess}}</div>
-							{{/if}}
+						<div class="alert-message block-message error hide" {{bind-attr class="resetErrors:show"}}>
+							{{resetErrors}}
+						</div>
+						<div class="alert-message block-message success hide" {{bind-attr class="resetSent:show"}}>
+							{{resetSent}}
 						</div>
 
 						<div class="field">

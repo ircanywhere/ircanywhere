@@ -9,17 +9,15 @@
 	 * -- string
 	 * -- usage: The mongodb oplog url - Note you may not have this available on shared mongohq and similar hosts */
 
+	"url": "http://10.0.33.34:3000/",
+	/* -- required
+	 * -- string 
+	 * -- usage: The http url of the web server you're running behind */
+
 	"port": 3000,
 	/* -- required
 	 * -- number
 	 * -- usage: The port to listen on */
-
-	"reverseDns": "localhost",
-	/* -- required
-	 * -- string
-	 * -- usage: The reverse DNS of this server, this needs to match exactly for certain features to work
-				 if no reverse dns is setup, enter your ip address in http://mxtoolbox.com/ReverseLookup.aspx
-				 and enter the value in "Domain Name" here. This isn't the domain that the server runs on */
 
 	"enableRegistrations": true,
 	/* -- required
@@ -51,6 +49,10 @@
 					 or Name <email@domain.tld> */
 
 		"smtp": "smtp://username:password@smtp.gmail.com"
+		/* -- required
+		 * -- string 
+		 * -- usage: The smtp server to connect to, it's advised you set this up properly, you can run
+		 			 a local server and pass in a local url, or get free accounts from places like Mailgun */
 	},
 
 	"clientSettings": {

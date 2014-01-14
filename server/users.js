@@ -24,7 +24,7 @@ UserManager = function() {
 		init: function() {
 			application.ee.on('ready', function() {
 				var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
-				this.server = emails.server.connect({
+				Manager.server = emails.server.connect({
 					user: smtp[2], 
 					password: smtp[4], 
 					host: smtp[6], 
@@ -44,6 +44,15 @@ UserManager = function() {
 				application.app.post('/api/login', function(req, res) {
 					Fiber(function() {
 						var response = Manager.userLogin(req, res);
+
+						res.header('Content-Type', 'application/json');
+						res.end(JSON.stringify(response));
+					}).run();
+				});
+
+				application.app.post('/api/forgot', function(req, res) {
+					Fiber(function() {
+						var response = Manager.forgotPassword(req, res);
 
 						res.header('Content-Type', 'application/json');
 						res.end(JSON.stringify(response));
@@ -120,13 +129,13 @@ UserManager = function() {
 			// log this event
 
 			var message = {
-				text: this.parse('./private/signup.txt', {name: name}),
+				text: Manager.parse('./private/signup.txt', {name: name}),
 				from: application.config.email.from,
 				to: email,
 				subject: 'Welcome to ' + application.config.email.siteName
 			};
 			
-			this.server.send(message);
+			Manager.server.send(message);
 			// send a email
 
 			output.successMessage = 'Your account has been successfully created, you may now login';
@@ -170,13 +179,51 @@ UserManager = function() {
 						res.cookie('token', token, {expires: expire});
 						// set a login key and a cookie
 
-						this.onUserLogin(user);
+						Manager.onUserLogin(user);
 					}
 					// check if password matches
 				}
 			}
 
-			return output;	
+			return output;
+		},
+
+		forgotPassword: function(req, res) {
+			var output = {failed: false, successMessage: '', errors: []},
+				email = req.param('email', ''),
+				token = _generateSalt(25),
+				expire = new Date(Date.now() + (24 * 60 * 60 * 1000)),
+				user = application.Users.findOne({email: email});
+
+			if (user === null) {
+				output.failed = true;
+				output.errors.push({error: 'User not found'});
+				// invalid user
+			} else {
+				var resetToken = {
+					token: token,
+					time: expire,
+					ip: req.ip
+				};
+
+				application.Users.update({email: email}, {$set: {resetToken: resetToken}});
+				// set the reset token
+
+				var link = application.config.url + '#/reset/' + token,
+					message = {
+						text: Manager.parse('./private/reset.txt', {name: user.name, link: link}),
+						from: application.config.email.from,
+						to: email,
+						subject: 'Your new password'
+					};
+				
+				Manager.server.send(message);
+				// send a email
+
+				output.successMessage = 'Instructions on how to reset your password have been sent';
+			}
+
+			return output;
 		},
 
 		onUserLogin: function(me) {

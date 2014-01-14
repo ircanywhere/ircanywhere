@@ -1,7 +1,11 @@
 App.IndexController = Ember.ObjectController.extend({
 	title: 'IRCAnywhere',
+	
 	errors: false,
-	loginErrors: '',
+
+	resetErrors: false,
+	resetSent: false,
+
 	forgotPassword: false,
 	email: 'Email Address',
 	password: 'Password',
@@ -19,13 +23,21 @@ App.IndexController = Ember.ObjectController.extend({
 
 			$.post('/api/login', {email: email, password: password}).then(function(data) {
 				self[(data.failed) ? 'loginFail' : 'loginSuccess'](data);
-			}, this.loginFail);
+			}, this.loginFail.bind(this));
 			// still stuck using jquery, everything seems to depend on it
 			// oh well.
 		},
 
 		resetSubmit: function() {
+			var self = this,
+				email = this.get('resetEmail');
 
+			email = exports.Helpers.trimInput(email);
+			// validation
+
+			$.post('/api/forgot', {email: email}).then(function(data) {
+				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
+			}, this.resetFail.bind(this));
 		},
 
 		forgotPassword: function() {
@@ -34,16 +46,31 @@ App.IndexController = Ember.ObjectController.extend({
 	},
 
 	loginSuccess: function(data) {
-		
+		this.set('errors', false);
 	},
 
 	loginFail: function(data) {
-		this.set('errors', true);
-		
 		if (typeof data === 'undefined') {
-			this.set('loginErrors', 'An error has occured');
+			this.set('errors', 'An error has occured');
 		} else {
-			this.set('loginErrors', data.errors[0].error);
+			this.set('errors', data.errors[0].error);
+		}
+		// set the errors
+	},
+
+	resetSuccess: function(data) {
+		this.set('resetErrors', false);
+		this.set('resetSent', data.successMessage);
+	},
+
+	resetFail: function(data) {
+		console.log(data);
+		this.set('resetSent', false);
+
+		if (typeof data === 'undefined') {
+			this.set('resetErrors', 'An error has occured');
+		} else {
+			this.set('resetErrors', data.errors[0].error);
 		}
 		// set the errors
 	}

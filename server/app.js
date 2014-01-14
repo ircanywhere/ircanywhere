@@ -24,6 +24,10 @@ Application = function() {
 				type: 'string',
 				required: true
 			},
+			'url': {
+				type: 'string',
+				required: true
+			},
 			'port': {
 				type: 'number',
 				required: true

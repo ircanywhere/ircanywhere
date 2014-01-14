@@ -1,0 +1,9 @@
+New password for your IRCAnywhere account
+
+Hello {{name}}.
+
+Somebody has requested to create a new password for your IRCAnywhere account using the "Forgot Password" function. In case you did not do this yourself, simply ignore this email, your account will not be affected in any way.
+
+To create a new password, please follow this link {{link}}. The link is active for 24 hours from when this email was sent.
+
+In case of problems or if you have any further questions, please do not hesitate to reply to this email.
