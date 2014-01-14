@@ -47,6 +47,7 @@ App.IndexController = Ember.ObjectController.extend({
 
 	loginSuccess: function(data) {
 		this.set('errors', false);
+		// XXX - Finish this
 	},
 
 	loginFail: function(data) {
@@ -64,7 +65,6 @@ App.IndexController = Ember.ObjectController.extend({
 	},
 
 	resetFail: function(data) {
-		console.log(data);
 		this.set('resetSent', false);
 
 		if (typeof data === 'undefined') {

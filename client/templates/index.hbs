@@ -7,7 +7,7 @@
 		</div>
 		<div class="banner-right">
 			<div id="login-box">
-				<form method="post" id="login-form" {{action "loginSubmit" on="submit"}}><fieldset>
+				<form method="post" {{action "loginSubmit" on="submit"}}><fieldset>
 					<div class="box">
 						<h5>Login</h5>
 						
@@ -27,7 +27,7 @@
 						<a href="#" id="forgot-password-link" class="btn secondary" {{action 'forgotPassword'}}>Forgot password?</a>
 					</div>
 				</fieldset></form>
-				<form method="post" id="reset-form" {{action "resetSubmit" on="submit"}}><fieldset>
+				<form method="post" {{action "resetSubmit" on="submit"}}><fieldset>
 					<div id="forgot-password" {{bind-attr class=":box forgotPassword:show:hide"}}>
 						<h5>Forgot Password</h5>
 

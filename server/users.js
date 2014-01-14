@@ -58,6 +58,15 @@ UserManager = function() {
 						res.end(JSON.stringify(response));
 					}).run();
 				});
+
+				application.app.post('/api/reset', function(req, res) {
+					Fiber(function() {
+						var response = Manager.resetPassword(req, res);
+
+						res.header('Content-Type', 'application/json');
+						res.end(JSON.stringify(response));
+					}).run();
+				});
 				// setup routes
 			});
 		},
@@ -221,6 +230,39 @@ UserManager = function() {
 				// send a email
 
 				output.successMessage = 'Instructions on how to reset your password have been sent';
+			}
+
+			return output;
+		},
+
+		resetPassword: function(req, res) {
+			var output = {failed: false, successMessage: '', errors: []},
+				password = req.param('password', ''),
+				confirmPassword = req.param('confirmPassword', ''),
+				token = req.param('token', ''),
+				time = new Date(Date.now()),
+				user = application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
+
+			if (user === null) {
+				output.failed = true;
+				output.errors.push({error: 'Invalid reset password url'});
+			} else if (password == '' || confirmPassword == '') {
+				output.failed = true;
+				output.errors.push({error: 'All fields are required'});
+			} else if (!helper.isValidPassword(password) || !helper.isValidPassword(confirmPassword))
+				output.failed = true;
+				output.errors.push({error: 'The password you have entered is invalid'});
+			} else if (password != confirmPassword) {
+				output.failed = true;
+				output.errors.push({error: 'The passwords you have entered do not match'});
+			} else {
+				var salt = user.salt,
+					hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+
+				application.Users.update({'resetToken.token': token}, {$unset: {resetToken: 1}, $set: {password: hash}});
+				// set the password
+
+				output.successMessage = 'Your password has been reset, you may now login';
 			}
 
 			return output;
