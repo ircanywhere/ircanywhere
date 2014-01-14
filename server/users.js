@@ -249,7 +249,7 @@ UserManager = function() {
 			} else if (password == '' || confirmPassword == '') {
 				output.failed = true;
 				output.errors.push({error: 'All fields are required'});
-			} else if (!helper.isValidPassword(password) || !helper.isValidPassword(confirmPassword))
+			} else if (!helper.isValidPassword(password) || !helper.isValidPassword(confirmPassword)) {
 				output.failed = true;
 				output.errors.push({error: 'The password you have entered is invalid'});
 			} else if (password != confirmPassword) {

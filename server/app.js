@@ -304,7 +304,7 @@ Application = function() {
 			App.app.use(express.urlencoded());
 			// setup middleware
 
-			App.app.get('/', function(req, res) {
+			App.app.get('/*', function(req, res) {
 				res.sendfile('./client/templates/index.html');
 			});
 			// setup routes
