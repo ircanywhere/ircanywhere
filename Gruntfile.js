@@ -2,14 +2,6 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		less: {
-			development: {
-				options: {
-					paths: ['client/less']
-				},
-				files: {
-					'client/build/ircanywhere.css': 'client/less/**/*.less'
-				}
-			},
 			production: {
 				options: {
 					paths: ['client/less'],
@@ -60,15 +52,25 @@ module.exports = function(grunt) {
 		watch: {
 			emberTemplates: {
 				files: 'client/templates/**/*.hbs',
-				tasks: ['emberTemplates']
+				tasks: ['emberTemplates'],
+				options: {
+					event: ['all'],
+				}
 			},
 			scripts: {
 				files: 'client/js/**/*.js',
-				tasks: ['concat', 'uglify'],
+				tasks: ['concat:dist', 'uglify:dist'],
 				options: {
 					event: ['all'],
-				},
+				}
 			},
+			less: {
+				files: 'client/less/**/*.less',
+           		tasks: ['less'],
+           		options: {
+					event: ['all'],
+				}
+			}
 		},
 	});
 	// Project configuration.

@@ -292,6 +292,8 @@ Application = function() {
 			App.app.enable('trust proxy');
 			// express settings
 
+			App.app.use(express.compress());
+			//App.app.use(express.static('client', {maxAge: 86400000}));
 			App.app.use(express.static('client'));
 			App.app.use(express.cookieParser(App.nodeId));
 			App.app.use(express.json());
