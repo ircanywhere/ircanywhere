@@ -76,7 +76,7 @@ UserManager = function() {
 				nickname = req.param('nickname', ''),
 				email = req.param('email', ''),
 				password = req.param('password', ''),
-				confirmPassword = req.param('confirm-password', ''),
+				confirmPassword = req.param('confirmPassword', ''),
 				output = {failed: false, successMessage: '', errors: []};
 
 			if (!application.config.enableRegistrations) {
