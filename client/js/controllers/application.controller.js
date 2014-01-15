@@ -12,7 +12,13 @@ App.ApplicationController = Ember.ObjectController.extend({
 		},
 
 		sync: function(data) {
-			console.log(data);
+			var self = this;
+
+			data.networks.forEach(function(network) {
+				network.id = network._id;
+				delete network._id;
+				
+			});
 		}
 	}
 });

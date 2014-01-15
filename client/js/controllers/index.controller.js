@@ -14,6 +14,7 @@ App.IndexController = Ember.ObjectController.extend({
 		if (this.socket.get('socket') === null) {
 			this.socket.connect();
 		}
+		// determine whether we need to try and authenticate with the web socket
 	},
 
 	actions: {
