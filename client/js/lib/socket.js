@@ -21,14 +21,19 @@ Ember.Socket = Ember.ObjectController.extend({
 	 * @constructor
 	 * Responsible for establishing a connect to the Socket.io server.
 	 */
-	init: function() {
+	connect: function() {
+		// already connected
+		if (this.get('socket') !== null) {
+			return false;
+		}
+
 		// connect to the socket server
 		var socket = io.connect();
 
-		socket.on('error', this._error.bind(this));
-
 		// Store a reference to the socket.
 		this.set('socket', socket);
+
+		socket.on('error', this._error.bind(this));
 
 		/**
 		 * @on connect
