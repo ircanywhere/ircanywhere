@@ -25,10 +25,7 @@ Ember.Socket = Ember.ObjectController.extend({
 		// connect to the socket server
 		var socket = io.connect();
 
-		socket.on('error', function socketError() {
-			// Throw an exception if an error occurs.
-			throw 'Unable to make a connection to the Socket.io server!';
-		});
+		socket.on('error', this._error.bind(this));
 
 		// Store a reference to the socket.
 		this.set('socket', socket);
@@ -55,6 +52,36 @@ Ember.Socket = Ember.ObjectController.extend({
 	},
 
 	/**
+	 * @method _error
+	 * Allows us to bind to error events in controllers
+	 * @return {void}
+	 * @private
+	 */
+	_error: function() {
+		var controllers = Ember.get(this, 'controllers'),
+			getController = this._getController.bind(this),
+			events = [],
+			module = this,
+			respond = function() {
+				var eventData = Array.prototype.slice.call(arguments);
+				module._update.call(module, this, eventData);
+			};
+
+		Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
+			// Fetch the controller if it's valid.
+			var controller = getController(controllerName),
+				eventNames = controller.events;
+
+			if (controller) {
+				// Invoke the `error` method if it has been defined on this controller.
+				if (typeof controller.events === 'object' && typeof controller.events.error === 'function') {
+					controller.events.error.apply(controller);
+				}
+			}
+		});
+	},
+
+	/**
 	 * @method _listen
 	 * Responsible for listening to events from Socket.io, and updating controller properties that
 	 * subscribe to those events.
@@ -66,12 +93,12 @@ Ember.Socket = Ember.ObjectController.extend({
 			getController = this._getController.bind(this),
 			events = [],
 			module = this,
-			respond = function respond() {
+			respond = function() {
 				var eventData = Array.prototype.slice.call(arguments);
 				module._update.call(module, this, eventData);
 			};
 
-		Ember.EnumerableUtils.forEach(controllers, function controllerIteration(controllerName) {
+		Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
 			// Fetch the controller if it's valid.
 			var controller = getController(controllerName),
 				eventNames = controller.events;
@@ -139,7 +166,7 @@ Ember.Socket = Ember.ObjectController.extend({
 
 					// Determine if the property is specifying multiple properties to update.
 					if (Ember.isArray(correspondingAction)) {
-						Ember.EnumerableUtils.forEach(correspondingAction, function propertyIteration(property, index) {
+						Ember.EnumerableUtils.forEach(correspondingAction, function(property, index) {
 							// Update each property included in the array of properties.
 							Ember.set(controller, property, eventData[index]);
 						});
@@ -165,7 +192,7 @@ Ember.Socket = Ember.ObjectController.extend({
 	 * @return {Object|Boolean}
 	 * @private
 	 */
-	_getController: function _getController(name) {
+	_getController: function(name) {
 		// Format the `name` to match what the lookup container is expecting, and then
 		// we'll locate the controller from the `container`.
 		name = 'controller:%@'.fmt(name);
