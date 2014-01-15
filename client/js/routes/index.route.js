@@ -1,6 +1,6 @@
 App.IndexRoute = AppRoute.extend({
 	activate: function() {
-		this.controllerFor('index').attemptConnect();
+		this.controllerFor('index').onTransition();
 	},
 
 	title: function(controller, model) {
