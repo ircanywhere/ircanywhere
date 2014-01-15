@@ -51,6 +51,11 @@ NetworkManager = function() {
 				// socket authorisation
 
 				application.app.io.on('connection', function (client) {
+					client.on('disconnect', function() {
+						delete Sockets[client._id];
+					});
+					// handle disconnect
+
 					Fiber(function() {
 						var user = client.handshake.user,
 							networks = application.Networks.find({'internal.userId': user._id}).toArray(),
@@ -76,52 +81,7 @@ NetworkManager = function() {
 						});
 						// compile a load of data to send to the frontend
 					}).run();
-
-					/*Fiber(function() {
-						var parsed = req.headers.cookie.split('; '),
-							cookies = {};
-
-						parsed.forEach(function(cookie) {
-							var split = cookie.split('=');
-								cookies[split[0]] = split[1];
-						});
-						// get our cookies
-
-						if (!cookies.token) {
-							return req.io.disconnect();
-						} else {
-							var query = {};
-								query['tokens.' + cookies.token] = {$exists: true};
-							var user = application.Users.findOne(query);
-
-							if (user === null) {
-								return req.io.disconnect();
-							} else {
-								Sockets[req.socket.id] = user;
-							}
-						}
-						// validate the cookie
-
-						var networks = application.Networks.find({'internal.userId': user._id}).toArray(),
-							tabs = application.Tabs.find({user: user._id}).toArray(),
-							netIds = {};
-
-						networks.forEach(function(network) {
-							netIds[network._id] = network.name;
-						});
-
-						tabs.forEach(function(tab) {
-							tab.users = application.ChannelUsers.find({network: netIds[tab.network], channel: tab.target}).toArray()
-						});
-						// loop tabs
-
-						req.io.respond({
-							user: user,
-							networks: networks,
-							tabs: tabs
-						});
-						// compile a load of data to send to the frontend
-					}).run();*/
+					// handle connect event
 				});
 
 				application.app.io.route('selectTab', function(req) {
