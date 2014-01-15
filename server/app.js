@@ -305,7 +305,7 @@ Application = function() {
 			// setup middleware
 
 			App.app.get('/*', function(req, res) {
-				res.sendfile('./client/templates/index.html');
+				res.sendfile('./client/templates/html/index.html');
 			});
 			// setup routes
 

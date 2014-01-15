@@ -12,11 +12,11 @@ App.IndexController = Ember.ObjectController.extend({
 
 	events: {
 		connect: function() {
-			//this.send('changeTemplate', 'reset', 'main');
+			
 		},
 
 		error: function() {
-			this.send('changeTemplate', 'login', 'application');
+			this.transitionTo('login');
 		},
 
 		sync: function(data) {
