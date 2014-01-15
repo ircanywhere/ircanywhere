@@ -20,7 +20,7 @@ NetworkManager = function() {
 			application.ee.on('ready', function() {
 				application.app.io.set('authorization', function(data, accept) {
 					Fiber(function() {
-						var parsed = data.headers.cookie.split('; '),
+						var parsed = (data.headers.cookie) ? data.headers.cookie.split('; ') : [],
 							cookies = {};
 
 						parsed.forEach(function(cookie) {
