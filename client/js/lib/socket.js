@@ -34,7 +34,6 @@ Ember.Socket = Ember.ObjectController.extend({
 		 * @on connect
 		 */
 		socket.on('connect', this._listen.bind(this));
-
 	},
 
 	/**
