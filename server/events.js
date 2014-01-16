@@ -36,21 +36,6 @@ EventManager = function() {
 		};
 
 	var Manager = {
-		init: function() {
-			/*Meteor.publish('events', function() {
-				return Events.find({user: this.userId});
-			});
-
-			Events.allow({
-				update: function (userId, doc, fields, modifier) {	
-					return doc.user === userId;
-				},
-				fetch: ['user']
-			});*/
-			// allow our events documents to be changed by us
-			// XXX - Convert this to socket.io
-		},
-
 		insertEvent: function(client, message, type) {
 			if (type == 'nick' || type == 'quit') {
 				var chans = application.ChannelUsers.find({network: client.name, nickname: message.nickname});
@@ -144,8 +129,6 @@ EventManager = function() {
 			return {prefix: '', sort: 6};
 		}
 	};
-
-	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };

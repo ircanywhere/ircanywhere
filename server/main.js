@@ -6,7 +6,8 @@ var Application = require('./app').Application,
 	NetworkManager = require('./networks').NetworkManager,
 	IRCHandler = require('./irchandler').IRCHandler,
 	IRCFactory = require('./factory').IRCFactory,
-	CommandManager = require('./commands').CommandManager;
+	CommandManager = require('./commands').CommandManager,
+	SocketManager = require('./sockets').SocketManager;
 
 Sockets = {};
 Clients = {};
@@ -14,6 +15,9 @@ Clients = {};
 
 application = new Application();
 // inject the config so we can mimic it in tests if needed
+
+socketManager = new SocketManager();
+// socket.io engine
 
 modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class

@@ -10,13 +10,6 @@ App.IndexController = Ember.ObjectController.extend({
 	password: 'Password',
 	resetEmail: 'Email Address',
 
-	onTransition: function() {
-		/*if (this.socket.get('socket') === null) {
-			this.socket.connect();
-		}*/
-		// determine whether we need to try and authenticate with the web socket
-	},
-
 	actions: {
 		loginSubmit: function() {
 			var self = this,

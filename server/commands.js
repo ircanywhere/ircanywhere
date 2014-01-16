@@ -24,14 +24,6 @@ CommandManager = function() {
 
 	var Manager = {
 		init: function() {
-			/*Meteor.publish('commands', function() {
-				return Commands.find({user: this.userId}, {
-					sort: {timestamp: -1},
-					limit: 10
-				});
-			});*/
-			// XXX - Move into sync command
-
 			application.ee.on('ready', function() {
 				application.app.io.route('send', function(req) {
 					Fiber(function() {
