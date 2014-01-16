@@ -14,31 +14,6 @@ ChannelManager = function() {
 		},
 		// a default channel object
 
-		init: function() {
-			/*Meteor.publish('channelUsers', function() {
-				var tabs = Tabs.find({user: this.userId}),
-					networks = Networks.find({'internal.userId': this.userId}),
-					nets = {},
-					match = [];
-
-				networks.forEach(function(network) {
-					nets[network._id] = network.name;
-				});
-
-				tabs.forEach(function(tab) {
-					if (tab.type == 'channel') {
-						match.push({network: nets[tab.network], channel: tab.target});
-					}
-				});
-
-				if (match.length === 0) {
-					return false;
-				} else {
-					return ChannelUsers.find({$or: match});
-				}
-			});*/
-		},
-
 		getChannel: function(network, channel) {
 			return application.Tabs.findOne({network: network, title: channel});
 		},
@@ -158,8 +133,6 @@ ChannelManager = function() {
 			// update the record
 		}
 	};
-
-	Fiber(Manager.init).run();
 
 	return _.extend(Manager, hooks);
 };

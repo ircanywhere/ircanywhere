@@ -46,10 +46,6 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 				self._store('tabs', [payload]);
 			});
 		});
-
-		this.findQuery(null, 'events', {type: 'join'}).then(function(data) {
-			console.log(data);
-		});
 		// handle our events individually
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events

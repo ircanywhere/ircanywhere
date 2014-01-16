@@ -24,30 +24,8 @@ CommandManager = function() {
 
 	var Manager = {
 		init: function() {
-			application.ee.on('ready', function() {
-				application.app.io.route('send', function(req) {
-					Fiber(function() {
-						var doc = req.data,
-							user = Sockets[req.socket.id];
-						// get the data being sent
-
-						if (!(doc.command && doc.network && doc.target !== '')) {
-							req.io.respond({success: false, error: 'invalid format'});
-							// validate it
-						} else {
-							var client = Clients[doc.network],
-								networkId = new mongo.ObjectId(doc.network),
-								inserted = application.Commands.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
-
-							Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
-							// success
-
-							req.io.respond({success: true, id: inserted._id.toString()});
-						}
-					}).run();
-				});
-
-				application.app.io.route('exec', function(req) {
+			application.app.io.route('send', function(req) {
+				Fiber(function() {
 					var doc = req.data,
 						user = Sockets[req.socket.id];
 					// get the data being sent
@@ -56,16 +34,35 @@ CommandManager = function() {
 						req.io.respond({success: false, error: 'invalid format'});
 						// validate it
 					} else {
-						Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
+						var client = Clients[doc.network],
+							networkId = new mongo.ObjectId(doc.network),
+							inserted = application.Commands.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
+
+						Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
+						// success
+
+						req.io.respond({success: true, id: inserted._id.toString()});
 					}
-				});
-				// create a method so the frontend can silently execute commands
-				// so if you call execCommand(netid, '#channel', '/kick ricki'); will
-				// be exactly the same as typing a command in the box with the difference being its
-				// not in the command backlog. This is good if we want to hook certain actions up to commands
-				// to save on duplicate code.
+				}).run();
 			});
-			// we need to wait until everything is ready to setup our commands etc
+
+			application.app.io.route('exec', function(req) {
+				var doc = req.data,
+					user = Sockets[req.socket.id];
+				// get the data being sent
+
+				if (!(doc.command && doc.network && doc.target !== '')) {
+					req.io.respond({success: false, error: 'invalid format'});
+					// validate it
+				} else {
+					Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
+				}
+			});
+			// create a method so the frontend can silently execute commands
+			// so if you call execCommand(netid, '#channel', '/kick ricki'); will
+			// be exactly the same as typing a command in the box with the difference being its
+			// not in the command backlog. This is good if we want to hook certain actions up to commands
+			// to save on duplicate code.
 
 			Manager.createAlias('/join', '/j');
 			Manager.createAlias('/part', '/p', '/leave');
@@ -301,7 +298,9 @@ CommandManager = function() {
 		}
 	};
 
-	Fiber(Manager.init).run();
+	application.ee.on('ready', function() {
+		Fiber(Manager.init).run();
+	});
 
 	return _.extend(Manager, hooks);
 };

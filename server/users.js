@@ -22,53 +22,51 @@ UserManager = function() {
 		
 	var Manager = {
 		init: function() {
-			application.ee.on('ready', function() {
-				var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
+			var smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
 				Manager.server = emails.server.connect({
 					user: smtp[2], 
 					password: smtp[4], 
 					host: smtp[6], 
 					ssl: true
 				});
-				// setup email server
+			// setup email server
 
-				application.app.post('/api/register', function(req, res) {
-					Fiber(function() {
-						var response = Manager.registerUser(req, res);
+			application.app.post('/api/register', function(req, res) {
+				Fiber(function() {
+					var response = Manager.registerUser(req, res);
 
-						res.header('Content-Type', 'application/json');
-						res.end(JSON.stringify(response));
-					}).run();
-				});
-
-				application.app.post('/api/login', function(req, res) {
-					Fiber(function() {
-						var response = Manager.userLogin(req, res);
-
-						res.header('Content-Type', 'application/json');
-						res.end(JSON.stringify(response));
-					}).run();
-				});
-
-				application.app.post('/api/forgot', function(req, res) {
-					Fiber(function() {
-						var response = Manager.forgotPassword(req, res);
-
-						res.header('Content-Type', 'application/json');
-						res.end(JSON.stringify(response));
-					}).run();
-				});
-
-				application.app.post('/api/reset', function(req, res) {
-					Fiber(function() {
-						var response = Manager.resetPassword(req, res);
-
-						res.header('Content-Type', 'application/json');
-						res.end(JSON.stringify(response));
-					}).run();
-				});
-				// setup routes
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
 			});
+
+			application.app.post('/api/login', function(req, res) {
+				Fiber(function() {
+					var response = Manager.userLogin(req, res);
+
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
+			});
+
+			application.app.post('/api/forgot', function(req, res) {
+				Fiber(function() {
+					var response = Manager.forgotPassword(req, res);
+
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
+			});
+
+			application.app.post('/api/reset', function(req, res) {
+				Fiber(function() {
+					var response = Manager.resetPassword(req, res);
+
+					res.header('Content-Type', 'application/json');
+					res.end(JSON.stringify(response));
+				}).run();
+			});
+			// setup routes
 		},
 
 		registerUser: function(req, res) {
@@ -313,7 +311,9 @@ UserManager = function() {
 		}
 	};
 
-	Fiber(Manager.init).run();
+	application.ee.on('ready', function() {
+		Fiber(Manager.init).run();
+	});
 
 	return _.extend(Manager, hooks);
 };

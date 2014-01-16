@@ -17,65 +17,63 @@ NetworkManager = function() {
 		},
 
 		init: function() {
-			application.ee.on('ready', function() {
-				var networks = application.Networks.find(),
-					tabs = application.Tabs.find();
+			var networks = application.Networks.find(),
+				tabs = application.Tabs.find();
 
-				networks.forEach(function(doc) {
-					var id = doc._id.toString();
-					if (!doc.internal) {
-						return false;
-					}
+			networks.forEach(function(doc) {
+				var id = doc._id.toString();
+				if (!doc.internal) {
+					return false;
+				}
 
-					Clients[id] = doc;
-					Clients[id].internal.tabs = {};
-				});
-				// load up networks and push them into Clients
-
-				application.ee.on('networks:insert', function(doc) {
-					var id = doc._id.toString();
-					if (!doc.internal) {
-						return false;
-					}
-
-					Clients[id] = doc;
-					Clients[id].internal.tabs = {};
-				});
-
-				application.ee.on('networks:update', function(doc) {
-					var id = doc._id.toString();
-					Clients[id] = doc;
-					Clients[id].internal.tabs = {};
-					application.Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
-						Clients[id].internal.tabs[tab.target] = tab;
-					});
-				});
-
-				application.ee.on('networks:delete', function(id) {
-					delete Clients[id.toString()];
-				});
-				// just sync clients up to this, instead of manually doing it
-				// we're asking for problems that way doing it this way means
-				// this object will be identical to the network list
-				// this method is inspired by meteor's observe capabilities
-
-				application.ee.on('tabs:insert', function(doc) {
-					Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
-				});
-
-				application.ee.on('tabs:update', function(doc) {
-					Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
-				});
-
-				application.ee.on('tabs:delete', function(id) {
-					_.each(Clients, function(value, key) {
-						var network = _.find(value.internal.tabs, {'_id': id});
-						delete Clients[key].internal.tabs[network.title];
-					});
-				});
-				// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
-				// instead of querying each time which is very inefficient
+				Clients[id] = doc;
+				Clients[id].internal.tabs = {};
 			});
+			// load up networks and push them into Clients
+
+			application.ee.on('networks:insert', function(doc) {
+				var id = doc._id.toString();
+				if (!doc.internal) {
+					return false;
+				}
+
+				Clients[id] = doc;
+				Clients[id].internal.tabs = {};
+			});
+
+			application.ee.on('networks:update', function(doc) {
+				var id = doc._id.toString();
+				Clients[id] = doc;
+				Clients[id].internal.tabs = {};
+				application.Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
+					Clients[id].internal.tabs[tab.target] = tab;
+				});
+			});
+
+			application.ee.on('networks:delete', function(id) {
+				delete Clients[id.toString()];
+			});
+			// just sync clients up to this, instead of manually doing it
+			// we're asking for problems that way doing it this way means
+			// this object will be identical to the network list
+			// this method is inspired by meteor's observe capabilities
+
+			application.ee.on('tabs:insert', function(doc) {
+				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+			});
+
+			application.ee.on('tabs:update', function(doc) {
+				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+			});
+
+			application.ee.on('tabs:delete', function(id) {
+				_.each(Clients, function(value, key) {
+					var network = _.find(value.internal.tabs, {'_id': id});
+					delete Clients[key].internal.tabs[network.title];
+				});
+			});
+			// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
+			// instead of querying each time which is very inefficient
 		},
 
 		getClients: function() {
@@ -268,7 +266,10 @@ NetworkManager = function() {
 		}
 	};
 
-	Fiber(Manager.init).run();
+	application.ee.on('ready', function() {
+		Fiber(Manager.init).run();
+	});
+	// run init when we get the go ahead
 
 	return _.extend(Manager, hooks);
 };
