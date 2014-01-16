@@ -16,7 +16,7 @@ SocketManager = function() {
 
 			application.app.io.on('connection', function (client) {
 				client.on('disconnect', function() {
-					delete Sockets[client._id];
+					Manager.handleDisconnect(client);
 				});
 				// handle disconnect
 
@@ -97,6 +97,10 @@ SocketManager = function() {
 			client.emit('networks', networks);
 			client.emit('tabs', tabs);
 			// compile a load of data to send to the frontend
+		},
+
+		handleDisconnect: function(client) {
+			delete Sockets[client._id];
 		},
 
 		handleEvents: function(req) {
