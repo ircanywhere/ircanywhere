@@ -11,7 +11,8 @@ var Application = require('./app').Application,
 
 Sockets = {};
 Clients = {};
-// clients
+Users = {};
+// global object holders
 
 application = new Application();
 // inject the config so we can mimic it in tests if needed

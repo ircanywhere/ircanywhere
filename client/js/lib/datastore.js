@@ -46,6 +46,10 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 				self._store('tabs', [payload]);
 			});
 		});
+
+		this.socket.on('insert', function(data) {
+			console.log(data);
+		});
 		// handle our events individually
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
@@ -74,7 +78,7 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 		return true;
 	},
 
-	_find: function(many, store, type, query) {
+	_find: function(many, type, query) {
 		var self = this,
 			collection = this.get(type);
 
@@ -110,19 +114,19 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 		}
 	},
 
-	find: function(store, type, query) {
-		return this._find(false, store, type, query);
+	find: function(type, query) {
+		return this._find(false, type, query);
 	},
 
-	findMany: function(store, type, query) {
-		return this._find(true, store, type, query);
+	findMany: function(type, query) {
+		return this._find(true, type, query);
 	},
 
-	findAll: function(store, type) {
-		return this._find(true, store, type, {});
+	findAll: function(type) {
+		return this._find(true, type, {});
 	},
 
-	findQuery: function(store, type, query) {
+	findQuery: function(type, query) {
 		var self = this;
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
@@ -138,5 +142,20 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 		// think messages that are a day old, we probably didn't get them in
 		// the sync event so they won't be in our data store, so we make a query
 		// which will request them, and return a promise.
+	},
+
+	update: function(type, query, update) {
+		var self = this,
+			payload = {collection: type, query: query, update: update};
+
+		return new Ember.RSVP.Promise(function(resolve, reject) {
+			self._send('update', payload, function(response) {
+				if (response.length > 0) {
+					resolve(response);
+				} else {
+					reject('not updated');
+				}
+			});
+		});
 	}
 });

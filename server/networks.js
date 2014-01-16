@@ -31,7 +31,7 @@ NetworkManager = function() {
 			});
 			// load up networks and push them into Clients
 
-			application.ee.on('networks:insert', function(doc) {
+			application.ee.on(['networks', 'insert'], function(doc) {
 				var id = doc._id.toString();
 				if (!doc.internal) {
 					return false;
@@ -39,9 +39,10 @@ NetworkManager = function() {
 
 				Clients[id] = doc;
 				Clients[id].internal.tabs = {};
+				// update internal records
 			});
 
-			application.ee.on('networks:update', function(doc) {
+			application.ee.on(['networks', 'update'], function(doc) {
 				var id = doc._id.toString();
 				Clients[id] = doc;
 				Clients[id].internal.tabs = {};
@@ -50,7 +51,7 @@ NetworkManager = function() {
 				});
 			});
 
-			application.ee.on('networks:delete', function(id) {
+			application.ee.on(['networks', 'delete'], function(id) {
 				delete Clients[id.toString()];
 			});
 			// just sync clients up to this, instead of manually doing it
@@ -58,15 +59,15 @@ NetworkManager = function() {
 			// this object will be identical to the network list
 			// this method is inspired by meteor's observe capabilities
 
-			application.ee.on('tabs:insert', function(doc) {
+			application.ee.on(['tabs', 'insert'], function(doc) {
 				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 			});
 
-			application.ee.on('tabs:update', function(doc) {
+			application.ee.on(['tabs', 'update'], function(doc) {
 				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 			});
 
-			application.ee.on('tabs:delete', function(id) {
+			application.ee.on(['tabs', 'delete'], function(id) {
 				_.each(Clients, function(value, key) {
 					var network = _.find(value.internal.tabs, {'_id': id});
 					delete Clients[key].internal.tabs[network.title];
@@ -165,7 +166,7 @@ NetworkManager = function() {
 		},
 
 		activeTab: function(client, target, activate) {
-			if (typeof target !== "boolean") {
+			if (typeof target !== 'boolean') {
 				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
 			} else {
 				application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
@@ -173,11 +174,7 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(req) {
-			var user = Sockets[req.socket.id],
-				url = req.data.url,
-				userId = user._id;
-
+		selectTab: function(userId, url, req) {
 			if (url === undefined || url === '') {
 				return req.io.respond({success: false, error: 'invalid url'});
 			}
@@ -212,32 +209,6 @@ NetworkManager = function() {
 			return req.io.respond({success: true});
 			// respond - we don't send new tab info down the line, we'll get it when it's synced up
 			// we can safely change the tab if the response is true
-		},
-
-		updateTab: function(req) {
-			var user = Sockets[req.socket.id],
-				params = req.data,
-				success = false;
-
-			if (!params.tab) {
-				return req.io.respond({success: false});
-			}
-
-			var tabId = params.tab,
-				update = {$set: {}};
-
-			if (params.hiddenUsers !== undefined && typeof params.hiddenUsers === 'boolean') {
-				update['$set'] = {hiddenUsers: params.hiddenUsers};
-				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
-				success = true;
-			} else if (params.hiddenEvents !== undefined && typeof params.hiddenEvents === 'boolean') {
-				update['$set'] = {hiddenEvents: params.hiddenEvents};
-				application.Tabs.update({_id: new mongo.ObjectId(tabId)}, update);
-				success = true;
-			}
-			// we're only allowed to update these two properties via this method atm
-
-			return req.io.respond({success: success});
 		},
 
 		removeTab: function(client, target) {

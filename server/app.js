@@ -4,7 +4,7 @@ Application = function() {
 	var _ = require('lodash'),
 		hooks = require('hooks'),
 		winston = require('winston'),
-		events = require('events'),
+		events = require('eventemitter2'),
 		os = require('os'),
 		fs = require('fs'),
 		raw = fs.readFileSync('./private/config.json').toString(),
@@ -124,10 +124,14 @@ Application = function() {
 	};
 
 	var App = {
-		init: function() {
-			App.ee = new events.EventEmitter();
-			// setup an event emitter
+		ee: new events.EventEmitter2({
+			wildcard: true,
+			delimiter: '.',
+			maxListeners: 0
+		}),
+		// setup an event emitter
 
+		init: function() {
 			App.config = JSON.parse(jsonminify(raw));
 			validate(App.config, schema);
 			// attempt to validate our config file
@@ -186,22 +190,22 @@ Application = function() {
 							switch(item.op) {
 								case 'i':
 									var mode = 'insert';
-									App.ee.emit(collection[1] + ':' + mode, item.o);
+									App.ee.emit([collection[1], mode], item.o);
 									break;
 								case 'u':
 									var mode = 'update',
 										doc = App.mongo.getCollection(collection[1]).find(item.o2).toArray()[0];
 									// get the new full document
 
-									App.ee.emit(collection[1] + ':' + mode, doc);
+									App.ee.emit([collection[1], mode], doc);
 									break;
 								case 'd':
 									var mode = 'delete';
-									App.ee.emit(collection[1] + ':' + mode, item.o._id);
+									App.ee.emit([collection[1], mode], item.o._id);
 									break;
 								case 'c':
 									for (var cmd in item.o) {
-										App.ee.emit(item.o[cmd] + ':' + cmd);
+										App.ee.emit([item.o[cmd], cmd]);
 									}
 								default:
 									break;

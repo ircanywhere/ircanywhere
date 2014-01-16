@@ -3,10 +3,36 @@ SocketManager = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
+		mongo = require('mongo-sync'),
 		Fiber = require('fibers');
 
 	var Manager = {
+		allowedUpdates: {
+			tabs: function(update) {
+				return ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
+						(_.has(update, 'hiddenEvents') && typeof update.hiddenUsers === 'boolean') || 
+						(_.has(update, 'selected') && typeof update.hiddenUsers === 'boolean'));
+			}
+		},
+
+		propogate: ['users', 'networks', 'tabs', 'events'],
+		// collections with allowed update rules
+		// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
+
 		init: function() {
+			application.ee.on(['*', '*'], function(doc) {
+				if (_.indexOf(Manager.propogate, this.event[0]) == -1) {
+					return false;
+				}
+
+				if (this.event[0] === 'users') {
+					var id = doc._id.toString(),
+						client = Users[id];
+
+					client.emit('update', {collection: 'users', record: doc});
+				}
+			});
+
 			application.app.io.set('authorization', function(data, accept) {
 				Fiber(function() {
 					Manager.handleAuth(data, accept);
@@ -32,18 +58,36 @@ SocketManager = function() {
 				}).run();
 			});
 
-			/*application.app.io.route('selectTab', function(req) {
-				Fiber(function() {
-					Manager.selectTab(req);
-				}).run();
-			});
+			application.app.io.route('update', function(req) {
+				var collection = req.data.collection,
+					query = req.data.query,
+					update = req.data.update;
 
-			application.app.io.route('updateTab', function(req) {
+				if (!collection || !query || !update) {
+					return req.io.respond({success: false, error: 'invalid format'});
+				}
+
+				if (!_.isFunction(Manager.allowedUpdates[collection])) {
+					return req.io.respond({success: false, error: 'cant update'});
+				}
+
+				if (!Manager.allowedUpdates[collection](update)) {
+					return req.io.respond({success: false, error: 'not allowed'});
+				}
+				// have we been denied?
+
 				Fiber(function() {
-					Manager.updateTab(req);
+					if (query._id) {
+						query._id = new mongo.ObjectId(query._id);
+					}
+					// update it to a proper mongo id
+
+					application.mongo.getCollection(collection).update(query, {$set: update});
+					req.io.respond({success: true});
+					// update and respond
 				}).run();
-			});*/
-			// XXX - Refactor these
+				// all clear
+			});
 		},
 
 		handleAuth: function(data, accept) {
@@ -82,6 +126,7 @@ SocketManager = function() {
 				netIds = {};
 
 			Sockets[client.id] = user;
+			Users[user._id.toString()] = client; 
 			// remember the link between the socket and the user
 
 			networks.forEach(function(network) {
@@ -100,7 +145,11 @@ SocketManager = function() {
 		},
 
 		handleDisconnect: function(client) {
-			delete Sockets[client._id];
+			var user = Sockets[client.id];
+
+			delete Users[user._id.toString()];
+			delete Sockets[client.id];
+			// clean up
 		},
 
 		handleEvents: function(req) {
