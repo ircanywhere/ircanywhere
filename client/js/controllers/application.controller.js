@@ -18,7 +18,7 @@ App.ApplicationController = Ember.ObjectController.extend({
 				network.id = network._id;
 				delete network._id;
 				
-			});
+			});	
 		}
 	}
 });

@@ -11,9 +11,9 @@ App.IndexController = Ember.ObjectController.extend({
 	resetEmail: 'Email Address',
 
 	onTransition: function() {
-		if (this.socket.get('socket') === null) {
+		/*if (this.socket.get('socket') === null) {
 			this.socket.connect();
-		}
+		}*/
 		// determine whether we need to try and authenticate with the web socket
 	},
 

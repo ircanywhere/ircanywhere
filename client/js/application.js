@@ -1,8 +1,8 @@
 App = Ember.Application.create({
-	Socket: Ember.Socket.extend({
-		controllers: ['application', 'index']
+	store: DS.Store.create({
+		revision: 11,
+		adapter: DS.SocketAdapter.create({})
 	})
-	// create a socket in the App namespace based on our Ember.Socket module
 });
 
 App.Router.reopen({
