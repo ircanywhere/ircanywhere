@@ -14,7 +14,7 @@ ChannelManager = function() {
 		// a default channel object
 
 		getChannel: function(network, channel) {
-			return application.Tabs.findOne({network: network, title: channel});
+			return application.Tabs.sync.findOne({network: network, title: channel});
 		},
 
 		insertUsers: function(key, network, channel, users, force) {
@@ -29,16 +29,16 @@ ChannelManager = function() {
 				find.push(u.nickname);
 
 				if (u.nickname == Clients[key].nick) {
-					application.Networks.update({_id: key}, {$set: {hostname: u.hostname}});
+					application.Networks.sync.update({_id: key}, {$set: {hostname: u.hostname}});
 				}
 				// update hostname
 			});
 			// turn this into an array of nicknames
 
 			if (force) {
-				application.ChannelUsers.remove({network: network, channel: channel});
+				application.ChannelUsers.sync.remove({network: network, channel: channel});
 			} else {
-				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}});
+				application.ChannelUsers.sync.remove({network: network, channel: channel, nickname: {$in: find}});
 			}
 			// ok so here we've gotta remove any users in the channel already
 			// and all of them if we're being told to force the update
@@ -47,7 +47,7 @@ ChannelManager = function() {
 				var prefix = eventManager.getPrefix(Clients[key], u);
 				u.sort = prefix.sort;
 				u.prefix = prefix.prefix;
-				application.ChannelUsers.insert(u);
+				application.ChannelUsers.sync.insert(u);
 			});
 			// send the update out
 
@@ -61,9 +61,9 @@ ChannelManager = function() {
 			// jsut remove the user from the entire network (on quits etc)
 
 			if (_.isArray(channel)) {
-				application.ChannelUsers.remove({network: network, nickname: {$in: users}});
+				application.ChannelUsers.sync.remove({network: network, nickname: {$in: users}});
 			} else {
-				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}});
+				application.ChannelUsers.sync.remove({network: network, channel: channel, nickname: {$in: users}});
 				// update
 			}
 			// send the update out
@@ -74,13 +74,17 @@ ChannelManager = function() {
 
 			_.each(users, function(u) {
 				var s = {network: network, nickname: u},
-					records = application.ChannelUsers.find(s);
+					records = application.ChannelUsers.sync.find(s);
 
-				records.forEach(function (user) {
+				records.each(function(err, user) {
+					if (err || user === null) {
+						return;
+					}
+
 					var updated = _.extend(user, values);
 						updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
 
-					application.ChannelUsers.update(s, _.omit(updated, '_id'));
+					application.ChannelUsers.sync.update(s, _.omit(updated, '_id'));
 					// update the record
 				});
 			});
@@ -93,14 +97,14 @@ ChannelManager = function() {
 				chan = this.getChannel(key, channel),
 				us = {};
 
-			var users = application.ChannelUsers.find({network: network, channel: channel}),
+			var users = application.ChannelUsers.sync.find({network: network, channel: channel}).sync.toArray(),
 				parsedModes = modeParser.sortModes(capab, mode);
 			// we're not arsed about the channel or network here
 
 			var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 			// we need to attempt to update the record now with the new info
 
-			application.Tabs.update({network: key, title: channel}, {$set: {modes: modes}});
+			application.Tabs.sync.update({network: key, title: channel}, {$set: {modes: modes}});
 			// update the record
 
 			users.forEach(function(u) {
@@ -113,7 +117,7 @@ ChannelManager = function() {
 				u.sort = prefix.sort;
 				u.prefix = prefix.prefix;
 				
-				application.ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u);
+				application.ChannelUsers.sync.update({network: network, channel: channel, nickname: u.nickname}, u);
 			});
 			// update users now
 		},
@@ -128,7 +132,7 @@ ChannelManager = function() {
 			};
 			// updat the topic record
 
-			application.Tabs.update({network: key, title: channel}, {$set: {topic: topic}});
+			application.Tabs.sync.update({network: key, title: channel}, {$set: {topic: topic}});
 			// update the record
 		}
 	};

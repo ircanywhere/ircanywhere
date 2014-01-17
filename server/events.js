@@ -6,7 +6,7 @@ EventManager = function() {
 		_insert = function(client, message, type, user) {
 			var network = client.name,
 				channel = (message.channel && !message.target) ? message.channel : message.target,
-				user = user || application.ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname});
+				user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
 			// get a channel user object if we've not got one
 
 			if (!message.channel && !message.target) {
@@ -30,17 +30,21 @@ EventManager = function() {
 					}
 				};
 
-			application.Events.insert(output);
+			application.Events.sync.insert(output);
 			// get the prefix, construct an output and insert it
 		};
 
 	var Manager = {
 		insertEvent: function(client, message, type) {
 			if (type == 'nick' || type == 'quit') {
-				var chans = application.ChannelUsers.find({network: client.name, nickname: message.nickname});
+				var chans = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname});
 				// find the channel, we gotta construct a query (kinda messy)
 
-				chans.forEach(function(chan) {
+				chans.each(function(err, chan) {
+					if (err || chan === null) {
+						return;
+					}
+					
 					message.channel = chan.channel;
 					_insert(client, message, type, chan);
 					// we're in here because the user either changing their nick

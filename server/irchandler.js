@@ -3,8 +3,7 @@ IRCHandler = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
-		helper = require('../lib/helpers').Helpers,
-		Fiber = require('fibers');
+		helper = require('../lib/helpers').Helpers;
 
 	var Handler = {
 		registered: function(client, message) {
@@ -24,7 +23,7 @@ IRCHandler = function() {
 			}
 			// find our channels to automatically join from the network setup
 
-			application.Networks.update({_id: client._id}, {$set: {
+			application.Networks.sync.update({_id: client._id}, {$set: {
 				'nick': message.nickname,
 				'name': message.capabilities.network.name,
 				'internal.status': networkManager.flags.connected,
@@ -105,13 +104,13 @@ IRCHandler = function() {
 
 		nick: function(client, message) {
 			if (message.nickname == client.nick) {
-				Networks.update({_id: client._id}, {$set: {nick: message.newnick}});
+				Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
 			}
 			// update the nickname because its us changing our nick
 
 			if (_.has(client.internal.tabs, message.nickname)) {
 				var mlower = message.nickname.toLowerCase();
-				application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
+				application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
 			}
 			// is this a client we're chatting to whos changed their nickname?
 			
@@ -152,7 +151,7 @@ IRCHandler = function() {
 		},
 
 		names: function(client, message) {
-			var channelUsers = application.ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}),
+			var channelUsers = application.ChannelUsers.sync.find({network: client.name, channel: message.channel.toLowerCase()}).sync.toArray(),
 				users = [],
 				keys = [],
 				regex = new RegExp('[' + helper.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');

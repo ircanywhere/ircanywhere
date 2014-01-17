@@ -26,7 +26,7 @@
 		"irc-factory": "1.2.5",
 		"jsonminify": "0.2.2",
 		"lodash": "2.4.1",
-		"mongo-sync": "0.2.4",
+		"mongodb": "1.3.23",
 		"simple-schema": "1.1.0",
 		"winston": "0.7.2"
 	},

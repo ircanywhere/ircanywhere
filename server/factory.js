@@ -21,32 +21,28 @@ IRCFactory = function() {
 				Factory.rpc = interfaces.rpc;
 			// connect to our uplinks
 
-			var wait = function(callback) {
-				Factory.events.on('message', function(message) {
-					callback(message);
+			Factory.events.on('message', function(message) {
+				fibrous.run(function() {
+					if (message.event == 'synchronize') {
+						var users = networkManager.getClients(),
+							keys = _.keys(users),
+							difference = _.difference(keys, message.keys);
+
+						_.each(message.keys, function(key) {
+							networkManager.changeStatus(key, networkManager.flags.connected);
+						});
+						
+						_.each(difference, function(key) {
+							var user = users[key];
+							networkManager.connectNetwork(user.user, user.network);
+						});
+						// the clients we're going to actually attempt to boot up
+
+						application.logger.log('warn', 'factory synchronize', message);
+					} else {
+						Factory.handleEvent(message.event, message.message);
+					}
 				});
-			};
-
-			wait.sync(function(message) {
-				if (message.event == 'synchronize') {
-					var users = networkManager.getClients(),
-						keys = _.keys(users),
-						difference = _.difference(keys, message.keys);
-
-					_.each(message.keys, function(key) {
-						networkManager.changeStatus(key, networkManager.flags.connected);
-					});
-					
-					_.each(difference, function(key) {
-						var user = users[key];
-						networkManager.connectNetwork(user.user, user.network);
-					});
-					// the clients we're going to actually attempt to boot up
-
-					application.logger.log('warn', 'factory synchronize', message);
-				} else {
-					Factory.handleEvent(message.event, message.message);
-				}
 			});
 		},
 

@@ -30,7 +30,7 @@ networkManager = new NetworkManager();
 userManager = new UserManager();
 // user manager
 
-/*ircFactory = new IRCFactory();
+ircFactory = new IRCFactory();
 // setup irc factory
 
 ircHandler = new IRCHandler();
@@ -43,4 +43,4 @@ eventManager = new EventManager();
 // event manager
 
 commandManager = new CommandManager();
-// command manager*/
+// command manager

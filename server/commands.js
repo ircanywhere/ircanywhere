@@ -3,12 +3,11 @@ CommandManager = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
-		mongo = require('mongo-sync'),
-		Fiber = require('fibers'),
+		mongo = require('mongodb'),
 		_ban = function(client, target, nickname, ban) {
 			var nickname = params[0],
 				mode = (ban) ? '+b' : '-b',
-				user = application.ChannelUsers.findOne({
+				user = application.ChannelUsers.sync.findOne({
 					network: client.name,
 					channel: new RegExp('^' + target + '$', 'i'),
 					nickname: new RegExp('^' + nickname + '$', 'i')
@@ -25,7 +24,7 @@ CommandManager = function() {
 	var Manager = {
 		init: function() {
 			application.app.io.route('send', function(req) {
-				Fiber(function() {
+				fibrous.run(function() {
 					var doc = req.data,
 						user = Sockets[req.socket.id];
 					// get the data being sent
@@ -36,28 +35,32 @@ CommandManager = function() {
 					} else {
 						var client = Clients[doc.network],
 							networkId = new mongo.ObjectId(doc.network),
-							inserted = application.Commands.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
+							inserted = application.Commands.sync.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
 
 						Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
 						// success
 
 						req.io.respond({success: true, id: inserted._id.toString()});
 					}
-				}).run();
+				});
 			});
 
 			application.app.io.route('exec', function(req) {
-				var doc = req.data,
-					user = Sockets[req.socket.id];
-				// get the data being sent
+				fibrous.run(function() {
+					var doc = req.data,
+						user = Sockets[req.socket.id];
+					// get the data being sent
 
-				if (!(doc.command && doc.network && doc.target !== '')) {
-					req.io.respond({success: false, error: 'invalid format'});
-					// validate it
-				} else {
-					Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
-				}
+					if (!(doc.command && doc.network && doc.target !== '')) {
+						req.io.respond({success: false, error: 'invalid format'});
+						// validate it
+					} else {
+						Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
+					}
+				});
 			});
+			// XXX - Consider updating to use collection inserts?
+
 			// create a method so the frontend can silently execute commands
 			// so if you call execCommand(netid, '#channel', '/kick ricki'); will
 			// be exactly the same as typing a command in the box with the difference being its
@@ -247,7 +250,7 @@ CommandManager = function() {
 		},
 
 		'/close': function(user, client, target, params) {
-			var tab = Tabs.findOne({target: target, network: client._id});
+			var tab = Tabs.sync.findOne({target: target, network: client._id});
 			// get the tab in question
 
 			if (tab.type === 'channel') {
@@ -299,7 +302,7 @@ CommandManager = function() {
 	};
 
 	application.ee.on('ready', function() {
-		Fiber(Manager.init).run();
+		fibrous.run(Manager.init);
 	});
 
 	return _.extend(Manager, hooks);

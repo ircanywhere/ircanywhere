@@ -21,13 +21,13 @@ NetworkManager = function() {
 
 			networks.each(function(err, doc) {
 				if (err || doc == null) {
-					return false;
+					return;
 				}
 				// error
 
 				var id = doc._id.toString();
 				if (!doc.internal) {
-					return false;
+					return;
 				}
 
 				Clients[id] = doc;
@@ -37,7 +37,7 @@ NetworkManager = function() {
 
 			tabs.each(function(err, doc) {
 				if (err || doc == null) {
-					return false;
+					return;
 				}
 				// error
 
@@ -63,7 +63,7 @@ NetworkManager = function() {
 				
 				application.Tabs.find({user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
 					if (err || doc == null) {
-						return false;
+						return;
 					}
 					// error
 					Clients[id].internal.tabs[tab.target] = tab;
