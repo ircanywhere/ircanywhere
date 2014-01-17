@@ -38,15 +38,19 @@ Ember.Socket = Ember.Object.extend({
 		var self = this;
 
 		this.socket.on('users', function(data) {
-			self._handle('users', data);
+			self._store('users', data);
 		});
 
 		this.socket.on('networks', function(data) {
-			self._handle('networks', data);
+			self._store('networks', data);
 		});
 
 		this.socket.on('tabs', function(data) {
-			self._handle('tabs', data);
+			self._store('tabs', data);
+		});
+
+		this.socket.on('channelUsers', function(data) {
+			self._store('channelUsers', data);
 		});
 
 		this.socket.on('insert', function(data) {
@@ -54,7 +58,7 @@ Ember.Socket = Ember.Object.extend({
 				return false;
 			}
 
-			self._handle(data.collection, [data.record]);
+			self._store(data.collection, [data.record]);
 		});
 
 		this.socket.on('update', function(data) {
@@ -65,7 +69,7 @@ Ember.Socket = Ember.Object.extend({
 			self._update(data.collection, data.id, data.record);
 		});
 
-		this.socket.on('remove', function(data) {
+		this.socket.on('delete', function(data) {
 			if (!data.collection || !data.id) {
 				return false;
 			}
@@ -76,24 +80,6 @@ Ember.Socket = Ember.Object.extend({
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
-	},
-
-	_handle: function(collection, data) {
-		var self = this;
-		if (collection === 'tabs') {
-			data.forEach(function(payload) {
-				if (payload.users.length > 0) {
-					self._store('channelUsers', payload.users);
-				}
-
-				delete payload.users;
-				// remove it so it's not stored in the tab map
-
-				self._store('tabs', [payload]);
-			});
-		} else {
-			self._store('networks', data);
-		}
 	},
 
 	_store: function(collection, payload) {
@@ -117,29 +103,19 @@ Ember.Socket = Ember.Object.extend({
 			return false;
 		}
 
-		var i = -1,
-			set = collection.find(function(obj, index) {
-				var found = self._search({_id: id}, obj);
-				if (found) {
-					i = index;
-				}
-				return found;
-			});
-		// locate said object and get it's index, cause
-		// we're gonna need to overwrite it
+		var object = collection.findProperty('_id', id);
+		// find the object
 
-		if (i == -1) {
-			return false;
-		}
-		// bail
+		collection.removeObject(object);
+		// bump it out
 
 		for (var key in changes) {
-			set[key] = changes[key];
+			object[key] = changes[key];
 		}
 		// overwrite them in the set
 
-		collection[i] = set;
-		// XXX - May need to trigger a change by altering .length or something
+		collection.pushObject(object);
+		// pop it back in
 	},
 
 	_delete: function(type, id) {
@@ -150,23 +126,11 @@ Ember.Socket = Ember.Object.extend({
 			return false;
 		}
 
-		var i = -1,
-			set = collection.find(function(obj, index) {
-				var found = self._search({_id: id}, obj);
-				if (found) {
-					i = index;
-				}
-				return found;
-			});
-		// look for the index where the object is at
+		var object = collection.findProperty('_id', id);
+		// find the object
 
-		if (i == -1) {
-			return false;
-		}
-		// bail
-
-		delete collection[i];
-		// remove
+		collection.removeObject(object);
+		// bump it out
 	},
 
 	_search: function(query, obj) {
@@ -256,7 +220,7 @@ Ember.Socket = Ember.Object.extend({
 		return new Ember.RSVP.Promise(function(resolve, reject) {
 			self._send('update', payload, function(response) {
 				if (response.length > 0) {
-					self._handle(type, response);
+					self._store(type, response);
 					// handle so we can insert into db
 
 					resolve(response);

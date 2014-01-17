@@ -153,7 +153,8 @@ SocketManager = function() {
 			var user = client.handshake.user,
 				networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 				tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
-				netIds = {};
+				netIds = {},
+				usersQuery = {$or: []};
 
 			Sockets[client.id] = user;
 			Users[user._id.toString()] = client; 
@@ -164,13 +165,16 @@ SocketManager = function() {
 			});
 
 			tabs.forEach(function(tab) {
-				tab.users = application.ChannelUsers.sync.find({network: netIds[tab.network], channel: tab.target}).sync.toArray()
+				usersQuery['$or'].push({network: netIds[tab.network], channel: tab.target});
 			});
 			// loop tabs
+
+			var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray();
 
 			client.emit('users', user);
 			client.emit('networks', networks);
 			client.emit('tabs', tabs);
+			client.emit('channelUsers', users);
 			// compile a load of data to send to the frontend
 		},
 

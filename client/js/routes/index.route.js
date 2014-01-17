@@ -6,7 +6,7 @@ App.Router.map(function() {
 
 App.IndexRoute = AppRoute.extend({
 	model: function() {
-		return this.controllerFor('application').socket.connect();
+		return this.controllerFor('index').socket.connect();
 	},
 
 	actions: {

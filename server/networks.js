@@ -86,7 +86,7 @@ NetworkManager = function() {
 				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 			});
 
-			application.ee.on(['tabs', 'delete'], function(id) {
+			application.ee.on(['tabs', 'delete'], function(doc, id) {
 				_.each(Clients, function(value, key) {
 					var network = _.find(value.internal.tabs, {'_id': id});
 					delete Clients[key].internal.tabs[network.title];

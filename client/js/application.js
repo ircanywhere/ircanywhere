@@ -1,6 +1,6 @@
 App = Ember.Application.create({
 	Socket: Ember.Socket.extend({
-		controllers: ['application']
+		controllers: ['index']
     })
 });
 
