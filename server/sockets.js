@@ -15,21 +15,42 @@ SocketManager = function() {
 			}
 		},
 
-		propogate: ['users', 'networks', 'tabs', 'events'],
+		propogate: ['users', 'networks', 'tabs', 'events', 'channelUsers'],
 		// collections with allowed update rules
 		// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
 		init: function() {
 			application.ee.on(['*', '*'], function(doc) {
-				if (_.indexOf(Manager.propogate, this.event[0]) == -1) {
+				var collection = this.event[0];
+				if (_.indexOf(Manager.propogate, collection) == -1) {
 					return false;
 				}
 
-				if (this.event[0] === 'users') {
-					var id = doc._id.toString(),
-						client = Users[id];
+				try {
+					if (collection === 'users') {
+						var id = doc._id.toString(),
+							client = Users[id];
 
-					client.emit('update', {collection: 'users', record: doc});
+						client.emit('update', {collection: collection, record: doc});
+					} else if (collection === 'networks') {
+						var id = doc.internal.userId.toString(),
+							client = Users[id];
+
+						client.emit('update', {collection: collection, record: doc});
+					} else if (collection === 'tabs' || collection === 'events') {
+						var id = doc.user.toString(),
+							client = Users[id];
+
+						client.emit('update', {collection: collection, record: doc});
+					} else if (collection === 'channelUsers') {
+						for (var id in Clients) {
+							for (var tabId in Clients[id].internal.tabs) {
+								console.log(tabId);
+							}
+						}
+					}
+				} catch (e) {
+					console.log(e);
 				}
 			});
 

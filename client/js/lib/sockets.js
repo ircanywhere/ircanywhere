@@ -1,26 +1,36 @@
-DS.SocketAdapter = DS.RESTAdapter.extend({
+Ember.Socket = Ember.ObjectController.extend({
+	controllers: [],
+
 	socket: null,
 
 	init: function() {
-		this._super();
-		// call the super constructor
-
 		this.set('user', new Ember.Set());
 		this.set('networks', new Ember.Set());
 		this.set('tabs', new Ember.Set());
 		this.set('channelUsers', new Ember.Set());
 		// setup the collections
-
-		this.socket = io.connect();
-		// connect
-
-		this.socket.on('error', this._error.bind(this));
-		this.socket.on('connect', this._listen.bind(this));
-		// bind events
 	},
 
-	_error: function() {
-		this.socket = null;
+	connect: function() {
+		var self = this;
+
+		return new Ember.RSVP.Promise(function(resolve, reject) {
+			var socket = io.connect();
+			// connect
+
+			socket.on('error', function(err) {
+				reject(err);
+			});
+
+			socket.on('connect', function() {
+				self._listen();
+
+				resolve();
+			});
+			// bind events
+
+			self.set('socket', socket);
+		});
 	},
 
 	_listen: function() {
@@ -114,11 +124,11 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 		}
 	},
 
-	find: function(type, query) {
+	findOne: function(type, query) {
 		return this._find(false, type, query);
 	},
 
-	findMany: function(type, query) {
+	find: function(type, query) {
 		return this._find(true, type, query);
 	},
 
@@ -126,7 +136,7 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 		return this._find(true, type, {});
 	},
 
-	findQuery: function(type, query) {
+	request: function(type, query) {
 		var self = this;
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
@@ -158,4 +168,20 @@ DS.SocketAdapter = DS.RESTAdapter.extend({
 			});
 		});
 	}
+});
+
+Ember.onLoad('Ember.Application', function($app) {
+	$app.initializer({
+		name: 'sockets',
+
+		initialize: function(container, application) {
+			application.register('socket:main', application.Socket, {
+				singleton: true
+			});
+			// register `socket:main` with Ember.js.
+
+			application.inject('controller', 'socket', 'socket:main');
+			// we then want to inject `socket` into each controller.
+		}
+	});
 });

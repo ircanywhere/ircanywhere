@@ -1,4 +1,4 @@
-App.IndexController = Ember.ObjectController.extend({
+App.LoginController = Ember.ObjectController.extend({
 	title: 'IRCAnywhere',
 	errors: false,
 

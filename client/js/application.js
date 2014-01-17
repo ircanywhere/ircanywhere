@@ -1,5 +1,7 @@
 App = Ember.Application.create({
-	DataStore: DS.SocketAdapter.create()
+	Socket: Ember.Socket.extend({
+		controllers: ['application']
+    })
 });
 
 App.Router.reopen({

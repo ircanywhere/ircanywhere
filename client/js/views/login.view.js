@@ -1,4 +1,4 @@
-App.IndexView = Ember.View.extend({
+App.LoginView = Ember.View.extend({
 	layoutName: 'splash',
 	templateName: 'login'
 });

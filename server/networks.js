@@ -31,6 +31,10 @@ NetworkManager = function() {
 			});
 			// load up networks and push them into Clients
 
+			tabs.forEach(function(doc) {
+				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+			});
+
 			application.ee.on(['networks', 'insert'], function(doc) {
 				var id = doc._id.toString();
 				if (!doc.internal) {
