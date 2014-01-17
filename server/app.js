@@ -172,47 +172,42 @@ Application = function() {
 			var start = Math.floor(+new Date() / 1000);
 
 			App.Oplog.find({}, {'tailable': true}).each(function(err, item) {
-				fibrous(function() {
-					if (err) {
-						throw err;
+				if (err) {
+					throw err;
+				}
+
+				if (item.ts.high_ >= start) {
+					var collection = item.ns.split('.');
+					// get the collection name
+
+					if (collection[0] !== App.database.mongo[3]) {
+						return false;
 					}
+					// bail if this is a different database
 
-					if (item.ts.high_ >= start) {
-						var collection = item.ns.split('.');
-						// get the collection name
-
-						if (collection[0] !== App.database.mongo[3]) {
-							return false;
-						}
-						// bail if this is a different database
-
-						switch(item.op) {
-							case 'i':
-								var mode = 'insert';
-								App.ee.emit([collection[1], mode], item.o);
-								break;
-							case 'u':
-								var mode = 'update',
-									doc = App.mongo.collection(collection[1]).find(item.o2).toArray()[0];
-								// get the new full document
-
-								App.ee.emit([collection[1], mode], doc);
-								break;
-							case 'd':
-								var mode = 'delete';
-								App.ee.emit([collection[1], mode], item.o._id);
-								break;
-							case 'c':
-								for (var cmd in item.o) {
-									App.ee.emit([item.o[cmd], cmd]);
-								}
-							default:
-								break;
-						}
-						// emit the event
+					switch(item.op) {
+						case 'i':
+							App.ee.emit([collection[1], 'insert'], item.o);
+							break;
+						case 'u':
+							App.mongo.collection(collection[1]).findOne(item.o2, function(err, doc) {
+								App.ee.emit([collection[1], 'update'], doc);
+							});
+							// get the new full document
+							break;
+						case 'd':
+							App.ee.emit([collection[1], 'delete'], item.o._id);
+							break;
+						case 'c':
+							for (var cmd in item.o) {
+								App.ee.emit([item.o[cmd], cmd]);
+							}
+						default:
+							break;
 					}
-					// data has changed
-				});
+					// emit the event
+				}
+				// data has changed
 			});
 		},
 

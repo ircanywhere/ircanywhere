@@ -62,7 +62,7 @@ NetworkManager = function() {
 				Clients[id].internal.tabs = {};
 				
 				application.Tabs.find({user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
-					if (err || doc == null) {
+					if (err || tab == null) {
 						return;
 					}
 					// error
@@ -157,6 +157,7 @@ NetworkManager = function() {
 					user: client.internal.userId,
 					url: (type === 'network') ? client.internal.url : client.internal.url + '/' + target.toLowerCase(),
 					network: client._id,
+					networkName: client.name,
 					target: target.toLowerCase(),
 					title: target,
 					type: type,
