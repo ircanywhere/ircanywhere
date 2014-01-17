@@ -13,9 +13,15 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	connect: function() {
-		var self = this;
+		var self = this,
+			sock = self.get('socket');
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
+			if (sock !== null && sock.socket.connected) {
+				resolve();
+			}
+			// already connected, resolve straight away
+
 			var socket = io.connect();
 			// connect
 
@@ -35,7 +41,13 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_listen: function() {
-		var self = this;
+		var controllers = Ember.get(this, 'controllers'),
+			getController = this._getController.bind(this),
+			self = this,
+			respond = function() {
+				var eventData = Array.prototype.slice.call(arguments);
+				module._update.call(module, this, eventData);
+			};
 
 		this.socket.on('users', function(data) {
 			self._store('users', data);
@@ -80,6 +92,34 @@ Ember.Socket = Ember.Object.extend({
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
+
+		Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
+			var controller = getController(controllerName),
+				eventNames = controller.events;
+			// fetch the controller if it's valid.
+
+			if (controller) {
+				if (typeof controller.events === 'object' && typeof controller.events.connect === 'function') {
+					controller.events.connect.apply(controller);
+				}
+				// invoke the `connect` method if it has been defined on this controller.
+			}
+		});
+		// bind any connect events to our controllers
+	},
+
+	_getController: function(name) {
+		name = 'controller:%@'.fmt(name);
+		var controller = this.container.lookup(name);
+		// format the `name` to match what the lookup container is expecting, and then
+		// we'll locate the controller from the `container`.
+
+		if (!controller || ('events' in controller === false)) {
+			return false;
+		}
+		// don't do anything with this controller if it hasn't defined a `events` hash.
+
+		return controller;
 	},
 
 	_store: function(collection, payload) {
@@ -162,7 +202,7 @@ Ember.Socket = Ember.Object.extend({
 		// attempt to find
 
 		if (set) {
-			return set;
+			return set[0];
 		} else {
 			return false;
 		}

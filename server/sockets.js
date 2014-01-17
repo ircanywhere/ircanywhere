@@ -47,6 +47,11 @@ SocketManager = function() {
 				}
 
 				clients.forEach(function(client) {
+					if (!client) {
+						return false;
+					}
+					// bail if its undefined
+
 					if (eventName === 'insert') {
 						client.emit(eventName, {collection: collection, record: doc});
 					} else if (eventName === 'update') {

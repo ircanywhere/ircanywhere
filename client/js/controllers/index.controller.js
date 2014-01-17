@@ -1,7 +1,19 @@
-App.IndexController = Ember.ArrayController.extend({
-	results: [],
+App.IndexController = Ember.ObjectController.extend({
+	actions: {},
 
-	init: function() {
-		this.set('results', this.socket.get('channelUsers'));
+	events: {
+		connect: function() {
+			var self = this,
+				callback = function() {
+					var selectedTab = self.socket.find('tabs', {selected: true});
+
+					if (selectedTab !== false) {
+						self.transitionToRoute('tab', selectedTab.url);
+						console.log(selectedTab.url);
+					}
+				};
+
+			setTimeout(callback, 100);
+		}
 	}
 });
