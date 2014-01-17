@@ -19,8 +19,10 @@ SocketManager = function() {
 		// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
 		init: function() {
-			application.ee.on(['*', '*'], function(doc) {
-				var collection = this.event[0];
+			application.ee.on(['*', '*'], function(doc, id) {
+				var collection = this.event[0],
+					eventName = this.event[1]
+
 				if (_.indexOf(Manager.propogate, collection) == -1) {
 					return false;
 				}
@@ -29,19 +31,19 @@ SocketManager = function() {
 					var client = Users[doc._id.toString()];
 
 					if (client) {
-						client.emit('update', {collection: collection, record: doc});
+						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
 					}
 				} else if (collection === 'networks') {
 					var client = Users[doc.internal.userId.toString()];
 
 					if (client) {
-						client.emit('update', {collection: collection, record: doc});
+						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
 					}
 				} else if (collection === 'tabs' || collection === 'events') {
 					var client = Users[doc.user.toString()];
 
 					if (client) {
-						client.emit('update', {collection: collection, record: doc});
+						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
 					}
 				} else if (collection === 'channelUsers') {
 					for (var id in Clients) {
@@ -49,7 +51,7 @@ SocketManager = function() {
 							var tab = Clients[id].internal.tabs[tabId];
 
 							if (tab.networkName == doc.network && doc.channel == tab.target) {
-								Users[tab.user.toString()].emit('update', {collection: collection, record: doc});
+								Users[tab.user.toString()].emit('update', {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
 							}
 						}
 					}
@@ -167,7 +169,7 @@ SocketManager = function() {
 			});
 			// loop tabs
 
-			client.emit('user', user);
+			client.emit('users', user);
 			client.emit('networks', networks);
 			client.emit('tabs', tabs);
 			// compile a load of data to send to the frontend

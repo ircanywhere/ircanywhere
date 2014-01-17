@@ -1,13 +1,14 @@
-Ember.Socket = Ember.ObjectController.extend({
+Ember.Socket = Ember.Object.extend({
 	controllers: [],
 
 	socket: null,
 
 	init: function() {
-		this.set('user', new Ember.Set());
-		this.set('networks', new Ember.Set());
-		this.set('tabs', new Ember.Set());
-		this.set('channelUsers', new Ember.Set());
+		this.set('user', Ember.A());
+		this.set('networks', Ember.A());
+		this.set('tabs', Ember.A());
+		this.set('channelUsers', Ember.A());
+		this.set('events', Ember.A());
 		// setup the collections
 	},
 
@@ -36,15 +37,46 @@ Ember.Socket = Ember.ObjectController.extend({
 	_listen: function() {
 		var self = this;
 
-		this.socket.on('user', function(data) {
-			self._store('users', data);
+		this.socket.on('users', function(data) {
+			self._handle('users', data);
 		});
 
 		this.socket.on('networks', function(data) {
-			self._store('networks', data);
+			self._handle('networks', data);
 		});
 
 		this.socket.on('tabs', function(data) {
+			self._handle('tabs', data);
+		});
+
+		this.socket.on('insert', function(data) {
+			console.log(data);
+		});
+
+		this.socket.on('update', function(data) {
+			console.log(data);
+		});
+
+		this.socket.on('remove', function(data) {
+			console.log(data);
+		});
+		// handle our events individually
+		// for sake of ease - like meteor, however we can get collection records in bulk
+		// there is an event for each collection apart from channelUsers, along with 3 additional events
+		// that indicate whether to insert/update/remove a record from one of the collections
+
+		setTimeout(function() {
+			
+			self.request('events').then(function(data) {
+				console.log(self.findAll('events'));
+			});
+
+		}, 100);
+	},
+
+	_handle: function(collection, data) {
+		var self = this;
+		if (collection === 'tabs') {
 			data.forEach(function(payload) {
 				if (payload.users.length > 0) {
 					self._store('channelUsers', payload.users);
@@ -55,19 +87,9 @@ Ember.Socket = Ember.ObjectController.extend({
 
 				self._store('tabs', [payload]);
 			});
-		});
-
-		this.socket.on('insert', function(data) {
-			console.log(data);
-		});
-		// handle our events individually
-		// for sake of ease - like meteor, however we can get collection records in bulk
-		// there is an event for each collection apart from channelUsers, along with 3 additional events
-		// that indicate whether to insert/update/remove a record from one of the collections
-
-		this.request('events', {}).then(function(data) {
-			console.log(data);
-		});
+		} else {
+			self._store('networks', data);
+		}
 	},
 
 	_store: function(collection, payload) {
@@ -78,7 +100,7 @@ Ember.Socket = Ember.ObjectController.extend({
 
 			var item = payload[i];
 			if (item._id) {
-				this.get(collection).add(item);
+				this.get(collection).pushObject(item);
 			}
 		}
 	},
@@ -95,29 +117,27 @@ Ember.Socket = Ember.ObjectController.extend({
 	_find: function(many, type, query) {
 		var self = this,
 			collection = this.get(type);
+		
+		if (!collection) {
+			return false;
+		}
 
-		return new Ember.RSVP.Promise(function(resolve, reject) {
-			if (!collection) {
-				return reject('invalid collection');
-			}
+		if (many) {
+			var set = collection.filter(function(obj) {
+				return self._search(query, obj);
+			});
+		} else {
+			var set = collection.find(function(obj) {
+				return self._search(query, obj);
+			});
+		}
+		// attempt to find
 
-			if (many) {
-				var set = collection.filter(function(obj) {
-					return self._search(query, obj);
-				});
-			} else {
-				var set = collection.find(function(obj) {
-					return self._search(query, obj);
-				});
-			}
-			// attempt to find
-
-			if (set) {
-				resolve(set);
-			} else {
-				reject('not found');
-			}
-		});
+		if (set) {
+			return set;
+		} else {
+			return false;
+		}
 	},
 
 	_send: function(event, payload, callback) {
@@ -137,7 +157,13 @@ Ember.Socket = Ember.ObjectController.extend({
 	},
 
 	findAll: function(type) {
-		return this._find(true, type, {});
+		var collection = this.get(type);
+		
+		if (!collection) {
+			return false;
+		}
+
+		return collection;
 	},
 
 	request: function(type, query) {
@@ -147,6 +173,7 @@ Ember.Socket = Ember.ObjectController.extend({
 			self._send(type, query, function(response) {
 				if (response.length > 0) {
 					resolve(response);
+					self._store(type, response);
 				} else {
 					reject('not found');
 				}
@@ -165,7 +192,12 @@ Ember.Socket = Ember.ObjectController.extend({
 		return new Ember.RSVP.Promise(function(resolve, reject) {
 			self._send('update', payload, function(response) {
 				if (response.length > 0) {
+					self._handle(type, response);
+					// handle so we can insert into db
+
 					resolve(response);
+					// also send it back if someone wants to do a straight away
+					// handle on the response
 				} else {
 					reject('not updated');
 				}

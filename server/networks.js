@@ -70,7 +70,7 @@ NetworkManager = function() {
 				});
 			});
 
-			application.ee.on(['networks', 'delete'], function(id) {
+			application.ee.on(['networks', 'delete'], function(doc, id) {
 				delete Clients[id.toString()];
 			});
 			// just sync clients up to this, instead of manually doing it

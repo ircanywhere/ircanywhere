@@ -130,6 +130,8 @@ Application = function() {
 		}),
 		// setup an event emitter
 
+		docs: {},
+
 		init: function() {
 			App.config = JSON.parse(jsonminify(raw));
 			validate(App.config, schema);
@@ -169,45 +171,85 @@ Application = function() {
 		},
 
 		setupOplog: function() {
-			var start = Math.floor(+new Date() / 1000);
+			var start = Math.floor(+new Date() / 1000),
+				collections = App.mongo.sync.collectionNames();
+
+			collections.forEach(function(col) {
+				var name = col.name.split('.')[1],
+					data = App.mongo.collection(name).sync.find({}).sync.toArray();
+				
+				App.docs[name] = {};
+				data.forEach(function(doc) {
+					App.docs[name][doc._id.toString()] = doc;
+				});
+			});
+			// storing all the documents in App.docs so we can have a handle
+			// on what documents are getting deleted etc
+			// this also lets us calculate document changes so we can propogate just
+			// the differences down to the clients to save bandwidth
+			// at the cost of higher memory usage for the server though
 
 			App.Oplog.find({}, {'tailable': true}).each(function(err, item) {
 				if (err) {
 					throw err;
 				}
 
-				if (item.ts.high_ >= start) {
-					var collection = item.ns.split('.');
-					// get the collection name
-
-					if (collection[0] !== App.database.mongo[3]) {
-						return false;
-					}
-					// bail if this is a different database
-
-					switch(item.op) {
-						case 'i':
-							App.ee.emit([collection[1], 'insert'], item.o);
-							break;
-						case 'u':
-							App.mongo.collection(collection[1]).findOne(item.o2, function(err, doc) {
-								App.ee.emit([collection[1], 'update'], doc);
-							});
-							// get the new full document
-							break;
-						case 'd':
-							App.ee.emit([collection[1], 'delete'], item.o._id);
-							break;
-						case 'c':
-							for (var cmd in item.o) {
-								App.ee.emit([item.o[cmd], cmd]);
-							}
-						default:
-							break;
-					}
-					// emit the event
+				if (!(item.ts.high_ >= start)) {
+					return false;
 				}
-				// data has changed
+				
+				var collection = item.ns.split('.'),
+					col = collection[1];
+				// get the collection name
+
+				if (collection[0] !== App.database.mongo[3]) {
+					return false;
+				}
+				// bail if this is a different database
+
+				switch(item.op) {
+					case 'i':
+						var id = item.o._id.toString();
+						if (!App.docs[col][id]) {
+							App.docs[col][id] = item.o;
+						}
+						// alter our global document collection
+
+						App.ee.emit([col, 'insert'], item.o);
+						// emit an event
+						break;
+					case 'u':
+						App.mongo.collection(col).findOne(item.o2, function(err, doc) {
+							var id = doc._id.toString();
+							if (!App.docs[col][id]) {
+								App.docs[col][id] = doc;
+							}
+							// alter our global document collection
+
+							App.ee.emit([col, 'update'], doc);
+						});
+						// get the new full document
+						break;
+					case 'd':
+						var id = item.o._id.toString();
+						if (App.docs[col][id]) {
+							setTimeout(function() {
+								delete App.docs[col][id];
+							}, 10000);
+						}
+						// delete it, in 10 seconds so if we need to use it anywhere we can
+
+						App.ee.emit([col, 'delete'], App.docs[col][id], item.o._id);
+						// emit
+						break;
+					case 'c':
+						for (var cmd in item.o) {
+							App.ee.emit([item.o[cmd], cmd]);
+						}
+					default:
+						break;
+				}
+				// emit the event
 			});
 		},
 

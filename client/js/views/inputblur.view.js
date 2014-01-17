@@ -10,4 +10,4 @@ App.InputBlur = Ember.TextField.extend({
 			this.set('value', this.get('default'));
 		}
 	},
-});​
+});
