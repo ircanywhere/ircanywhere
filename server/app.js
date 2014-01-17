@@ -304,6 +304,7 @@ Application = function() {
 			App.app.use(express.cookieParser(App.nodeId));
 			App.app.use(express.json());
 			App.app.use(express.urlencoded());
+			App.app.use(fibrous.middleware);
 			// setup middleware
 
 			App.app.get('/*', function(req, res) {
@@ -311,7 +312,7 @@ Application = function() {
 			});
 			// setup routes
 
-			App.app.listen(this.config.port);
+			App.app.listen(App.config.port);
 		}
 	};
 

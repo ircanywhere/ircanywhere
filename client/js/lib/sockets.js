@@ -64,6 +64,10 @@ Ember.Socket = Ember.ObjectController.extend({
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
+
+		this.request('events', {}).then(function(data) {
+			console.log(data);
+		});
 	},
 
 	_store: function(collection, payload) {

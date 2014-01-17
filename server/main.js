@@ -18,10 +18,10 @@ Users = {};
 application = new Application();
 // inject the config so we can mimic it in tests if needed
 
-/*socketManager = new SocketManager();
+socketManager = new SocketManager();
 // socket.io engine
 
-modeParser = new ModeParser();
+/*modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class
 
 networkManager = new NetworkManager();
