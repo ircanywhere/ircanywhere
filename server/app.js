@@ -122,6 +122,36 @@ Application = function() {
 		}
 	};
 
+	var _getDifferences = function(o1, o2) {
+		var k, kDiff,
+			diff = {};
+		
+		for (k in o1) {
+			if (!o1.hasOwnProperty(k)) {
+			} else if (typeof o1[k] != 'object' || typeof o2[k] != 'object') {
+				if (!(k in o2) || o1[k] !== o2[k]) {
+					diff[k] = o2[k];
+				}
+			} else if (kDiff = _getDifferences(o1[k], o2[k])) {
+				diff[k] = kDiff;
+			}
+		}
+		
+		for (k in o2) {
+			if (o2.hasOwnProperty(k) && !(k in o1)) {
+				diff[k] = o2[k];
+			}
+		}
+		
+		for (k in diff) {
+			if (diff.hasOwnProperty(k)) {
+				return diff;
+			}
+		}
+		
+		return false;
+	};
+
 	var App = {
 		ee: new events.EventEmitter2({
 			wildcard: true,
@@ -133,6 +163,9 @@ Application = function() {
 		docs: {},
 
 		init: function() {
+			_.mixin({getDifferences: _getDifferences});
+			// pop getDifferences into lodash
+
 			App.config = JSON.parse(jsonminify(raw));
 			validate(App.config, schema);
 			// attempt to validate our config file
@@ -221,22 +254,24 @@ Application = function() {
 					case 'u':
 						App.mongo.collection(col).findOne(item.o2, function(err, doc) {
 							var id = doc._id.toString();
-							if (!App.docs[col][id]) {
+							setTimeout(function() {
 								App.docs[col][id] = doc;
-							}
+							}, 10000);
 							// alter our global document collection
 
-							App.ee.emit([col, 'update'], doc);
+							App.ee.emit([col, 'update'], doc, App.docs[col][id]);
 						});
 						// get the new full document
 						break;
 					case 'd':
 						var id = item.o._id.toString();
-						if (App.docs[col][id]) {
-							setTimeout(function() {
-								delete App.docs[col][id];
-							}, 10000);
-						}
+						setTimeout(function() {
+							if (App.docs[col][id]) {
+								return false;
+							}
+
+							delete App.docs[col][id];
+						}, 10000);
 						// delete it, in 10 seconds so if we need to use it anywhere we can
 
 						App.ee.emit([col, 'delete'], App.docs[col][id], item.o._id);

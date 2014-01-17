@@ -50,11 +50,11 @@ Ember.Socket = Ember.Object.extend({
 		});
 
 		this.socket.on('insert', function(data) {
-			console.log(data);
+			self._handle(data.collection, [data.record]);
 		});
 
 		this.socket.on('update', function(data) {
-			console.log(data);
+			self._update(data.collection, data.id, data.record);
 		});
 
 		this.socket.on('remove', function(data) {
@@ -67,9 +67,10 @@ Ember.Socket = Ember.Object.extend({
 
 		setTimeout(function() {
 			
-			self.request('events').then(function(data) {
+			//console.log(self.findAll('tabs'));
+			/*self.request('events').then(function(data) {
 				console.log(self.findAll('events'));
-			});
+			});*/
 
 		}, 100);
 	},
@@ -105,9 +106,42 @@ Ember.Socket = Ember.Object.extend({
 		}
 	},
 
+	_update: function(type, id, changes) {
+		var self = this,
+			collection = this.get(type);
+		
+		if (!collection) {
+			return false;
+		}
+
+		var i = -1,
+			set = collection.find(function(obj, index) {
+				var found = self._search({_id: id}, obj);
+				if (found) {
+					i = index;
+				}
+				return found;
+			});
+		// locate said object and get it's index, cause
+		// we're gonna need to overwrite it
+
+		if (i == -1) {
+			return false;
+		}
+		// bail
+
+		for (var key in changes) {
+			set[key] = changes[key];
+		}
+		// overwrite them in the set
+
+		collection[i] = set;
+		// XXX - May need to trigger a change by altering .length or something
+	},
+
 	_search: function(query, obj) {
 		for (var key in query) {
-			if ((key in obj && query[key] == obj[key]) === false) {
+			if ((key in obj && query[key] === obj[key]) === false) {
 				return false;
 			}
 		}

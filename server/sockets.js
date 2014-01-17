@@ -19,50 +19,49 @@ SocketManager = function() {
 		// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
 		init: function() {
-			application.ee.on(['*', '*'], function(doc, id) {
+			application.ee.on(['*', '*'], function(doc, ext) {
 				var collection = this.event[0],
-					eventName = this.event[1]
+					eventName = this.event[1],
+					clients = [];
 
 				if (_.indexOf(Manager.propogate, collection) == -1) {
 					return false;
 				}
 
 				if (collection === 'users') {
-					var client = Users[doc._id.toString()];
-
-					if (client) {
-						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
-					}
+					clients.push(Users[doc._id.toString()]);
 				} else if (collection === 'networks') {
-					var client = Users[doc.internal.userId.toString()];
-
-					if (client) {
-						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
-					}
+					clients.push(Users[doc.internal.userId.toString()]);
 				} else if (collection === 'tabs' || collection === 'events') {
-					var client = Users[doc.user.toString()];
-
-					if (client) {
-						client.emit(eventName, {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
-					}
+					clients.push(Users[doc.user.toString()]);
 				} else if (collection === 'channelUsers') {
 					for (var id in Clients) {
 						for (var tabId in Clients[id].internal.tabs) {
 							var tab = Clients[id].internal.tabs[tabId];
 
 							if (tab.networkName == doc.network && doc.channel == tab.target) {
-								Users[tab.user.toString()].emit('update', {collection: collection, record: (eventName === 'delete') ? doc._id : doc});
+								clients.push(Users[tab.user.toString()]);
 							}
 						}
 					}
 				}
+
+				clients.forEach(function(client) {
+					if (eventName === 'insert') {
+						client.emit(eventName, {collection: collection, record: doc});
+					} else if (eventName === 'update') {
+						var changes = _.getDifferences(ext, doc);
+						if (changes) {
+							client.emit(eventName, {collection: collection, id: doc._id.toString(), record: changes});
+						}
+					} else if (eventName === 'delete') {
+						client.emit(eventName, {collection: collection, id: doc._id.toString()}); 
+					}
+				});
 				// all of this code works by watching changes via the oplog, that way 
 				// we dont need to worry about updating the database AND sending changes
 				// to the frontend clients, we can just send the document down when we spot a change
 				// to the clients who need to see it, a bit like meteor, without subscriptions
-				// XXX - We can probably improve things by sending down only the fields
-				//       that have changed and send only the changes to the client, and merge them
-				//       client side - this means storing all the documents in memory though - or something like redis
 			});
 
 			application.app.io.set('authorization', function(data, accept) {
