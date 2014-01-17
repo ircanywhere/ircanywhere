@@ -1,9 +1,18 @@
 App.TabController = Ember.ArrayController.extend({
 	title: 'dawg',
+	actions: {},
 
-	results: [],
+	arrayContentWillChange: function(startIdx, removeAmt, addAmt) {
+		console.log(startIdx, removeAmt, addAmt);
+	},
 
-	init: function() {
-		this.set('results', this.socket.findAll('channelUsers'));
+	filteredContent: Ember.computed.filterBy('content', 'channel', '#ircanywhere-test'),
+
+	events: {
+		ready: function() {
+			var result = this.socket.findAll('channelUsers');
+			
+			this.set('content', result);
+		}
 	}
 });

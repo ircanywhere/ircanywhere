@@ -4,7 +4,7 @@ Ember.Socket = Ember.Object.extend({
 	socket: null,
 
 	init: function() {
-		this.set('user', Ember.A());
+		this.set('users', Ember.A());
 		this.set('networks', Ember.A());
 		this.set('tabs', Ember.A());
 		this.set('channelUsers', Ember.A());
@@ -50,7 +50,7 @@ Ember.Socket = Ember.Object.extend({
 			};
 
 		this.socket.on('users', function(data) {
-			self._store('users', data);
+			self._store('users', [data]);
 		});
 
 		this.socket.on('networks', function(data) {
@@ -93,19 +93,22 @@ Ember.Socket = Ember.Object.extend({
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
 
-		Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
-			var controller = getController(controllerName),
-				eventNames = controller.events;
-			// fetch the controller if it's valid.
+		setTimeout(function() {
+			Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
+				var controller = getController(controllerName),
+					eventNames = controller.events;
+				// fetch the controller if it's valid.
 
-			if (controller) {
-				if (typeof controller.events === 'object' && typeof controller.events.connect === 'function') {
-					controller.events.connect.apply(controller);
+				if (controller) {
+					if (typeof controller.events === 'object' && typeof controller.events.ready === 'function') {
+						controller.events.ready.apply(controller);
+					}
+					// invoke the `ready` method if it has been defined on this controller.
 				}
-				// invoke the `connect` method if it has been defined on this controller.
-			}
-		});
-		// bind any connect events to our controllers
+			});
+			// bind any connect events to our controllers
+			// but wait 100ms so we've given it time to insert our records
+		}, 100);
 	},
 
 	_getController: function(name) {
@@ -123,16 +126,11 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_store: function(collection, payload) {
-		for (var i in payload) {
-			if (!payload.hasOwnProperty(i)) {
-				continue;
-			}
+		var self = this;
 
-			var item = payload[i];
-			if (item._id) {
-				this.get(collection).pushObject(item);
-			}
-		}
+		payload.forEach(function(object) {
+			self.get(collection).pushObject(Ember.Object.create(object));
+		});
 	},
 
 	_update: function(type, id, changes) {
@@ -146,16 +144,15 @@ Ember.Socket = Ember.Object.extend({
 		var object = collection.findProperty('_id', id);
 		// find the object
 
-		collection.removeObject(object);
-		// bump it out
+		if (!object) {
+			return false;
+		}
+		// object doesnt even exist? :/
 
 		for (var key in changes) {
-			object[key] = changes[key];
+			object.set(key, changes[key]);
 		}
 		// overwrite them in the set
-
-		collection.pushObject(object);
-		// pop it back in
 	},
 
 	_delete: function(type, id) {
@@ -202,7 +199,7 @@ Ember.Socket = Ember.Object.extend({
 		// attempt to find
 
 		if (set) {
-			return set[0];
+			return set.toArray();
 		} else {
 			return false;
 		}

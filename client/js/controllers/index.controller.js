@@ -2,18 +2,12 @@ App.IndexController = Ember.ObjectController.extend({
 	actions: {},
 
 	events: {
-		connect: function() {
-			var self = this,
-				callback = function() {
-					var selectedTab = self.socket.find('tabs', {selected: true});
+		ready: function() {
+			var selectedTab = this.socket.find('tabs', {selected: true})[0];
 
-					if (selectedTab !== false) {
-						self.transitionToRoute('tab', selectedTab.url);
-						console.log(selectedTab.url);
-					}
-				};
-
-			setTimeout(callback, 100);
+			if (selectedTab !== false) {
+				this.transitionToRoute('tab', selectedTab.url);
+			}
 		}
 	}
 });
