@@ -8,6 +8,7 @@ var Application = require('./app').Application,
 	IRCFactory = require('./factory').IRCFactory,
 	CommandManager = require('./commands').CommandManager,
 	SocketManager = require('./sockets').SocketManager;
+	fibrous = require('fibrous');
 
 Sockets = {};
 Clients = {};
@@ -17,7 +18,7 @@ Users = {};
 application = new Application();
 // inject the config so we can mimic it in tests if needed
 
-socketManager = new SocketManager();
+/*socketManager = new SocketManager();
 // socket.io engine
 
 modeParser = new ModeParser();
@@ -42,4 +43,4 @@ eventManager = new EventManager();
 // event manager
 
 commandManager = new CommandManager();
-// command manager
+// command manager*/

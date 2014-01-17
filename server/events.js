@@ -3,7 +3,6 @@ EventManager = function() {
 
 	var _ = require('lodash'),
 		hooks = require('hooks'),
-		Fiber = require('fibers'),
 		_insert = function(client, message, type, user) {
 			var network = client.name,
 				channel = (message.channel && !message.target) ? message.channel : message.target,

@@ -2,8 +2,7 @@ ChannelManager = function() {
 	"use strict";
 
 	var _ = require('lodash'),
-		hooks = require('hooks'),
-		Fiber = require('fibers');
+		hooks = require('hooks');
 
 	var Manager = {
 		channel: {

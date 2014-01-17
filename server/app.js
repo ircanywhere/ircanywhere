@@ -12,8 +12,7 @@ Application = function() {
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
 		express = require('express.io'),
-		mongo = require('mongo-sync'),
-		Fiber = require('fibers');
+		mongo = require('mongodb');
 
 	var schema = {
 		'mongo': {
@@ -141,18 +140,18 @@ Application = function() {
 				oplog: App.config.oplog.split(/\//i)
 			};
 
-			App.mongo = new mongo.Server(App.database.mongo[2]).db(App.database.mongo[3]);
-			App.oplog = new mongo.Server(App.database.oplog[2]).db(App.database.oplog[3]);
+			App.mongo = mongo.MongoClient.sync.connect(App.config.mongo);
+			App.oplog = mongo.MongoClient.sync.connect(App.config.oplog);
 			// two db connections because we're greedy
 
-			App.Nodes = App.mongo.getCollection('nodes');
-			App.Users = App.mongo.getCollection('users');
-			App.Networks = App.mongo.getCollection('networks');
-			App.Tabs = App.mongo.getCollection('tabs');
-			App.ChannelUsers = App.mongo.getCollection('channelUsers');
-			App.Events = App.mongo.getCollection('events');
-			App.Commands = App.mongo.getCollection('commands');
-			App.Oplog = App.oplog.getCollection('oplog.rs');
+			App.Nodes = App.mongo.collection('nodes');
+			App.Users = App.mongo.collection('users');
+			App.Networks = App.mongo.collection('networks');
+			App.Tabs = App.mongo.collection('tabs');
+			App.ChannelUsers = App.mongo.collection('channelUsers');
+			App.Events = App.mongo.collection('events');
+			App.Commands = App.mongo.collection('commands');
+			App.Oplog = App.oplog.collection('oplog.rs');
 
 			App.setupOplog();
 			// setup our oplog tailer, this gives us Meteor-like observes
@@ -170,51 +169,50 @@ Application = function() {
 		},
 
 		setupOplog: function() {
-			var start = Math.floor(+new Date() / 1000),
-				result = App.Oplog.find({}, {'tailable': true});
+			var start = Math.floor(+new Date() / 1000);
 
-			result._cursor.each(function(err, item) {
-				Fiber(function() {
+			App.Oplog.find({}, {'tailable': true}).each(function(err, item) {
+				fibrous(function() {
 					if (err) {
 						throw err;
-					} else {
-						if (item.ts.high_ >= start) {
-							var collection = item.ns.split('.');
-							// get the collection name
-
-							if (collection[0] !== App.database.mongo[3]) {
-								return false;
-							}
-							// bail if this is a different database
-
-							switch(item.op) {
-								case 'i':
-									var mode = 'insert';
-									App.ee.emit([collection[1], mode], item.o);
-									break;
-								case 'u':
-									var mode = 'update',
-										doc = App.mongo.getCollection(collection[1]).find(item.o2).toArray()[0];
-									// get the new full document
-
-									App.ee.emit([collection[1], mode], doc);
-									break;
-								case 'd':
-									var mode = 'delete';
-									App.ee.emit([collection[1], mode], item.o._id);
-									break;
-								case 'c':
-									for (var cmd in item.o) {
-										App.ee.emit([item.o[cmd], cmd]);
-									}
-								default:
-									break;
-							}
-							// emit the event
-						}
-						// data has changed
 					}
-				}).run();
+
+					if (item.ts.high_ >= start) {
+						var collection = item.ns.split('.');
+						// get the collection name
+
+						if (collection[0] !== App.database.mongo[3]) {
+							return false;
+						}
+						// bail if this is a different database
+
+						switch(item.op) {
+							case 'i':
+								var mode = 'insert';
+								App.ee.emit([collection[1], mode], item.o);
+								break;
+							case 'u':
+								var mode = 'update',
+									doc = App.mongo.collection(collection[1]).find(item.o2).toArray()[0];
+								// get the new full document
+
+								App.ee.emit([collection[1], mode], doc);
+								break;
+							case 'd':
+								var mode = 'delete';
+								App.ee.emit([collection[1], mode], item.o._id);
+								break;
+							case 'c':
+								for (var cmd in item.o) {
+									App.ee.emit([item.o[cmd], cmd]);
+								}
+							default:
+								break;
+						}
+						// emit the event
+					}
+					// data has changed
+				});
 			});
 		},
 
@@ -267,13 +265,13 @@ Application = function() {
 				json = defaultJson;
 			}
 
-			var node = App.Nodes.findOne(query);
+			var node = App.Nodes.sync.findOne(query);
 			if (node !== null) {
 				App.Nodes.update(query, defaultJson, {safe: false});
 				json = _.extend(node, defaultJson);
 				json._id = json._id.toString();
 			} else {
-				App.Nodes.insert(defaultJson, {safe: false});
+				App.Nodes.sync.insert(defaultJson, {safe: false});
 				json = defaultJson;
 			}
 
@@ -317,7 +315,7 @@ Application = function() {
 		}
 	};
 
-	Fiber(App.init).run();
+	fibrous.run(App.init);
 	// initiate the module if need be
 
 	return _.extend(App, hooks);

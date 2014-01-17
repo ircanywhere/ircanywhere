@@ -28,26 +28,21 @@ SocketManager = function() {
 
 				try {
 					if (collection === 'users') {
-						var id = doc._id.toString(),
-							client = Users[id];
-
-						client.emit('update', {collection: collection, record: doc});
+						var client = Users[doc._id.toString()];
 					} else if (collection === 'networks') {
-						var id = doc.internal.userId.toString(),
-							client = Users[id];
-
-						client.emit('update', {collection: collection, record: doc});
+						var client = Users[doc.internal.userId.toString()];
 					} else if (collection === 'tabs' || collection === 'events') {
-						var id = doc.user.toString(),
-							client = Users[id];
-
-						client.emit('update', {collection: collection, record: doc});
+						var client = Users[doc.user.toString()];
 					} else if (collection === 'channelUsers') {
 						for (var id in Clients) {
 							for (var tabId in Clients[id].internal.tabs) {
-								console.log(tabId);
+								console.log(tabId, Clients[id].internal.tabs[tabId]);
 							}
 						}
+					}
+
+					if (client) {
+						client.emit('update', {collection: collection, record: doc});
 					}
 				} catch (e) {
 					console.log(e);
