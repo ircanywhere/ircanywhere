@@ -50,29 +50,32 @@ Ember.Socket = Ember.Object.extend({
 		});
 
 		this.socket.on('insert', function(data) {
+			if (!data.collection || !data.record) {
+				return false;
+			}
+
 			self._handle(data.collection, [data.record]);
 		});
 
 		this.socket.on('update', function(data) {
+			if (!data.collection || !data.id || !data.record) {
+				return false;
+			}
+
 			self._update(data.collection, data.id, data.record);
 		});
 
 		this.socket.on('remove', function(data) {
-			console.log(data);
+			if (!data.collection || !data.id) {
+				return false;
+			}
+
+			self._delete(data.collection, data.id);
 		});
 		// handle our events individually
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
-
-		setTimeout(function() {
-			
-			//console.log(self.findAll('tabs'));
-			/*self.request('events').then(function(data) {
-				console.log(self.findAll('events'));
-			});*/
-
-		}, 100);
 	},
 
 	_handle: function(collection, data) {
@@ -137,6 +140,33 @@ Ember.Socket = Ember.Object.extend({
 
 		collection[i] = set;
 		// XXX - May need to trigger a change by altering .length or something
+	},
+
+	_delete: function(type, id) {
+		var self = this,
+			collection = this.get(type);
+		
+		if (!collection) {
+			return false;
+		}
+
+		var i = -1,
+			set = collection.find(function(obj, index) {
+				var found = self._search({_id: id}, obj);
+				if (found) {
+					i = index;
+				}
+				return found;
+			});
+		// look for the index where the object is at
+
+		if (i == -1) {
+			return false;
+		}
+		// bail
+
+		delete collection[i];
+		// remove
 	},
 
 	_search: function(query, obj) {
