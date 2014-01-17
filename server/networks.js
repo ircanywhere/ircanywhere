@@ -4,8 +4,7 @@ NetworkManager = function() {
 	var _ = require('lodash'),
 		hooks = require('hooks'),
 		helper = require('../lib/helpers').Helpers,
-		mongo = require('mongo-sync'),
-		Fiber = require('fibers');
+		mongo = require('mongodb');
 
 	var Manager = {
 		flags: {
@@ -20,7 +19,12 @@ NetworkManager = function() {
 			var networks = application.Networks.find(),
 				tabs = application.Tabs.find();
 
-			networks.forEach(function(doc) {
+			networks.each(function(err, doc) {
+				if (err || doc == null) {
+					return false;
+				}
+				// error
+
 				var id = doc._id.toString();
 				if (!doc.internal) {
 					return false;
@@ -31,7 +35,12 @@ NetworkManager = function() {
 			});
 			// load up networks and push them into Clients
 
-			tabs.forEach(function(doc) {
+			tabs.each(function(err, doc) {
+				if (err || doc == null) {
+					return false;
+				}
+				// error
+
 				Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 			});
 
@@ -48,9 +57,15 @@ NetworkManager = function() {
 
 			application.ee.on(['networks', 'update'], function(doc) {
 				var id = doc._id.toString();
+				
 				Clients[id] = doc;
 				Clients[id].internal.tabs = {};
-				application.Tabs.find({user: doc.internal.userId, network: doc._id}).forEach(function(tab) {
+				
+				application.Tabs.find({user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
+					if (err || doc == null) {
+						return false;
+					}
+					// error
 					Clients[id].internal.tabs[tab.target] = tab;
 				});
 			});
@@ -83,11 +98,11 @@ NetworkManager = function() {
 
 		getClients: function() {
 			var clients = {},
-				networks =  application.Networks.find();
+				networks =  application.Networks.sync.find().sync.toArray();
 			// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 			networks.forEach(function(network) {
-				var me = application.Users.findOne({_id: network.internal.userId}),
+				var me = application.Users.sync.findOne({_id: network.internal.userId}),
 					reconnect = false;
 
 				if (network.internal.status !== Manager.flags.disconnected) {
@@ -105,7 +120,7 @@ NetworkManager = function() {
 		},
 
 		addNetwork: function(user, network) {
-			var userCount = application.Users.find().count(),
+			var userCount = application.Users.sync.find().count(),
 				userName = application.config.clientSettings.userNamePrefix + userCount;
 
 			network.name = network.server;
@@ -132,7 +147,7 @@ NetworkManager = function() {
 			// the client but they wont be able to edit it, it also wont be able to be enforced
 			// by the config settings or network settings, it's overwritten every time.
 
-			return application.Networks.insert(network)[0];
+			return application.Networks.sync.insert(network)[0];
 			// insert the network. Just doing this will propogate the change directly due to our observe driver
 		},
 
@@ -155,25 +170,25 @@ NetworkManager = function() {
 			// empty, bolt it
 
 			if (select) {
-				application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}});
+				application.Tabs.sync.update({user: client.internal.userId, selected: true}, {$set: {selected: false}});
 			}
 			// are they requesting a new selected tab?
 
-			var tab = application.Tabs.findOne({user: client.internal.userId, network: client._id, target: target});
+			var tab = application.Tabs.sync.findOne({user: client.internal.userId, network: client._id, target: target});
 
 			if (tab === null) {
-				application.Tabs.insert(obj);
+				application.Tabs.sync.insert(obj);
 			} else {
-				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
+				application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
 			}
 			// insert to db, or update old record
 		},
 
 		activeTab: function(client, target, activate) {
 			if (typeof target !== 'boolean') {
-				application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
+				application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
 			} else {
-				application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
+				application.Tabs.sync.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
 			}
 			// update the activation flag
 		},
@@ -184,13 +199,13 @@ NetworkManager = function() {
 			}
 			// no url, bail
 
-			var net = application.Networks.findOne({'internal.userId': userId}, {fields: {id: 1, internal: 1}}),
-				tab = application.Tabs.findOne({user: userId, url: url}),
+			var net = application.Networks.sync.findOne({'internal.userId': userId}, {fields: {id: 1, internal: 1}}),
+				tab = application.Tabs.sync.findOne({user: userId, url: url}),
 				newTab = tab;
 
 			if (tab !== null && !tab.selected) {
-				application.Tabs.update({user: userId}, {$set: {selected: false}});
-				application.Tabs.update({user: userId, url: url}, {$set: {selected: true}});
+				application.Tabs.sync.update({user: userId}, {$set: {selected: false}});
+				application.Tabs.sync.update({user: userId, url: url}, {$set: {selected: true}});
 				// mark all as not selected apart from the one we've been told to select
 			} else if (tab === null) {
 				var netId = net._id.toString(),
@@ -220,9 +235,9 @@ NetworkManager = function() {
 			// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
 			
 			if (target) {
-				application.Tabs.remove({user: client.internal.userId, network: client._id, target: target});
+				application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target});
 			} else {
-				application.Tabs.remove({user: client.internal.userId, network: client._id});
+				application.Tabs.sync.remove({user: client.internal.userId, network: client._id});
 			}
 			// remove tabs
 		},
@@ -237,12 +252,12 @@ NetworkManager = function() {
 				return;
 			}
 
-			application.Networks.update({_id: networkId}, {$set: {'internal.status': status}});
+			application.Networks.sync.update({_id: networkId}, {$set: {'internal.status': status}});
 		}
 	};
 
 	application.ee.on('ready', function() {
-		Fiber(Manager.init).run();
+		fibrous.run(Manager.init);
 	});
 	// run init when we get the go ahead
 

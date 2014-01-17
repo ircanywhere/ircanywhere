@@ -7,7 +7,6 @@ UserManager = function() {
 		hooks = require('hooks'),
 		emails = require('emailjs'),
 		helper = require('../lib/helpers').Helpers,
-		Fiber = require('fibers'),
 		_generateSalt = function(string_length) {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
 				randomstring = '';
@@ -32,39 +31,31 @@ UserManager = function() {
 			// setup email server
 
 			application.app.post('/api/register', function(req, res) {
-				Fiber(function() {
-					var response = Manager.registerUser(req, res);
+				var response = Manager.registerUser(req, res);
 
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify(response));
 			});
 
 			application.app.post('/api/login', function(req, res) {
-				Fiber(function() {
-					var response = Manager.userLogin(req, res);
+				var response = Manager.userLogin(req, res);
 
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify(response));
 			});
 
 			application.app.post('/api/forgot', function(req, res) {
-				Fiber(function() {
-					var response = Manager.forgotPassword(req, res);
+				var response = Manager.forgotPassword(req, res);
 
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify(response));
 			});
 
 			application.app.post('/api/reset', function(req, res) {
-				Fiber(function() {
-					var response = Manager.resetPassword(req, res);
+				var response = Manager.resetPassword(req, res);
 
-					res.header('Content-Type', 'application/json');
-					res.end(JSON.stringify(response));
-				}).run();
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify(response));
 			});
 			// setup routes
 		},
@@ -121,14 +112,14 @@ UserManager = function() {
 				};
 			// the user record
 
-			var find = application.Users.find({email: email}).toArray();
+			var find = application.Users.sync.find({email: email}).sync.toArray();
 			if (find.length > 0) {
 				output.failed = true;
 				output.errors.push({error: 'The email you have used is already in use'});
 
 				return output;
 			} else {
-				application.Users.insert(user);
+				application.Users.sync.insert(user);
 			}
 			// it's failed, lets bail
 
@@ -155,7 +146,7 @@ UserManager = function() {
 				token = _generateSalt(25),
 				expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
 				output = {failed: false, successMessage: '', errors: []},
-				user = application.Users.findOne({email: email});
+				user = application.Users.sync.findOne({email: email});
 
 			if (user === null) {
 				output.failed = true;
@@ -182,7 +173,7 @@ UserManager = function() {
 								ip: req.ip
 							};
 
-						application.Users.update({email: email}, {$set: {tokens: tokens}});
+						application.Users.sync.update({email: email}, {$set: {tokens: tokens}});
 						res.cookie('token', token, {expires: expire});
 						// set a login key and a cookie
 
@@ -200,7 +191,7 @@ UserManager = function() {
 				email = req.param('email', ''),
 				token = _generateSalt(25),
 				expire = new Date(Date.now() + (24 * 60 * 60 * 1000)),
-				user = application.Users.findOne({email: email});
+				user = application.Users.sync.findOne({email: email});
 
 			if (user === null) {
 				output.failed = true;
@@ -213,7 +204,7 @@ UserManager = function() {
 					ip: req.ip
 				};
 
-				application.Users.update({email: email}, {$set: {resetToken: resetToken}});
+				application.Users.sync.update({email: email}, {$set: {resetToken: resetToken}});
 				// set the reset token
 
 				var link = application.config.url + '#/reset/' + token,
@@ -239,7 +230,7 @@ UserManager = function() {
 				confirmPassword = req.param('confirmPassword', ''),
 				token = req.param('token', ''),
 				time = new Date(Date.now()),
-				user = application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
+				user = application.Users.sync.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
 
 			if (user === null) {
 				output.failed = true;
@@ -257,7 +248,7 @@ UserManager = function() {
 				var salt = user.salt,
 					hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
-				application.Users.update({'resetToken.token': token}, {$unset: {resetToken: 1}, $set: {password: hash}});
+				application.Users.sync.update({'resetToken.token': token}, {$unset: {resetToken: 1}, $set: {password: hash}});
 				// set the password
 
 				output.successMessage = 'Your password has been reset, you may now login';
@@ -273,7 +264,7 @@ UserManager = function() {
 				return;
 			}
 
-			var networks = application.Networks.find({'internal.userId': userId}).toArray();
+			var networks = application.Networks.sync.find({'internal.userId': userId}).sync.toArray();
 			// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
 			if (me.profile.flags.newUser && networks.length === 0) {
@@ -312,7 +303,7 @@ UserManager = function() {
 	};
 
 	application.ee.on('ready', function() {
-		Fiber(Manager.init).run();
+		fibrous.run(Manager.init);
 	});
 
 	return _.extend(Manager, hooks);

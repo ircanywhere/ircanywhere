@@ -21,7 +21,7 @@ application = new Application();
 socketManager = new SocketManager();
 // socket.io engine
 
-/*modeParser = new ModeParser();
+modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class
 
 networkManager = new NetworkManager();
@@ -30,7 +30,7 @@ networkManager = new NetworkManager();
 userManager = new UserManager();
 // user manager
 
-ircFactory = new IRCFactory();
+/*ircFactory = new IRCFactory();
 // setup irc factory
 
 ircHandler = new IRCHandler();
