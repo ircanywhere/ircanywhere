@@ -7,7 +7,7 @@ App.SidebarController = Ember.ArrayController.extend({
 		});
 		// XXX - i don't really like this but hey it works, I'll come back to it at some
 		// point in the future and see if theres a better way
-	}.observes('networks.@each.internal'),
+	}.observes('networks.@each.internal', 'content.@each.selected'),
 
 	ready: function() {
 		var self = this,
