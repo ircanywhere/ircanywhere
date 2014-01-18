@@ -97,7 +97,7 @@ ChannelManager = function() {
 				chan = this.getChannel(key, channel),
 				us = {};
 
-			var users = application.ChannelUsers.sync.findOne({network: network, channel: channel}),
+			var users = application.ChannelUsers.sync.find({network: network, channel: channel}).sync.toArray(),
 				parsedModes = modeParser.sortModes(capab, mode);
 			// we're not arsed about the channel or network here
 

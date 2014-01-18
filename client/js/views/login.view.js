@@ -1,4 +1,5 @@
 App.LoginView = Ember.View.extend({
 	layoutName: 'splash',
-	templateName: 'login'
+	templateName: 'login',
+	classNames: 'clear'
 });

@@ -1,8 +1,8 @@
 App.Router.map(function() {
-	this.route('tab', {path: '/t/:url'});
+	this.route('main', {path: '/t/:url'});
 });
 
-App.TabRoute = AppRoute.extend({
+App.MainRoute = AppRoute.extend({
 	model: function() {
 		return this.controllerFor('index').socket.connect();
 	},

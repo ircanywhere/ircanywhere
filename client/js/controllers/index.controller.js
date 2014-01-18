@@ -6,7 +6,7 @@ App.IndexController = Ember.ObjectController.extend({
 			var selectedTab = this.socket.find('tabs', {selected: true})[0];
 
 			if (selectedTab !== false) {
-				this.transitionToRoute('tab', selectedTab.url);
+				this.transitionToRoute('main', selectedTab.url);
 			}
 		}
 	}
