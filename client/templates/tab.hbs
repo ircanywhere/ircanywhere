@@ -1,5 +1,3 @@
-<ul>
-	{{#each user in filteredContent}}
-		<li>{{user.nickname}}</li>
-	{{/each}}
-</ul>
+{{#each controller}}
+	{{json this.internal}}<br />
+{{/each}}

@@ -4,8 +4,9 @@
 </div>
 <div class="items">
 	<ul>
-	{{#each networks}}
-		{{> network}}
+
+	{{#each controller}}
+		{{view App.SidebarItemView}}
 	{{/each}}
 	</ul>
 </div>

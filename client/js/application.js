@@ -1,6 +1,6 @@
 App = Ember.Application.create({
 	Socket: Ember.Socket.extend({
-		controllers: ['index', 'tab']
+		controllers: ['index', 'tab', 'sidebar']
     })
 });
 

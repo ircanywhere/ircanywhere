@@ -55,16 +55,7 @@ SocketManager = function() {
 					if (eventName === 'insert') {
 						client.emit(eventName, {collection: collection, record: doc});
 					} else if (eventName === 'update') {
-						var changes = _.getDifferences(ext, doc),
-							output = {};
-
-						if (changes) {
-							for (var key in changes) {
-								output[key] = doc[key];
-							}
-
-							client.emit(eventName, {collection: collection, id: doc._id.toString(), record: output});
-						}
+						client.emit(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 					} else if (eventName === 'delete') {
 						client.emit(eventName, {collection: collection, id: doc._id.toString()}); 
 					}

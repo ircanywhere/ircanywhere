@@ -122,36 +122,6 @@ Application = function() {
 		}
 	};
 
-	var _getDifferences = function(o1, o2) {
-		var k, kDiff,
-			diff = {};
-		
-		for (k in o1) {
-			if (!o1.hasOwnProperty(k)) {
-			} else if (typeof o1[k] != 'object' || typeof o2[k] != 'object') {
-				if (!(k in o2) || o1[k] !== o2[k]) {
-					diff[k] = o2[k];
-				}
-			} else if (kDiff = _getDifferences(o1[k], o2[k])) {
-				diff[k] = kDiff;
-			}
-		}
-		
-		for (k in o2) {
-			if (o2.hasOwnProperty(k) && !(k in o1)) {
-				diff[k] = o2[k];
-			}
-		}
-		
-		for (k in diff) {
-			if (diff.hasOwnProperty(k)) {
-				return diff;
-			}
-		}
-		
-		return false;
-	};
-
 	var App = {
 		ee: new events.EventEmitter2({
 			wildcard: true,
@@ -163,9 +133,6 @@ Application = function() {
 		docs: {},
 
 		init: function() {
-			_.mixin({getDifferences: _getDifferences});
-			// pop getDifferences into lodash
-
 			App.config = JSON.parse(jsonminify(raw));
 			validate(App.config, schema);
 			// attempt to validate our config file
@@ -218,9 +185,6 @@ Application = function() {
 			});
 			// storing all the documents in App.docs so we can have a handle
 			// on what documents are getting deleted etc
-			// this also lets us calculate document changes so we can propogate just
-			// the differences down to the clients to save bandwidth
-			// at the cost of higher memory usage for the server though
 
 			App.Oplog.find({}, {'tailable': true}).each(function(err, item) {
 				if (err) {

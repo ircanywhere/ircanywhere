@@ -1,0 +1,7 @@
+<li {{bind-attr class="selected:selected"}}>
+	{{#link-to 'tab' url title=title}}
+		<span {{bind-attr class=":link view.getClass"}}>
+			{{title}}
+		</span>
+	{{/link-to}}
+</li>

@@ -20,7 +20,7 @@ App.LoginController = Ember.ObjectController.extend({
 			email = exports.Helpers.trimInput(email);
 			// validation
 
-			$.post('/api/login', {email: email, password: password}).then(function(data) {
+			Ember.$.post('/api/login', {email: email, password: password}).then(function(data) {
 				self[(data.failed) ? 'loginFail' : 'loginSuccess'](data);
 			}, this.loginFail.bind(this));
 			// still stuck using jquery, everything seems to depend on it
@@ -34,7 +34,7 @@ App.LoginController = Ember.ObjectController.extend({
 			email = exports.Helpers.trimInput(email);
 			// validation
 
-			$.post('/api/forgot', {email: email}).then(function(data) {
+			Ember.$.post('/api/forgot', {email: email}).then(function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
 			}, this.resetFail.bind(this));
 		},

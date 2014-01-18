@@ -1,4 +1,4 @@
-App.MainView = Ember.View.extend({
+App.TabView = Ember.View.extend({
 	layoutName: 'main',
 	templateName: 'tab',
 	classNames: 'main-view'

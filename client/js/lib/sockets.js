@@ -95,19 +95,17 @@ Ember.Socket = Ember.Object.extend({
 
 		setTimeout(function() {
 			Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
-				var controller = getController(controllerName),
-					eventNames = controller.events;
+				var controller = getController(controllerName);
 				// fetch the controller if it's valid.
 
 				if (controller) {
-					if (typeof controller.events === 'object' && typeof controller.events.ready === 'function') {
-						controller.events.ready.apply(controller);
+					if (typeof controller.ready === 'function') {
+						controller.ready.apply(controller);
 					}
 					// invoke the `ready` method if it has been defined on this controller.
 				}
 			});
 			// bind any connect events to our controllers
-			// but wait 100ms so we've given it time to insert our records
 		}, 100);
 	},
 
@@ -117,7 +115,7 @@ Ember.Socket = Ember.Object.extend({
 		// format the `name` to match what the lookup container is expecting, and then
 		// we'll locate the controller from the `container`.
 
-		if (!controller || ('events' in controller === false)) {
+		if (!controller || ('ready' in controller === false)) {
 			return false;
 		}
 		// don't do anything with this controller if it hasn't defined a `events` hash.
@@ -126,10 +124,17 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_store: function(collection, payload) {
-		var self = this;
+		var self = this,
+			col = self.get(collection),
+			exists = false;
 
 		payload.forEach(function(object) {
-			self.get(collection).pushObject(Ember.Object.create(object));
+			exists = col.findBy('_id', object._id);
+			if (exists) {
+				self._update(collection, exists._id, object);
+			} else {
+				col.pushObject(Ember.Object.create(object));
+			}
 		});
 	},
 
@@ -149,9 +154,7 @@ Ember.Socket = Ember.Object.extend({
 		}
 		// object doesnt even exist? :/
 
-		for (var key in changes) {
-			object.set(key, changes[key]);
-		}
+		object.setProperties(changes);
 		// overwrite them in the set
 	},
 
