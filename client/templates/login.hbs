@@ -24,28 +24,30 @@
 					</div>
 					<div class="actions">
 						{{input type="submit" class="btn primary" value="Login"}}
-						<a href="#" id="forgot-password-link" class="btn secondary" {{action 'forgotPassword'}}>Forgot password?</a>
+						<a href="#" id="forgot-password-link" class="btn secondary" {{action toggleProperty 'forgotPassword'}}>Forgot password?</a>
 					</div>
 				</fieldset></form>
-				<form method="post" {{action "resetSubmit" on="submit"}}><fieldset>
-					<div id="forgot-password" {{bind-attr class=":box forgotPassword:show:hide"}}>
-						<h5>Forgot Password</h5>
+				{{#if forgotPassword}}
+					<form method="post" {{action "resetSubmit" on="submit"}}><fieldset>
+						<div class="box">
+							<h5>Forgot Password</h5>
 
-						<div class="alert-message block-message error hide" {{bind-attr class="resetErrors:show"}}>
-							{{resetErrors}}
-						</div>
-						<div class="alert-message block-message success hide" {{bind-attr class="resetSent:show"}}>
-							{{resetSent}}
-						</div>
+							<div class="alert-message block-message error hide" {{bind-attr class="resetErrors:show"}}>
+								{{resetErrors}}
+							</div>
+							<div class="alert-message block-message success hide" {{bind-attr class="resetSent:show"}}>
+								{{resetSent}}
+							</div>
 
-						<div class="field">
-							{{view App.InputBlur type="text" class="login-input" value=resetEmail valueBinding="model.resetEmail" default="Email Address"}}
+							<div class="field">
+								{{view App.InputBlur type="text" class="login-input" value=resetEmail valueBinding="model.resetEmail" default="Email Address"}}
+							</div>
 						</div>
-					</div>
-					<div id="forgot-password-actions" {{bind-attr class=":actions forgotPassword:show:hide"}}>
-						{{input type="submit" class="btn primary" value="Reset"}}
-					</div>
-				</fieldset></form>
+						<div class="actions">
+							{{input type="submit" class="btn primary" value="Reset"}}
+						</div>
+					</fieldset></form>
+				{{/if}}
 			</div>
 		</div>
 	</div>
