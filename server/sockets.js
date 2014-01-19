@@ -7,10 +7,26 @@ SocketManager = function() {
 
 	var Manager = {
 		allowedUpdates: {
-			tabs: function(update) {
-				return ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
-						(_.has(update, 'hiddenEvents') && typeof update.hiddenUsers === 'boolean') || 
-						(_.has(update, 'selected') && typeof update.hiddenUsers === 'boolean'));
+			tabs: function(uid, query, update) {
+				var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
+							   (_.has(update, 'hiddenEvents') && typeof update.hiddenUsers === 'boolean') || 
+							   (_.has(update, 'selected') && typeof update.hiddenUsers === 'boolean'));
+				// been allowed
+
+				if (allowed) {
+					var find = application.Tabs.sync.findOne(_.extend(query, {user: uid}));
+					// look for a user related to this record
+					// if we've found one we can proceed
+
+					application.Tabs.update({user: uid}, {$set: {selected: false}});
+					// also check for selected here, if a new tab is being selected then we will
+					// force the de-selection of the others
+
+					return (find);
+				} else {
+					return false;
+				}
+				// we've been allowed, check more strongly
 			}
 		},
 
@@ -95,7 +111,8 @@ SocketManager = function() {
 				fibrous.run(function() {
 					var collection = req.data.collection,
 						query = req.data.query,
-						update = req.data.update;
+						update = req.data.update,
+						user = req.handshake.user;
 
 					if (!collection || !query || !update) {
 						return req.io.respond({success: false, error: 'invalid format'});
@@ -105,15 +122,15 @@ SocketManager = function() {
 						return req.io.respond({success: false, error: 'cant update'});
 					}
 
-					if (!Manager.allowedUpdates[collection](update)) {
+					if (query._id) {
+						query._id = new mongo.ObjectID(query._id);
+					}
+					// update it to a proper mongo id
+
+					if (!Manager.allowedUpdates[collection](user._id, query, update)) {
 						return req.io.respond({success: false, error: 'not allowed'});
 					}
 					// have we been denied?
-
-					if (query._id) {
-						query._id = new mongo.ObjectId(query._id);
-					}
-					// update it to a proper mongo id
 
 					application.mongo.collection(collection).sync.update(query, {$set: update});
 					req.io.respond({success: true});

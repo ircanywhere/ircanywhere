@@ -3,7 +3,11 @@ App.IndexController = Ember.ObjectController.extend({
 		var selectedTab = this.socket.find('tabs', {selected: true})[0];
 
 		if (selectedTab !== false) {
-			this.transitionToRoute('tab', selectedTab.url);
+			if (selectedTab.type === 'network') {
+				this.transitionToRoute('tab', selectedTab.url + '/');
+			} else {
+				this.transitionToRoute('tab', selectedTab.url);
+			}
 		}
 	}
 });

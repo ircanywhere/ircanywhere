@@ -5,10 +5,8 @@ App.TabController = Ember.ArrayController.extend({
 	// filter it to a specific channel
 
 	ready: function() {
-		this.set('content', this.socket.findAll('tabs'));
+		this.set('content', this.socket.findAll('events'));
 		// set the content when we're ready
-
-		console.log(this.get('content'));
 	}
 });
 

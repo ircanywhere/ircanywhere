@@ -16,25 +16,31 @@ App.SidebarItemView = Ember.View.extend({
 		}
 
 		return classes.join(' ');
-	}.property(),
+	}.property('context.selected'),
 	
 	getClass: function() {
 		var classNames = [''],
 			tab = this.get('context'),
-			network = App.__container__.lookup('controller:sidebar').networks.findBy('_id', tab.network);
+			network = App.__container__.lookup('controller:sidebar').get('networks').findBy('_id', tab.network);
 		// ember people will hate me for using this but afaik it's impossible
 		// to get the network
 
-		if (tab.type === 'network' && network.internal.status === 'connecting') {
+		if (tab.get('type') === 'network' && network.get('internal').status === 'connecting') {
 			classNames.push('net-loader');
-		} else if (tab.type === 'network' && network.internal.status !== 'connecting') {
+		} else if (tab.get('type') === 'network' && network.get('internal').status !== 'connecting') {
 			classNames.push('net-loaded');
-		} else if (tab.type === 'channel' || tab.type === 'query') {
+		} else if (tab.get('type') === 'channel' || tab.get('type') === 'query') {
 			
 		} else {
 			classNames.push('net-loaded');
 		}
 
 		return classNames.join(' ');
-	}.property().cacheable()
+	}.property('context').cacheable(),
+
+	url: function() {
+		var split = this.get('context').get('url').split('/');
+
+		return (split.length == 1) ? split[0] : split[0] + '/' + encodeURIComponent(split[1]);
+	}.property('context.url')
 });

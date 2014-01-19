@@ -194,43 +194,6 @@ NetworkManager = function() {
 			// update the activation flag
 		},
 
-		selectTab: function(userId, url, req) {
-			if (url === undefined || url === '') {
-				return req.io.respond({success: false, error: 'invalid url'});
-			}
-			// no url, bail
-
-			var net = application.Networks.sync.findOne({'internal.userId': userId}, {fields: {id: 1, internal: 1}}),
-				tab = application.Tabs.sync.findOne({user: userId, url: url}),
-				newTab = tab;
-
-			if (tab !== null && !tab.selected) {
-				application.Tabs.sync.update({user: userId}, {$set: {selected: false}});
-				application.Tabs.sync.update({user: userId, url: url}, {$set: {selected: true}});
-				// mark all as not selected apart from the one we've been told to select
-			} else if (tab === null) {
-				var netId = net._id.toString(),
-					client = Clients[netId],
-					target = url.split('/');
-
-				if (target.length <= 1) {
-					return false;
-				}
-				// we're not allowed to add a network like this
-
-				if (helper.isChannel(client.internal.capabilities.channel.types, target[1])) {
-					ircFactory.send(client._id, 'join', [target[1]]);
-				} else {
-					Manager.addTab(Clients[netId], target[1], 'query', true);
-				}
-				// create tab
-			}
-
-			return req.io.respond({success: true});
-			// respond - we don't send new tab info down the line, we'll get it when it's synced up
-			// we can safely change the tab if the response is true
-		},
-
 		removeTab: function(client, target) {
 			// it's now up to the client to re-select the tab when they get a message saying it's been
 			// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
