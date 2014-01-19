@@ -37,6 +37,10 @@ App.LoginController = Ember.ObjectController.extend({
 			Ember.$.post('/api/forgot', {email: email}).then(function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
 			}, this.resetFail.bind(this));
+		},
+
+		toggleProperty: function() {
+			this.toggleProperty('forgotPassword');
 		}
 	},
 

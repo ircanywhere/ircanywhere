@@ -1,8 +1,7 @@
 App.Router.map(function() {
-	/*this.resource('tab', function() {*/
-		/*this.route('channel', {path: '/t/:url'});*/
-		this.route('tab', {path: '/t/:url'});
-	/*});*/
+	this.resource('tab', {path: '/t/:network'}, function() {
+		this.route('tab', {path: '/:channel'});
+	});
 });
 
 App.TabRoute = AppRoute.extend({
@@ -11,18 +10,7 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	activate: function() {
-		var location = document.location,
-			url = location.pathname;
-			url = url.substring(3, url.length - 1);
-
-		if (url !== '') {
-			console.log(url);
-		}
-		/*this.get('controller').socket.emit('update', {
-			collection: 'tabs',
-			query: {url: url},
-			update: {selected: true}
-		});*/
+		console.log(document.location)
 	},
 
 	actions: {

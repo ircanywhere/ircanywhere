@@ -9,8 +9,8 @@ SocketManager = function() {
 		allowedUpdates: {
 			tabs: function(uid, query, update) {
 				var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
-							   (_.has(update, 'hiddenEvents') && typeof update.hiddenUsers === 'boolean') || 
-							   (_.has(update, 'selected') && typeof update.hiddenUsers === 'boolean'));
+							   (_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
+							   (_.has(update, 'selected') && typeof update.selected === 'boolean'));
 				// been allowed
 
 				if (allowed) {
@@ -18,11 +18,7 @@ SocketManager = function() {
 					// look for a user related to this record
 					// if we've found one we can proceed
 
-					application.Tabs.update({user: uid}, {$set: {selected: false}});
-					// also check for selected here, if a new tab is being selected then we will
-					// force the de-selection of the others
-
-					return (find);
+					return (find !== null);
 				} else {
 					return false;
 				}
@@ -131,6 +127,12 @@ SocketManager = function() {
 						return req.io.respond({success: false, error: 'not allowed'});
 					}
 					// have we been denied?
+
+					if (collection === 'tabs' && _.has(update, 'selected')) {
+						application.Tabs.sync.update({user: user._id}, {$set: {selected: false}}, {multi: true});
+					}
+					// also check for selected here, if a new tab is being selected then we will
+					// force the de-selection of the others
 
 					application.mongo.collection(collection).sync.update(query, {$set: update});
 					req.io.respond({success: true});
