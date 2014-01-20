@@ -288,7 +288,6 @@ Application = function() {
 				defaultJson = {
 					endpoint: (App.config.ssl) ? 'https://0.0.0.0:' + App.config.port : 'http://0.0.0.0:' + App.config.port,
 					hostname: os.hostname(),
-					reverseDns: App.config.reverseDns,
 					port: App.config.port,
 					ipAddress: '0.0.0.0'
 				};
@@ -296,7 +295,7 @@ Application = function() {
 			try {
 				data = fs.readFileSync('./private/node.json', {encoding: 'utf8'});
 				json = JSON.parse(data);
-				query = {_id: new mongo.ObjectId(json._id)};
+				query = {_id: new mongo.ObjectID(json._id)};
 			} catch (e) {
 				json = defaultJson;
 			}
