@@ -1,7 +1,16 @@
+Ember.SocketEmitter = Ember.Object.extend(Ember.Evented, {
+	done: function() {
+		this.trigger('done');
+	}
+});
+
 Ember.Socket = Ember.Object.extend({
 	controllers: [],
 
 	socket: null,
+	done: false,
+
+	emitter: Ember.SocketEmitter.create(),
 
 	init: function() {
 		this.set('users', Ember.A());
@@ -10,6 +19,8 @@ Ember.Socket = Ember.Object.extend({
 		this.set('channelUsers', Ember.A());
 		this.set('events', Ember.A());
 		// setup the collections
+
+		this.connect();
 	},
 
 	connect: function() {
@@ -49,6 +60,8 @@ Ember.Socket = Ember.Object.extend({
 				module._update.call(module, this, eventData);
 			};
 
+		this.set('done', false);
+
 		this.socket.on('users', function(data) {
 			self._store('users', [data]);
 		});
@@ -62,7 +75,7 @@ Ember.Socket = Ember.Object.extend({
 		});
 
 		this.socket.on('channelUsers', function(data) {
-			self._store('channelUsers', data);
+			self._store('channelUsers', data, true);
 		});
 
 		this.socket.on('insert', function(data) {
@@ -93,7 +106,9 @@ Ember.Socket = Ember.Object.extend({
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
 
-		setTimeout(function() {
+		this.get('emitter').on('done', function() {
+			self.set('done', true);
+
 			Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
 				var controller = getController(controllerName);
 				// fetch the controller if it's valid.
@@ -106,7 +121,7 @@ Ember.Socket = Ember.Object.extend({
 				}
 			});
 			// bind any connect events to our controllers
-		}, 100);
+		});
 	},
 
 	_getController: function(name) {
@@ -123,19 +138,32 @@ Ember.Socket = Ember.Object.extend({
 		return controller;
 	},
 
-	_store: function(collection, payload) {
-		var self = this,
+	_store: function(collection, payload, emit) {
+		var emit = (emit) ? emit : false,
+			self = this,
 			col = self.get(collection),
-			exists = false;
+			count = (payload.length - 1).toString(),
+			exists = false,
+			object = {};
 
-		payload.forEach(function(object) {
-			exists = col.findBy('_id', object._id);
-			if (exists) {
-				self._update(collection, exists._id, object);
-			} else {
-				col.pushObject(Ember.Object.create(object));
+		for (var i in payload) {
+			if (!payload.hasOwnProperty(i)) {
+				continue;
 			}
-		});
+
+			object = Ember.Object.create(payload[i]);
+			exists = col.findBy('_id', object.get('_id'));
+			
+			if (exists) {
+				self._update(collection, exists.get('_id'), object);
+			} else {
+				col.pushObject(object);
+			}
+
+			if (emit && i === count) {
+				self.get('emitter').done();
+			}
+		}
 	},
 
 	_update: function(type, id, changes) {
@@ -222,6 +250,30 @@ Ember.Socket = Ember.Object.extend({
 
 	find: function(type, query) {
 		return this._find(true, type, query);
+	},
+
+	findButWait: function(type, query) {
+		var self = this,
+			_getResults = function(resolve, reject) {
+				var results = self._find(true, type, query);
+				
+				if (results) {
+					resolve(results);
+				} else {
+					reject('not found');
+				}
+			};
+
+		return new Ember.RSVP.Promise(function(resolve, reject) {
+			if (self.get('done') === false) {
+				self.get('emitter').on('done', function() {
+					_getResults(resolve, reject);
+				});
+				// wait till we've done inserting results
+			} else {
+				_getResults(resolve, reject);
+			}
+		});
 	},
 
 	findAll: function(type) {

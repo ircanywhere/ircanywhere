@@ -131,6 +131,7 @@ NetworkManager = function() {
 			network.saslUsername = network.saslUsername || undefined;
 			network.password = network.password || null;
 			network.capab = true;
+			network.url = network.server + ':' + ((network.secure) ? '+' : '') + network.port;
 			// because some settings can be omitted, we're going to set them to
 			// the hard-coded defaults if they are, ok. We don't need to worry about
 			// validating them before hand either because app.js takes care of that.
@@ -140,8 +141,7 @@ NetworkManager = function() {
 			network.internal = {
 				nodeId: application.nodeId,
 				userId: user._id,
-				status: this.flags.closed,
-				url: network.server + ':' + ((network.secure) ? '+' : '') + network.port
+				status: this.flags.closed
 			}
 			// this stores internal information about the network, it will be available to
 			// the client but they wont be able to edit it, it also wont be able to be enforced
@@ -155,7 +155,7 @@ NetworkManager = function() {
 			var select = select || false,
 				obj = {
 					user: client.internal.userId,
-					url: (type === 'network') ? client.internal.url : client.internal.url + '/' + target.toLowerCase(),
+					url: (type === 'network') ? client.url : client.url + '/' + target.toLowerCase(),
 					network: client._id,
 					networkName: client.name,
 					target: target.toLowerCase(),

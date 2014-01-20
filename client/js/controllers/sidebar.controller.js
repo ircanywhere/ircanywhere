@@ -20,5 +20,22 @@ App.SidebarController = Ember.ArrayController.extend({
 		this.set('networks', networks);
 		this.set('content', content);
 		// set that to the tabs collection, it'll update automatically when they change
+	},
+
+	actions: {
+		goto: function(url) {
+			url = url.substring(3);
+			// cut the /t/ off the front
+
+			var split = url.split('/');
+
+			console.log(split, url);
+
+			if (split.length === 1) {
+				this.transitionToRoute('tab', split[0]);
+			} else {
+				this.transitionToRoute('channel', split[0], split[1]);
+			}
+		}
 	}
 });

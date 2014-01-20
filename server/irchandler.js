@@ -110,7 +110,7 @@ IRCHandler = function() {
 
 			if (_.has(client.internal.tabs, message.nickname)) {
 				var mlower = message.nickname.toLowerCase();
-				application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.internal.url + '/' + mlower}});
+				application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}});
 			}
 			// is this a client we're chatting to whos changed their nickname?
 			

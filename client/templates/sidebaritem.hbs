@@ -1,5 +1,5 @@
-{{#link-to 'tab' view.url title=title}}
+<a {{action 'goto' view.url}} {{bind-attr href=view.url}} {{bind-attr title=title}}>
 	<span {{bind-attr class=":link view.getClass"}}>
 		{{unbound title}}
 	</span>
-{{/link-to}}
+</a>
