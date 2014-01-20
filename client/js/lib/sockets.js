@@ -71,7 +71,11 @@ Ember.Socket = Ember.Object.extend({
 		});
 
 		this.socket.on('channelUsers', function(data) {
-			self._store('channelUsers', data, true);
+			self._store('channelUsers', data);
+		});
+
+		this.socket.on('events', function(data) {
+			self._store('events', data, true);
 		});
 
 		this.socket.on('insert', function(data) {

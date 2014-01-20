@@ -4,7 +4,7 @@ App.ChannelRoute = AppRoute.extend({
 			network = this.modelFor('tab')[0];
 		
 		return new Ember.RSVP.Promise(function(resolve, reject) {
-			var result = self.controllerFor('channel').socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.title)});
+			var result = self.controllerFor('tab').socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
 			
 			if (result) {
 				resolve(result);
@@ -19,16 +19,24 @@ App.ChannelRoute = AppRoute.extend({
 	},
 
 	activate: function() {
-		var model = this.modelFor('channel')[0];
+		var socket = this.controllerFor('tab').socket,
+			selected = socket.find('tabs', {selected: true})[0],
+			model = this.modelFor('channel')[0];
 		// get the channel model
 
-		this.controllerFor('channel').socket.update('tabs', {_id: model.get('_id')}, {selected: true});
+		if (selected.get('_id') !== model.get('_id')) {
+			socket.update('tabs', {_id: model.get('_id')}, {selected: true});
+		}
 	},
 
 	deactivate: function() {
 		var model = this.modelFor('tab')[0];
 		// get the tab model
 
-		this.controllerFor('channel').socket.update('tabs', {url: model.get('url')}, {selected: true});
+		this.controllerFor('tab').socket.update('tabs', {url: model.get('url')}, {selected: true});
+	},
+
+	title: function(controller, model) {
+		return model[0].get('target') + ' - ' + App.get('defaultTitle');
 	}
 });

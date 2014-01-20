@@ -1,6 +1,6 @@
 App.Router.map(function() {
 	this.resource('tab', {path: '/t/:url'}, function() {
-		this.resource('channel', {path: '/:title'});
+		this.resource('channel', {path: '/:tab'});
 	});
 });
 
@@ -10,6 +10,6 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	title: function(controller, model) {
-		return 'wat';
+		return model[0].get('name') + ' - ' + App.get('defaultTitle');
 	}
 });

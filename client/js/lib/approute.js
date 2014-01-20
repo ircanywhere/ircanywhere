@@ -3,6 +3,6 @@ AppRoute = Ember.Route.extend({
 		this.render();
 
 		var pageTitle = this.title ? this.title(controller, model) : null;
-		document.title = pageTitle ? pageTitle : 'IRCAnywhere';
+		document.title = pageTitle ? pageTitle : App.get('defaultTitle');
 	}
 });

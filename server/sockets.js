@@ -162,11 +162,11 @@ SocketManager = function() {
 					return false;
 				} else {
 					if (new Date() > user.tokens[cookies.token].time) {
-						/*var unset = {};
+						var unset = {};
 							unset['tokens.' + cookies.token] = 1;
 						
 						application.Users.sync.update(query, {$unset: unset});
-						// token is expired, remove it*/
+						// token is expired, remove it
 
 						return false;
 					} else {
@@ -185,6 +185,7 @@ SocketManager = function() {
 				networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 				tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 				netIds = {},
+				eventsQuery = {$or: []},
 				usersQuery = {$or: []};
 
 			Sockets[client.id] = user;
@@ -196,16 +197,20 @@ SocketManager = function() {
 			});
 
 			tabs.forEach(function(tab) {
-				usersQuery['$or'].push({network: netIds[tab.network], channel: tab.target});
+				usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
+				eventsQuery['$or'].push({network: netIds[tab.network], target: tab.title});
 			});
 			// loop tabs
 
-			var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray();
+			var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
+				events = application.Events.sync.find(_.extend({user: user._id}, eventsQuery)).sort({sort: {'message.time': 1}}).limit(50).sync.toArray();
+			// sort and limit them
 
 			client.emit('users', user);
 			client.emit('networks', networks);
 			client.emit('tabs', tabs);
 			client.emit('channelUsers', users);
+			client.emit('events', events);
 			// compile a load of data to send to the frontend
 		},
 
