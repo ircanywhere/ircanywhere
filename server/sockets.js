@@ -161,7 +161,17 @@ SocketManager = function() {
 				if (user === null) {
 					return false;
 				} else {
-					data.user = user;
+					if (new Date() > user.tokens[cookies.token].time) {
+						/*var unset = {};
+							unset['tokens.' + cookies.token] = 1;
+						
+						application.Users.sync.update(query, {$unset: unset});
+						// token is expired, remove it*/
+
+						return false;
+					} else {
+						data.user = user;
+					}
 				}
 			}
 			// validate the cookie

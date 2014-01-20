@@ -13,8 +13,6 @@ Ember.Socket = Ember.Object.extend({
 	emitter: Ember.SocketEmitter.create(),
 
 	init: function() {
-		var self = this;
-
 		this.set('users', Ember.A());
 		this.set('networks', Ember.A());
 		this.set('tabs', Ember.A());
@@ -22,8 +20,20 @@ Ember.Socket = Ember.Object.extend({
 		this.set('events', Ember.A());
 		// setup the collections
 
-		var socket = io.connect();
+		this.connect();
+	},
+
+	connect: function() {
+		var self = this,
+			socket = io.connect(),
+			existing = this.get('socket');
 		// connect
+
+		if (existing) {
+			existing.socket.connecting = false;
+			existing.socket.connect();
+		}
+		// socket exists
 
 		socket.on('error', function(err) {
 			self._getController('index').transitionToRoute('login');
