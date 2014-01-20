@@ -13,6 +13,8 @@ Ember.Socket = Ember.Object.extend({
 	emitter: Ember.SocketEmitter.create(),
 
 	init: function() {
+		var self = this;
+
 		this.set('users', Ember.A());
 		this.set('networks', Ember.A());
 		this.set('tabs', Ember.A());
@@ -20,35 +22,19 @@ Ember.Socket = Ember.Object.extend({
 		this.set('events', Ember.A());
 		// setup the collections
 
-		this.connect();
-	},
+		var socket = io.connect();
+		// connect
 
-	connect: function() {
-		var self = this,
-			sock = self.get('socket');
-
-		return new Ember.RSVP.Promise(function(resolve, reject) {
-			if (sock !== null && sock.socket.connected) {
-				resolve();
-			}
-			// already connected, resolve straight away
-
-			var socket = io.connect();
-			// connect
-
-			socket.on('error', function(err) {
-				reject(err);
-			});
-
-			socket.on('connect', function() {
-				self._listen();
-
-				resolve();
-			});
-			// bind events
-
-			self.set('socket', socket);
+		socket.on('error', function(err) {
+			self._getController('index').transitionToRoute('login');
 		});
+
+		socket.on('connect', function() {
+			self._listen();
+		});
+		// bind events
+
+		this.set('socket', socket);
 	},
 
 	_listen: function() {

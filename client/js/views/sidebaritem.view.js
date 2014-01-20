@@ -16,7 +16,7 @@ App.SidebarItemView = Ember.View.extend({
 		}
 
 		return classes.join(' ');
-	}.property('context.selected'),
+	}.property('context.selected').cacheable(),
 	
 	getClass: function() {
 		var classNames = [''],
@@ -42,5 +42,5 @@ App.SidebarItemView = Ember.View.extend({
 		var split = this.get('context').get('url').split('/');
 
 		return (split.length == 1) ? '/t/' + split[0] : '/t/' + split[0] + '/' + encodeURIComponent(split[1]);
-	}.property('context.url')
+	}.property('context.url').cacheable()
 });

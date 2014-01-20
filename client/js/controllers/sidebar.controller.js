@@ -29,8 +29,6 @@ App.SidebarController = Ember.ArrayController.extend({
 
 			var split = url.split('/');
 
-			console.log(split, url);
-
 			if (split.length === 1) {
 				this.transitionToRoute('tab', split[0]);
 			} else {
