@@ -2,25 +2,34 @@ App.MessagesController = Ember.ArrayController.extend({
 	needs: ['channel', 'tab'],
 	events: [],
 
-	filtered: function() {
-		var network = this.get('controllers.tab.model'),
-			tab = this.get('controllers.channel.model');
+	filtered: Ember.arrayComputed('events', 'controllers.tab.model', 'controllers.channel.model', {
+		addedItem: function(accum, item) {
+			var network = this.get('controllers.tab.model'),
+				tab = this.get('controllers.channel.model');
 
-		var events = this.get('events').filter(function(item) {
-			if (tab && (item.get('network') === network.get('name') && item.get('target') === tab.get('title'))) {
-				return true;
-			} else if (!tab && (item.get('network') === network.get('name') && item.get('target') === network.get('name'))) {
-				return true;
-			} else {
-				return false;
+			if ((tab && item.network === network.name && item.target === tab.title) ||
+				(!tab && item.network === network.name && item.target === network.name)) {
+				accum.pushObject(item);
 			}
-		});
 
-		return events;
-	}.property('events.@each', 'controllers.channel.model', 'controllers.tab.model').cacheable(),
+			return accum;
+		},
+		
+		removedItem: function(accum, item) {
+			if ((tab && item.network === network.name && item.target === tab.title) ||
+				(!tab && item.network === network.name && item.target === network.name)) {
+				accum.removeObject(item);
+			}
+
+			return accum;
+		}
+	}),
 
 	ready: function() {
 		this.set('events', this.socket.findAll('events'));
+		// we have to use the direct data set for events because we wont be able to
+		// take advantage of it's live pushing and popping
+		// ie new events immediately becoming visible with no effort
 	}
 });
 
