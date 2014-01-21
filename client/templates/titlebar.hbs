@@ -1,0 +1,27 @@
+<div class="topic-wrap">
+	<span class="chan-title">{{tab.title}}</span>
+	<span class="chan-modes">{{tab.modes}}</span>
+	<span class="chan-desc">{{tab.desc}}</span>
+</div>
+<ul id="options-menu">
+	<li class="dropdown"><a href="#" {{action toggleProperty 'showMenu'}} class="dropdown-toggle">Options</a>
+		{{#if showMenu}}
+			<ul class="dropdown-menu">
+				<li>{{#link-to 'channel' tab.network}}Edit Network{{/link-to}}</li>
+				{{#if tab.isChannel}}
+					<li><a href="#" {{action setTopic}}>Set Topic</a></li>
+					<li class="divider"></li>
+					<li><a href="#" {{action toggleUsers}}>{{toggleUsersText}}</a></li>
+					<li><a href="#" {{action toggleEvents}}>{{toggleEventsText}}</a></li>
+				{{/if}}
+				<li class="divider"></li>
+				{{#if tab.isChannel}}
+					<li><a href="#" {{action toggleCycle}}>{{channelLink}}</a></li>
+				{{/if}}
+				<li><a href="#" {{action toggleConnect}}>{{connectionLink}}</a></li>
+			</ul>
+		{{/if}}
+	</li>
+	<li><a href="#" {{action closeWindow}}>Close</a></li>
+</ul>
+<div class="topbar inner"></div>

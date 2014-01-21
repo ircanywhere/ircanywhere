@@ -32,7 +32,3 @@ App.MessagesController = Ember.ArrayController.extend({
 		// ie new events immediately becoming visible with no effort
 	}
 });
-
-Ember.Handlebars.helper('json', function(value, options) {
-	return JSON.stringify(value);
-});
