@@ -10,7 +10,7 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	model: function(params) {
-		return this.controllerFor('tab').socket.findButWait('networks', {url: params.url});
+		return this.controllerFor('index').socket.findButWait('networks', {url: params.url});
 	},
 
 	title: function(controller, model) {

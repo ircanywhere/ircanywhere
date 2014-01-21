@@ -25,6 +25,17 @@ App.MessagesController = Ember.ArrayController.extend({
 		}
 	}),
 
+	messages: function() {
+		var results = this.get('filtered'),
+			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+				content: results,
+				sortProperties: ['message.time'],
+				sortAscending: true
+			});
+
+		return sorted.slice(sorted.get('length') - 100, sorted.get('length'));
+	}.property('events'),
+
 	ready: function() {
 		this.set('events', this.socket.findAll('events'));
 		// we have to use the direct data set for events because we wont be able to

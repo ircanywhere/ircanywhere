@@ -8,7 +8,7 @@ App.ChannelRoute = AppRoute.extend({
 			network = this.modelFor('tab')[0];
 		
 		return new Ember.RSVP.Promise(function(resolve, reject) {
-			var result = self.controllerFor('tab').socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
+			var result = self.controllerFor('index').socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
 			
 			if (result) {
 				resolve(result);
@@ -23,7 +23,7 @@ App.ChannelRoute = AppRoute.extend({
 	},
 
 	activate: function() {
-		var socket = this.controllerFor('tab').socket,
+		var socket = this.controllerFor('index').socket,
 			selected = socket.find('tabs', {selected: true})[0],
 			model = this.modelFor('channel')[0];
 		// get the channel model
@@ -38,7 +38,7 @@ App.ChannelRoute = AppRoute.extend({
 		// get the tab model
 
 		this.controllerFor('channel').set('model', null);
-		this.controllerFor('tab').socket.update('tabs', {url: model.get('url')}, {selected: true});
+		this.controllerFor('index').socket.update('tabs', {url: model.get('url')}, {selected: true});
 	},
 
 	title: function(controller, model) {
