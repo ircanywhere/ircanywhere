@@ -2,7 +2,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	needs: ['channel', 'tab'],
 	events: [],
 
-	filtered: Ember.arrayComputed('events', 'controllers.tab.model', 'controllers.channel.model', {
+	filtered: Ember.arrayComputed('sorted', 'controllers.tab.model', 'controllers.channel.model', {
 		addedItem: function(accum, item) {
 			var network = this.get('controllers.tab.model'),
 				tab = this.get('controllers.channel.model');
@@ -16,6 +16,9 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
+			var network = this.get('controllers.tab.model'),
+				tab = this.get('controllers.channel.model');
+
 			if ((tab && item.network === network.name && item.target === tab.title) ||
 				(!tab && item.network === network.name && item.target === network.name)) {
 				accum.removeObject(item);
@@ -25,15 +28,15 @@ App.MessagesController = Ember.ArrayController.extend({
 		}
 	}),
 
-	messages: function() {
-		var results = this.get('filtered'),
+	sorted: function() {
+		var results = this.get('events'),
 			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 				content: results,
 				sortProperties: ['message.time'],
 				sortAscending: true
 			});
 
-		return sorted.slice(sorted.get('length') - 100, sorted.get('length'));
+		return sorted;
 	}.property('events'),
 
 	ready: function() {
