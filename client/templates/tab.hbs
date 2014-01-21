@@ -1,1 +1,10 @@
-{{render 'messages'}}
+<div {{bind-attr id=view.tabId}} class="tab">
+	<div class="messages">
+		<div class="loading">
+			<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
+		</div>
+		<div class="backlog">
+			{{render 'messages'}}
+		</div>
+	</div>
+</div>

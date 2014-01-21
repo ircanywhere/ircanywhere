@@ -1,3 +1,5 @@
-{{#each filtered}}
-	{{json this}}<br />
-{{/each}}
+<div class="inside-backlog">
+	{{#each event in filtered itemController="event"}}
+		{{render 'event' event.content}}
+	{{/each}}
+</div>
