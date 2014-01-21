@@ -47,8 +47,9 @@ Ember.Handlebars.helper('userLink', function(show, options) {
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
-		html = '<a href="/' + url + '/' + nickname + '" rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
+		route = '/t/' + url + '/' + nickname,
+		html = Ember.Handlebars.compile('<a href="' + route + '" {{action visitLink}} rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
 	
-	return new Ember.Handlebars.SafeString(html);
+	return html(null, options);
 	// return the element
 });

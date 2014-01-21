@@ -4,6 +4,6 @@ App.TabView = Ember.View.extend({
 	classNames: 'main-view',
 
 	tabId: function() {
-		return 'tab-' + this.get('context').get('_id');
+		return 'tab-' + this.get('context._id');
 	}.property('context._id')
 });
