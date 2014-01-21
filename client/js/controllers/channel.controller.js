@@ -1,4 +1,4 @@
-App.TabController = Ember.ArrayController.extend({
+App.ChannelController = Ember.ArrayController.extend({
 	events: [],
 
 	ready: function() {
