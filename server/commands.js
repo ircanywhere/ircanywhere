@@ -23,49 +23,16 @@ CommandManager = function() {
 
 	var Manager = {
 		init: function() {
-			application.app.io.route('send', function(req) {
+			application.ee.on(['commands', 'insert'], function(doc) {
 				fibrous.run(function() {
-					var doc = req.data,
-						user = Sockets[req.socket.id];
-					// get the data being sent
+					var user = application.Users.sync.findOne({_id: doc.user}),
+						client = Clients[doc.network.toString()];
+					// get some variables
 
-					if (!(doc.command && doc.network && doc.target !== '')) {
-						req.io.respond({success: false, error: 'invalid format'});
-						// validate it
-					} else {
-						var client = Clients[doc.network],
-							networkId = new mongo.ObjectId(doc.network),
-							inserted = application.Commands.sync.insert(_.extend(doc, {user: user._id, network: networkId}))[0];
-
-						Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
-						// success
-
-						req.io.respond({success: true, id: inserted._id.toString()});
-					}
+					Manager.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
+					// success
 				});
 			});
-
-			application.app.io.route('exec', function(req) {
-				fibrous.run(function() {
-					var doc = req.data,
-						user = Sockets[req.socket.id];
-					// get the data being sent
-
-					if (!(doc.command && doc.network && doc.target !== '')) {
-						req.io.respond({success: false, error: 'invalid format'});
-						// validate it
-					} else {
-						Manager.parseCommand(user, Clients[doc.network], doc.target.toLowerCase(), doc.command);
-					}
-				});
-			});
-			// XXX - Consider updating to use collection inserts?
-
-			// create a method so the frontend can silently execute commands
-			// so if you call execCommand(netid, '#channel', '/kick ricki'); will
-			// be exactly the same as typing a command in the box with the difference being its
-			// not in the command backlog. This is good if we want to hook certain actions up to commands
-			// to save on duplicate code.
 
 			Manager.createAlias('/join', '/j');
 			Manager.createAlias('/part', '/p', '/leave');

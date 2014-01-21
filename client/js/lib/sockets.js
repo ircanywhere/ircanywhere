@@ -305,6 +305,26 @@ Ember.Socket = Ember.Object.extend({
 		// which will request them, and return a promise.
 	},
 
+	insert: function(type, insert) {
+		var self = this,
+			payload = {collection: type, insert: insert};
+
+		return new Ember.RSVP.Promise(function(resolve, reject) {
+			self._send('insert', payload, function(response) {
+				if (response.length > 0) {
+					self._store(type, response);
+					// handle so we can insert into db
+
+					resolve(response);
+					// also send it back if someone wants to do a straight away
+					// handle on the response
+				} else {
+					reject('not inserted');
+				}
+			});
+		});
+	},
+
 	update: function(type, query, update) {
 		var self = this,
 			payload = {collection: type, query: query, update: update};
@@ -313,7 +333,7 @@ Ember.Socket = Ember.Object.extend({
 			self._send('update', payload, function(response) {
 				if (response.length > 0) {
 					self._store(type, response);
-					// handle so we can insert into db
+					// handle so we can update into db
 
 					resolve(response);
 					// also send it back if someone wants to do a straight away

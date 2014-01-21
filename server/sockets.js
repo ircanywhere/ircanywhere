@@ -26,6 +26,34 @@ SocketManager = function() {
 			}
 		},
 
+		allowedInserts: {
+			commands: function(uid, insert) {
+				insert.user = uid;
+				insert.timestamp = +new Date();
+				// modify doc
+
+				var allowed = ((insert.command && insert.network) &&
+							   (insert.target !== '') &&
+							   (insert.backlog !== undefined));
+
+				if (allowed) {
+					var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
+					// try and find a valid tab
+
+					if (find) {
+						insert.network = find.network;
+						return true;
+					} else {
+						return false;
+					}
+					// overwrite network with an id
+				} else {
+					return false;
+				}
+				// check more strongly..
+			}
+		},
+
 		propogate: ['users', 'networks', 'tabs', 'events', 'channelUsers'],
 		// collections with allowed update rules
 		// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
@@ -100,6 +128,31 @@ SocketManager = function() {
 			application.app.io.route('events', function(req) {
 				fibrous.run(function() {
 					Manager.handleEvents(req);
+				});
+			});
+
+			application.app.io.route('insert', function(req) {
+				fibrous.run(function() {
+					var collection = req.data.collection,
+						insert = req.data.insert,
+						user = req.handshake.user;
+
+					if (!collection || !insert) {
+						return req.io.respond({success: false, error: 'invalid format'});
+					}
+
+					if (!_.isFunction(Manager.allowedInserts[collection])) {
+						return req.io.respond({success: false, error: 'cant insert'});
+					}
+
+					if (!Manager.allowedInserts[collection](user._id, insert)) {
+						return req.io.respond({success: false, error: 'not allowed'});
+					}
+					// have we been denied?
+
+					application.mongo.collection(collection).sync.insert(insert);
+					req.io.respond({success: true});
+					// update and respond
 				});
 			});
 
