@@ -2,27 +2,26 @@ App.MessagesController = Ember.ArrayController.extend({
 	needs: ['channel', 'tab'],
 	events: [],
 
-	/*filteredContent: Ember.arrayComputed('events.[]', {
-		initialValue: [],
-		addedItem: function(accum, item) {
-			if (item.network === 'unique') {
-				accum.pushObject(item);
+	filtered: function() {
+		var network = this.get('controllers.tab.model'),
+			tab = this.get('controllers.channel.model');
+
+		var events = this.get('events').filter(function(item) {
+			if (tab && (item.get('network') === network.get('name') && item.get('target') === tab.get('title'))) {
+				return true;
+			} else if (!tab && (item.get('network') === network.get('name') && item.get('target') === network.get('name'))) {
+				return true;
+			} else {
+				return false;
 			}
-			return accum;
-		},
-		removedItem: function(accum, item) {
-			accum.removeObject(item);
-			return accum;
-		}
-	}),*/
+		});
 
-	getEvents: function() {
-		var networkModel = this.get('controllers.tab.model'),
-			tabModel = this.get('controllers.channel.model'),
-			events = this.socket.findAll('events');
+		return events;
+	}.property('events.@each', 'controllers.channel.model', 'controllers.tab.model').cacheable(),
 
-		this.set('events', events);
-	}.observes('controllers.channel.model', 'controllers.tab.model')
+	ready: function() {
+		this.set('events', this.socket.findAll('events'));
+	}
 });
 
 Ember.Handlebars.helper('json', function(value, options) {

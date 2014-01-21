@@ -1,7 +1,3 @@
-App.TabController = Ember.ArrayController.extend({
-	events: [],
-
-	ready: function() {
-		//this.set('events', this.socket.findAll('events'));
-	}
+App.TabController = Ember.ObjectController.extend({
+	
 });

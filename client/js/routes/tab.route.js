@@ -5,6 +5,10 @@ App.Router.map(function() {
 });
 
 App.TabRoute = AppRoute.extend({
+	setupController: function(controller, model) {
+		controller.set('model', model[0]);
+	},
+
 	model: function(params) {
 		return this.controllerFor('tab').socket.findButWait('networks', {url: params.url});
 	},

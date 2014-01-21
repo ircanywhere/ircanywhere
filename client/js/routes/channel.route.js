@@ -1,4 +1,8 @@
 App.ChannelRoute = AppRoute.extend({
+	setupController: function(controller, model) {
+		controller.set('model', model[0]);
+	},
+	
 	model: function(params) {
 		var self = this,
 			network = this.modelFor('tab')[0];
@@ -33,6 +37,7 @@ App.ChannelRoute = AppRoute.extend({
 		var model = this.modelFor('tab')[0];
 		// get the tab model
 
+		this.controllerFor('channel').set('model', null);
 		this.controllerFor('tab').socket.update('tabs', {url: model.get('url')}, {selected: true});
 	},
 
