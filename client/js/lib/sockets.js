@@ -18,6 +18,7 @@ Ember.Socket = Ember.Object.extend({
 		this.set('tabs', Ember.A());
 		this.set('channelUsers', Ember.A());
 		this.set('events', Ember.A());
+		this.set('commands', Ember.A());
 		// setup the collections
 
 		this.connect();
@@ -108,7 +109,11 @@ Ember.Socket = Ember.Object.extend({
 		}
 
 		if (event === 'events') {
-			self._store('events', data, true);
+			self._store('events', data);
+		}
+
+		if (event === 'commands') {
+			self._store('commands', data, true);
 		}
 
 		if (event === 'insert') {
