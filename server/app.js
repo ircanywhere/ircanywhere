@@ -1,369 +1,310 @@
-Application = function() {
-	"use strict";
+var _ = require('lodash'),
+	hooks = require('hooks'),
+	winston = require('winston'),
+	events = require('eventemitter2'),
+	os = require('os'),
+	fs = require('fs'),
+	raw = fs.readFileSync('./private/config.json').toString(),
+	schema = require('./schema').schema,
+	path = require('path'),
+	jsonminify = require('jsonminify'),
+	validate = require('simple-schema'),
+	express = require('express'),
+	sockjs = require('sockjs'),
+	mongo = require('mongodb');
 
-	var _ = require('lodash'),
-		hooks = require('hooks'),
-		winston = require('winston'),
-		events = require('eventemitter2'),
-		os = require('os'),
-		fs = require('fs'),
-		raw = fs.readFileSync('./private/config.json').toString(),
-		path = require('path'),
-		jsonminify = require('jsonminify'),
-		validate = require('simple-schema'),
-		express = require('express'),
-		sockjs = require('sockjs'),
-		mongo = require('mongodb');
+/**
+ * The applications's main object, contains all the startup functions.
+ * All of the objects contained in this prototype are extendable by standard
+ * rules.
+ *
+ * Examples:
+ *
+ *		application.post('init', function(next) {
+ *			console.log('do something after init() is run');
+ *			next();
+ *		});
+ *
+ * @class	Application
+ * @method	Application
+ * @extend	false
+ * @return 	void
+ */
+var Application = function() {
+	this.docs = {};
+	this.ee = new events.EventEmitter2({
+		wildcard: true,
+		delimiter: '.',
+		maxListeners: 0
+	});
+	this.config = JSON.parse(jsonminify(raw));
+	// predefine our variables
 
-	var schema = {
-		'mongo': {
-			type: 'string',
-			required: true
-		},
-		'oplog': {
-			type: 'string',
-			required: true
-		},
-		'url': {
-			type: 'string',
-			required: true
-		},
-		'port': {
-			type: 'number',
-			required: true
-		},
-		'reverseDns': {
-			type: 'string',
-			required: true
-		},
-		'enableRegistrations': {
-			type: 'boolean',
-			required: true
-		},
-		'ssl': {
-			type: 'boolean',
-			required: false
-		},
-		'forkProcess': {
-			type: 'boolean',
-			required: true
-		},
-		'email': {
-			type: 'object',
-			required: true
-		},
-		'email.siteName': {
-			type: 'string',
-			required: false
-		},
-		'email.from': {
-			type: 'string',
-			required: true
-		},
-		'email.smtp': {
-			type: 'string',
-			required: true
-		},
-		'clientSettings': {
-			type: 'object',
-			required: true
-		},
-		'clientSettings.networkLimit': {
-			type: 'number',
-			min: 1,
-			max: 10,
-			required: true
-		},
-		'clientSettings.networkRestriction': {
-			type: 'string',
-			required: false
-		},
-		'clientSettings.userNamePrefix': {
-			type: 'string',
-			required: true
-		},
-		'defaultNetwork': {
-			type: 'object',
-			required: true
-		},
-		'defaultNetwork.server': {
-			type: 'string',
-			required: true
-		},
-		'defaultNetwork.port': {
-			type: 'number',
-			min: 1,
-			max: 65535,
-			required: true
-		},
-		'defaultNetwork.realname': {
-			type: 'string',
-			required: true
-		},
-		'defaultNetwork.secure': {
-			type: 'boolean',
-			required: false
-		},
-		'defaultNetwork.password': {
-			type: 'string',
-			required: false
-		},
-		'defaultNetwork.channels': {
-			type: 'array',
-			required: false
-		},
-		'defaultNetwork.channels.$.channel': {
-			type: 'string',
-			required: true,
-			regEx: /([#&][^\x07\x2C\s]{0,200})/
-		},
-		'defaultNetwork.channels.$.password': {
-			type: 'string',
-			required: false
-		}
+	fibrous.run(this.init.bind(this));
+	// initiate the module
+}
+
+/**
+ * The main entry point for the application
+ *
+ * @method	init
+ * @extend	true
+ * @return	void
+ */
+Application.prototype.init = function() {
+	validate(this.config, schema);
+	// attempt to validate our config file
+
+	this.database = {
+		mongo: this.config.mongo.split(/\//i),
+		oplog: this.config.oplog.split(/\//i)
 	};
 
-	var App = {
-		ee: new events.EventEmitter2({
-			wildcard: true,
-			delimiter: '.',
-			maxListeners: 0
-		}),
-		// setup an event emitter
+	this.mongo = mongo.MongoClient.sync.connect(this.config.mongo);
+	this.oplog = mongo.MongoClient.sync.connect(this.config.oplog);
+	// two db connections because we're greedy
 
-		docs: {},
+	this.Nodes = this.mongo.collection('nodes');
+	this.Users = this.mongo.collection('users');
+	this.Networks = this.mongo.collection('networks');
+	this.Tabs = this.mongo.collection('tabs');
+	this.ChannelUsers = this.mongo.collection('channelUsers');
+	this.Events = this.mongo.collection('events');
+	this.Commands = this.mongo.collection('commands');
+	this.Oplog = this.oplog.collection('oplog.rs');
 
-		init: function() {
-			App.config = JSON.parse(jsonminify(raw));
-			validate(App.config, schema);
-			// attempt to validate our config file
+	this.setupOplog();
+	// setup our oplog tailer, this gives us Meteor-like observes
 
-			App.database = {
-				mongo: App.config.mongo.split(/\//i),
-				oplog: App.config.oplog.split(/\//i)
-			};
+	this.setupWinston();
+	this.setupNode();
+	// next thing to do if we're all alright is setup our node
+	// this has been implemented now in the way for clustering
 
-			App.mongo = mongo.MongoClient.sync.connect(App.config.mongo);
-			App.oplog = mongo.MongoClient.sync.connect(App.config.oplog);
-			// two db connections because we're greedy
+	this.setupServer();
+	// setup express server
 
-			App.Nodes = App.mongo.collection('nodes');
-			App.Users = App.mongo.collection('users');
-			App.Networks = App.mongo.collection('networks');
-			App.Tabs = App.mongo.collection('tabs');
-			App.ChannelUsers = App.mongo.collection('channelUsers');
-			App.Events = App.mongo.collection('events');
-			App.Commands = App.mongo.collection('commands');
-			App.Oplog = App.oplog.collection('oplog.rs');
+	this.ee.emit('ready');
+	// initiate sub-objects
+}
 
-			App.setupOplog();
-			// setup our oplog tailer, this gives us Meteor-like observes
+/**
+ * Sets up the oplog tracker
+ *
+ * @method	setupOplog
+ * @extend	true
+ * @return	void
+ */
+Application.prototype.setupOplog = function() {
+	var self = this,
+		start = Math.floor(+new Date() / 1000),
+		collections = this.mongo.sync.collectionNames();
 
-			App.setupWinston();
-			App.setupNode();
-			// next thing to do if we're all alright is setup our node
-			// this has been implemented now in the way for clustering
+	collections.forEach(function(col) {
+		var name = col.name.split('.')[1],
+			data = self.mongo.collection(name).sync.find({}).sync.toArray();
+		
+		self.docs[name] = {};
+		data.forEach(function(doc) {
+			self.docs[name][doc._id.toString()] = doc;
+		});
+	});
+	// storing all the documents in self.docs so we can have a handle
+	// on what documents are getting deleted etc
 
-			App.setupServer();
-			// setup express server
+	this.Oplog.find({}, {'tailable': true}).each(function(err, item) {
+		if (err) {
+			throw err;
+		}
 
-			App.ee.emit('ready');
-			// initiate sub-objects
-		},
+		if (!(item.ts.high_ >= start)) {
+			return false;
+		}
+		
+		var collection = item.ns.split('.'),
+			col = collection[1];
+		// get the collection name
 
-		setupOplog: function() {
-			var start = Math.floor(+new Date() / 1000),
-				collections = App.mongo.sync.collectionNames();
+		if (collection[0] !== self.database.mongo[3]) {
+			return false;
+		}
+		// bail if this is a different database
 
-			collections.forEach(function(col) {
-				var name = col.name.split('.')[1],
-					data = App.mongo.collection(name).sync.find({}).sync.toArray();
-				
-				App.docs[name] = {};
-				data.forEach(function(doc) {
-					App.docs[name][doc._id.toString()] = doc;
+		switch(item.op) {
+			case 'i':
+				var id = item.o._id.toString();
+				if (!self.docs[col][id]) {
+					self.docs[col][id] = item.o;
+				}
+				// alter our global document collection
+
+				self.ee.emit([col, 'insert'], item.o);
+				// emit an event
+				break;
+			case 'u':
+				self.mongo.collection(col).findOne(item.o2, function(err, doc) {
+					var id = doc._id.toString();
+					setTimeout(function() {
+						self.docs[col][id] = doc;
+					}, 10000);
+					// alter our global document collection
+
+					self.ee.emit([col, 'update'], doc, self.docs[col][id]);
 				});
-			});
-			// storing all the documents in App.docs so we can have a handle
-			// on what documents are getting deleted etc
+				// get the new full document
+				break;
+			case 'd':
+				var id = item.o._id.toString();
+				setTimeout(function() {
+					if (self.docs[col][id]) {
+						return false;
+					}
 
-			App.Oplog.find({}, {'tailable': true}).each(function(err, item) {
-				if (err) {
-					throw err;
+					delete self.docs[col][id];
+				}, 10000);
+				// delete it, in 10 seconds so if we need to use it anywhere we can
+
+				self.ee.emit([col, 'delete'], self.docs[col][id], item.o._id);
+				// emit
+				break;
+			case 'c':
+				for (var cmd in item.o) {
+					self.ee.emit([item.o[cmd], cmd]);
 				}
-
-				if (!(item.ts.high_ >= start)) {
-					return false;
-				}
-				
-				var collection = item.ns.split('.'),
-					col = collection[1];
-				// get the collection name
-
-				if (collection[0] !== App.database.mongo[3]) {
-					return false;
-				}
-				// bail if this is a different database
-
-				switch(item.op) {
-					case 'i':
-						var id = item.o._id.toString();
-						if (!App.docs[col][id]) {
-							App.docs[col][id] = item.o;
-						}
-						// alter our global document collection
-
-						App.ee.emit([col, 'insert'], item.o);
-						// emit an event
-						break;
-					case 'u':
-						App.mongo.collection(col).findOne(item.o2, function(err, doc) {
-							var id = doc._id.toString();
-							setTimeout(function() {
-								App.docs[col][id] = doc;
-							}, 10000);
-							// alter our global document collection
-
-							App.ee.emit([col, 'update'], doc, App.docs[col][id]);
-						});
-						// get the new full document
-						break;
-					case 'd':
-						var id = item.o._id.toString();
-						setTimeout(function() {
-							if (App.docs[col][id]) {
-								return false;
-							}
-
-							delete App.docs[col][id];
-						}, 10000);
-						// delete it, in 10 seconds so if we need to use it anywhere we can
-
-						App.ee.emit([col, 'delete'], App.docs[col][id], item.o._id);
-						// emit
-						break;
-					case 'c':
-						for (var cmd in item.o) {
-							App.ee.emit([item.o[cmd], cmd]);
-						}
-					default:
-						break;
-				}
-				// emit the event
-			});
-		},
-
-		setupWinston: function() {
-			App.logger = new (winston.Logger)({
-				transports: [
-					new (winston.transports.Console)(),
-					new (winston.transports.File)({
-						name: 'error',
-						level: 'error',
-						filename: './logs/error.log',
-						json: false,
-						timestamp: true
-					}),
-					new (winston.transports.File)({
-						name: 'warn',
-						level: 'warn',
-						filename: './logs/warn.log',
-						json: false,
-						timestamp: true
-					}),
-					new (winston.transports.File)({
-						name: 'info',
-						level: 'info',
-						filename: './logs/info.log',
-						json: false,
-						timestamp: true
-					})
-				]
-			});
-		},
-
-		setupNode: function() {
-			var data = '',
-				json = {},
-				query = {_id: null},
-				defaultJson = {
-					endpoint: (App.config.ssl) ? 'https://0.0.0.0:' + App.config.port : 'http://0.0.0.0:' + App.config.port,
-					hostname: os.hostname(),
-					port: App.config.port,
-					ipAddress: '0.0.0.0'
-				};
-
-			try {
-				data = fs.readFileSync('./private/node.json', {encoding: 'utf8'});
-				json = JSON.parse(data);
-				query = {_id: new mongo.ObjectID(json._id)};
-			} catch (e) {
-				json = defaultJson;
-			}
-
-			var node = App.Nodes.sync.findOne(query);
-			if (node !== null) {
-				App.Nodes.update(query, defaultJson, {safe: false});
-				json = _.extend(node, defaultJson);
-				json._id = json._id.toString();
-			} else {
-				App.Nodes.sync.insert(defaultJson, {safe: false});
-				json = defaultJson;
-			}
-
-			json._id = json._id.toString();
-			App.nodeId = json._id;
-			data = (data == '') ? {} : JSON.parse(data);
-			// house keeping
-
-			if (_.isEqual(data, json)) {
-				return false;
-			}
-
-			fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
-				if (err) {
-					throw err;
-				}
-			});
-		},
-
-		setupServer: function() {
-			var app = express(),
-				server = require('http').createServer(app),
-				sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
-			// setup a http server
-
-			sockjsServer.installHandlers(server, {prefix: '/websocket'});
-
-			app.enable('trust proxy');
-			// express settings
-
-			app.use(express.compress());
-			//app.use(express.static('client', {maxAge: 86400000}));
-			app.use(express.static('client'));
-			app.use(express.cookieParser(App.nodeId));
-			app.use(express.json());
-			app.use(express.urlencoded());
-			app.use(fibrous.middleware);
-			// setup middleware
-
-			app.get('/*', function(req, res) {
-				res.sendfile('./client/templates/html/index.html');
-			});
-			// setup routes
-
-			server.listen(App.config.port);
-
-			App.app = app;
-			App.sockjs = sockjsServer;
-			// put them in the main namespace
+			default:
+				break;
 		}
-	};
+		// emit the event
+	});
+}
 
-	fibrous.run(App.init);
-	// initiate the module if need be
+/**
+ * Sets up the winston loggers
+ *
+ * @method	setupWinston
+ * @extend	true
+ * @return	void
+ */
+Application.prototype.setupWinston = function() {
+	this.logger = new (winston.Logger)({
+		transports: [
+			new (winston.transports.Console)(),
+			new (winston.transports.File)({
+				name: 'error',
+				level: 'error',
+				filename: './logs/error.log',
+				json: false,
+				timestamp: true
+			}),
+			new (winston.transports.File)({
+				name: 'warn',
+				level: 'warn',
+				filename: './logs/warn.log',
+				json: false,
+				timestamp: true
+			}),
+			new (winston.transports.File)({
+				name: 'info',
+				level: 'info',
+				filename: './logs/info.log',
+				json: false,
+				timestamp: true
+			})
+		]
+	});
+}
 
-	return _.extend(App, hooks);
-};
+/**
+ * Checks for a node record to store in the file system and database
+ * This is done to generate a 'unique' but always the same ID to identify
+ * the system so we can make way for clustering in the future
+ * 
+ * @method	setupNode
+ * @extend	true
+ * @return	void
+ */
+Application.prototype.setupNode = function() {
+	var data = '',
+		json = {},
+		query = {_id: null},
+		defaultJson = {
+			endpoint: (this.config.ssl) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
+			hostname: os.hostname(),
+			port: this.config.port,
+			ipAddress: '0.0.0.0'
+		};
 
-exports.Application = Application;
+	try {
+		data = fs.readFileSync('./private/node.json', {encoding: 'utf8'});
+		json = JSON.parse(data);
+		query = {_id: new mongo.ObjectID(json._id)};
+	} catch (e) {
+		json = defaultJson;
+	}
+
+	var node = this.Nodes.sync.findOne(query);
+	if (node !== null) {
+		this.Nodes.update(query, defaultJson, {safe: false});
+		json = _.extend(node, defaultJson);
+		json._id = json._id.toString();
+	} else {
+		this.Nodes.sync.insert(defaultJson, {safe: false});
+		json = defaultJson;
+	}
+
+	json._id = json._id.toString();
+	this.nodeId = json._id;
+	data = (data == '') ? {} : JSON.parse(data);
+	// house keeping
+
+	if (_.isEqual(data, json)) {
+		return false;
+	}
+
+	fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+		if (err) {
+			throw err;
+		}
+	});
+}
+
+/**
+ * Sets up the express and sockjs server to handle all HTTP / WebSocket requests
+ *
+ * @method	setupServer
+ * @extend	true
+ * @return	void
+ */
+Application.prototype.setupServer = function() {
+	var app = express(),
+		server = require('http').createServer(app),
+		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
+	// setup a http server
+
+	sockjsServer.installHandlers(server, {prefix: '/websocket'});
+
+	app.enable('trust proxy');
+	// express settings
+
+	app.use(express.compress());
+	//app.use(express.static('client', {maxAge: 86400000}));
+	app.use(express.static('client'));
+	app.use(express.cookieParser(this.nodeId));
+	app.use(express.json());
+	app.use(express.urlencoded());
+	app.use(fibrous.middleware);
+	// setup middleware
+
+	app.get('/*', function(req, res) {
+		res.sendfile('./client/templates/html/index.html');
+	});
+	// setup routes
+
+	server.listen(this.config.port);
+
+	this.app = app;
+	this.sockjs = sockjsServer;
+	// put them in the main namespace
+}
+
+exports.Application = _.extend(Application, hooks);

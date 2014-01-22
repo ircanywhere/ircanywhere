@@ -13,7 +13,7 @@
 {{#if isQuit}}
 	<div data-type="quit" {{bind-attr class=classNames data-id=_id data-read=read}}>
 		<span class="time">{{unbound time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&larr; You have disconnected{{else}}&larr; {{unbound userLink false}} ({{unbound message.username}}@{{unbound message.hostname}}) has quit: {{unbound message.message}}{{/if}}</span>
+		<span class="column event">{{#if extra.self}}&larr; You have disconnected{{else}}&larr; {{unbound userLink false}} ({{unbound message.username}}@{{unbound message.hostname}}) has quit: {{unbound ircParse message.message}}{{/if}}</span>
 	</div>
 {{/if}}
 {{#if isMode}}
@@ -25,7 +25,7 @@
 {{#if isTopic}}
 	<div data-type="topic" {{bind-attr class=classNames data-id=_id data-read=read}}>
 		<span class="time">{{unbound time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{unbound message.topic}}{{else}}&ndash;  {{unbound userLink false}} has changed the topic to: {{unbound message.topic}}{{/if}}</span>
+		<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{unbound ircParse message.topic}}{{else}}&ndash;  {{unbound userLink false}} has changed the topic to: {{unbound ircParse message.topic}}{{/if}}</span>
 	</div>
 {{/if}}
 {{#if isNick}}
@@ -37,12 +37,12 @@
 {{#if isKick}}
 	<div data-type="kick" {{bind-attr class=classNames data-id=_id data-read=read}}>
 		<span class="time">{{unbound time message.time}}</span>
-		<span class="column event">{{#if extra.self}}&larr; You have been kicked from {{unbound message.channel}} ({{unbound message.message}}){{else}}&larr; {{unbound userLink false}} has kicked {{unbound message.kicked}} ({{unbound message.message}}){{/if}}</span>
+		<span class="column event">{{#if extra.self}}&larr; You have been kicked from {{unbound message.channel}} ({{unbound ircParse message.message}}){{else}}&larr; {{unbound userLink false}} has kicked {{unbound message.kicked}} ({{unbound ircParse message.message}}){{/if}}</span>
 	</div>
 {{/if}}
 {{#if isPrivmsg}}
 	<div data-type="privmsg" {{bind-attr class=classNames data-id=_id data-read=read data-self=extra.self data-highlight=extra.highlight}}>
 		<span class="time">{{unbound time message.time}}</span>
-		<span class="column message">{{unbound userLink true}}{{unbound message.message}}</span>
+		<span class="column message">{{unbound userLink true}}{{unbound ircParse message.message}}</span>
 	</div>
 {{/if}}

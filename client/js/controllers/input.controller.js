@@ -4,6 +4,6 @@ App.InputController = Ember.ObjectController.extend({
 	lastCommand: '',
 
 	nick: function() {
-
-	}.property()
+		return this.get('controllers.network.model.nick');
+	}.observes('controllers.network.model.nick').property('controllers.network.model.nick')
 });

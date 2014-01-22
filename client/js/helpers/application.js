@@ -53,3 +53,10 @@ Ember.Handlebars.helper('userLink', function(show, options) {
 	return html(null, options);
 	// return the element
 });
+
+Ember.Handlebars.helper('ircParse', function(text, options) {
+	var network = this.get('controllers.network.model'),
+		message = Ember.Handlebars.compile(App.Parser.exec(text, network));
+
+	return message(null, options);
+});
