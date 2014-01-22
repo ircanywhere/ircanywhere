@@ -6,7 +6,9 @@ var _ = require('lodash'),
  * the handling of joins/parts/mode changes/topic changes and such.
  * As always these functions are extendable and can be prevented or extended by using hooks.
  *
+ * @class	ChannelManager
  * @method	ChannelManager
+ * @extend	false
  * @return	void
  */
 var ChannelManager = function() {
@@ -25,6 +27,7 @@ var ChannelManager = function() {
  * @method	getChannel
  * @param 	{String} network
  * @param 	{String} channel
+ * @extend	true
  * @return	{Object} tab object
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
@@ -41,6 +44,7 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * @param 	{String} channel
  * @param 	{Array} users
  * @param 	{Boolean} force
+ * @extend	true
  * @return	{String} tab _id
  */
 ChannelManager.prototype.insertUsers = function(key, network, channel, users, force) {
@@ -88,6 +92,7 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
  * @param 	{String} network
  * @param 	{String} channel
  * @param 	{Array} [optional] users
+ * @extend	true
  * @return	void
  */
 ChannelManager.prototype.removeUsers = function(network, channel, users) {
@@ -113,6 +118,7 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
  * @param 	{String} network
  * @param 	{Array} users
  * @param 	{Object} values
+ * @extend	true
  * @return 	void
  */
 ChannelManager.prototype.updateUsers = function(key, network, users, values) {
@@ -149,6 +155,7 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  * @param 	{String} network
  * @param 	{String} channel
  * @param 	{String} mode
+ * @extend	true
  * @return 	void
  */
 ChannelManager.prototype.updateModes = function(key, capab, network, channel, mode) {
@@ -189,6 +196,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
  * @param 	{String} channel
  * @param 	{String} topic
  * @param 	{String} setby
+ * @extend	true
  * @return 	void
  */
 ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
