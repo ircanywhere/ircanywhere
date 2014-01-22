@@ -207,7 +207,7 @@ NetworkManager = function() {
 		},
 
 		connectNetwork: function(user, network) {
-			ircFactory.create(user, network);
+			ircFactory.create(network);
 		},
 
 		changeStatus: function(networkId, status) {

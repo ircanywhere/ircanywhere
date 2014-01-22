@@ -39,7 +39,7 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * network name and channel name, with the option to force an overwrite
  * 
  * @method	insertUsers
- * @param 	{String} key
+ * @param 	{ObjectID} key
  * @param 	{String} network
  * @param 	{String} channel
  * @param 	{Array} users
@@ -114,7 +114,7 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
  * Updates a user or an array of users from the specific channel with the values passed in
  *
  * @method 	updateUsers
- * @param 	{String} key
+ * @param 	{ObjectID} key
  * @param 	{String} network
  * @param 	{Array} users
  * @param 	{Object} values
@@ -150,7 +150,7 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  * externally, however can be pre and post hooked like all other functions in this object.
  *
  * @method 	updateModes
- * @param 	{String} key
+ * @param 	{ObjectID} key
  * @param 	{Object} capab
  * @param 	{String} network
  * @param 	{String} channel
@@ -192,7 +192,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
  * Updates the specific channel's topic and setby in the internal records
  *
  * @method 	updateTopic
- * @param 	{String} key
+ * @param 	{ObjectID} key
  * @param 	{String} channel
  * @param 	{String} topic
  * @param 	{String} setby

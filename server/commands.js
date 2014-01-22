@@ -36,6 +36,7 @@ var _ban = function(client, target, nickname, ban) {
  *
  * @class	CommandManager
  * @method	CommandManager
+ * @extend 	true
  * @return	void
  */
 var CommandManager = function() {
