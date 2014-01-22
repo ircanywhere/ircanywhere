@@ -25,29 +25,32 @@ Ember.Socket = Ember.Object.extend({
 
 	connect: function() {
 		var self = this,
-			socket = io.connect(),
-			existing = this.get('socket');
+			socket = new SockJS('/websocket'),
+			existing = this.socket;
 		// connect
 
 		if (existing) {
-			existing.socket.connecting = false;
-			existing.socket.connect();
+			socket = new SockJS('/websocket');
 		}
 		// socket exists
 
-		socket.on('error', function(err) {
-			self._getController('index').transitionToRoute('login');
-		});
+		socket.onclose = function() {
+			// XXX - Handle reconnect
+		}
 
-		socket.on('connect', function() {
-			self._listen();
-		});
+		socket.onopen = function() {
+			self._setup();
+		}
+
+		socket.onmessage = function(message) {
+			self._listen(JSON.parse(message.data));
+		}
 		// bind events
 
 		this.set('socket', socket);
 	},
 
-	_listen: function() {
+	_setup: function() {
 		var controllers = Ember.get(this, 'controllers'),
 			getController = this._getController.bind(this),
 			self = this,
@@ -57,54 +60,6 @@ Ember.Socket = Ember.Object.extend({
 			};
 
 		this.set('done', false);
-
-		this.socket.on('users', function(data) {
-			self._store('users', [data]);
-		});
-
-		this.socket.on('networks', function(data) {
-			self._store('networks', data);
-		});
-
-		this.socket.on('tabs', function(data) {
-			self._store('tabs', data);
-		});
-
-		this.socket.on('channelUsers', function(data) {
-			self._store('channelUsers', data);
-		});
-
-		this.socket.on('events', function(data) {
-			self._store('events', data, true);
-		});
-
-		this.socket.on('insert', function(data) {
-			if (!data.collection || !data.record) {
-				return false;
-			}
-
-			self._store(data.collection, [data.record]);
-		});
-
-		this.socket.on('update', function(data) {
-			if (!data.collection || !data.id || !data.record) {
-				return false;
-			}
-
-			self._update(data.collection, data.id, data.record);
-		});
-
-		this.socket.on('delete', function(data) {
-			if (!data.collection || !data.id) {
-				return false;
-			}
-
-			self._delete(data.collection, data.id);
-		});
-		// handle our events individually
-		// for sake of ease - like meteor, however we can get collection records in bulk
-		// there is an event for each collection apart from channelUsers, along with 3 additional events
-		// that indicate whether to insert/update/remove a record from one of the collections
 
 		this.get('emitter').on('done', function() {
 			self.set('done', true);
@@ -122,6 +77,67 @@ Ember.Socket = Ember.Object.extend({
 			});
 			// bind any connect events to our controllers
 		});
+
+		this._send('authenticate', document.cookie);
+		// authenticate
+	},
+
+	_listen: function(incoming) {
+		var self = this,
+			event = incoming.event,
+			data = incoming.data;
+
+		if (event === 'authenticate' && !data) {
+			self._getController('index').transitionToRoute('login');
+		}
+
+		if (event === 'users') {
+			self._store('users', [data]);
+		}
+
+		if (event === 'networks') {
+			self._store('networks', data);
+		}
+
+		if (event === 'tabs') {
+			self._store('tabs', data);
+		}
+
+		if (event === 'channelUsers') {
+			self._store('channelUsers', data);
+		}
+
+		if (event === 'events') {
+			self._store('events', data, true);
+		}
+
+		if (event === 'insert') {
+			if (!data.collection || !data.record) {
+				return false;
+			}
+
+			self._store(data.collection, [data.record]);
+		}
+
+		if (event === 'update') {
+			if (!data.collection || !data.id || !data.record) {
+				return false;
+			}
+
+			self._update(data.collection, data.id, data.record);
+		}
+
+		if (event === 'delete') {
+			if (!data.collection || !data.id) {
+				return false;
+			}
+
+			self._delete(data.collection, data.id);
+		}
+		// handle our events individually
+		// for sake of ease - like meteor, however we can get collection records in bulk
+		// there is an event for each collection apart from channelUsers, along with 3 additional events
+		// that indicate whether to insert/update/remove a record from one of the collections
 	},
 
 	_getController: function(name) {
@@ -236,12 +252,8 @@ Ember.Socket = Ember.Object.extend({
 		}
 	},
 
-	_send: function(event, payload, callback) {
-		if (callback) {
-			this.socket.emit(event, payload, callback);
-		} else {
-			this.socket.emit(event, payload);
-		}
+	_send: function(event, payload) {
+		this.socket.send(JSON.stringify({event: event, data: payload}));
 	},
 
 	findOne: function(type, query) {
@@ -289,60 +301,21 @@ Ember.Socket = Ember.Object.extend({
 	request: function(type, query) {
 		var self = this;
 
-		return new Ember.RSVP.Promise(function(resolve, reject) {
-			self._send(type, query, function(response) {
-				if (response.length > 0) {
-					resolve(response);
-					self._store(type, response);
-				} else {
-					reject('not found');
-				}
-			});
-		});
-		// this is used to request way back records
-		// think messages that are a day old, we probably didn't get them in
-		// the sync event so they won't be in our data store, so we make a query
-		// which will request them, and return a promise.
+		self._send(type, query);
 	},
 
 	insert: function(type, insert) {
 		var self = this,
 			payload = {collection: type, insert: insert};
 
-		return new Ember.RSVP.Promise(function(resolve, reject) {
-			self._send('insert', payload, function(response) {
-				if (response.length > 0) {
-					self._store(type, response);
-					// handle so we can insert into db
-
-					resolve(response);
-					// also send it back if someone wants to do a straight away
-					// handle on the response
-				} else {
-					reject('not inserted');
-				}
-			});
-		});
+		self._send('insert', payload);
 	},
 
 	update: function(type, query, update) {
 		var self = this,
 			payload = {collection: type, query: query, update: update};
 
-		return new Ember.RSVP.Promise(function(resolve, reject) {
-			self._send('update', payload, function(response) {
-				if (response.length > 0) {
-					self._store(type, response);
-					// handle so we can update into db
-
-					resolve(response);
-					// also send it back if someone wants to do a straight away
-					// handle on the response
-				} else {
-					reject('not updated');
-				}
-			});
-		});
+		self._send('update', payload);
 	}
 });
 

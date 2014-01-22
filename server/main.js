@@ -19,7 +19,7 @@ application = new Application();
 // inject the config so we can mimic it in tests if needed
 
 socketManager = new SocketManager();
-// socket.io engine
+// websocket engine
 
 modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class

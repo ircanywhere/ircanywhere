@@ -93,11 +93,11 @@ SocketManager = function() {
 					// bail if its undefined
 
 					if (eventName === 'insert') {
-						client.emit(eventName, {collection: collection, record: doc});
+						client.send(eventName, {collection: collection, record: doc});
 					} else if (eventName === 'update') {
-						client.emit(eventName, {collection: collection, id: doc._id.toString(), record: doc});
+						client.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 					} else if (eventName === 'delete') {
-						client.emit(eventName, {collection: collection, id: doc._id.toString()}); 
+						client.send(eventName, {collection: collection, id: doc._id.toString()});
 					}
 				});
 				// all of this code works by watching changes via the oplog, that way 
@@ -106,96 +106,55 @@ SocketManager = function() {
 				// to the clients who need to see it, a bit like meteor, without subscriptions
 			});
 
-			application.app.io.set('authorization', function(data, accept) {
-				fibrous.run(function() {
-					accept(null, Manager.handleAuth(data));
-				});
-			});
-			// socket authorisation
+			application.sockjs.on('connection', function (client) {
+				client.send = function(event, data) {
+					client.write(JSON.stringify({event: event, data: data}));
+					return client;
+				}
+				// define a function to ease this
 
-			application.app.io.on('connection', function (client) {
-				fibrous.run(function() {
-					client.on('disconnect', function() {
+				client.on('data', function(message) {
+					fibrous.run(function() {
+						var parsed = JSON.parse(message),
+							event = parsed.event,
+							data = parsed.data;
+
+						if (event === 'authenticate') {
+							Manager.handleAuth(client, data, function() {
+								Manager.handleConnect(client);
+								// handle success
+							});
+						}
+						// socket authentication
+
+						if (event === 'events') {
+							Manager.handleEvents(client, data);
+						}
+						// handle requesting of data from events collection
+
+						if (event === 'insert') {
+							Manager.handleInsert(client, data);
+						}
+						// handle inserts
+
+						if (event === 'update') {
+							Manager.handleUpdate(client, data);
+						}
+						// handle updates
+					});
+				});
+
+				client.on('close', function() {
+					fibrous.run(function() {
 						Manager.handleDisconnect(client);
 					});
-					// handle disconnect
-
-					Manager.handleConnect(client);
-					// handle connect event
 				});
-			});
-
-			application.app.io.route('events', function(req) {
-				fibrous.run(function() {
-					Manager.handleEvents(req);
-				});
-			});
-
-			application.app.io.route('insert', function(req) {
-				fibrous.run(function() {
-					var collection = req.data.collection,
-						insert = req.data.insert,
-						user = req.handshake.user;
-
-					if (!collection || !insert) {
-						return req.io.respond({success: false, error: 'invalid format'});
-					}
-
-					if (!_.isFunction(Manager.allowedInserts[collection])) {
-						return req.io.respond({success: false, error: 'cant insert'});
-					}
-
-					if (!Manager.allowedInserts[collection](user._id, insert)) {
-						return req.io.respond({success: false, error: 'not allowed'});
-					}
-					// have we been denied?
-
-					application.mongo.collection(collection).sync.insert(insert);
-					req.io.respond({success: true});
-					// update and respond
-				});
-			});
-
-			application.app.io.route('update', function(req) {
-				fibrous.run(function() {
-					var collection = req.data.collection,
-						query = req.data.query,
-						update = req.data.update,
-						user = req.handshake.user;
-
-					if (!collection || !query || !update) {
-						return req.io.respond({success: false, error: 'invalid format'});
-					}
-
-					if (!_.isFunction(Manager.allowedUpdates[collection])) {
-						return req.io.respond({success: false, error: 'cant update'});
-					}
-
-					if (query._id) {
-						query._id = new mongo.ObjectID(query._id);
-					}
-					// update it to a proper mongo id
-
-					if (!Manager.allowedUpdates[collection](user._id, query, update)) {
-						return req.io.respond({success: false, error: 'not allowed'});
-					}
-					// have we been denied?
-
-					if (collection === 'tabs' && _.has(update, 'selected')) {
-						application.Tabs.sync.update({user: user._id}, {$set: {selected: false}}, {multi: true});
-					}
-					// also check for selected here, if a new tab is being selected then we will
-					// force the de-selection of the others
-
-					application.mongo.collection(collection).sync.update(query, {$set: update});
-					req.io.respond({success: true});
-					// update and respond
-				});
+				// handle disconnects
 			});
 		},
 
-		handleAuth: function(data) {
-			var parsed = (data.headers.cookie) ? data.headers.cookie.split('; ') : [],
+		handleAuth: function(client, data, callback) {
+			var parsed = (data) ? data.split('; ') : [],
 				cookies = {};
 
 			parsed.forEach(function(cookie) {
@@ -205,6 +164,7 @@ SocketManager = function() {
 			// get our cookies
 
 			if (!cookies.token) {
+				client.send('authenticate', false).close();
 				return false;
 			} else {
 				var query = {};
@@ -212,6 +172,7 @@ SocketManager = function() {
 				var user = application.Users.sync.findOne(query);
 
 				if (user === null) {
+					client.send('authenticate', false).close();
 					return false;
 				} else {
 					if (new Date() > user.tokens[cookies.token].time) {
@@ -221,20 +182,21 @@ SocketManager = function() {
 						application.Users.sync.update(query, {$unset: unset});
 						// token is expired, remove it
 
+						client.send('authenticate', false).close();
 						return false;
 					} else {
-						data.user = user;
+						client.user = user;
 					}
 				}
 			}
 			// validate the cookie
 
-			return true;
-			// accept the connection
+			callback();
+			// go go
 		},
 
 		handleConnect: function(client) {
-			var user = client.handshake.user,
+			var user = client.user,
 				networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 				tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 				netIds = {},
@@ -259,11 +221,11 @@ SocketManager = function() {
 				events = application.Events.sync.find(_.extend({user: user._id}, eventsQuery)).sort({sort: {'message.time': 1}}).limit(50).sync.toArray();
 			// sort and limit them
 
-			client.emit('users', user);
-			client.emit('networks', networks);
-			client.emit('tabs', tabs);
-			client.emit('channelUsers', users);
-			client.emit('events', events);
+			client.send('users', user);
+			client.send('networks', networks);
+			client.send('tabs', tabs);
+			client.send('channelUsers', users);
+			client.send('events', events);
 			// compile a load of data to send to the frontend
 		},
 
@@ -275,12 +237,68 @@ SocketManager = function() {
 			// clean up
 		},
 
-		handleEvents: function(req) {
-			var response = application.Events.sync.find(req.data).sync.toArray();
+		handleEvents: function(client, data) {
+			var response = application.Events.sync.find(data).sync.toArray();
 			// perform the query
 
-			req.io.respond(response);
+			client.send('events', response);
 			// get the data
+		},
+
+		handleInsert: function(client, data) {
+			var collection = data.collection,
+				insert = data.insert,
+				user = client.user;
+
+			if (!collection || !insert) {
+				return client.send('error', {command: 'insert', error: 'invalid format'});
+			}
+
+			if (!_.isFunction(Manager.allowedInserts[collection])) {
+				return client.send('error', {command: 'insert', error: 'cant insert'});
+			}
+
+			if (!Manager.allowedInserts[collection](user._id, insert)) {
+				return client.send('error', {command: 'insert', error: 'not allowed'});
+			}
+			// have we been denied?
+
+			application.mongo.collection(collection).sync.insert(insert);
+			// insert
+		},
+
+		handleUpdate: function(client, data) {
+			var collection = data.collection,
+				query = data.query,
+				update = data.update,
+				user = client.user;
+
+			if (!collection || !query || !update) {
+				return client.send('error', {command: 'update', error: 'invalid format'});
+			}
+
+			if (!_.isFunction(Manager.allowedUpdates[collection])) {
+				return client.send('error', {command: 'update', error: 'cant update'});
+			}
+
+			if (query._id) {
+				query._id = new mongo.ObjectID(query._id);
+			}
+			// update it to a proper mongo id
+
+			if (!Manager.allowedUpdates[collection](user._id, query, update)) {
+				returnclient.send('error', {command: 'update', error: 'not allowed'});
+			}
+			// have we been denied?
+
+			if (collection === 'tabs' && _.has(update, 'selected')) {
+				application.Tabs.sync.update({user: user._id}, {$set: {selected: false}}, {multi: true});
+			}
+			// also check for selected here, if a new tab is being selected then we will
+			// force the de-selection of the others
+
+			application.mongo.collection(collection).sync.update(query, {$set: update});
+			// update
 		}
 	};
 

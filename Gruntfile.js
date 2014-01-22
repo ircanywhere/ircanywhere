@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 				separator: ';'
 			},
 			dependency: {
-				src: ['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/socket.io*.js'],
+				src: ['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'],
 				dest: 'client/build/dependency.js'
 			},
 			dist: {

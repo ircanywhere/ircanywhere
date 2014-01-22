@@ -11,7 +11,8 @@ Application = function() {
 		path = require('path'),
 		jsonminify = require('jsonminify'),
 		validate = require('simple-schema'),
-		express = require('express.io'),
+		express = require('express'),
+		sockjs = require('sockjs'),
 		mongo = require('mongodb');
 
 	var schema = {
@@ -164,7 +165,7 @@ Application = function() {
 			// this has been implemented now in the way for clustering
 
 			App.setupServer();
-			// setup express.io server
+			// setup express server
 
 			App.ee.emit('ready');
 			// initiate sub-objects
@@ -327,27 +328,35 @@ Application = function() {
 		},
 
 		setupServer: function() {
-			App.app = express().http().io();
+			var app = express(),
+				server = require('http').createServer(app),
+				sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 			// setup a http server
 
-			App.app.enable('trust proxy');
+			sockjsServer.installHandlers(server, {prefix: '/websocket'});
+
+			app.enable('trust proxy');
 			// express settings
 
-			App.app.use(express.compress());
-			//App.app.use(express.static('client', {maxAge: 86400000}));
-			App.app.use(express.static('client'));
-			App.app.use(express.cookieParser(App.nodeId));
-			App.app.use(express.json());
-			App.app.use(express.urlencoded());
-			App.app.use(fibrous.middleware);
+			app.use(express.compress());
+			//app.use(express.static('client', {maxAge: 86400000}));
+			app.use(express.static('client'));
+			app.use(express.cookieParser(App.nodeId));
+			app.use(express.json());
+			app.use(express.urlencoded());
+			app.use(fibrous.middleware);
 			// setup middleware
 
-			App.app.get('/*', function(req, res) {
+			app.get('/*', function(req, res) {
 				res.sendfile('./client/templates/html/index.html');
 			});
 			// setup routes
 
-			App.app.listen(App.config.port);
+			server.listen(App.config.port);
+
+			App.app = app;
+			App.sockjs = sockjsServer;
+			// put them in the main namespace
 		}
 	};
 
