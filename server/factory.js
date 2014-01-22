@@ -11,6 +11,7 @@ var _ = require('lodash'),
  *
  * @class	IRCFactory
  * @method 	IRCFactory
+ * @extend	false
  * @return 	void
  */
 var IRCFactory = function() {
@@ -33,7 +34,7 @@ var IRCFactory = function() {
  * when the application is ready to run
  *
  * @method 	init
- * @extend 	false
+ * @extend 	true
  * @return 	void
  */
 IRCFactory.prototype.init = function() {

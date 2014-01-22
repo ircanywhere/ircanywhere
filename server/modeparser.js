@@ -10,6 +10,7 @@ var _ = require('lodash');
  * 
  * @class	ModeParser
  * @method 	ModeParser
+ * @extend	false
  * @return 	void
  */
 var ModeParser = function() {

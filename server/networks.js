@@ -9,6 +9,7 @@ var _ = require('lodash'),
  *
  * @class	NetworkManager
  * @method 	NetworkManager
+ * @extend	false
  * @return 	void
  */
 var NetworkManager = function() {
@@ -35,7 +36,7 @@ var NetworkManager = function() {
  * writes to the collection will propogate through and update Clients
  *
  * @method 	init
- * @extend 	false
+ * @extend 	true
  * @return 	void
  */
 NetworkManager.prototype.init = function() {
