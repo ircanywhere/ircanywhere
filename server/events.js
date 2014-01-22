@@ -25,7 +25,7 @@ var _insert = function(client, message, type, user) {
 	// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 	// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 	
-	var prefixObject = EventManager.getPrefix(client, user),
+	var prefixObject = eventManager.getPrefix(client, user),
 		output = {
 			type: type,
 			user: client.internal.userId,
@@ -35,7 +35,7 @@ var _insert = function(client, message, type, user) {
 			read: false,
 			extra: {
 				self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
-				highlight: EventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
+				highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
 				prefix: prefixObject.prefix
 			}
 		};
@@ -52,7 +52,7 @@ var _insert = function(client, message, type, user) {
  * @extend	false
  * @return 	void
  */
-var EventManager = function() {
+function EventManager() {
 
 }
 

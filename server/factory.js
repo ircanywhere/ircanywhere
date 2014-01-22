@@ -14,7 +14,7 @@ var _ = require('lodash'),
  * @extend	false
  * @return 	void
  */
-var IRCFactory = function() {
+function IRCFactory() {
 	var self = this;
 
 	this.api = new factory();
@@ -62,7 +62,7 @@ IRCFactory.prototype.init = function() {
 
 				application.logger.log('warn', 'factory synchronize', message);
 			} else {
-				this.handleEvent(message.event, message.message);
+				self.handleEvent(message.event, message.message);
 			}
 		});
 	});

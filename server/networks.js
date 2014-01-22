@@ -12,7 +12,7 @@ var _ = require('lodash'),
  * @extend	false
  * @return 	void
  */
-var NetworkManager = function() {
+function NetworkManager() {
 	var self = this;
 
 	this.flags = {

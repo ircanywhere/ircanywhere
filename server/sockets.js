@@ -10,7 +10,7 @@ var _ = require('lodash'),
  * @extend	false
  * @return 	void
  */
-var SocketManager = function() {
+function SocketManager() {
 	var self = this;
 
 	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers'];
@@ -21,9 +21,6 @@ var SocketManager = function() {
 		fibrous.run(self.init.bind(self));
 	});
 }
-
-SocketManager.allowedUpdates = {};
-SocketManager.allowedInserts = {};
 
 /**
  * An allow rule for updates to the tab collections, checks the correct properties
@@ -37,7 +34,7 @@ SocketManager.allowedInserts = {};
  * @extend 	false
  * @return 	{Boolean}
  */
-SocketManager.allowedUpdates.tabs = function(uid, query, update) {
+SocketManager.prototype.tabs_update = function(uid, query, update) {
 	var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
 				   (_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
 				   (_.has(update, 'selected') && typeof update.selected === 'boolean'));
@@ -65,7 +62,7 @@ SocketManager.allowedUpdates.tabs = function(uid, query, update) {
  * @extend 	false
  * @return 	{Boolean}
  */
-SocketManager.allowedInserts.commands = function(uid, insert) {
+SocketManager.prototype.commands_insert = function(uid, insert) {
 	insert.user = uid;
 	insert.timestamp = +new Date();
 	// modify doc
@@ -349,12 +346,12 @@ SocketManager.prototype.handleInsert = function(client, data) {
 		return;
 	}
 
-	if (!_.isFunction(this.allowedInserts[collection])) {
+	if (!_.isFunction(this[collection + '_insert'])) {
 		client.send('error', {command: 'insert', error: 'cant insert'});
 		return;
 	}
 
-	if (!this.allowedInserts[collection](user._id, insert)) {
+	if (!this[collection + '_insert'](user._id, insert)) {
 		client.send('error', {command: 'insert', error: 'not allowed'});
 		return;
 	}
@@ -382,7 +379,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 		return client.send('error', {command: 'update', error: 'invalid format'});
 	}
 
-	if (!_.isFunction(this.allowedUpdates[collection])) {
+	if (!_.isFunction(this[collection + '_update'])) {
 		return client.send('error', {command: 'update', error: 'cant update'});
 	}
 
@@ -391,7 +388,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 	}
 	// update it to a proper mongo id
 
-	if (!this.allowedUpdates[collection](user._id, query, update)) {
+	if (!this[collection + '_update'](user._id, query, update)) {
 		returnclient.send('error', {command: 'update', error: 'not allowed'});
 	}
 	// have we been denied?

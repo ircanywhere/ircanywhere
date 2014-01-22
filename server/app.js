@@ -30,7 +30,7 @@ var _ = require('lodash'),
  * @extend	false
  * @return 	void
  */
-var Application = function() {
+function Application() {
 	this.docs = {};
 	this.ee = new events.EventEmitter2({
 		wildcard: true,

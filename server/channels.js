@@ -11,7 +11,7 @@ var _ = require('lodash'),
  * @extend	false
  * @return	void
  */
-var ChannelManager = function() {
+function ChannelManager() {
 	this.channel = {
 		network: '',
 		channel: '',

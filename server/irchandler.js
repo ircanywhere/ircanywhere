@@ -12,7 +12,7 @@ var _ = require('lodash'),
  * @method 	IRCHandler
  * @return 	void
  */
-var IRCHandler = function() {
+function IRCHandler() {
 
 }
 

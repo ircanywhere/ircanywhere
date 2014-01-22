@@ -39,7 +39,7 @@ var _ban = function(client, target, nickname, ban) {
  * @extend 	false
  * @return	void
  */
-var CommandManager = function() {
+function CommandManager() {
 	var self = this;
 
 	application.ee.on('ready', function() {

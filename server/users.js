@@ -33,7 +33,7 @@ var _generateSalt = function(string_length) {
  * @extend	false
  * @return 	void
  */
-var UserManager = function() {
+function UserManager() {
 	var self = this;
 
 	application.ee.on('ready', function() {

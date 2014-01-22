@@ -13,7 +13,7 @@ var _ = require('lodash');
  * @extend	false
  * @return 	void
  */
-var ModeParser = function() {
+function ModeParser() {
 
 }
 
