@@ -30,9 +30,9 @@ App.SidebarController = Ember.ArrayController.extend({
 			var split = url.split('/');
 
 			if (split.length === 1) {
-				this.transitionToRoute('tab', split[0]);
+				this.transitionToRoute('network', split[0]);
 			} else {
-				this.transitionToRoute('channel', split[0], split[1]);
+				this.transitionToRoute('tab', split[0], split[1]);
 			}
 		}
 	}

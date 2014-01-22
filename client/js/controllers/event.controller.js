@@ -1,13 +1,13 @@
 App.EventController = Ember.ObjectController.extend({
-	needs: ['channel', 'tab'],
+	needs: ['tab', 'network'],
 	
 	classNames: function() {
 		var type = this.get('content.type'),
-			hideEvents = this.get('controllers.channel.model.hiddenEvents'),
+			hideEvents = this.get('controllers.tab.model.hiddenEvents'),
 			hide = (hideEvents && (type === 'join' || type === 'part' || type === 'quit')) ? ' hide' : '';
 
 		return (type === 'privmsg') ? 'row' + hide : 'row other' + hide;
-	}.property('content.type', 'controllers.channel.model.hiddenEvents'),
+	}.property('content.type', 'controllers.tab.model.hiddenEvents'),
 
 	isJoin: function() {
 		return (this.get('content.type') === 'join');

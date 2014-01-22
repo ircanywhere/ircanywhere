@@ -1,11 +1,11 @@
 App.MessagesController = Ember.ArrayController.extend({
-	needs: ['channel', 'tab'],
+	needs: ['tab', 'network'],
 	events: [],
 
-	filtered: Ember.arrayComputed('sorted', 'controllers.tab.model', 'controllers.channel.model', {
+	filtered: Ember.arrayComputed('sorted', 'controllers.network.model', 'controllers.tab.model', {
 		addedItem: function(accum, item) {
-			var network = this.get('controllers.tab.model'),
-				tab = this.get('controllers.channel.model');
+			var network = this.get('controllers.network.model'),
+				tab = this.get('controllers.tab.model');
 
 			if ((tab && item.network === network.name && item.target === tab.title) ||
 				(!tab && item.network === network.name && item.target === network.name)) {
@@ -16,8 +16,8 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var network = this.get('controllers.tab.model'),
-				tab = this.get('controllers.channel.model');
+			var network = this.get('controllers.network.model'),
+				tab = this.get('controllers.tab.model');
 
 			if ((tab && item.network === network.name && item.target === tab.title) ||
 				(!tab && item.network === network.name && item.target === network.name)) {

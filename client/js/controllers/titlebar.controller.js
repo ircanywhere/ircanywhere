@@ -1,5 +1,5 @@
 App.TitlebarController = Ember.ObjectController.extend({
-	needs: ['channel', 'tab'],
+	needs: ['tab', 'network'],
 	tabs: [],
 	tab: {},
 

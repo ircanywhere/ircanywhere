@@ -32,7 +32,7 @@ Ember.Handlebars.helper('userLink', function(show, options) {
 		username = context.username || context.message.username,
 		hostname = context.hostname || context.message.hostname,
 		prefixClass = '',
-		url = this.get('controllers.tab.model').url;
+		url = this.get('controllers.network.model').url;
 	
 	if (prefix == '') {
 		prefixClass = '';

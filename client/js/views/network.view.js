@@ -1,4 +1,4 @@
-App.TabView = Ember.View.extend({
+App.NetworkView = Ember.View.extend({
 	layoutName: 'main',
 	templateName: 'tab',
 	classNames: 'main-view',

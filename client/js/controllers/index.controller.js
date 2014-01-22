@@ -4,9 +4,9 @@ App.IndexController = Ember.ObjectController.extend({
 			url = selectedTab.get('url').split('/');
 
 		if (selectedTab.get('type') === 'network') {
-			this.transitionToRoute('tab', url[0]);
+			this.transitionToRoute('network', url[0]);
 		} else {
-			this.transitionToRoute('channel', url[0], encodeURIComponent(url[1]));
+			this.transitionToRoute('tab', url[0], encodeURIComponent(url[1]));
 		}
 	}
 });

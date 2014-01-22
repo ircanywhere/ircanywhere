@@ -201,7 +201,8 @@ SocketManager = function() {
 				tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 				netIds = {},
 				eventsQuery = {$or: []},
-				usersQuery = {$or: []};
+				usersQuery = {$or: []},
+				commandsQuery = {$or: []};
 
 			Sockets[client.id] = user;
 			Users[user._id.toString()] = client; 
@@ -214,11 +215,13 @@ SocketManager = function() {
 			tabs.forEach(function(tab) {
 				usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
 				eventsQuery['$or'].push({network: netIds[tab.network], target: tab.title});
+				commandsQuery['$or'].push({network: tab.network, target: tab.title});
 			});
 			// loop tabs
 
 			var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
-				events = application.Events.sync.find(_.extend({user: user._id}, eventsQuery)).sort({sort: {'message.time': 1}}).limit(50).sync.toArray();
+				events = application.Events.sync.find(_.extend({user: user._id}, eventsQuery)).sort({sort: {'message.time': 1}}).limit(50).sync.toArray(),
+				commands = application.Commands.sync.find(_.extend({user: user._id}, commandsQuery)).sync.toArray();
 			// sort and limit them
 
 			client.send('users', user);
@@ -226,6 +229,7 @@ SocketManager = function() {
 			client.send('tabs', tabs);
 			client.send('channelUsers', users);
 			client.send('events', events);
+			client.send('commands', commands);
 			// compile a load of data to send to the frontend
 		},
 

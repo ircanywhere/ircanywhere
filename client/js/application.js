@@ -2,7 +2,7 @@ App = Ember.Application.create({
 	defaultTitle: 'IRCAnywhere',
 	
 	Socket: Ember.Socket.extend({
-		controllers: ['index', 'login', 'titlebar', 'tab', 'messages', 'sidebar']
+		controllers: ['index', 'login', 'titlebar', 'network', 'messages', 'sidebar']
     })
 });
 

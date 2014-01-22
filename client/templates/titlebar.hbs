@@ -7,7 +7,7 @@
 	<li class="dropdown"><a href="#" {{action toggleProperty 'showMenu'}} class="dropdown-toggle">Options</a>
 		{{#if showMenu}}
 			<ul class="dropdown-menu">
-				<li>{{#link-to 'channel' tab.network}}Edit Network{{/link-to}}</li>
+				<li>{{#link-to 'tab' tab.network}}Edit Network{{/link-to}}</li>
 				{{#if tab.isChannel}}
 					<li><a href="#" {{action setTopic}}>Set Topic</a></li>
 					<li class="divider"></li>
