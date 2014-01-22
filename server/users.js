@@ -282,7 +282,7 @@ UserManager = function() {
 				}
 
 				if (reconnect) {
-					networkManager.connectNetwork(me, network);
+					networkManager.connectNetwork(network);
 				}
 			}
 			// loop through our networks and connect them if need be

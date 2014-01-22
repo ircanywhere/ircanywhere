@@ -46,8 +46,8 @@ IRCFactory.prototype.init = function() {
 	this.events.on('message', function(message) {
 		fibrous.run(function() {
 			if (message.event == 'synchronize') {
-				var users = networkManager.getClients(),
-					keys = _.keys(users),
+				var networks = networkManager.getClients(),
+					keys = _.keys(networks),
 					difference = _.difference(keys, message.keys);
 
 				_.each(message.keys, function(key) {
@@ -55,8 +55,7 @@ IRCFactory.prototype.init = function() {
 				});
 				
 				_.each(difference, function(key) {
-					var user = users[key];
-					networkManager.connectNetwork(user.user, user.network);
+					networkManager.connectNetwork(networks[key]);
 				});
 				// the clients we're going to actually attempt to boot up
 
