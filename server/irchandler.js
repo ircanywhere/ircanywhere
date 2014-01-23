@@ -211,13 +211,15 @@ IRCHandler.prototype.nick = function(client, message) {
  */
 IRCHandler.prototype.who = function(client, message) {
 	var users = [],
+		socket = Users[client.internal.userId.toString()],
 		prefixes = _.invert(client.internal.capabilities.modes.prefixmodes);
 
 	networkManager.addTab(client, message.channel, 'channel');
 	// we'll update our internal channels cause we might be reconnecting after inactivity
 
-	_.each(message.who, function(u) {
-		var split = u.prefix.split('@'),
+	for (var uid in message.who) {
+		var u = message.who[uid],
+			split = u.prefix.split('@'),
 			mode = u.mode.replace(/[a-z0-9]/i, ''),
 			user = {};
 
@@ -236,9 +238,14 @@ IRCHandler.prototype.who = function(client, message) {
 		// set the current most highest ranking prefix
 
 		users.push(user);
-	});
+	}
 
-	channelManager.insertUsers(client._id, client.name, message.channel, users, true);
+	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
+
+	if (socket) {
+		socket.send('channelUsers', {data: inserts});
+	}
+	// burst emit these instead of letting the oplog tailer handle it, it's too heavy
 }
 
 /**

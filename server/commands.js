@@ -1,5 +1,6 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
+	helper = require('../lib/helpers').Helpers,
 	mongo = require('mongodb');
 
 /**
@@ -219,7 +220,7 @@ CommandManager.prototype['/me'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/join'] = function(user, client, target, params) {
-	if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		ircFactory.send(client._id, 'join', params);
 	} else {
 		ircFactory.send(client._id, 'join', [target].concat(params));
@@ -237,7 +238,7 @@ CommandManager.prototype['/join'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/part'] = function(user, client, target, params) {
-	if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		ircFactory.send(client._id, 'part', params);
 	} else {
 		ircFactory.send(client._id, 'part', [target].concat(params));
@@ -255,7 +256,7 @@ CommandManager.prototype['/part'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/cycle'] = function(user, client, target, params) {
-	if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		ircFactory.send(client._id, 'part', params);
 		ircFactory.send(client._id, 'join', params);
 	} else {
@@ -279,7 +280,7 @@ CommandManager.prototype['/topic'] = function(user, client, target, params) {
 		return false;
 	}
 
-	if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		var topic = [params.slice(1).join(' ')];
 		ircFactory.send(client._id, 'topic', [params[0]].concat(topic));
 	} else {
@@ -300,7 +301,7 @@ CommandManager.prototype['/topic'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/mode'] = function(user, client, target, params) {
-	if (Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		console.log('target exists', params);
 		ircFactory.send(client._id, 'mode', params);
 	} else {
@@ -320,7 +321,7 @@ CommandManager.prototype['/mode'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/invite'] = function(user, client, target, params) {
-	if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		ircFactory.send(client._id, 'raw', ['INVITE'].concat(params));
 	} else {
 		ircFactory.send(client._id, 'raw', ['INVITE', params[0], target]);
@@ -338,7 +339,7 @@ CommandManager.prototype['/invite'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/kick'] = function(user, client, target, params) {
-	if (params.length !== 0 && Meteor.Helpers.isChannel(client.internal.capabilities.channel.types, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client.internal.capabilities.channel.types, params[0])) {
 		ircFactory.send(client._id, 'raw', ['KICK'].concat(params));
 	} else {
 		ircFactory.send(client._id, 'raw', ['KICK', target].concat(params));

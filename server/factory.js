@@ -51,13 +51,13 @@ IRCFactory.prototype.init = function() {
 					keys = _.keys(networks),
 					difference = _.difference(keys, message.keys);
 
-				_.each(message.keys, function(key) {
+				for (var key in message.keys) {
 					networkManager.changeStatus(key, networkManager.flags.connected);
-				});
+				}
 				
-				_.each(difference, function(key) {
+				for (var key in difference) {
 					networkManager.connectNetwork(networks[key]);
-				});
+				}
 				// the clients we're going to actually attempt to boot up
 
 				application.logger.log('warn', 'factory synchronize', message);
@@ -93,7 +93,9 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 		client = Clients[key];
 
 	if (_.isFunction(ircHandler[e])) {
-		ircHandler[e].call(ircHandler, client, object);
+		fibrous.run(function() {
+			ircHandler[e].call(ircHandler, client, object);
+		});
 	}
 	
 	console.log(event, object);

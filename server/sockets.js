@@ -14,6 +14,7 @@ function SocketManager() {
 	var self = this;
 
 	this.allowRules = {};
+	this.operationRules = {};
 	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers'];
 	// collections with allowed update rules
 	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
@@ -33,23 +34,35 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		update: function(uid, query, update) {
-			var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
-						   (_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
-						   (_.has(update, 'selected') && typeof update.selected === 'boolean'));
-			// been allowed
-
-			if (allowed) {
-				var find = application.Tabs.sync.findOne(_.extend(query, {user: uid}));
-				// look for a user related to this record
-				// if we've found one we can proceed
-
-				return (find !== null);
-			} else {
-				return false;
-			}
-			// we've been allowed, check more strongly
+			return ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
+					(_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
+					(_.has(update, 'selected') && typeof update.selected === 'boolean'));
 		}
 	});
+
+	this.rules('tabs', {
+		/**
+		 * An update date rule to execute when we've passed the allow rules
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		update: function(uid, query, update) {
+			if (_.has(update, 'selected')) {
+				application.Tabs.sync.update({user: uid, selected: true}, {$set: {selected: false}});
+			}
+			// also check for selected here, if a new tab is being selected then we will
+			// force the de-selection of the others
+
+			application.Tabs.sync.update(_.extend(query, {user: uid}), {$set: update});
+			// update
+		}
+	})
 
 	this.allow('commands', {
 		/**
@@ -64,29 +77,39 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		insert: function(uid, insert) {
+			return ((insert.command && insert.network) &&
+					(insert.target !== '') &&
+					(insert.backlog !== undefined));
+		}
+	});
+
+	this.rules('commands', {
+		/**
+		 * An insert date rule to execute when we've passed the allow rules
+		 *
+		 * @method 	insert
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		insert: function(uid, query, insert) {
+			var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
+			// try and find a valid tab
+
+			if (!find) {
+				return;
+			}
+
 			insert.user = uid;
 			insert.timestamp = +new Date();
-			// modify doc
+			insert.network = find.network;
+			// bail if we can't find the tab, if we can re-set the network value
 
-			var allowed = ((insert.command && insert.network) &&
-						   (insert.target !== '') &&
-						   (insert.backlog !== undefined));
-
-			if (allowed) {
-				var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
-				// try and find a valid tab
-
-				if (find) {
-					insert.network = find.network;
-					return true;
-				} else {
-					return false;
-				}
-				// overwrite network with an id
-			} else {
-				return false;
-			}
-			// check more strongly..
+			application.Commands.sync.insert(insert);
+			// insert
 		}
 	});
 
@@ -118,6 +141,29 @@ SocketManager.prototype.allow = function(collection, object) {
 		self.allowRules[collection][operation] = fn;
 	}
 }
+
+/**
+ * Responsible for setting operation rules on how to update things
+ *
+ * @method 	rules
+ * @param 	{String} collection
+ * @param 	{Object} object
+ * @extend	true
+ * @return 	void
+ */
+SocketManager.prototype.rules = function(collection, object) {
+	var self = this;
+
+	for (var operation in object) {
+		var fn = object[operation];
+
+		if (!self.operationRules[collection]) {
+			self.operationRules[collection] = {};
+		}
+
+		self.operationRules[collection][operation] = fn;
+	}
+}
 	
 /**
  * Called when the application is ready, sets up an observer on our collections
@@ -147,7 +193,7 @@ SocketManager.prototype.init = function() {
 			clients.push(Users[doc.internal.userId.toString()]);
 		} else if (collection === 'tabs' || collection === 'events') {
 			clients.push(Users[doc.user.toString()]);
-		} else if (collection === 'channelUsers') {
+		} else if (collection === 'channelUsers' && !doc._burst) {
 			for (var id in Clients) {
 				for (var tabId in Clients[id].internal.tabs) {
 					var tab = Clients[id].internal.tabs[tabId];
@@ -377,7 +423,7 @@ SocketManager.prototype.handleInsert = function(client, data) {
 		return;
 	}
 
-	if (!_.isFunction(this.allowRules[collection]['insert'])) {
+	if (!_.isFunction(this.allowRules[collection]['insert']) || !_.isFunction(this.operationRules[collection]['insert'])) {
 		client.send('error', {command: 'insert', error: 'cant insert'});
 		return;
 	}
@@ -388,7 +434,7 @@ SocketManager.prototype.handleInsert = function(client, data) {
 	}
 	// have we been denied?
 
-	application.mongo.collection(collection).sync.insert(insert);
+	this.operationRules[collection]['insert'](user._id, query, update);
 	// insert
 }
 
@@ -410,7 +456,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 		return client.send('error', {command: 'update', error: 'invalid format'});
 	}
 
-	if (!_.isFunction(this.allowRules[collection]['update'])) {
+	if (!_.isFunction(this.allowRules[collection]['update']) || !_.isFunction(this.operationRules[collection]['update'])) {
 		return client.send('error', {command: 'update', error: 'cant update'});
 	}
 
@@ -424,13 +470,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 	}
 	// have we been denied?
 
-	if (collection === 'tabs' && _.has(update, 'selected')) {
-		application.Tabs.sync.update({user: user._id}, {$set: {selected: false}}, {multi: true});
-	}
-	// also check for selected here, if a new tab is being selected then we will
-	// force the de-selection of the others
-
-	application.mongo.collection(collection).sync.update(query, {$set: update});
+	this.operationRules[collection]['update'](user._id, query, update);
 	// update
 }
 

@@ -14,34 +14,36 @@ var _ = require('lodash'),
  * @return 	void
  */
 var _insert = function(client, message, type, user) {
-	var network = client.name,
-		channel = (message.channel && !message.target) ? message.channel : message.target,
-		user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
-	// get a channel user object if we've not got one
+	fibrous.run(function() {
+		var network = client.name,
+			channel = (message.channel && !message.target) ? message.channel : message.target,
+			user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
+		// get a channel user object if we've not got one
 
-	if (!message.channel && !message.target) {
-		var channel = null;
-	}
-	// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
-	// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
-	
-	var prefixObject = eventManager.getPrefix(client, user),
-		output = {
-			type: type,
-			user: client.internal.userId,
-			network: network,
-			target: channel,
-			message: message,
-			read: false,
-			extra: {
-				self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
-				highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
-				prefix: prefixObject.prefix
-			}
-		};
+		if (!message.channel && !message.target) {
+			var channel = null;
+		}
+		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
+		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
+		
+		var prefixObject = eventManager.getPrefix(client, user),
+			output = {
+				type: type,
+				user: client.internal.userId,
+				network: network,
+				target: channel,
+				message: message,
+				read: false,
+				extra: {
+					self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
+					highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
+					prefix: prefixObject.prefix
+				}
+			};
 
-	application.Events.sync.insert(output);
-	// get the prefix, construct an output and insert it
+		application.Events.sync.insert(output);
+		// get the prefix, construct an output and insert it
+	});
 }
 
 /**
