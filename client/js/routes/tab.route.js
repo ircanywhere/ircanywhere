@@ -23,24 +23,28 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	activate: function() {
-		var socket = this.controllerFor('index').socket,
+		var index = this.controllerFor('index'),
+			socket = index.socket,
 			selected = socket.findOne('tabs', {selected: true}),
 			model = this.modelFor('tab')[0];
 		// get the channel model
 
 		if (selected.get('_id') !== model.get('_id')) {
 			socket.update('tabs', {_id: model.get('_id')}, {selected: true});
+			index.set('tabId', model.get('_id'));
 		}
 	},
 
 	deactivate: function() {
-		var socket = this.controllerFor('index').socket,
+		var index = this.controllerFor('index'),
+			socket = index.socket,
 			tab = socket.findOne('tabs', {url: this.modelFor('network')[0].get('url')}),
 			selected = socket.findOne('tabs', {selected: true});
 		// get the tab model
 
 		if (selected.get('_id') !== tab.get('_id')) {
-			this.controllerFor('index').socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
+			index.socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
+			index.set('tabId', tab.get('_id'));
 		}
 	},
 

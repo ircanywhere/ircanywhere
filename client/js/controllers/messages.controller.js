@@ -1,16 +1,13 @@
 App.MessagesController = Ember.ArrayController.extend({
+	needs: ['index'],
 	tabs: [],
 	events: [],
 
-	filtered: Ember.arrayComputed('sorted', 'tabs.@each.selected', {
+	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('selected', true)[0];
+			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 
-			console.log(item.network, tab.networkName, item.target, tab.title, (tab && item.network === tab.networkName && item.target === tab.title));
-			console.log(item.network, tab.networkName, item.target, tab.networkName, (!tab && item.network === tab.networkName && item.target === tab.networkName));
-
-			if ((tab && item.network === tab.networkName && item.target === tab.title) ||
-				(!tab && item.network === tab.networkName && item.target === tab.networkName)) {
+			if (tab && item.network === tab.networkName && item.target === tab.title) {
 				accum.pushObject(item);
 			}
 
@@ -18,10 +15,9 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('selected', true)[0];
+			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 
-			if ((tab && item.network === tab.networkName && item.target === tab.title) ||
-				(!tab && item.network === tab.networkName && item.target === tab.networkName)) {
+			if (tab && item.network === tab.networkName && item.target === tab.title) {
 				accum.removeObject(item);
 			}
 

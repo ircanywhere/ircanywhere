@@ -1,5 +1,5 @@
 App.TitlebarController = Ember.ObjectController.extend({
-	needs: ['tab', 'network'],
+	needs: ['index', 'network', 'tab'],
 	tabs: [],
 	tab: {},
 
@@ -77,18 +77,22 @@ App.TitlebarController = Ember.ObjectController.extend({
 	},
 
 	tabChanged: function() {
-		var tab = this.get('tabs').filterProperty('selected', true);
+		var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 		// get the selected tab
 
-		if (tab.length === 1) {
-			this.set('tab', this._formatTab(tab[0]));
+		if (tab) {
+			this.set('tab', this._formatTab(tab));
 		}
 		// update this.tab if we have a new selected tab
-	}.observes('tabs.@each.selected'),
+	}.observes('controllers.index.tabId'),
 
 	optionsChanged: function() {
-		var tab = this.get('tabs').filterProperty('selected', true)[0];
+		var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 		// get the selected tab
+
+		if (!tab) {
+			return false;
+		} 
 
 		if (tab.get('hiddenUsers')) {
 			this.set('toggleUsersText', 'Show Users');
