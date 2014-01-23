@@ -13,9 +13,82 @@ var _ = require('lodash'),
 function SocketManager() {
 	var self = this;
 
+	this.allowRules = {};
 	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers'];
 	// collections with allowed update rules
 	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
+
+	this.allow('tabs', {
+		/**
+		 * An allow rule for updates to the tab collections, checks the correct properties
+		 * are being updated and their type, also then checks if they are allowed to update
+		 * the specific document.
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	{Boolean}
+		 */
+		update: function(uid, query, update) {
+			var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
+						   (_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
+						   (_.has(update, 'selected') && typeof update.selected === 'boolean'));
+			// been allowed
+
+			if (allowed) {
+				var find = application.Tabs.sync.findOne(_.extend(query, {user: uid}));
+				// look for a user related to this record
+				// if we've found one we can proceed
+
+				return (find !== null);
+			} else {
+				return false;
+			}
+			// we've been allowed, check more strongly
+		}
+	});
+
+	this.allow('commands', {
+		/**
+		 * An allow rule for inserts to the commands collection, similar to the one above
+		 * checks for parameters then their uid to see if they can insert a command into that tab
+		 *
+		 * @method 	insert
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} insert
+		 * @extend 	false
+		 * @private
+		 * @return 	{Boolean}
+		 */
+		insert: function(uid, insert) {
+			insert.user = uid;
+			insert.timestamp = +new Date();
+			// modify doc
+
+			var allowed = ((insert.command && insert.network) &&
+						   (insert.target !== '') &&
+						   (insert.backlog !== undefined));
+
+			if (allowed) {
+				var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
+				// try and find a valid tab
+
+				if (find) {
+					insert.network = find.network;
+					return true;
+				} else {
+					return false;
+				}
+				// overwrite network with an id
+			} else {
+				return false;
+			}
+			// check more strongly..
+		}
+	});
 
 	application.ee.on('ready', function() {
 		fibrous.run(self.init.bind(self));
@@ -23,69 +96,27 @@ function SocketManager() {
 }
 
 /**
- * An allow rule for updates to the tab collections, checks the correct properties
- * are being updated and their type, also then checks if they are allowed to update
- * the specific document.
+ * Responsible for setting allow rules on collection modifications from the client side
+ * currently only compatible with inserts and updates.
  *
- * @method 	tabs
- * @param 	{ObjectID} uid
- * @param 	{Object} query
- * @param 	{Object} update
- * @extend 	false
- * @return 	{Boolean}
+ * @method 	allow
+ * @param 	{String} collection
+ * @param 	{Object} object
+ * @extend	true
+ * @return 	void
  */
-SocketManager.prototype.tabs_update = function(uid, query, update) {
-	var allowed = ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
-				   (_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
-				   (_.has(update, 'selected') && typeof update.selected === 'boolean'));
-	// been allowed
+SocketManager.prototype.allow = function(collection, object) {
+	var self = this;
 
-	if (allowed) {
-		var find = application.Tabs.sync.findOne(_.extend(query, {user: uid}));
-		// look for a user related to this record
-		// if we've found one we can proceed
+	for (var operation in object) {
+		var fn = object[operation];
 
-		return (find !== null);
-	} else {
-		return false;
-	}
-	// we've been allowed, check more strongly
-}
-
-/**
- * An allow rule for inserts to the commands collection, similar to the one above
- * checks for parameters then their uid to see if they can insert a command into that tab
- *
- * @method 	commands
- * @param 	{ObjectID} uid
- * @param 	{Object} insert
- * @extend 	false
- * @return 	{Boolean}
- */
-SocketManager.prototype.commands_insert = function(uid, insert) {
-	insert.user = uid;
-	insert.timestamp = +new Date();
-	// modify doc
-
-	var allowed = ((insert.command && insert.network) &&
-				   (insert.target !== '') &&
-				   (insert.backlog !== undefined));
-
-	if (allowed) {
-		var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
-		// try and find a valid tab
-
-		if (find) {
-			insert.network = find.network;
-			return true;
-		} else {
-			return false;
+		if (!self.allowRules[collection]) {
+			self.allowRules[collection] = {};
 		}
-		// overwrite network with an id
-	} else {
-		return false;
+
+		self.allowRules[collection][operation] = fn;
 	}
-	// check more strongly..
 }
 	
 /**
@@ -346,12 +377,12 @@ SocketManager.prototype.handleInsert = function(client, data) {
 		return;
 	}
 
-	if (!_.isFunction(this[collection + '_insert'])) {
+	if (!_.isFunction(this.allowRules[collection]['insert'])) {
 		client.send('error', {command: 'insert', error: 'cant insert'});
 		return;
 	}
 
-	if (!this[collection + '_insert'](user._id, insert)) {
+	if (!this.allowRules[collection]['insert'](user._id, insert)) {
 		client.send('error', {command: 'insert', error: 'not allowed'});
 		return;
 	}
@@ -379,7 +410,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 		return client.send('error', {command: 'update', error: 'invalid format'});
 	}
 
-	if (!_.isFunction(this[collection + '_update'])) {
+	if (!_.isFunction(this.allowRules[collection]['update'])) {
 		return client.send('error', {command: 'update', error: 'cant update'});
 	}
 
@@ -388,7 +419,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 	}
 	// update it to a proper mongo id
 
-	if (!this[collection + '_update'](user._id, query, update)) {
+	if (!this.allowRules[collection]['update'](user._id, query, update)) {
 		returnclient.send('error', {command: 'update', error: 'not allowed'});
 	}
 	// have we been denied?
