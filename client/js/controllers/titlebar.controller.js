@@ -80,11 +80,11 @@ App.TitlebarController = Ember.ObjectController.extend({
 		var tab = this.get('tabs').filterProperty('selected', true);
 		// get the selected tab
 
-		if (tab.length > 0) {
+		if (tab.length === 1) {
 			this.set('tab', this._formatTab(tab[0]));
 		}
 		// update this.tab if we have a new selected tab
-	}.observes('controllers.network.model', 'controllers.tab.model'),
+	}.observes('tabs.@each.selected'),
 
 	optionsChanged: function() {
 		var tab = this.get('tabs').filterProperty('selected', true)[0];

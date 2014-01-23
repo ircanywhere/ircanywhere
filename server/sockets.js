@@ -340,7 +340,7 @@ SocketManager.prototype.handleConnect = function(client) {
 		networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 		tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 		netIds = {},
-		eventsQuery = {$or: []},
+		events = [],
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []};
 
@@ -354,13 +354,14 @@ SocketManager.prototype.handleConnect = function(client) {
 
 	tabs.forEach(function(tab) {
 		usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
-		eventsQuery['$or'].push({network: netIds[tab.network], target: tab.title});
 		commandsQuery['$or'].push({network: tab.network, target: tab.title});
+
+		var eventResults = application.Events.sync.find({network: netIds[tab.network], target: tab.title, user: user._id}).sort({$natural: -1}).limit(50).sync.toArray();
+			events = _.union(events, eventResults);
 	});
 	// loop tabs
 
 	var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
-		events = application.Events.sync.find(_.extend({user: user._id}, eventsQuery)).sort({sort: {'message.time': 1}}).limit(50).sync.toArray(),
 		commands = application.Commands.sync.find(_.extend({user: user._id}, commandsQuery)).sync.toArray();
 	// sort and limit them
 

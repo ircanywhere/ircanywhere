@@ -1,14 +1,16 @@
 App.MessagesController = Ember.ArrayController.extend({
-	needs: ['tab', 'network'],
+	tabs: [],
 	events: [],
 
-	filtered: Ember.arrayComputed('sorted', 'controllers.network.model', 'controllers.tab.model', {
+	filtered: Ember.arrayComputed('sorted', 'tabs.@each.selected', {
 		addedItem: function(accum, item) {
-			var network = this.get('controllers.network.model'),
-				tab = this.get('controllers.tab.model');
+			var tab = this.get('tabs').filterProperty('selected', true)[0];
 
-			if ((tab && item.network === network.name && item.target === tab.title) ||
-				(!tab && item.network === network.name && item.target === network.name)) {
+			console.log(item.network, tab.networkName, item.target, tab.title, (tab && item.network === tab.networkName && item.target === tab.title));
+			console.log(item.network, tab.networkName, item.target, tab.networkName, (!tab && item.network === tab.networkName && item.target === tab.networkName));
+
+			if ((tab && item.network === tab.networkName && item.target === tab.title) ||
+				(!tab && item.network === tab.networkName && item.target === tab.networkName)) {
 				accum.pushObject(item);
 			}
 
@@ -16,11 +18,10 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var network = this.get('controllers.network.model'),
-				tab = this.get('controllers.tab.model');
+			var tab = this.get('tabs').filterProperty('selected', true)[0];
 
-			if ((tab && item.network === network.name && item.target === tab.title) ||
-				(!tab && item.network === network.name && item.target === network.name)) {
+			if ((tab && item.network === tab.networkName && item.target === tab.title) ||
+				(!tab && item.network === tab.networkName && item.target === tab.networkName)) {
 				accum.removeObject(item);
 			}
 
@@ -40,6 +41,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	}.property('events'),
 
 	ready: function() {
+		this.set('tabs', this.socket.findAll('tabs'));
 		this.set('events', this.socket.findAll('events'));
 		// we have to use the direct data set for events because we wont be able to
 		// take advantage of it's live pushing and popping

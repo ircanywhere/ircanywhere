@@ -251,7 +251,7 @@ Ember.Socket = Ember.Object.extend({
 		// attempt to find
 
 		if (set) {
-			return set.toArray();
+			return (many) ? set.toArray() : set;
 		} else {
 			return false;
 		}

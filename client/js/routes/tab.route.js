@@ -24,7 +24,7 @@ App.TabRoute = AppRoute.extend({
 
 	activate: function() {
 		var socket = this.controllerFor('index').socket,
-			selected = socket.find('tabs', {selected: true})[0],
+			selected = socket.findOne('tabs', {selected: true}),
 			model = this.modelFor('tab')[0];
 		// get the channel model
 
@@ -34,11 +34,14 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	deactivate: function() {
-		var model = this.modelFor('network')[0];
+		var socket = this.controllerFor('index').socket,
+			tab = socket.findOne('tabs', {url: this.modelFor('network')[0].get('url')}),
+			selected = socket.findOne('tabs', {selected: true});
 		// get the tab model
 
-		this.controllerFor('tab').set('model', null);
-		this.controllerFor('index').socket.update('tabs', {url: model.get('url')}, {selected: true});
+		if (selected.get('_id') !== tab.get('_id')) {
+			this.controllerFor('index').socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
+		}
 	},
 
 	title: function(controller, model) {
