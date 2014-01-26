@@ -1,0 +1,7 @@
+{{#if view.isChannel}}
+	{{#with content.selectedTab}}
+		<span class="channel-name">{{title}}</span><span class="modes">+{{modes}}</span><span class="topic">{{ircParse topic.topic}}</span>
+	{{/with}}
+{{else}}
+	<span class="channel-name">{{name}}</span><span class="modes"></span><span class="topic">{{url}}</span>
+{{/if}}

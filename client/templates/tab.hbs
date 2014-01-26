@@ -1,14 +1,6 @@
 <div {{bind-attr id=view.tabId}} class="tab">
 	<div class="messages">
-		<div class="overlay-bar">
-		{{#if view.isChannel}}
-			{{#with content.selectedTab}}
-				<span class="channel-name">{{title}}</span><span class="modes">+{{modes}}</span><span class="topic">{{ircParse topic.topic}}</span>
-			{{/with}}
-		{{else}}
-			<span class="channel-name">{{name}}</span><span class="modes"></span><span class="topic">{{url}}</span>
-		{{/if}}
-		</div>
+		{{render 'overlaybar' this}}
 		<div class="backlog">
 			{{render 'messages'}}
 		</div>
