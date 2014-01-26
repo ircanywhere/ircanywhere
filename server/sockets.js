@@ -89,13 +89,12 @@ function SocketManager() {
 		 *
 		 * @method 	insert
 		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
 		 * @param 	{Object} update
 		 * @extend 	false
 		 * @private
 		 * @return 	void
 		 */
-		insert: function(uid, query, insert) {
+		insert: function(uid, insert) {
 			var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
 			// try and find a valid tab
 
@@ -435,7 +434,7 @@ SocketManager.prototype.handleInsert = function(client, data) {
 	}
 	// have we been denied?
 
-	this.operationRules[collection]['insert'](user._id, query, update);
+	this.operationRules[collection]['insert'](user._id, insert);
 	// insert
 }
 
