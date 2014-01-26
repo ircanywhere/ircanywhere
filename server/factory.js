@@ -56,7 +56,7 @@ IRCFactory.prototype.init = function() {
 				}
 				
 				for (var key in difference) {
-					networkManager.connectNetwork(networks[key]);
+					networkManager.connectNetwork(networks[difference[key]]);
 				}
 				// the clients we're going to actually attempt to boot up
 

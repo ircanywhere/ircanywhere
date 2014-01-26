@@ -1,5 +1,5 @@
 App.TabController = Ember.ObjectController.extend({
-	needs: ['index'],
+	needs: ['index', 'network'],
 	
 	updateSelected: function() {
 		var tab = this.get('model'),

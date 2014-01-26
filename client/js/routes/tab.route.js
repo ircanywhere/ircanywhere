@@ -5,10 +5,11 @@ App.TabRoute = AppRoute.extend({
 	
 	model: function(params) {
 		var self = this,
+			index = this.controllerFor('index'),
 			network = this.modelFor('network')[0];
 		
 		return new Ember.RSVP.Promise(function(resolve, reject) {
-			var result = self.controllerFor('index').socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
+			var result = index.socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
 			
 			if (result) {
 				resolve(result);
@@ -31,8 +32,9 @@ App.TabRoute = AppRoute.extend({
 
 		if (selected.get('_id') !== model.get('_id')) {
 			socket.update('tabs', {_id: model.get('_id')}, {selected: true});
-			index.set('tabId', model.get('_id'));
 		}
+
+		index.set('tabId', model.get('_id'));
 	},
 
 	deactivate: function() {
@@ -44,8 +46,9 @@ App.TabRoute = AppRoute.extend({
 
 		if (selected.get('_id') !== tab.get('_id')) {
 			index.socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
-			index.set('tabId', tab.get('_id'));
 		}
+
+		index.set('tabId', tab.get('_id'));
 	},
 
 	title: function(controller, model) {

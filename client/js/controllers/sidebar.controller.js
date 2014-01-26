@@ -15,7 +15,7 @@ App.SidebarController = Ember.ArrayController.extend({
 	ready: function() {
 		var self = this,
 			networks = this.socket.findAll('networks'),
-			content = this.socket.findAll('tabs');
+			content = this.socket.find('tabs', {});
 
 		this.set('networks', networks);
 		this.set('content', content);

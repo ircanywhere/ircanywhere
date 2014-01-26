@@ -1,5 +1,5 @@
 Ember.Handlebars.helper('json', function(value, options) {
-	return JSON.stringify(value.content);
+	return JSON.stringify(value.content || value);
 });
 
 Ember.Handlebars.helper('time', function(context, options) {

@@ -2,7 +2,7 @@ App.IndexController = Ember.ObjectController.extend({
 	tabId: null,
 	
 	ready: function() {
-		var selectedTab = this.socket.find('tabs', {selected: true})[0],
+		var selectedTab = this.socket.findOne('tabs', {selected: true}),
 			url = selectedTab.get('url').split('/');
 
 		if (selectedTab.get('type') === 'network') {
