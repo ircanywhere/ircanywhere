@@ -12,7 +12,7 @@ App.InputController = Ember.ObjectController.extend({
 
 	nick: function() {
 		return this.get('controllers.network.model.nick');
-	}.observes('controllers.network.model.nick').property('controllers.network.model.nick'),
+	}.observes('controllers.network.model.nick').property('controllers.network.model.nick').cacheable(),
 
 	actions: {
 		sendCommand: function() {

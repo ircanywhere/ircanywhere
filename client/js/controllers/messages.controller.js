@@ -34,7 +34,7 @@ App.MessagesController = Ember.ArrayController.extend({
 			});
 
 		return sorted;
-	}.property('events'),
+	}.property('events').cacheable(),
 
 	ready: function() {
 		this.set('tabs', this.socket.findAll('tabs'));

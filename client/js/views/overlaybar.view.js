@@ -4,7 +4,7 @@ App.OverlaybarView = Ember.View.extend({
 
 	isChannel: function() {
 		return (this.get('context.selectedTab.type') === 'channel');
-	}.property('context.selectedTab.type'),
+	}.property('context.selectedTab.type').cacheable(),
 
 	mouseEnter: function(e) {
 		App.set('timein', setTimeout(function() {

@@ -42,5 +42,12 @@ App.SidebarItemView = Ember.View.extend({
 		var split = this.get('context.url').split('/');
 
 		return (split.length == 1) ? '/t/' + split[0] : '/t/' + split[0] + '/' + encodeURIComponent(split[1]);
-	}.property('context.url').cacheable()
+	}.property('context.url').cacheable(),
+
+	title: function() {
+		var active = this.get('context.active'),
+			title = this.get('context.title');
+
+		return (!active) ? '(' + title + ')' : title;
+	}.property('context.title', 'context.active').cacheable(),
 });

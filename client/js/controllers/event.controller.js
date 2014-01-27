@@ -7,39 +7,39 @@ App.EventController = Ember.ObjectController.extend({
 			hide = (hideEvents && (type === 'join' || type === 'part' || type === 'quit')) ? ' hide' : '';
 
 		return (type === 'privmsg') ? 'row' + hide : 'row other' + hide;
-	}.property('content.type', 'controllers.tab.model.hiddenEvents'),
+	}.property('content.type', 'controllers.tab.model.hiddenEvents').cacheable(),
 
 	isJoin: function() {
 		return (this.get('content.type') === 'join');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isPart: function() {
 		return (this.get('content.type') === 'part');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isQuit: function() {
 		return (this.get('content.type') === 'quit');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isMode: function() {
 		return (this.get('content.type') === 'mode');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isTopic: function() {
 		return (this.get('content.type') === 'topic');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isNick: function() {
 		return (this.get('content.type') === 'nick');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isKick: function() {
 		return (this.get('content.type') === 'kick');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	isPrivmsg: function() {
 		return (this.get('content.type') === 'privmsg');
-	}.property('content.type'),
+	}.property('content.type').cacheable(),
 
 	actions: {
 		visitLink: function() {

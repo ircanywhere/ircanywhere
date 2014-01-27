@@ -1,0 +1,9 @@
+<div class="members-title clear">
+	<span class="left">Users</span>
+	<span class="right">{{userCount}}</span>
+</div>
+<ul>
+	{{#each users}}
+		<li>{{userLink this .. true}}</li>
+	{{/each}}
+</ul>
