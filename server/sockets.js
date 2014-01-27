@@ -359,8 +359,17 @@ SocketManager.prototype.handleConnect = function(client) {
 		usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
 		commandsQuery['$or'].push({network: tab.network, target: tab.title});
 
-		var eventResults = application.Events.sync.find({network: netIds[tab.network], target: tab.title, user: user._id}).sort({$natural: -1}).limit(50).sync.toArray();
-			events = _.union(events, eventResults);
+		var target = (tab.type === 'network') ? '*' : tab.title,
+			query = {network: netIds[tab.network], target: target, user: user._id},
+			eventResults = application.Events.sync.find(query).sort({$natural: -1}).sync.toArray(),
+			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
+			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
+		// get some information about the unread items/highlights
+
+		tab.unread = unreadItems;
+		tab.highlights = unreadHighlights;
+		events = _.union(events, eventResults);
+		// combine the results
 	});
 	// loop tabs
 

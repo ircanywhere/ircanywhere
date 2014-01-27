@@ -4,7 +4,11 @@ Ember.Handlebars.helper('json', function(value, options) {
 });
 
 Ember.Handlebars.helper('lookup', function(component, context, options) {
-	Ember.TEMPLATES[component](this, options);
+	if (Ember.TEMPLATES[component]) {
+		Ember.TEMPLATES[component](this, options);
+	} else {
+		console.warn('Got event, but template for:', component, 'does not exist');
+	}
 });
 
 Ember.Handlebars.helper('time', function(context, options) {
@@ -63,6 +67,10 @@ Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
 		hostname = context.hostname || context.message.hostname,
 		prefixClass = '',
 		url = this.get('controllers.network.model').url;
+
+	if (!nickname) {
+		return '';
+	}
 	
 	if (prefix == '') {
 		prefixClass = '';

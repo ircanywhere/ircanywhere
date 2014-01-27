@@ -1,0 +1,6 @@
+{{#each item in content.message.message}}
+<div data-type="status" {{bind-attr class=classNames data-id=content._id}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column message">{{item}}</span>
+</div>
+{{/each}}

@@ -1,5 +1,8 @@
 var _ = require('lodash'),
-	hooks = require('hooks');
+	hooks = require('hooks'),
+	helper = require('../lib/helpers').Helpers;
+
+var channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action'];
 
 /**
  * Inserts an event into a backlog after all the checking has been done
@@ -13,7 +16,7 @@ var _ = require('lodash'),
  * @private	
  * @return 	void
  */
-var _insert = function(client, message, type, user) {
+var _insert = function(client, message, type, user, force) {
 	fibrous.run(function() {
 		var network = client.name,
 			channel = (message.channel && !message.target) ? message.channel : message.target,
@@ -26,14 +29,18 @@ var _insert = function(client, message, type, user) {
 		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
+		var target = (channelEvents[type] || (type === 'notice' && helper.isChannel(client.internal.capabilities.channel.types, channel))) ? channel : '*';
+			target = (force) ? '*' : target;
+		// anything else goes in '*' so it's forwarded to the server log
+
 		var prefixObject = eventManager.getPrefix(client, user),
 			output = {
 				type: type,
 				user: client.internal.userId,
 				network: network,
-				target: channel,
+				target: target,
 				message: message,
-				read: false,
+				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? false : true,
 				extra: {
 					self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
 					highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
@@ -91,6 +98,11 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 		// these two types wont have a target, or a channel, so
 		// we'll have to do some calculating to determine where we want them
 		// we shall put them in channel and privmsg tab events
+
+		if (message.nickname === client.nick) {
+			_insert(client, message, type, null, true);
+		}
+		// we can also push it into the * backlog if it's us
 	} else if (type == 'privmsg' || type == 'action') {
 		var tab = client.internal.tabs[message.target];
 

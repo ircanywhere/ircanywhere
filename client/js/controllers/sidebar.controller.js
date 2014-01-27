@@ -16,6 +16,10 @@ App.SidebarController = Ember.ArrayController.extend({
 					tab.set('unread', i);
 				}
 			});
+
+			if (i > tab.unread) {
+				tab.set('unread', tab.unread);
+			}
 		});
 		// XXX - I'm kind of unhappy about this loop inside a loop, this will be replaced though
 		// 		 when I write the event emitter, we'll probably just use that to calculate unreads etc

@@ -5,9 +5,10 @@ App.MessagesController = Ember.ArrayController.extend({
 
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
+				target = (tab && tab.type === 'network') ? '*' : tab.title;
 
-			if (tab && item.network === tab.networkName && item.target === tab.title) {
+			if (tab && item.network === tab.networkName && item.target === target) {
 				accum.pushObject(item);
 			}
 
@@ -15,9 +16,10 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
+				target = (tab && tab.type === 'network') ? '*' : tab.title;
 
-			if (tab && item.network === tab.networkName && item.target === tab.title) {
+			if (tab && item.network === tab.networkName && item.target === target) {
 				accum.removeObject(item);
 			}
 

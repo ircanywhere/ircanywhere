@@ -10,37 +10,7 @@ App.EventController = Ember.ObjectController.extend({
 	}.property('content.type', 'controllers.tab.model.hiddenEvents').cacheable(),
 
 	templateName: function() {
-		switch (this.get('content.type')) {
-			case 'join':
-				return 'events/join';
-				break;
-			case 'part':
-				return 'events/part';
-				break;
-			case 'quit':
-				return 'events/quit';
-				break;
-			case 'mode':
-				return 'events/mode';
-				break;
-			case 'topic':
-				return 'events/topic';
-				break;
-			case 'nick':
-				return 'events/nick';
-				break;
-			case 'kick':
-				return 'events/kick';
-				break;
-			case 'privmsg':
-				return 'events/privmsg';
-				break;
-			case 'action':
-				return 'events/action';
-				break;
-			default:
-				break;
-		}
+		return 'events/' + this.get('content.type');
 	}.property('content.type').cacheable(),
 
 	actions: {

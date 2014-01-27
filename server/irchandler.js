@@ -3,6 +3,29 @@ var _ = require('lodash'),
 	helper = require('../lib/helpers').Helpers;
 
 /**
+ * Formats an array of RAW IRC strings, taking off the :leguin.freenode.net 251 ricki- :
+ * at the start, returns an array of strings with it removed
+ *
+ * @method 	_insert
+ * @param 	{Array} raw
+ * @private	
+ * @return 	{Array}
+ */
+var _formatRaw = function(raw) {
+	var output = [];
+	raw.forEach(function(line) {
+		var split = line.split(' ');
+			split.splice(0, 3);
+		var string = split.join(' ');
+			string = (string.substr(0, 1) === ':') ? string.substr(1) : string;
+		
+		output.push(string);
+	});
+
+	return output;
+};
+
+/**
  * The object responsible for handling an event from IRCFactory
  * none of these should be called directly, however they can be hooked onto
  * or have their actions prevented or replaced. The function names equal directly
@@ -54,6 +77,14 @@ IRCHandler.prototype.registered = function(client, message) {
 
 	networkManager.addTab(client, client.name, 'network', true);
 	// add the tab
+
+	eventManager.insertEvent(client, {
+		nickname: message.nickname,
+		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
+		message: _formatRaw(message.raw),
+		raw: message.raw
+	}, 'registered');
+	// event
 }
 
 /**
@@ -89,6 +120,40 @@ IRCHandler.prototype.failed = function(client, message) {
 	
 	networkManager.activeTab(client, false);
 	// now lets update the tabs to inactive
+}
+
+/**
+ * Handles an incoming lusers
+ *
+ * @method 	lusers
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.lusers = function(client, message) {
+	eventManager.insertEvent(client, {
+		time: message.time,
+		message: _formatRaw(message.raw),
+		raw: message.raw
+	}, 'lusers');
+}
+
+/**
+ * Handles an incoming motd
+ *
+ * @method 	motd
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.motd = function(client, message) {
+	eventManager.insertEvent(client, {
+		time: message.time,
+		message: message.motd,
+		raw: message.raw
+	}, 'motd');
 }
 
 /**
@@ -376,15 +441,40 @@ IRCHandler.prototype.action = function(client, message) {
  * @extend 	true
  * @return 	void
  */
-/*IRCHandler.prototype.notice = function(client, message) {
+IRCHandler.prototype.notice = function(client, message) {
 	eventManager.insertEvent(client, message, 'notice');
-}*/
-// XXX - Change * target to be dumped in the server log
+}
+
+/**
+ * Handles an incoming usermode
+ *
+ * @method 	usermode
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.usermode = function(client, message) {
+	eventManager.insertEvent(client, message, 'usermode');
+}
+
+/**
+ * Handles an incoming ctcp_response
+ *
+ * @method 	ctcp_response
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.ctcp_response = function(client, message) {
+	eventManager.insertEvent(client, message, 'ctcp_response');
+}
 
 /**
  * Handles an incoming ctcp request
  *
- * @method ctcp_request
+ * @method 	ctcp_request
  * @param 	{Object} client
  * @param 	{Object} message
  * @extend 	true
@@ -398,5 +488,22 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
 
 	eventManager.insertEvent(client, message, 'ctcp_request');
 }
+
+/* XXX - Events TODO
+ 	
+ 	away
+ 	unaway
+ 	names
+ 	whois
+ 	links
+ 	list
+ 	banlist
+ 	invitelist
+ 	exceptlist
+ 	quietlist
+ 	invite
+ 	unknown
+
+ */
 
 exports.IRCHandler = _.extend(IRCHandler, hooks);
