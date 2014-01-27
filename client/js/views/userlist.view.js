@@ -1,6 +1,7 @@
 App.UserlistView = Ember.View.extend({
 	templateName: 'userlist',
 	classNameBindings: ['divClass'],
+	controller: App.UserlistController,
 
 	divClass: function() {
 		var classNames = ['userlist'],

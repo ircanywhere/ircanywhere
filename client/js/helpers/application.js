@@ -1,23 +1,10 @@
 Ember.Handlebars.helper('json', function(value, options) {
-	return JSON.stringify(value.content || value);
+	console.log(value.content);
+	return 'null';
 });
 
-Ember.Handlebars.registerHelper('group', function(options) {
-	var data = options.data,
-		fn = options.fn,
-		view = data.view,
-		childView;
-
-	childView = view.createChildView(Ember._MetamorphView, {
-		context: Ember.get(view, 'context'),
-
-		template: function(context, options) {
-			options.data.insideGroup = true;
-			return fn(context, options);
-		}
-	});
-
-	view.appendChild(childView);
+Ember.Handlebars.helper('lookup', function(component, context, options) {
+	Ember.TEMPLATES[component](this, options);
 });
 
 Ember.Handlebars.helper('time', function(context, options) {
@@ -43,8 +30,26 @@ Ember.Handlebars.helper('time', function(context, options) {
 	return hour + ':' + minute + ' ' + ap;
 });
 
-Ember.Handlebars.helper('userLink', function(show, options) {
-	var context = this.get('content'),
+Ember.Handlebars.registerHelper('group', function(options) {
+	var data = options.data,
+		fn = options.fn,
+		view = data.view,
+		childView;
+
+	childView = view.createChildView(Ember._MetamorphView, {
+		context: Ember.get(view, 'context'),
+
+		template: function(context, options) {
+			options.data.insideGroup = true;
+			return fn(context, options);
+		}
+	});
+
+	view.appendChild(childView);
+});
+
+Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
+	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
 		username = context.username || context.message.username,

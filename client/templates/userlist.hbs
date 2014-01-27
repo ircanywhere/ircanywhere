@@ -3,7 +3,7 @@
 	<span class="right">{{userCount}}</span>
 </div>
 <ul>
-	{{#each users}}
-		<li>{{userLink this .. true}}</li>
+	{{#each user in filtered}}
+		<li>{{userLink true user}}</li>
 	{{/each}}
 </ul>
