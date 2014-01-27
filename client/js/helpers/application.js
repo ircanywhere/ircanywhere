@@ -30,6 +30,13 @@ Ember.Handlebars.helper('time', function(context, options) {
 	return hour + ':' + minute + ' ' + ap;
 });
 
+Ember.Handlebars.helper('ircParse', function(text, options) {
+	var network = this.get('controllers.network.model'),
+		message = Ember.Handlebars.compile(App.Parser.exec(text, network));
+
+	return message(null, options);
+});
+
 Ember.Handlebars.registerHelper('group', function(options) {
 	var data = options.data,
 		fn = options.fn,
@@ -75,11 +82,4 @@ Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
 	
 	return html(null, options);
 	// return the element
-});
-
-Ember.Handlebars.helper('ircParse', function(text, options) {
-	var network = this.get('controllers.network.model'),
-		message = Ember.Handlebars.compile(App.Parser.exec(text, network));
-
-	return message(null, options);
 });

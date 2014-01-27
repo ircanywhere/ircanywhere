@@ -15,7 +15,7 @@ function SocketManager() {
 
 	this.allowRules = {};
 	this.operationRules = {};
-	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers'];
+	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers', 'commands'];
 	// collections with allowed update rules
 	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
@@ -190,7 +190,11 @@ SocketManager.prototype.init = function() {
 			clients.push(Users[doc._id.toString()]);
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId.toString()]);
-		} else if (collection === 'tabs' || collection === 'events') {
+		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
+			if (collection === 'commands' && !doc.backlog) {
+				return false;
+			}
+			
 			clients.push(Users[doc.user.toString()]);
 		} else if (collection === 'channelUsers' && !doc._burst) {
 			for (var id in Clients) {
@@ -361,7 +365,7 @@ SocketManager.prototype.handleConnect = function(client) {
 	// loop tabs
 
 	var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
-		commands = application.Commands.sync.find(_.extend({user: user._id}, commandsQuery)).sync.toArray();
+		commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sync.toArray();
 	// sort and limit them
 
 	client.send('users', user);

@@ -3,7 +3,7 @@ App.InputView = Ember.View.extend({
 	classNames: 'channel-input',
 
 	didInsertElement: function() {
-		Ember.$(document).on('keydown', {self: this}, this.documentKeyDown);
+		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
 		// bind an event to re-focus the box when someone hits a key
 		// it's not entirely ember-ish binding events manually but it's
 		// difficult to do this without doing so
@@ -16,7 +16,7 @@ App.InputView = Ember.View.extend({
 	},
 
 	documentKeyDown: function(e) {
-		self.$('input').focus();
+		this.$('input').focus();
 	},
 
 	keyDown: function(e) {

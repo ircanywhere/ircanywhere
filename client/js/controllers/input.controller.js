@@ -16,7 +16,7 @@ App.InputController = Ember.ObjectController.extend({
 
 	actions: {
 		sendCommand: function() {
-			var tab = this.get('controllers.tab.model');
+			var tab = this.socket.findOne('tabs', {selected: true});
 
 			this.socket.insert('commands', {
 				command: this.get('inputValue'),

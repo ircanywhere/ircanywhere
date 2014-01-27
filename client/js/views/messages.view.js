@@ -22,7 +22,9 @@ App.MessagesView = Ember.View.extend({
 
 		if (offset === last.height() || pos === height) {
 			Ember.run.later(this, function() {
-				this.$().context.scrollTop = this.$().context.scrollHeight;
+				if (this.$() !== undefined) {
+					this.$().context.scrollTop = this.$().context.scrollHeight;
+				}
 			}, 100);
 		}
 	}.observes('controller.filtered.@each')
