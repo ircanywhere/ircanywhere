@@ -3,6 +3,10 @@ App.UserlistController = Ember.ArrayController.extend({
 	tabs: [],
 	users: [],
 
+	userCount: function() {
+		return this.get('filtered').length;
+	}.property('filtered').cacheable(),
+
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];

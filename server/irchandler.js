@@ -355,6 +355,19 @@ IRCHandler.prototype.privmsg = function(client, message) {
 }
 
 /**
+ * Handles an incoming action
+ *
+ * @method action
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.action = function(client, message) {
+	eventManager.insertEvent(client, message, 'action');
+}
+
+/**
  * Handles an incoming notice
  *
  * @method 	notice

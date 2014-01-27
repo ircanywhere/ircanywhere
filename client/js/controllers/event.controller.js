@@ -6,7 +6,7 @@ App.EventController = Ember.ObjectController.extend({
 			hideEvents = this.get('controllers.tab.model.hiddenEvents'),
 			hide = (hideEvents && (type === 'join' || type === 'part' || type === 'quit')) ? ' hide' : '';
 
-		return (type === 'privmsg') ? 'row' + hide : 'row other' + hide;
+		return (type === 'privmsg' || type === 'action') ? 'row' + hide : 'row other' + hide;
 	}.property('content.type', 'controllers.tab.model.hiddenEvents').cacheable(),
 
 	templateName: function() {
@@ -34,6 +34,9 @@ App.EventController = Ember.ObjectController.extend({
 				break;
 			case 'privmsg':
 				return 'events/privmsg';
+				break;
+			case 'action':
+				return 'events/action';
 				break;
 			default:
 				break;
