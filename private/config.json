@@ -27,7 +27,7 @@
 	"ssl": false,
 	/* -- boolean 
 	 * -- usage: Whether to enable HTTPS or not - you will need certificates
-				 defaults to false. Note you'll have to have force-ssl package enabled for this to work */
+				 defaults to false. */
 
 	"forkProcess": true,
 	/* -- required

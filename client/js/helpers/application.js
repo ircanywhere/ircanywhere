@@ -1,5 +1,5 @@
 Ember.Handlebars.helper('json', function(value, options) {
-	console.log(value.content);
+	console.log(value);
 	return 'null';
 });
 
@@ -78,7 +78,7 @@ Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		route = '/t/' + url + '/' + nickname,
-		html = Ember.Handlebars.compile('<a href="' + route + '" {{action visitLink}} rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
+		html = Ember.Handlebars.compile('<a href="' + route + '" {{action goto "' + route + '"}} rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
 	
 	return html(null, options);
 	// return the element

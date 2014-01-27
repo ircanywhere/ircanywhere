@@ -38,6 +38,7 @@ function Application() {
 		maxListeners: 0
 	});
 	this.config = JSON.parse(jsonminify(raw));
+	this.packagejson = JSON.parse(fs.readFileSync('./package.json').toString());
 	// predefine our variables
 
 	fibrous.run(this.init.bind(this));

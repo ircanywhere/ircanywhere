@@ -43,5 +43,20 @@ App.UserlistController = Ember.ArrayController.extend({
 	ready: function() {
 		this.set('users', this.socket.findAll('channelUsers'));
 		this.set('tabs', this.socket.findAll('tabs'));
+	},
+
+	actions: {
+		goto: function(url) {
+			url = url.substring(3);
+			// cut the /t/ off the front
+
+			var split = url.split('/');
+
+			if (split.length === 1) {
+				this.transitionToRoute('network', split[0]);
+			} else {
+				this.transitionToRoute('tab', split[0], split[1]);
+			}
+		}
 	}
 });

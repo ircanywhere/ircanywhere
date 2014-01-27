@@ -392,7 +392,7 @@ IRCHandler.prototype.action = function(client, message) {
  */
 IRCHandler.prototype.ctcp_request = function(client, message) {
 	if (message.type.toUpperCase() == 'VERSION') {
-		var version = 'IRCAnywhere v' + application.smartjson.version + ' ' + application.smartjson.homepage;
+		var version = 'IRCAnywhere v' + application.packagejson.version + ' ' + application.packagejson.homepage;
 		ircFactory.send(client._id, 'ctcp', [message.nickname, 'VERSION', version]);
 	}
 

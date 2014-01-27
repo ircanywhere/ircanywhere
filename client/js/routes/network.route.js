@@ -1,5 +1,5 @@
 App.Router.map(function() {
-	this.resource('network', {path: '/n/:url'}, function() {
+	this.resource('network', {path: '/t/:url'}, function() {
 		this.resource('tab', {path: '/:tab'});
 	});
 });

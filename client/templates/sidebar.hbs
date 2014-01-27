@@ -5,7 +5,7 @@
 <div class="items">
 	<ul>
 	{{#each controller}}
-		{{view App.SidebarItemView}}
+		{{render 'sidebaritem' this}}
 	{{/each}}
 	</ul>
 </div>

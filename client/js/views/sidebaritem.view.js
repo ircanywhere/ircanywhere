@@ -1,11 +1,12 @@
-App.SidebarItemView = Ember.View.extend({
+App.SidebaritemView = Ember.View.extend({
 	tagName: 'li',
 	templateName: 'sidebaritem',
 	classNameBindings: ['liClass'],
+	controller: App.SidebaritemController,
 
 	liClass: function() {
 		var classes = ['clear'],
-			tab = this.get('context');
+			tab = this.get('controller.content');
 
 		if (tab.selected) {
 			classes.push('selected');
@@ -16,14 +17,12 @@ App.SidebarItemView = Ember.View.extend({
 		}
 
 		return classes.join(' ');
-	}.property('context.selected').cacheable(),
+	}.property('controller.content.selected').cacheable(),
 	
 	getClass: function() {
 		var classNames = [''],
-			tab = this.get('context'),
-			network = App.__container__.lookup('controller:sidebar').get('networks').findBy('_id', tab.network);
-		// ember people will hate me for using this but afaik it's impossible
-		// to get the network
+			tab = this.get('controller.content'),
+			network = this.get('controller.parentController.networks').findBy('_id', tab.network);
 
 		if (tab.get('type') === 'network' && network.get('internal').status === 'connecting') {
 			classNames.push('net-loader');
@@ -36,18 +35,18 @@ App.SidebarItemView = Ember.View.extend({
 		}
 
 		return classNames.join(' ');
-	}.property('context').cacheable(),
+	}.property('controller.content').cacheable(),
 
 	url: function() {
-		var split = this.get('context.url').split('/');
+		var split = this.get('controller.content.url').split('/');
 
 		return (split.length == 1) ? '/t/' + split[0] : '/t/' + split[0] + '/' + encodeURIComponent(split[1]);
-	}.property('context.url').cacheable(),
+	}.property('controller.content.url').cacheable(),
 
 	title: function() {
-		var active = this.get('context.active'),
-			title = this.get('context.title');
+		var active = this.get('controller.active'),
+			title = this.get('controller.title');
 
 		return (!active) ? '(' + title + ')' : title;
-	}.property('context.title', 'context.active').cacheable(),
+	}.property('controller.content.title', 'controller.content.active').cacheable(),
 });
