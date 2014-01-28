@@ -507,18 +507,18 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
 
 /* XXX - Events TODO
  	
- 	away
- 	unaway
- 	names
- 	whois
- 	links
- 	list
- 	banlist
- 	invitelist
- 	exceptlist
- 	quietlist
- 	invite
- 	unknown
+ 	away 		-  maybe this should alter the network status?
+ 	unaway		-  ^
+ 	names 		-  kinda done, need to determine whether they've ran /names or not and show it as a model maybe
+ 	whois		- /--
+ 	links 		-/
+ 	list 		-| These need to be moved over from events
+ 	banlist 	-| and sent straight down the websocket pipe
+ 	invitelist 	-| to be parsed into a model window or something
+ 	exceptlist 	-| because we dont want to store this info
+ 	quietlist 	-\
+ 	invitelist	- \--
+ 	unknown		-  Should be handled as a 'status' message
 
  */
 

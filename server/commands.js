@@ -409,6 +409,25 @@ CommandManager.prototype['/nick'] = function(user, client, target, params) {
 }
 
 /**
+ * '/ctcp' command
+ *
+ * @param 	{Object} user
+ * @param 	{Object} client
+ * @param 	{String} target
+ * @param 	{String} params
+ * @extend 	true
+ * @return 	void
+ */
+CommandManager.prototype['/ctcp'] = function(user, client, target, params) {
+	var targ = params[0],
+		type = params[1];
+
+	if (user && type) {
+		ircFactory.send(client._id, 'privmsg', [targ, '' + type.toUpperCase() + '']);
+	}
+}
+
+/**
  * '/away' command
  *
  * @param 	{Object} user
@@ -448,7 +467,7 @@ CommandManager.prototype['/unaway'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/close'] = function(user, client, target, params) {
-	var tab = Tabs.sync.findOne({target: target, network: client._id});
+	var tab = application.Tabs.sync.findOne({target: target, network: client._id});
 	// get the tab in question
 
 	if (tab.type === 'channel') {

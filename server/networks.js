@@ -1,6 +1,5 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	helper = require('../lib/helpers').Helpers,
 	mongo = require('mongodb');
 
 /**

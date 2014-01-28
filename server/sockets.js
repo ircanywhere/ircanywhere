@@ -1,5 +1,6 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
+	helper = require('../lib/helpers').Helpers,
 	mongo = require('mongodb');
 
 /**
@@ -34,15 +35,32 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		update: function(uid, query, update) {
-			return ((_.has(update, 'hiddenUsers') && typeof update.hiddenUsers === 'boolean') ||
-					(_.has(update, 'hiddenEvents') && typeof update.hiddenEvents === 'boolean') || 
-					(_.has(update, 'selected') && typeof update.selected === 'boolean'));
+			return ((update.hiddenUsers && typeof update.hiddenUsers === 'boolean') ||
+					(update.hiddenEvents && typeof update.hiddenEvents === 'boolean') || 
+					(update.selected && typeof update.selected === 'boolean'));
+		},
+
+		/**
+		 * An allow rule for inserts to the tab collection, we check for target, type and
+		 * network id
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} insert
+		 * @extend 	false
+		 * @private
+		 * @return 	{Boolean}
+		 */
+		insert: function(uid, insert) {
+			return ((insert.target && typeof insert.target === 'string') &&
+					(insert.network && typeof insert.network === 'string') &&
+					(insert.selected && typeof insert.selected === 'boolean'));
 		}
 	});
 
 	this.rules('tabs', {
 		/**
-		 * An update date rule to execute when we've passed the allow rules
+		 * An update rule to execute when we've passed the allow rules
 		 *
 		 * @method 	update
 		 * @param 	{ObjectID} uid
@@ -61,7 +79,27 @@ function SocketManager() {
 
 			application.Tabs.sync.update(_.extend(query, {user: uid}), {$set: update});
 			// update
-		}
+		},
+
+		/**
+		 * An insert rule for the tab collection
+		 *
+		 * @method 	insert
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} insert
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		insert: function(uid, insert) {
+			var client = Clients[new mongo.ObjectID(insert.network)];
+
+			if (client && client.internal.userId.toString() === uid.toString()) {
+				var type = helper.isChannel(client.internal.capabilities.channel.types, insert.target);
+				networkManager.addTab(client, insert.target, type, insert.selected);
+			}
+			// we're allowed to continue, use network manager to add the tab
+		},
 	})
 
 	this.allow('commands', {

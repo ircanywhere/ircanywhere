@@ -20,10 +20,6 @@
 			display: none!important;
 		}
 
-		&[data-highlight] { background: palegreen; }
-		&[data-self] { background: linen; }
-		&[data-type=notice] { background: lavender; }
-
 		a[rel=user-link] {
 			color: #383838;
 			font-weight: bold;
@@ -135,6 +131,18 @@
 					padding: 5px 15px;
 					.border-radius(5px);
 				}
+			}
+		}
+
+		&[data-highlight] { background: palegreen; }
+		&[data-self] { background: linen; }
+		&[data-type=notice] {
+			background: lavender;
+
+			a[rel=user-link] {
+				margin: 0 10px 0 0!important;
+				font-weight: bold;
+				text-decoration: none;
 			}
 		}
 	}
