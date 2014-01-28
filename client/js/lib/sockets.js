@@ -269,12 +269,14 @@ Ember.Socket = Ember.Object.extend({
 		return this._find(true, type, query);
 	},
 
-	findButWait: function(type, query) {
-		var self = this,
+	findButWait: function(type, query, one) {
+		var one = one || false,
+			self = this,
 			_getResults = function(resolve, reject) {
 				var results = self._find(true, type, query);
 				
 				if (results) {
+					results = (one) ? results[0] : results;
 					resolve(results);
 				} else {
 					reject('not found');

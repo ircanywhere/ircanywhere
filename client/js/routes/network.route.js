@@ -6,14 +6,14 @@ App.Router.map(function() {
 
 App.NetworkRoute = AppRoute.extend({
 	setupController: function(controller, model) {
-		controller.set('model', model[0]);
+		controller.set('model', model);
 	},
 
 	model: function(params) {
-		return this.controllerFor('index').socket.findButWait('networks', {url: params.url});
+		return this.controllerFor('index').socket.findButWait('networks', {url: params.url}, true);
 	},
 
 	title: function(controller, model) {
-		return model[0].get('name') + ' - ' + App.get('defaultTitle');
+		return model.get('name') + ' - ' + App.get('defaultTitle');
 	}
 });

@@ -95,7 +95,7 @@ function SocketManager() {
 			var client = Clients[new mongo.ObjectID(insert.network)];
 
 			if (client && client.internal.userId.toString() === uid.toString()) {
-				var type = helper.isChannel(client.internal.capabilities.channel.types, insert.target);
+				var type = (helper.isChannel(client.internal.capabilities.channel.types, insert.target)) ? 'channel' : 'query';
 				networkManager.addTab(client, insert.target, type, insert.selected);
 			}
 			// we're allowed to continue, use network manager to add the tab
