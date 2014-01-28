@@ -301,18 +301,18 @@ NetworkManager.prototype.connectNetwork = function(network) {
 /**
  * Description
  * @method 	changeStatus
- * @param 	{ObjectID} networkId
+ * @param 	{Object} query
  * @param 	{Boolean} status
  * @extend 	true
  * @return  void
  */
-NetworkManager.prototype.changeStatus = function(networkId, status) {
+NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {
 		application.logger.log('warn', 'invalid status flag', {flag: status, network: networkId});
 		return;
 	}
 
-	application.Networks.sync.update({_id: networkId}, {$set: {'internal.status': status}});
+	application.Networks.sync.update(query, {$set: {'internal.status': status}});
 }
 
 exports.NetworkManager = _.extend(NetworkManager, hooks);

@@ -18,7 +18,9 @@ var channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'p
  */
 var _insert = function(client, message, type, user, force) {
 	fibrous.run(function() {
-		var network = client.name,
+		var force = force || false,
+			user = user || false,
+			network = client.name,
 			channel = (message.channel && !message.target) ? message.channel : message.target,
 			user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
 		// get a channel user object if we've not got one
@@ -29,7 +31,7 @@ var _insert = function(client, message, type, user, force) {
 		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
-		var target = (channelEvents[type] || (type === 'notice' && helper.isChannel(client.internal.capabilities.channel.types, channel))) ? channel : '*';
+		var target = (_.indexOf(channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client.internal.capabilities.channel.types, channel))) ? channel : '*';
 			target = (force) ? '*' : target;
 		// anything else goes in '*' so it's forwarded to the server log
 
@@ -93,7 +95,7 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 		});
 
 		if (_.has(client.internal.tabs, message.nickname)) {
-			_insert(client, message, type, chan);
+			_insert(client, message, type);
 		}
 		// these two types wont have a target, or a channel, so
 		// we'll have to do some calculating to determine where we want them
@@ -106,7 +108,7 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 	} else if (type == 'privmsg' || type == 'action') {
 		var tab = client.internal.tabs[message.target];
 
-		if (tab === undefined) {
+		if (!tab) {
 			networkManager.addTab(client, message.nickname, 'query', false);
 		}
 		// create the tab if its undefined

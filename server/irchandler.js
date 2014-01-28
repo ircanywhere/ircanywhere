@@ -71,7 +71,7 @@ IRCHandler.prototype.registered = function(client, message) {
 		'internal.status': networkManager.flags.connected,
 		'internal.capabilities': message.capabilities
 	}});
-	//networkManager.changeStatus(client._id, networkManager.flags.connected);
+	//networkManager.changeStatus({_id: client._id}, networkManager.flags.connected);
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
@@ -84,7 +84,10 @@ IRCHandler.prototype.registered = function(client, message) {
 		message: _formatRaw(message.raw),
 		raw: message.raw
 	}, 'registered');
-	// event
+	// a bit of a hack here we'll spin the timestamp back 15ms to make sure it
+	// comes in order, it's because we've gotta wait till we've recieved all the capab
+	// stuff in irc-factory before we send it out, which can create a race condition
+	// which causes lusers to be sent through first
 }
 
 /**
@@ -103,6 +106,11 @@ IRCHandler.prototype.closed = function(client, message) {
 
 	networkManager.activeTab(client, false);
 	// now lets update the tabs to inactive
+
+	eventManager.insertEvent(client, {
+		time: new Date().toJSON(),
+		message: (message.reconnecting) ? 'Connection closed. Attempting reconnect number ' + message.attempts : 'You have disconnected.',
+	}, 'closed');
 }
 
 /**
@@ -115,11 +123,16 @@ IRCHandler.prototype.closed = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.failed = function(client, message) {
-	networkManager.changeStatus(client._id, networkManager.flags.failed);
+	networkManager.changeStatus({_id: client._id}, networkManager.flags.failed);
 	// mark tab as failed
 	
 	networkManager.activeTab(client, false);
 	// now lets update the tabs to inactive
+
+	eventManager.insertEvent(client, {
+		time: new Date().toJSON(),
+		message: 'Connection closed. Retry attempts exhausted.',
+	}, 'closed');
 }
 
 /**
@@ -151,9 +164,12 @@ IRCHandler.prototype.lusers = function(client, message) {
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
 		time: message.time,
-		message: message.motd,
+		message: new Date(new Date(message.time).getTime() - 15).toJSON(),
 		raw: message.raw
 	}, 'motd');
+	// again spin this back 15ms to prevent a rare but possible race condition where
+	// motd is the last thing that comes through, because we wait till we've recieved
+	// it all before sending it out, javascripts async nature causes this.
 }
 
 /**

@@ -52,7 +52,7 @@ IRCFactory.prototype.init = function() {
 					difference = _.difference(keys, message.keys);
 
 				for (var key in message.keys) {
-					networkManager.changeStatus(key, networkManager.flags.connected);
+					networkManager.changeStatus({_id: key}, networkManager.flags.connected);
 				}
 				
 				for (var key in difference) {
@@ -114,7 +114,7 @@ IRCFactory.prototype.create = function(network) {
 	// generate a key, we just use the network id because it's unique per network
 	// and doesn't need to be linked to a client, saves us hashing keys all the time
 
-	networkManager.changeStatus(key, networkManager.flags.connecting);
+	networkManager.changeStatus({_id: key}, networkManager.flags.connecting);
 	// mark the network as connecting
 
 	this.rpc.emit('createClient', key, network);
