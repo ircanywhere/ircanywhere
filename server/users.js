@@ -163,7 +163,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	}
 	// it's failed, lets bail
 
-	application.logger.log('info', 'account created', user);
+	application.logger.log('info', 'account created', helper.cleanObjectIds(user));
 	// log this event
 
 	var message = {

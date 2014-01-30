@@ -71,7 +71,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 				network: tab.get('networkName'),
 				isChannel: false
 			};
-		} else if (tab.type == 'query') {
+		} else if (tab.type === 'query') {
 			return {
 				key: tab.get('_id'),
 				title: tab.get('target'),
@@ -80,7 +80,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 				network: tab.get('networkName'),
 				isChannel: false
 			};
-		} else if (tab.type == 'channel') {
+		} else if (tab.type === 'channel') {
 			return {
 				key: tab.get('_id'),
 				title: tab.get('target'),

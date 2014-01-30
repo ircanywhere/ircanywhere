@@ -34,11 +34,9 @@ Ember.Handlebars.helper('time', function(context, options) {
 	return hour + ':' + minute + ' ' + ap;
 });
 
-Ember.Handlebars.helper('ircParse', function(text, options) {
-	var network = this.get('controllers.network.model'),
-		message = Ember.Handlebars.compile(App.Parser.exec(text, network));
-
-	return message(null, options);
+Ember.Handlebars.registerBoundHelper('ircParse', function(text, options) {
+	var network = this.get('controllers.network.model');
+	return new Ember.Handlebars.SafeString(App.Parser.exec(text, network));
 });
 
 Ember.Handlebars.registerHelper('group', function(options) {
@@ -86,7 +84,7 @@ Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		route = '/t/' + url + '/' + nickname,
-		html = Ember.Handlebars.compile('<a href="' + route + '" {{action goto "' + route + '"}} rel="user-link" data-nick="' + nickname + '"  data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
+		html = Ember.Handlebars.compile('<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '" {{action goto "' + route + '"}}>' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
 	
 	return html(null, options);
 	// return the element

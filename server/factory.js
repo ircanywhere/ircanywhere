@@ -1,7 +1,8 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	crypto = require('crypto'),
-	factory = require('irc-factory').Api;
+	factory = require('irc-factory').Api,
+	helper = require('../lib/helpers').Helpers;
 
 /**
  * The IRCFactory object which handles communication with the irc-factory package
@@ -60,7 +61,7 @@ IRCFactory.prototype.init = function() {
 				}
 				// the clients we're going to actually attempt to boot up
 
-				application.logger.log('warn', 'factory synchronize', message);
+				application.logger.log('warn', 'factory synchronize', helper.cleanObjectIds(message));
 			} else {
 				self.handleEvent(message.event, message.message);
 			}
@@ -118,7 +119,7 @@ IRCFactory.prototype.create = function(network) {
 	// mark the network as connecting
 
 	this.rpc.emit('createClient', key, network);
-	application.logger.log('info', 'creating irc client', Clients[key]);
+	application.logger.log('info', 'creating irc client', helper.cleanObjectIds(Clients[key]));
 },
 
 /**
@@ -130,7 +131,7 @@ IRCFactory.prototype.create = function(network) {
  * @return 	void
  */
 IRCFactory.prototype.destroy = function(key) {
-	application.logger.log('info', 'destroying irc client', Clients[key]);
+	application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(Clients[key]));
 	// log it before we destroy it below
 
 	this.rpc.emit('destroyClient', key.toString());

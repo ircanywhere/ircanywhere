@@ -1,6 +1,7 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	mongo = require('mongodb');
+	mongo = require('mongodb'),
+	helper = require('../lib/helpers').Helpers;
 
 /**
  * Responsible for handling everything related to networks, such as tracking changes
@@ -307,7 +308,7 @@ NetworkManager.prototype.connectNetwork = function(network) {
  */
 NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {
-		application.logger.log('warn', 'invalid status flag', {flag: status, network: networkId});
+		application.logger.log('warn', 'invalid status flag', helper.cleanObjectIds({flag: status, network: networkId}));
 		return;
 	}
 
