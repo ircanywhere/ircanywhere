@@ -119,7 +119,7 @@ IRCFactory.prototype.create = function(network) {
 	// mark the network as connecting
 
 	this.rpc.emit('createClient', key, network);
-	application.logger.log('info', 'creating irc client', helper.cleanObjectIds(Clients[key]));
+	application.logger.log('info', 'creating irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
 },
 
 /**
@@ -131,7 +131,7 @@ IRCFactory.prototype.create = function(network) {
  * @return 	void
  */
 IRCFactory.prototype.destroy = function(key) {
-	application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(Clients[key]));
+	application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
 	// log it before we destroy it below
 
 	this.rpc.emit('destroyClient', key.toString());

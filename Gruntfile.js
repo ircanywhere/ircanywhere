@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 				dest: 'client/build/dependency.js'
 			},
 			dist: {
-				src: ['lib/*.js', 'client/js/lib/*.js', 'client/js/*.js', 'client/js/helpers/*.js', 'client/js/routes/*.js', 'client/js/models/*.js', 'client/js/controllers/*.js', 'client/js/views/*.js'],
+				src: ['lib/*.js', 'client/js/lib/*.js', 'client/js/*.js', 'client/js/helpers/*.js', 'client/js/mixins/*.js', 'client/js/routes/*.js', 'client/js/models/*.js', 'client/js/controllers/*.js', 'client/js/views/*.js'],
 				dest: 'client/build/<%= pkg.name %>.js'
 			}
 		},

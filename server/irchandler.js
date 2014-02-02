@@ -163,8 +163,8 @@ IRCHandler.prototype.lusers = function(client, message) {
  */
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
-		time: message.time,
-		message: new Date(new Date(message.time).getTime() - 15).toJSON(),
+		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
+		message: _formatRaw(message.raw),
 		raw: message.raw
 	}, 'motd');
 	// again spin this back 15ms to prevent a rare but possible race condition where
@@ -505,6 +505,20 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
 	eventManager.insertEvent(client, message, 'ctcp_request');
 }
 
+/**
+ * Handles an incoming unknown
+ *
+ * @method 	unknown
+ * @param 	{Object} client
+ * @param 	{Object} message
+ * @extend 	true
+ * @return 	void
+ */
+IRCHandler.prototype.unknown = function(client, message) {
+	message.message = message.params.join(' ');
+	eventManager.insertEvent(client, message, 'unknown');
+}
+
 /* XXX - Events TODO
  	
  	away 		-  maybe this should alter the network status?
@@ -518,7 +532,6 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
  	exceptlist 	-| because we dont want to store this info
  	quietlist 	-\
  	invitelist	- \--
- 	unknown		-  Should be handled as a 'status' message
 
  */
 
