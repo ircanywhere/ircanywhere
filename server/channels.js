@@ -31,7 +31,15 @@ function ChannelManager() {
  * @return	{Object} tab object
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
-	return application.Tabs.sync.findOne({network: network, title: channel});
+	var chan = application.Tabs.sync.findOne({network: network, title: channel});
+
+	if (!chan) {
+		var chan = _.clone(this.channel);
+			chan.network = network;
+			chan.channel = channel;
+	}
+
+	return chan;
 }
 
 /**

@@ -533,10 +533,13 @@ CommandManager.prototype['/quit'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/reconnect'] = function(user, client, target, params) {
-	ircFactory.send(client._id, 'reconnect', []);
+	if (client.internal.connected || client.internal.connecting) {
+		ircFactory.send(client._id, 'reconnect', []);
+	} else {
+		networkManager.connectNetwork(client);
+	}
 	// send the go ahead
 
-	networkManager.activeTab(client, client.name, true);
 	networkManager.changeStatus(client._id, networkManager.flags.connecting);
 	// mark as connecting and mark the tab as active again
 }

@@ -21,10 +21,10 @@ App.IndexController = Ember.ObjectController.extend({
 	}.observes('tabs.@each.selected'),
 	
 	determinePath: function() {
-		if (!this.socket.get('authed')) {
+		if (this.socket.authed === false) {
 			this.transitionToRoute('login');
 		}
-	},
+	}.observes('socket.authed'),
 
 	ready: function() {
 		this.set('tabs', this.socket.findAll('tabs'));

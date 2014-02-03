@@ -9,7 +9,7 @@ Ember.Socket = Ember.Object.extend({
 
 	socket: null,
 	done: false,
-	authed: false,
+	authed: null,
 
 	emitter: Ember.SocketEmitter.create(),
 
@@ -185,6 +185,10 @@ Ember.Socket = Ember.Object.extend({
 			if (emit && i === count) {
 				self.get('emitter').done();
 			}
+		}
+
+		if (payload.length === 0 && emit) {
+			self.get('emitter').done();
 		}
 	},
 

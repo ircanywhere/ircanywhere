@@ -4,7 +4,7 @@ App.TitlebarView = Ember.View.extend({
 
 	didInsertElement: function() {
 		Ember.$(document).on('click', this.documentClick.bind(this));
-		this.$('ul#options-menu li > a').on('mouseenter', this.mouseLeave.bind(this));
+		this.$('ul#options-menu li > a, ul#options-menu li > ul').on('mouseenter', this.mouseLeave.bind(this));
 		// setup dynamic events for individual elements
 	},
 

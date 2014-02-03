@@ -51,20 +51,6 @@ function IRCHandler() {
 IRCHandler.prototype.registered = function(client, message) {
 	var channels = {};
 	
-	// XXX - send our connect commands, things that the user defines
-	// 		 nickserv identify or something
-
-	for (var key in client.channels) {
-		var channel = client.channels[key],
-			chan = channel.channel,
-			password = channel.password || '';
-
-		ircFactory.send(client._id, 'join', [chan, password]);
-		ircFactory.send(client._id, 'mode', [chan]);
-		// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
-	}
-	// find our channels to automatically join from the network setup
-
 	client.internal.capabilities = message.capabilities;
 	// set this immediately so the other stuff works
 
@@ -78,15 +64,16 @@ IRCHandler.prototype.registered = function(client, message) {
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-	application.Tabs.sync.update({title: client.name, network: client._id}, {
+	application.Tabs.sync.update({title: client.name, network: client._id}, {$set: {
 		title: message.capabilities.network.name,
-		target: message.capabilities.network.name
-	})
+		target: message.capabilities.network.name,
+		active: true
+	}});
 	// update the tab
 
-	application.Tabs.sync.update({network: client._id}, {
+	application.Tabs.sync.update({network: client._id}, {$set: {
 		networkName: message.capabilities.network.name,
-	});
+	}});
 	// update any sub tabs
 
 	eventManager.insertEvent(client, {
@@ -99,6 +86,20 @@ IRCHandler.prototype.registered = function(client, message) {
 	// comes in order, it's because we've gotta wait till we've recieved all the capab
 	// stuff in irc-factory before we send it out, which can create a race condition
 	// which causes lusers to be sent through first
+
+	// XXX - send our connect commands, things that the user defines
+	// 		 nickserv identify or something
+
+	for (var key in client.channels) {
+		var channel = client.channels[key],
+			chan = channel.channel,
+			password = channel.password || '';
+
+		ircFactory.send(client._id, 'join', [chan, password]);
+		ircFactory.send(client._id, 'mode', [chan]);
+		// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
+	}
+	// find our channels to automatically join from the network setup
 }
 
 /**
@@ -202,13 +203,12 @@ IRCHandler.prototype.join = function(client, message) {
 	// just a standard user object, although with a modes object aswell
 
 	if (message.nickname == client.nick) {
-		ircFactory.send(client._id, 'mode', [message.channel]);
 		networkManager.addTab(client, message.channel, 'channel', true);
+		ircFactory.send(client._id, 'mode', [message.channel]);
 	}
 	// if it's us joining a channel we'll mark it in internal.tabs
 
 	channelManager.insertUsers(client._id, client.name, message.channel, [user]);
-
 	eventManager.insertEvent(client, message, 'join');
 	// event
 }

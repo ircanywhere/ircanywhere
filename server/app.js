@@ -132,39 +132,17 @@ Application.prototype.setupOplog = function() {
 
 		switch(item.op) {
 			case 'i':
-				var id = item.o._id.toString();
-				if (!self.docs[col][id]) {
-					self.docs[col][id] = item.o;
-				}
-				// alter our global document collection
-
 				self.ee.emit([col, 'insert'], item.o);
 				// emit an event
 				break;
 			case 'u':
 				self.mongo.collection(col).findOne(item.o2, function(err, doc) {
-					var id = doc._id.toString();
-					setTimeout(function() {
-						self.docs[col][id] = doc;
-					}, 10000);
-					// alter our global document collection
-
-					self.ee.emit([col, 'update'], doc, self.docs[col][id]);
+					self.ee.emit([col, 'update'], doc, self.docs[col][doc._id.toString()]);
 				});
 				// get the new full document
 				break;
 			case 'd':
-				var id = item.o._id.toString();
-				setTimeout(function() {
-					if (self.docs[col][id]) {
-						return false;
-					}
-
-					delete self.docs[col][id];
-				}, 10000);
-				// delete it, in 10 seconds so if we need to use it anywhere we can
-
-				self.ee.emit([col, 'delete'], self.docs[col][id], item.o._id);
+				self.ee.emit([col, 'delete'], self.docs[col][item.o._id.toString()], item.o._id);
 				// emit
 				break;
 			case 'c':

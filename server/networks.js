@@ -182,20 +182,21 @@ NetworkManager.prototype.addNetwork = function(user, network) {
 	//		 if simple-schema could automatically cast these, maybe it can with cast: {}
 
 	network.internal = {
+		capabilities: {},
 		nodeId: application.nodeId,
 		userId: user._id,
-		status: this.flags.closed
+		status: this.flags.disconnected
 	}
 	// this stores internal information about the network, it will be available to
 	// the client but they wont be able to edit it, it also wont be able to be enforced
 	// by the config settings or network settings, it's overwritten every time.
 
-	var document = application.Networks.sync.insert(network)[0];
+	var doc = application.Networks.sync.insert(network)[0];
 	
-	this.addTab(document, document.name, 'network', true);
+	this.addTab(doc, doc.name, 'network', true, false);
 	// add the tab
 
-	return document;
+	return doc;
 	// insert the network. Just doing this will propogate the change directly due to our observe driver
 }
 
@@ -211,8 +212,9 @@ NetworkManager.prototype.addNetwork = function(user, network) {
  * @extend 	true
  * @return 	void
  */
-NetworkManager.prototype.addTab = function(client, target, type, select) {
-	var select = select || false,
+NetworkManager.prototype.addTab = function(client, target, type, select, active) {
+	var select = (select !== undefined) ? select : false,
+		active = (active !== undefined) ? active : true,
 		obj = {
 			user: client.internal.userId,
 			url: (type === 'network') ? client.url : client.url + '/' + target.toLowerCase(),
@@ -222,7 +224,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select) {
 			title: target,
 			type: type,
 			selected: select,
-			active: true
+			active: active
 		};
 
 	if (obj.target.trim() == '') {
@@ -230,19 +232,21 @@ NetworkManager.prototype.addTab = function(client, target, type, select) {
 	}
 	// empty, bolt it
 
+	var callback = function(err, doc) {
+		if (client.internal.tabs[obj.target]) {
+			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active, selected: select}}, function(err, doc) { });
+		} else {
+			application.Tabs.insert(obj, function(err, doc) { });
+		}
+		// insert to db, or update old record
+	};
+
 	if (select) {
-		application.Tabs.sync.update({user: client.internal.userId, selected: true}, {$set: {selected: false}});
+		application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}}, callback);
+	} else {
+		callback(null, null);
 	}
 	// are they requesting a new selected tab?
-
-	var tab = application.Tabs.sync.findOne({user: client.internal.userId, network: client._id, target: target});
-
-	if (tab === null) {
-		application.Tabs.sync.insert(obj);
-	} else {
-		application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: true, selected: select}});
-	}
-	// insert to db, or update old record
 }
 
 /**
@@ -293,6 +297,13 @@ NetworkManager.prototype.removeTab = function(client, target) {
  * Connect the specified network record, should only really be called when creating
  * a new network as IRCFactory will load the client up on startup and then determine
  * whether to connect the network itself based on the options.
+ *
+ * However, it's also called when it appears that there is no connected client on the
+ * /reconnect command (and any other similar commands). We can determine this (sloppy)
+ * from checking client.internal.status. If in the case that it does exist, it doesn't
+ * matter if this is called really because irc-factory will prevent a re-write if the
+ * key is the same. We could consider looking at the response from factory synchronize
+ * but it might not yield a good result because of newly created clients since startup.
  *
  * @method 	connectNetwork
  * @param 	{Object} network

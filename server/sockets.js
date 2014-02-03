@@ -1,7 +1,29 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers,
+	objectDiff = require('objectdiff'),
 	mongo = require('mongodb');
+
+/**
+ * Updates the global repository of documents with the new document, this is done after
+ * the event emitters are handled.
+ *
+ * @method 	_alterDoc
+ * @param 	{String} collection
+ * @param 	{String} operation
+ * @param 	{Object} doc
+ * @extend 	false
+ * @private
+ * @return 	void
+ */
+var _alterDoc = function(collection, operation, doc) {
+	if (operation === 'insert' || operation === 'update') {
+		application.docs[collection][doc._id.toString()] = doc;
+	} else if (operation === 'delete') {
+		delete application.docs[collection][doc._id.toString()];
+	}
+	// alter our global document collection
+};
 
 /**
  * Responsible for handling all the websockets and their RPC-style commands
@@ -148,7 +170,7 @@ function SocketManager() {
 			var deny = true,
 				allowed = ['command', 'network', 'target', 'backlog'];
 			
-			_.forOwn(update, function(item, value) {
+			_.forOwn(insert, function(item, value) {
 				if ((item === 'command' || item === 'network' || item === 'target') && typeof value === 'string') {
 					deny = false;
 				}
@@ -314,7 +336,7 @@ SocketManager.prototype.init = function() {
 			clients = [];
 
 		if (_.indexOf(self.propogate, collection) == -1) {
-			return false;
+			return _alterDoc(collection, eventName, doc);
 		}
 
 		if (eventName === 'update' && collection === 'users') {
@@ -323,7 +345,7 @@ SocketManager.prototype.init = function() {
 			clients.push(Users[doc.internal.userId.toString()]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
 			if ((collection === 'commands' && !doc.backlog) || (eventName === 'update' && collection === 'events')) {
-				return false;
+				return _alterDoc(collection, eventName, doc);
 			}
 			// ignore specific scenarios
 			
@@ -349,7 +371,9 @@ SocketManager.prototype.init = function() {
 			if (eventName === 'insert') {
 				client.send(eventName, {collection: collection, record: doc});
 			} else if (eventName === 'update') {
-				client.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
+				if (objectDiff.diffOwnProperties(doc, ext).changed !== 'equal') {
+					client.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
+				}
 			} else if (eventName === 'delete') {
 				client.send(eventName, {collection: collection, id: doc._id.toString()});
 			}
@@ -358,6 +382,8 @@ SocketManager.prototype.init = function() {
 		// we dont need to worry about updating the database AND sending changes
 		// to the frontend clients, we can just send the document down when we spot a change
 		// to the clients who need to see it, a bit like meteor, without subscriptions
+
+		return _alterDoc(collection, eventName, doc);
 	});
 
 	application.sockjs.on('connection', function (client) {
@@ -457,6 +483,8 @@ SocketManager.prototype.handleAuth = function(client, data, callback) {
 	}
 	// validate the cookie
 
+	client.send('authenticate', true);
+
 	callback();
 	// go go
 }
@@ -477,7 +505,8 @@ SocketManager.prototype.handleConnect = function(client) {
 		netIds = {},
 		events = [],
 		usersQuery = {$or: []},
-		commandsQuery = {$or: []};
+		commandsQuery = {$or: []},
+		selected = false;
 
 	Sockets[client.id] = user;
 	Users[user._id.toString()] = client; 
@@ -487,9 +516,19 @@ SocketManager.prototype.handleConnect = function(client) {
 		netIds[network._id] = network.name;
 	});
 
-	tabs.forEach(function(tab) {
+	tabs.forEach(function(tab, index) {
+		if (tab.selected) {
+			selected = true;
+		}
+
+		if (index === (tabs.length - 1) && selected === false) {
+			tab.selected = true;
+		}
+		// determine whether we have a selected tab or not?
+
 		usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
 		commandsQuery['$or'].push({network: tab.network, target: tab.title});
+		// construct some queries
 
 		var target = (tab.type === 'network') ? '*' : tab.title,
 			query = {network: netIds[tab.network], target: target, user: user._id},

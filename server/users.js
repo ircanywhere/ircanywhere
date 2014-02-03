@@ -141,7 +141,7 @@ UserManager.prototype.registerUser = function(req, res) {
 			email: email,
 			password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
 			salt: salt,
-			tokens: [],
+			tokens: {},
 			profile: {
 				name: name,
 				nickname: nickname
@@ -349,7 +349,7 @@ UserManager.prototype.onUserLogin = function(me) {
 		var network = networks[netId],
 			reconnect = false;
 
-		if (network.internal.status !== networkManager.flags.disconnect) {
+		if (network.internal.status !== networkManager.flags.disconnected) {
 			reconnect = true;
 		}
 
