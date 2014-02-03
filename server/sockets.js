@@ -317,7 +317,7 @@ SocketManager.prototype.init = function() {
 			return false;
 		}
 
-		if (collection === 'users') {
+		if (eventName === 'update' && collection === 'users') {
 			clients.push(Users[doc._id.toString()]);
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId.toString()]);

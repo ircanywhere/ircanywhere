@@ -144,10 +144,7 @@ UserManager.prototype.registerUser = function(req, res) {
 			tokens: [],
 			profile: {
 				name: name,
-				nickname: nickname,
-				flags: {
-					newUser: true
-				}
+				nickname: nickname
 			}
 		};
 	// the user record
@@ -175,6 +172,9 @@ UserManager.prototype.registerUser = function(req, res) {
 	
 	this.server.send(message);
 	// send a email
+
+	networkManager.addNetwork(user, application.config.defaultNetwork);
+	// create a network for them
 
 	output.successMessage = 'Your account has been successfully created, you may now login';
 	return output;
@@ -344,12 +344,6 @@ UserManager.prototype.onUserLogin = function(me) {
 
 	var networks = application.Networks.sync.find({'internal.userId': userId}).sync.toArray();
 	// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
-
-	if (me.profile.flags.newUser && networks.length === 0) {
-		var network = networkManager.addNetwork(me, application.config.defaultNetwork);
-		networks.push(network);
-	}
-	// user is new and has no networks, create one for them.
 
 	for (var netId in networks) {
 		var network = networks[netId],
