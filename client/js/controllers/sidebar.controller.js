@@ -2,7 +2,8 @@ App.SidebarController = Ember.ArrayController.extend({
 	newUnreadItem: function() {
 		var tabs = this.get('content'),
 			events = this.get('events'),
-			i = 0;
+			i = 0,
+			hl = 0;
 			
 		var filtered = events.filter(function(item) {
 			return ((item.type === 'notice' || item.type === 'privmsg' || item.type === 'action') && item.unread);
@@ -10,16 +11,26 @@ App.SidebarController = Ember.ArrayController.extend({
 
 		tabs.forEach(function(tab) {
 			i = 0;
+			hl = 0;
 			
 			filtered.forEach(function(item) {
 				if (tab.type === 'channel' && item.network === tab.networkName && item.target === tab.title) {
 					i++;
 					tab.set('unread', i);
+
+					if (item.extra.highlight) {
+						hl++;
+						tab.set('highlights', hl);
+					}
 				}
 			});
 
 			if (i > tab.unread) {
 				tab.set('unread', tab.unread);
+			}
+
+			if (hl > tab.highlights) {
+				tab.set('highlights', tab.highlights);
 			}
 		});
 		// XXX - I'm kind of unhappy about this loop inside a loop, this will be replaced though

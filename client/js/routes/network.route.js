@@ -20,6 +20,14 @@ App.NetworkRoute = AppRoute.extend({
 	actions: {
 		markAsRead: function(id) {
 			this.controller.markAllAsRead(id);
+		},
+
+		gotoUnread: function(id) {
+			this.controller.gotoUnread(id);
+		},
+
+		gotoHighlight: function(id) {
+			this.controller.gotoHighlight(id);
 		}
 	}
 });

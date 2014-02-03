@@ -44,5 +44,13 @@ App.NetworkController = Ember.ObjectController.extend({
 
 		this.socket.update('events', {network: tab.networkName, target: target, read: false}, {read: true});
 		// update the records
+	},
+
+	gotoUnread: function(id) {
+		console.log('goto first unread');
+	},
+
+	gotoHighlight: function(id) {
+		console.log('goto first highlight');
 	}
 });

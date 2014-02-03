@@ -21,6 +21,7 @@ var _insert = function(client, message, type, user, force) {
 		var force = force || false,
 			user = user || false,
 			network = client.name,
+			ours = (message.nickname === client.nick),
 			channel = (message.channel && !message.target) ? message.channel : message.target,
 			user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
 		// get a channel user object if we've not got one
@@ -42,10 +43,10 @@ var _insert = function(client, message, type, user, force) {
 				network: network,
 				target: target,
 				message: message,
-				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? ((message.nickname === client.nick) ? true : false) : true,
+				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
 				extra: {
 					self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
-					highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),
+					highlight: eventManager.determineHighlight(client, message, type, ours),
 					prefix: prefixObject.prefix
 				}
 			};
@@ -130,19 +131,15 @@ EventManager.prototype.insertEvent = function(client, message, type) {
  * @return 	{Boolean}
  */
 EventManager.prototype.determineHighlight = function(client, message, type, ours) {
-	if (!ours || (type !== 'privmsg' && type !== 'action')) {
+	if (ours || (type !== 'privmsg' && type !== 'action')) {
 		return false;
 	}
 
-	/**
-	 * Description
-	 * @method escape
-	 * @param {} text
-	 * @return CallExpression
-	 */
 	var escape = function(text) {
 		return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 	};
+
+	console.log(message.message.match('(' + escape(client.nick) + ')'));
 
 	if (message.message.match('(' + escape(client.nick) + ')')) {
 		return true;
