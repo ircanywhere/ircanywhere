@@ -90,12 +90,7 @@ Ember.Socket = Ember.Object.extend({
 			data = incoming.data;
 
 		if (event === 'authenticate') {
-			if (data) {
-				self.set('authed', true);
-			} else {
-				self.set('authed', false);
-				self._getController('index').transitionToRoute('login');
-			}
+			self.set('authed', data);
 		}
 
 		if (event === 'users') {

@@ -78,8 +78,16 @@ IRCHandler.prototype.registered = function(client, message) {
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-	networkManager.addTab(client, client.name, 'network', true);
-	// add the tab
+	application.Tabs.sync.update({title: client.name, network: client._id}, {
+		title: message.capabilities.network.name,
+		target: message.capabilities.network.name
+	})
+	// update the tab
+
+	application.Tabs.sync.update({network: client._id}, {
+		networkName: message.capabilities.network.name,
+	});
+	// update any sub tabs
 
 	eventManager.insertEvent(client, {
 		nickname: message.nickname,

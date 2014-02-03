@@ -18,6 +18,9 @@ Users = {};
 application = new Application();
 // inject the config so we can mimic it in tests if needed
 
+userManager = new UserManager();
+// user manager
+
 socketManager = new SocketManager();
 // websocket engine
 
@@ -26,9 +29,6 @@ modeParser = new ModeParser();
 
 networkManager = new NetworkManager();
 // setup network manager
-
-userManager = new UserManager();
-// user manager
 
 ircFactory = new IRCFactory();
 // setup irc factory
