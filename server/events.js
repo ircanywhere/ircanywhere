@@ -42,7 +42,7 @@ var _insert = function(client, message, type, user, force) {
 				network: network,
 				target: target,
 				message: message,
-				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? false : true,
+				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? ((message.nickname === client.nick) ? true : false) : true,
 				extra: {
 					self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
 					highlight: eventManager.determineHighlight(client, message, type, (client.nick === message.nickname)),

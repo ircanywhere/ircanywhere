@@ -260,7 +260,7 @@ function SocketManager() {
 				}
 			}
 			// convert _id to proper mongo IDs
-
+			
 			application.Events.sync.update(query, {$set: update}, {multi: true});
 		}
 	});

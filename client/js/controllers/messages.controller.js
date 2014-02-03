@@ -2,6 +2,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	needs: ['index'],
 	tabs: [],
 	events: [],
+	readDocs: [],
 
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
@@ -51,15 +52,16 @@ App.MessagesController = Ember.ArrayController.extend({
 		// ie new events immediately becoming visible with no effort
 	},
 
-	markAsRead: function(docs) {
+	markAsRead: function() {
 		var query = {'$or': []};
-		docs.forEach(function(id) {
+		this.get('readDocs').forEach(function(id) {
 			query['$or'].push({_id: id});
 		});
 		// construct a query from docs
 
-		if (docs.length > 0) {
-			//this.socket.update('events', query, {read: true});
+		if (this.get('readDocs').length > 0) {
+			this.socket.update('events', query, {read: true});
+			this.set('readDocs', []);
 		}
 		// send the update out
 	},
@@ -69,6 +71,7 @@ App.MessagesController = Ember.ArrayController.extend({
 			var self = this,
 				tab = this.get('tabs').filterProperty('_id', id)[0],
 				events = this.get('filtered').filterProperty('unread', true),
+				counter = 0;
 				docs = [];
 
 			events.forEach(function(item) {
@@ -79,21 +82,29 @@ App.MessagesController = Ember.ArrayController.extend({
 					// XXX - Handle highlights
 
 					item.set('unread', false);
-					docs.push(item._id);
+					if (self.readDocs.indexOf(item._id) === -1) {
+						self.readDocs.push(item._id);
+						counter++;
+					}
 				}
 			});
 
-			var unread = tab.get('unread') - docs.length;
-			tab.set('unread', unread);
+			var unread = tab.get('unread') - counter;
+				unread = (unread <= 0) ? 0 : unread;
+				tab.set('unread', unread);
 			// update the icon
-
-			if (unread > 0) {
-				clearTimeout(this.scrollTimeout);
-				this.scrollTimeout = setTimeout(function() {
-					self.markAsRead(docs);
-				}, 5000);
+			
+			if (this.get('timeout')) {
+				return false;
 			}
-			// send to server*/
+			// already a pending timeout
+
+			var scrollTimeout = setTimeout(function() {
+				self.markAsRead();
+				self.set('timeout', null);
+			}, 5000);
+
+			this.set('timeout', scrollTimeout);
 		}
 	}
 });
