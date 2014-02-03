@@ -15,5 +15,11 @@ App.NetworkRoute = AppRoute.extend({
 
 	title: function(controller, model) {
 		return model.get('name') + ' - ' + App.get('defaultTitle');
+	},
+
+	actions: {
+		markAsRead: function(id) {
+			this.controller.markAllAsRead(id);
+		}
 	}
 });

@@ -99,7 +99,7 @@ Application.prototype.init = function() {
 Application.prototype.setupOplog = function() {
 	var self = this,
 		start = Math.floor(+new Date() / 1000),
-		collections = this.mongo.sync.collectionNames();
+		collections = ['nodes', 'users', 'networks', 'tabs', 'channelUsers', 'events', 'commands'];
 
 	collections.forEach(function(col) {
 		var name = col.name.split('.')[1],
@@ -134,6 +134,7 @@ Application.prototype.setupOplog = function() {
 		switch(item.op) {
 			case 'i':
 				var id = item.o._id.toString();
+				console.log(self.docs);
 				if (!self.docs[col][id]) {
 					self.docs[col][id] = item.o;
 				}

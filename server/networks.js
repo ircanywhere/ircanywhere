@@ -190,6 +190,9 @@ NetworkManager.prototype.addNetwork = function(user, network) {
 	// the client but they wont be able to edit it, it also wont be able to be enforced
 	// by the config settings or network settings, it's overwritten every time.
 
+	this.addTab(network, network.name, 'network', true);
+	// add the tab
+
 	return application.Networks.sync.insert(network)[0];
 	// insert the network. Just doing this will propogate the change directly due to our observe driver
 }
@@ -308,7 +311,7 @@ NetworkManager.prototype.connectNetwork = function(network) {
  */
 NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {
-		application.logger.log('warn', 'invalid status flag', helper.cleanObjectIds({flag: status, network: networkId}));
+		application.logger.log('warn', 'invalid status flag', helper.cleanObjectIds({flag: status, network: query}));
 		return;
 	}
 

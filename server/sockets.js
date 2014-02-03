@@ -35,9 +35,22 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		update: function(uid, query, update) {
-			return ((update.hiddenUsers && typeof update.hiddenUsers === 'boolean') ||
-					(update.hiddenEvents && typeof update.hiddenEvents === 'boolean') || 
-					(update.selected && typeof update.selected === 'boolean'));
+			var deny = true,
+				allowed = ['hiddenUsers', 'hiddenEvents', 'selected'];
+			
+			_.forOwn(update, function(item, value) {
+				if ((item === 'hiddenUsers' || item == 'hiddenEvents' || item === 'selected') && typeof value === 'boolean') {
+					deny = false;
+				}
+				// check the values?
+
+				if (_.indexOf(allowed, item) === -1) {
+					deny = true;
+				}
+				// invalid key
+			});
+			
+			return deny;
 		},
 
 		/**
@@ -52,9 +65,26 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		insert: function(uid, insert) {
-			return ((insert.target && typeof insert.target === 'string') &&
-					(insert.network && typeof insert.network === 'string') &&
-					(insert.selected && typeof insert.selected === 'boolean'));
+			var deny = true,
+				allowed = ['target', 'network', 'selected'];
+			
+			_.forOwn(insert, function(item, value) {
+				if ((item === 'target' || item === 'network') && typeof value === 'string') {
+					deny = false;
+				}
+
+				if (item === 'selected' && typeof value === 'boolean') {
+					deny = false;
+				}
+				// check the values?
+
+				if (_.indexOf(allowed, item) === -1) {
+					deny = true;
+				}
+				// invalid key
+			});
+			
+			return deny;
 		}
 	});
 
@@ -95,7 +125,7 @@ function SocketManager() {
 			var client = Clients[new mongo.ObjectID(insert.network)];
 
 			if (client && client.internal.userId.toString() === uid.toString()) {
-				var type = (helper.isChannel(client.internal.capabilities.channel.types, insert.target)) ? 'channel' : 'query';
+				var type = (helper.isChannel(client, insert.target)) ? 'channel' : 'query';
 				networkManager.addTab(client, insert.target, type, insert.selected);
 			}
 			// we're allowed to continue, use network manager to add the tab
@@ -115,9 +145,26 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		insert: function(uid, insert) {
-			return ((insert.command && insert.network) &&
-					(insert.target !== '') &&
-					(insert.backlog !== undefined));
+			var deny = true,
+				allowed = ['command', 'network', 'target', 'backlog'];
+			
+			_.forOwn(update, function(item, value) {
+				if ((item === 'command' || item === 'network' || item === 'target') && typeof value === 'string') {
+					deny = false;
+				}
+
+				if (item === 'backlog' && typeof value === 'boolean') {
+					deny = false;
+				}
+				// check the values?
+
+				if (_.indexOf(allowed, item) === -1) {
+					deny = true;
+				}
+				// invalid key
+			});
+			
+			return deny;
 		}
 	});
 
@@ -147,6 +194,52 @@ function SocketManager() {
 
 			application.Commands.sync.insert(insert);
 			// insert
+		}
+	});
+
+	this.allow('events', {
+		/**
+		 * An update rule to execute when we've passed the allow rules
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		update: function(uid, query, update) {
+			return (_.difference(_.keys(update), ['read']).length === 0 && typeof update.read === 'boolean');
+		}
+	});
+
+	this.rules('events', {
+		/**
+		 * An update rule to execute when we've passed the allow rules
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		update: function(uid, query, update) {
+			if ('$or' in query) {
+				for (var i in query['$or']) {
+					var subQuery = query['$or'][i];
+
+					if ('_id' in subQuery) {
+						subQuery._id = new mongo.ObjectID(subQuery._id);
+						query.$or[i] = subQuery;
+					}
+				}
+			}
+			// convert _id to proper mongo IDs
+
+			application.Events.sync.update(query, {$set: update}, {multi: true});
 		}
 	});
 
@@ -229,9 +322,10 @@ SocketManager.prototype.init = function() {
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId.toString()]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
-			if (collection === 'commands' && !doc.backlog) {
+			if ((collection === 'commands' && !doc.backlog) || (eventName === 'update' && collection === 'events')) {
 				return false;
 			}
+			// ignore specific scenarios
 			
 			clients.push(Users[doc.user.toString()]);
 		} else if (collection === 'channelUsers' && !doc._burst) {
@@ -411,9 +505,14 @@ SocketManager.prototype.handleConnect = function(client) {
 	});
 	// loop tabs
 
-	var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
-		commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sync.toArray();
-	// sort and limit them
+	if (tabs.length === 0) {
+		var users = [],
+			commands = [];
+	} else {
+		var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
+			commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sync.toArray();
+	}
+	// get channel users and commands
 
 	client.send('users', user);
 	client.send('networks', networks);
@@ -435,7 +534,10 @@ SocketManager.prototype.handleConnect = function(client) {
 SocketManager.prototype.handleDisconnect = function(client) {
 	var user = Sockets[client.id];
 
-	delete Users[user._id.toString()];
+	if (user) {
+		delete Users[user._id.toString()];
+	}
+	
 	delete Sockets[client.id];
 	// clean up
 }
@@ -517,7 +619,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 	// update it to a proper mongo id
 
 	if (!this.allowRules[collection]['update'](user._id, query, update)) {
-		returnclient.send('error', {command: 'update', error: 'not allowed'});
+		return client.send('error', {command: 'update', error: 'not allowed'});
 	}
 	// have we been denied?
 

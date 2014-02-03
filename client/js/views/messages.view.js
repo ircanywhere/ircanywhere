@@ -42,29 +42,14 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		var self = this,
 			parent = this.$(),
 			container = this.$('.inside-backlog'),
+			tabId = parent.parents('.tab').attr('id').substr(4),
 			scrollBottom = parent.height() + parent.scrollTop(),
-			scrollTop = scrollBottom - parent.height(),
-			elements = highlights = topUnread = bottomUnread = unreadElements = 0,
-			markAsRead = false;
-
-		container.find('.row[data-type=privmsg]').each(function(n) {
-			// fairly messy selector here, not sure how efficient this is?
-			// alot of this code is taken from the previous code base, much time was spent
-			// perfecting this and it was in it's most reliable state
-			var topOffset = $(this)[0].offsetTop,
-				elHeight = $(this)[0].clientHeight,
-				realOffset = (topOffset + elHeight);
-
-			console.log(topOffset, scrollTop, topOffset, self.get('scrollPosition'),  scrollTop < topOffset, topOffset < self.get('scrollPosition'));
-			if (scrollTop === 0 || scrollTop < topOffset && topOffset < self.get('scrollPosition')) {
-				/*markAsRead = true;
-				$(this).removeAttr('data-read');*/
-			}
-			// mark messages in the visible viewport as read
-		});
-
-		//console.log(markAsRead);
+			scrollTop = scrollBottom - parent.height();
+		
+		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom, container);
+		// send to controller to do the actual updating
 
 		self.set('scrollPosition', scrollBottom);
+		// reset the scroll position
 	}
 });

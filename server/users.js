@@ -167,7 +167,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	// log this event
 
 	var message = {
-		text: this.parse('./private/signup.txt', {name: name}),
+		text: this.parse('./private/emails/signup.txt', {name: name}),
 		from: application.config.email.from,
 		to: email,
 		subject: 'Welcome to ' + application.config.email.siteName
@@ -267,7 +267,7 @@ UserManager.prototype.forgotPassword = function(req, res) {
 
 		var link = application.config.url + '/reset/' + token,
 			message = {
-				text: this.parse('./private/reset.txt', {name: user.name, link: link}),
+				text: this.parse('./private/emails/reset.txt', {name: user.name, link: link}),
 				from: application.config.email.from,
 				to: email,
 				subject: 'Your new password'

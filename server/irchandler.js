@@ -65,6 +65,9 @@ IRCHandler.prototype.registered = function(client, message) {
 	}
 	// find our channels to automatically join from the network setup
 
+	client.internal.capabilities = message.capabilities;
+	// set this immediately so the other stuff works
+
 	application.Networks.sync.update({_id: client._id}, {$set: {
 		'nick': message.nickname,
 		'name': message.capabilities.network.name,

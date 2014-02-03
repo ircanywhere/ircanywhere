@@ -31,7 +31,7 @@ var _insert = function(client, message, type, user, force) {
 		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
-		var target = (_.indexOf(channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client.internal.capabilities.channel.types, channel))) ? channel : '*';
+		var target = (_.indexOf(channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
 			target = (force) ? '*' : target;
 		// anything else goes in '*' so it's forwarded to the server log
 

@@ -5,11 +5,12 @@ App.SidebarController = Ember.ArrayController.extend({
 			i = 0;
 			
 		var filtered = events.filter(function(item) {
-			return ((item.type === 'notice' || item.type === 'privmsg' || item.type === 'action') && !item.read);
+			return ((item.type === 'notice' || item.type === 'privmsg' || item.type === 'action') && item.unread);
 		});
 
 		tabs.forEach(function(tab) {
 			i = 0;
+			
 			filtered.forEach(function(item) {
 				if (tab.type === 'channel' && item.network === tab.networkName && item.target === tab.title) {
 					i++;

@@ -24,5 +24,22 @@ App.NetworkController = Ember.ObjectController.extend({
 
 	ready: function() {
 		this.tabChanged();
+	},
+
+	markAllAsRead: function(id) {
+		var tab = this.socket.findOne('tabs', {_id: id});
+
+		if (!tab) {
+			return false;
+		}
+		// some how this has happened, but lets be safe and not continue anyway
+
+		var target = (tab.type === 'network') ? '*' : tab.title,
+			events = this.socket.findAll('events', {network: tab.networkName, target: target, unread: true});
+		// get the events for the specific tab
+
+		events.setEach('unread', false);
+		tab.set('unread', 0);
+		// mark them as unread to hide the bar
 	}
 });

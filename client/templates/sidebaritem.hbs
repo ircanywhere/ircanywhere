@@ -1,7 +1,7 @@
 <a {{action 'goto' view.url}} {{bind-attr href=view.url}} {{bind-attr title=title}}>
 	<span {{bind-attr class=":link view.getClass"}}>
 		{{#if highlight}}<span class="alert highlight">{{highlight}}</span>{{/if}}
-		{{#if unread}}<span class="alert unread">{{unread}}</span>{{/if}}
+		{{#if unread}}<span class="alert unread" {{action 'markAsRead' _id}}>{{unread}}</span>{{/if}}
 		{{view.title}}
 	</span>
 </a>
