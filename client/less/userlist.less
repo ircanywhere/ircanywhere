@@ -7,6 +7,7 @@
 	color: #333C41;
 	overflow-y: auto;
 	margin-top: 3px;
+	border-left: 3px solid @white;
 
 	div.members-title {
 		padding: 10px;
@@ -33,6 +34,11 @@
 
 		li {
 			line-height: normal;
+
+			.right {
+				float: right;
+				margin-right: 5px;
+			}
 
 			a {
 				text-decoration: none;
@@ -61,6 +67,71 @@
 						height: 15px;
 					}
 				}
+			}
+
+			&[data-type=op] {
+				background: #FFD1D1;
+
+				&.head {
+					display: block;
+					padding: 7px 10px;
+					font-weight: bold;
+					color: darkRed;
+					background: #FFD1D1;
+					border-top: 1px solid #FFA8A8;
+				}
+
+				&:not(.head):hover { background: #FFB3B3; }
+			}
+
+			&[data-type=halfop] {
+				background: #FFEAB7;
+
+				&.head {
+					display: block;
+					padding: 7px 10px;
+					font-weight: bold;
+					color: darkOrange;
+					background: #FFEAB7;
+					border-top: 1px solid #FFC966;
+				}
+
+				&:not(.head):hover { background: #FFDF91; }
+			}
+
+			&[data-type=voice] {
+				background: #E9F4FF;
+
+				&.head {
+					display: block;
+					content: "Voiced (1)";
+					padding: 7px 10px;
+					font-weight: bold;
+					color: darkBlue;
+					background: #E9F4FF;
+					border-top: 1px solid #B5DAFF;
+				}
+
+				&:not(.head):hover { background: #D1E8FF; }
+			}
+
+			&[data-type=user] {
+				&.head {
+					display: block;
+					content: "Users (10)";
+					padding: 7px 10px;
+					font-weight: bold;
+					color: #333C41;
+					border-top: 1px solid #CFCFCF;
+
+					&:hover {
+						background: inherit;
+					}
+				}
+			}
+
+			&:hover {
+				background: #D1D1D1;
 			}
 		}
 	}

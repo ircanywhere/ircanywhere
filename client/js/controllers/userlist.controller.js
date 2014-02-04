@@ -2,6 +2,7 @@ App.UserlistController = Ember.ArrayController.extend({
 	needs: ['index', 'network', 'tab'],
 	tabs: [],
 	users: [],
+	last: null,
 
 	userCount: function() {
 		return this.get('filtered').length;

@@ -1,0 +1,4 @@
+{{#if showHeading}}
+	<li {{bind-attr data-type=this.type}} class="head clear"><span class="left">{{this.heading}}</span><span class="right">{{this.count}}</span></li>
+{{/if}}
+<li {{bind-attr data-type=this.type}}>{{userLink true this.context}}</li>

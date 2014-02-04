@@ -4,6 +4,8 @@
 </div>
 <ul>
 	{{#each user in filtered}}
-		<li>{{userLink true user}}</li>
+		{{#group}}
+			{{render 'userlistitem' user}}
+		{{/group}}
 	{{/each}}
 </ul>
