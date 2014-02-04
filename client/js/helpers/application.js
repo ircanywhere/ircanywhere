@@ -35,7 +35,6 @@ Ember.Handlebars.helper('time', function(context, options) {
 });
 
 Ember.Handlebars.registerBoundHelper('ircParse', function(text, options) {
-	console.log(this);
 	var network = this.get('controllers.network.model');
 	return new Ember.Handlebars.SafeString(App.Parser.exec(text, network));
 });

@@ -2,11 +2,17 @@ App.UserlistController = Ember.ArrayController.extend({
 	needs: ['index', 'network', 'tab'],
 	tabs: [],
 	users: [],
-	last: null,
 
 	userCount: function() {
 		return this.get('filtered').length;
 	}.property('filtered').cacheable(),
+
+	owners: Ember.computed.filterBy('filtered', 'sort', 1),
+	admins: Ember.computed.filterBy('filtered', 'sort', 2),
+	operators: Ember.computed.filterBy('filtered', 'sort', 3),
+	halfops: Ember.computed.filterBy('filtered', 'sort', 4),
+	voiced: Ember.computed.filterBy('filtered', 'sort', 5),
+	normal: Ember.computed.filterBy('filtered', 'sort', 6),
 
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
