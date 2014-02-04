@@ -1,11 +1,11 @@
 <div class="header">
 	<h3>IRCAnywhere</h3>
-	{{#link-to "index"}}Settings{{/link-to}} &middot; {{#link-to "index"}}Logout{{/link-to}}
+	<a href="#" {{action "openModal" "settings"}}>Settings</a> &middot; {{#link-to "index"}}Logout{{/link-to}}
 </div>
 <div class="items">
 	<ul>
 	{{#each controller}}
-		{{render 'sidebaritem' this}}
+		{{render "sidebaritem" this}}
 	{{/each}}
 	</ul>
 </div>

@@ -1,8 +1,7 @@
 @import "header.less";
 
-div.main-view:extend(.clear) {
+div.main-view:extend(.clear), body > div {
 	height: 100%;
-
 }
 
 div.container {
@@ -454,6 +453,99 @@ div.sidebar {
 
 // template.sidebar styles
 
+.overlay {
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.2);
+	z-index: 9999;
+
+	.modal {
+		margin: 30px auto;
+		width: 800px;
+		max-height: 80%;
+		z-index: 10000;
+		background: @white;
+		background-clip: padding-box;
+		border: 1px solid #999;
+		border-radius: 6px;
+		.box-shadow(0 3px 9px rgba(0, 0, 0, .5));
+		display: none;
+
+		.modal-header {
+			padding: 15px;
+			border-bottom: 1px solid #E5E5E5;
+
+			h3 {
+				font-weight: bold;
+				margin: 0;
+				padding: 0;
+				font-size: 16px;
+				color: @black;
+			}
+		}
+
+		.modal-body {
+			display: flex;
+
+			.left-set {
+				width: 70%;
+				padding: 18px;
+			}
+
+			.right-set {
+				flex: 1;
+				padding: 20px;
+				padding-left: 0;
+				border-left: 1px solid @login-box-border;
+			}
+
+			p.large {
+				font-size: 14px!important;
+				line-height: 1.5!important;
+				margin-bottom: 25px!important;
+			}
+
+			ul.setting-tabs {
+				list-style-type: none;
+				padding: 0;
+				margin: 0 0 0 -1px;
+
+				li {
+					background: #d9d9d9;
+					background: -moz-linear-gradient(left, @login-box-border 0%, @white 100%);
+					background: -webkit-gradient(linear, left top, right top, color-stop(0%, @login-box-border), color-stop(100%, @white));
+					background: -webkit-linear-gradient(left, @login-box-border 0%, @white 100%);
+					background: -ms-linear-gradient(left, @login-box-border 0%, @white 100%);
+					background: linear-gradient(left, @login-box-border 0%, @white 100%);
+					padding: 1px 0;
+
+					a {
+						display: block;
+						padding: 10px 20px;
+						font-size: 13px;
+						margin: -1px;
+						margin-left: 1px;
+						background: @white;
+						.transition(none);
+					}
+
+					&.active a {
+						margin: 0;
+						background: @white;
+						color: @dark-gray;
+						font-weight: bold;
+					}
+				}
+			}
+		}
+	}
+}
+
+// modal styles
+
 ::-webkit-scrollbar {
 	width: 14px;
 	height: 10px;
@@ -473,4 +565,4 @@ div.sidebar {
 	border-radius: 6px;
 }
 
-// scrollbar tyles
+// scrollbar styles

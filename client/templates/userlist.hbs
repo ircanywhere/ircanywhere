@@ -34,7 +34,9 @@
 		{{/each}}
 	{{/if}}
 	{{#if normal}}
-		<li data-type="user" class="head clear"><span class="left">Users</span><span class="right">{{normal.length}}</span></li>
+		{{#if displayHeading}}
+			<li data-type="user" class="head clear"><span class="left">Users</span><span class="right">{{normal.length}}</span></li>
+		{{/if}}
 		{{#each user in normal}}
 			<li data-type="user">{{userLink true user}}</li>
 		{{/each}}

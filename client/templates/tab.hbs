@@ -1,21 +1,21 @@
 <div {{bind-attr id=view.tabId}} class="tab selected">
 	<div class="messages">
-		{{render 'overlaybar' this}}
+		{{render "overlaybar" this}}
 		{{#if selectedTab.unread}}
-		<div class="top-message-bar message-bar clear" {{action 'gotoUnread' selectedTab._id}}>
+		<div class="top-message-bar message-bar clear" {{action "gotoUnread" selectedTab._id}}>
 			<span class="left">
 				<span class="last hide">0</span>
-				<span class="message-number">There are <span class="alert unread">{{selectedTab.unread}}</span> unread messages{{#if selectedTab.highlights}} and <span class="alert highlight" {{action 'gotoHighlight' selectedTab._id}}>{{selectedTab.highlights}}</span> highlights{{/if}} since your last visit.</span>
+				<span class="message-number">There are <span class="alert unread">{{selectedTab.unread}}</span> unread messages{{#if selectedTab.highlights}} and <span class="alert highlight" {{action "gotoHighlight" selectedTab._id}}>{{selectedTab.highlights}}</span> highlights{{/if}} since your last visit.</span>
 			</span>
 			<span class="right">
-				<a href="#" {{action 'markAsRead' selectedTab._id}} class="read-backlog">Mark as read</a>
+				<a href="#" {{action "markAsRead" selectedTab._id}} class="read-backlog">Mark as read</a>
 			</span>
 		</div>
 		{{/if}}
-		{{render 'messages'}}
-		{{render 'input'}}
+		{{render "messages"}}
+		{{render "input"}}
 	</div>
 	{{#if view.showUserList}}
-		{{render 'userlist'}}
+		{{render "userlist"}}
 	{{/if}}
 </div>

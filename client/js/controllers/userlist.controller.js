@@ -14,6 +14,10 @@ App.UserlistController = Ember.ArrayController.extend({
 	voiced: Ember.computed.filterBy('filtered', 'sort', 5),
 	normal: Ember.computed.filterBy('filtered', 'sort', 6),
 
+	displayHeading: function() {
+		return (this.get('filtered.length') !== this.get('normal.length'));
+	}.property('filtered.length', 'normal.length'),
+
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
