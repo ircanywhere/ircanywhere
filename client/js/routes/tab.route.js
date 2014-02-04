@@ -1,7 +1,8 @@
 App.TabRoute = AppRoute.extend({
 	setupController: function(controller, model) {
-		this.controllerFor('index').socket.findAll('tabs').setEach('selected', false);
-		model.set('selected', true);
+		/*this.controllerFor('index').socket.findAll('tabs').setEach('selected', false);
+		model.set('selected', true);*/
+		this.updateTab(model.url);
 		// update our local storage immediately so we dont get a delay on tab change
 
 		controller.set('model', model);
@@ -27,7 +28,7 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	activate: function() {
-		var index = this.controllerFor('index'),
+		/*var index = this.controllerFor('index'),
 			socket = index.socket,
 			selected = socket.findOne('tabs', {selected: true}),
 			model = this.modelFor('tab');
@@ -38,11 +39,13 @@ App.TabRoute = AppRoute.extend({
 			// send the update to the backend
 		}
 
-		index.set('tabId', model.get('_id'));
+		index.set('tabId', model.get('_id'));*/
+
+		//this.updateTab(this.modelFor('tab').url);
 	},
 
 	deactivate: function() {
-		var index = this.controllerFor('index'),
+		/*var index = this.controllerFor('index'),
 			socket = index.socket,
 			tab = socket.findOne('tabs', {url: this.modelFor('network').get('url')}),
 			selected = socket.findOne('tabs', {selected: true});
@@ -57,7 +60,9 @@ App.TabRoute = AppRoute.extend({
 			// send the update to the backend
 		}
 
-		index.set('tabId', tab.get('_id'));
+		index.set('tabId', tab.get('_id'));*/
+
+		//this.updateTab(this.modelFor('network').url);
 	},
 
 	title: function(controller, model) {

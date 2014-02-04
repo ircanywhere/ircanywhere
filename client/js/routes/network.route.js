@@ -6,21 +6,7 @@ App.Router.map(function() {
 
 App.NetworkRoute = AppRoute.extend({
 	setupController: function(controller, model) {
-		var index = this.controllerFor('index'),
-			socket = index.socket,
-			tab = socket.findOne('tabs', {url: model.get('url')}),
-			selected = socket.findOne('tabs', {selected: true});
-
-		if (selected.get('_id') !== tab.get('_id')) {
-			socket.findAll('tabs').setEach('selected', false);
-			tab.set('selected', true);
-			// update our local storage immediately so we dont get a delay on tab change
-
-			index.socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
-			// send the update to the backend
-		}
-		// get the tab model
-
+		this.updateTab(model.url);
 		controller.set('model', model);
 	},
 

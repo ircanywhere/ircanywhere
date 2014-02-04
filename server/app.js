@@ -259,8 +259,6 @@ Application.prototype.setupServer = function() {
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 	// setup a http server
 
-	sockjsServer.installHandlers(server, {prefix: '/websocket'});
-
 	app.enable('trust proxy');
 	// express settings
 
@@ -277,6 +275,11 @@ Application.prototype.setupServer = function() {
 		res.sendfile('./client/templates/html/index.html');
 	});
 	// setup routes
+
+	sockjsServer.on('connection', socketManager.onSocketOpen.bind(socketManager));
+	// websocket routes
+
+	sockjsServer.installHandlers(server, {prefix: '/websocket'});
 
 	server.listen(this.config.port);
 

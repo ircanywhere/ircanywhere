@@ -2,6 +2,7 @@ var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers,
 	objectDiff = require('objectdiff'),
+	WebSocket = require('./websocket').WebSocket,
 	mongo = require('mongodb');
 
 /**
@@ -144,11 +145,11 @@ function SocketManager() {
 		 * @return 	void
 		 */
 		insert: function(uid, insert) {
-			var client = Clients[new mongo.ObjectID(insert.network)];
+			var ircClient = Clients[new mongo.ObjectID(insert.network)];
 
-			if (client && client.internal.userId.toString() === uid.toString()) {
-				var type = (helper.isChannel(client, insert.target)) ? 'channel' : 'query';
-				networkManager.addTab(client, insert.target, type, insert.selected);
+			if (ircClient && ircClient.internal.userId.toString() === uid.toString()) {
+				var type = (helper.isChannel(ircClient, insert.target)) ? 'channel' : 'query';
+				networkManager.addTab(ircClient, insert.target, type, insert.selected);
 			}
 			// we're allowed to continue, use network manager to add the tab
 		},
@@ -362,20 +363,20 @@ SocketManager.prototype.init = function() {
 			}
 		}
 
-		clients.forEach(function(client) {
-			if (!client) {
+		clients.forEach(function(socketClient) {
+			if (!socketClient) {
 				return false;
 			}
 			// bail if its undefined
 
 			if (eventName === 'insert') {
-				client.send(eventName, {collection: collection, record: doc});
+				socketClient.send(eventName, {collection: collection, record: doc});
 			} else if (eventName === 'update') {
 				if (objectDiff.diffOwnProperties(doc, ext).changed !== 'equal') {
-					client.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
+					socketClient.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 				}
 			} else if (eventName === 'delete') {
-				client.send(eventName, {collection: collection, id: doc._id.toString()});
+				socketClient.send(eventName, {collection: collection, id: doc._id.toString()});
 			}
 		});
 		// all of this code works by watching changes via the oplog, that way 
@@ -385,52 +386,52 @@ SocketManager.prototype.init = function() {
 
 		return _alterDoc(collection, eventName, doc);
 	});
+}
 
-	application.sockjs.on('connection', function (client) {
-		client.send = function(event, data) {
-			client.write(JSON.stringify({event: event, data: data}));
-			return client;
-		}
-		// define a function to ease this
+/**
+ * Handles a new websocket opening
+ *
+ * @method 	onSocketOpen
+ * @param 	{Object} socket
+ * @extend	true
+ * @return 	void
+ */
+SocketManager.prototype.onSocketOpen = function(socket) {
+	// so here we handle incoming websocket connections
+	// and then wrap them in our own websocket rpc which handles
+	// event binding and such, doing this allows us to quickly
+	// switch websocket engines if we ever need to and gives us a standard
+	// api which is extendable by people writing modules
 
-		client.on('data', function(message) {
-			fibrous.run(function() {
-				var parsed = JSON.parse(message),
-					event = parsed.event,
-					data = parsed.data;
+	var webSocket = new WebSocket(socket);
+	// create the websocket and assign it to Sockets[id]
+	// websocket constructor handles event binding etc
 
-				if (event === 'authenticate') {
-					self.handleAuth(client, data, function() {
-						self.handleConnect(client);
-						// handle success
-					});
-				}
-				// socket authentication
-
-				if (event === 'events') {
-					self.handleEvents(client, data);
-				}
-				// handle requesting of data from events collection
-
-				if (event === 'insert') {
-					self.handleInsert(client, data);
-				}
-				// handle inserts
-
-				if (event === 'update') {
-					self.handleUpdate(client, data);
-				}
-				// handle updates
-			});
+	webSocket.on('authenticate', function(data) {
+		fibrous.run(function() {
+			socketManager.handleAuth(webSocket, data);
 		});
-
-		client.on('close', function() {
-			fibrous.run(function() {
-				self.handleDisconnect(client);
-			});
-		});
-		// handle disconnects
 	});
+
+	webSocket.on('events', function(data) {
+		fibrous.run(function() {
+			socketManager.handleEvents(webSocket, data);
+		});
+	});
+
+	webSocket.on('insert', function(data) {
+		fibrous.run(function() {
+			socketManager.handleInsert(webSocket, data);
+		});
+	});
+
+	webSocket.on('update', function(data) {
+		fibrous.run(function() {
+			socketManager.handleUpdate(webSocket, data);
+		});
+	});
+
+	Sockets[socket.id] = webSocket;
 }
 
 /**
@@ -439,13 +440,13 @@ SocketManager.prototype.init = function() {
  * expired or incorrect.
  *
  * @method 	handleAuth
- * @param 	{Object} client
+ * @param 	{Object} socket
  * @param 	{Object} data
  * @param 	{Function} callback
  * @extend	true
  * @return 	void
  */
-SocketManager.prototype.handleAuth = function(client, data, callback) {
+SocketManager.prototype.handleAuth = function(socket, data) {
 	var parsed = (data) ? data.split('; ') : [],
 		cookies = {};
 
@@ -456,37 +457,42 @@ SocketManager.prototype.handleAuth = function(client, data, callback) {
 	// get our cookies
 
 	if (!cookies.token) {
-		client.send('authenticate', false).close();
+		socket.send('authenticate', false, true);
+		return false;
+	}
+
+	var query = {};
+		query['tokens.' + cookies.token] = {$exists: true};
+	var user = application.Users.sync.findOne(query);
+
+	if (!user) {
+		socket.send('authenticate', false, true);
+		return false;
+	}
+
+	if (new Date() > user.tokens[cookies.token].time) {
+		var unset = {};
+			unset['tokens.' + cookies.token] = 1;
+		
+		application.Users.sync.update(query, {$unset: unset});
+		// token is expired, remove it
+
+		socket.send('authenticate', false, true);
 		return false;
 	} else {
-		var query = {};
-			query['tokens.' + cookies.token] = {$exists: true};
-		var user = application.Users.sync.findOne(query);
+		socket._user = user;
+		// store user in _user in the websocket object
 
-		if (user === null) {
-			client.send('authenticate', false).close();
-			return false;
-		} else {
-			if (new Date() > user.tokens[cookies.token].time) {
-				var unset = {};
-					unset['tokens.' + cookies.token] = 1;
-				
-				application.Users.sync.update(query, {$unset: unset});
-				// token is expired, remove it
-
-				client.send('authenticate', false).close();
-				return false;
-			} else {
-				client.user = user;
-			}
-		}
+		Users[user._id.toString()] = socket;
+		// also store a reference in Users so we can quickly acquire the correct websocket
 	}
 	// validate the cookie
 
-	client.send('authenticate', true);
+	socket.send('authenticate', true);
+	// approve the authentication
 
-	callback();
-	// go go
+	this.handleConnect(socket);
+	// handle sending out data on connect
 }
 
 /**
@@ -494,12 +500,12 @@ SocketManager.prototype.handleAuth = function(client, data, callback) {
  * they have been authenticated and it's been accepted.
  * 
  * @method 	handleConnect
- * @param 	{Object} client
+ * @param 	{Object} socket
  * @extend	true
  * @return 	void
  */
-SocketManager.prototype.handleConnect = function(client) {
-	var user = client.user,
+SocketManager.prototype.handleConnect = function(socket) {
+	var user = socket._user,
 		networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 		tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 		netIds = {},
@@ -507,10 +513,6 @@ SocketManager.prototype.handleConnect = function(client) {
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []},
 		selected = false;
-
-	Sockets[client.id] = user;
-	Users[user._id.toString()] = client; 
-	// remember the link between the socket and the user
 
 	networks.forEach(function(network) {
 		netIds[network._id] = network.name;
@@ -553,47 +555,28 @@ SocketManager.prototype.handleConnect = function(client) {
 	}
 	// get channel users and commands
 
-	client.send('users', user);
-	client.send('networks', networks);
-	client.send('tabs', tabs);
-	client.send('channelUsers', users);
-	client.send('events', events);
-	client.send('commands', commands);
+	socket.send('users', user);
+	socket.send('networks', networks);
+	socket.send('tabs', tabs);
+	socket.send('channelUsers', users);
+	socket.send('events', events);
+	socket.send('commands', commands);
 	// compile a load of data to send to the frontend
-}
-
-/**
- * Handles websocket disconnections
- *
- * @method 	handleDisconnect
- * @param 	{Object} client
- * @extend	true
- * @return 	void
- */
-SocketManager.prototype.handleDisconnect = function(client) {
-	var user = Sockets[client.id];
-
-	if (user) {
-		delete Users[user._id.toString()];
-	}
-	
-	delete Sockets[client.id];
-	// clean up
 }
 
 /**
  * Handles queries to the events collection
  *
  * @method 	handleEvents
- * @param 	{Object} client
+ * @param 	{Object} socket
  * @param 	{Object} data
  * @return 	void
  */
-SocketManager.prototype.handleEvents = function(client, data) {
+SocketManager.prototype.handleEvents = function(socket, data) {
 	var response = application.Events.sync.find(data).sync.toArray();
 	// perform the query
 
-	client.send('events', response);
+	socket.send('events', response);
 	// get the data
 }
 
@@ -601,27 +584,27 @@ SocketManager.prototype.handleEvents = function(client, data) {
  * Handles insert rpc calls
  *
  * @method 	handleInsert
- * @param 	{Object} client
+ * @param 	{Object} socket
  * @param 	{Object} data
  * @return 	void
  */
-SocketManager.prototype.handleInsert = function(client, data) {
+SocketManager.prototype.handleInsert = function(socket, data) {
 	var collection = data.collection,
 		insert = data.insert,
-		user = client.user;
+		user = socket._user;
 
 	if (!collection || !insert) {
-		client.send('error', {command: 'insert', error: 'invalid format'});
+		socket.send('error', {command: 'insert', error: 'invalid format'});
 		return;
 	}
 
 	if (!_.isFunction(this.allowRules[collection]['insert']) || !_.isFunction(this.operationRules[collection]['insert'])) {
-		client.send('error', {command: 'insert', error: 'cant insert'});
+		socket.send('error', {command: 'insert', error: 'cant insert'});
 		return;
 	}
 
 	if (!this.allowRules[collection]['insert'](user._id, insert)) {
-		client.send('error', {command: 'insert', error: 'not allowed'});
+		socket.send('error', {command: 'insert', error: 'not allowed'});
 		return;
 	}
 	// have we been denied?
@@ -634,22 +617,22 @@ SocketManager.prototype.handleInsert = function(client, data) {
  * Handles update rpc calls
  *
  * @method 	handleUpdate
- * @param 	{Object} client
+ * @param 	{Object} socket
  * @param 	{Object} data
  * @return 	void
  */
-SocketManager.prototype.handleUpdate = function(client, data) {
+SocketManager.prototype.handleUpdate = function(socket, data) {
 	var collection = data.collection,
 		query = data.query,
 		update = data.update,
-		user = client.user;
+		user = socket._user;
 
 	if (!collection || !query || !update) {
-		return client.send('error', {command: 'update', error: 'invalid format'});
+		return socket.send('error', {command: 'update', error: 'invalid format'});
 	}
 
 	if (!_.isFunction(this.allowRules[collection]['update']) || !_.isFunction(this.operationRules[collection]['update'])) {
-		return client.send('error', {command: 'update', error: 'cant update'});
+		return socket.send('error', {command: 'update', error: 'cant update'});
 	}
 
 	if (query._id) {
@@ -658,7 +641,7 @@ SocketManager.prototype.handleUpdate = function(client, data) {
 	// update it to a proper mongo id
 
 	if (!this.allowRules[collection]['update'](user._id, query, update)) {
-		return client.send('error', {command: 'update', error: 'not allowed'});
+		return socket.send('error', {command: 'update', error: 'not allowed'});
 	}
 	// have we been denied?
 
