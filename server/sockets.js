@@ -488,9 +488,6 @@ SocketManager.prototype.handleAuth = function(socket, data) {
 	}
 	// validate the cookie
 
-	socket.send('authenticate', true);
-	// approve the authentication
-
 	this.handleConnect(socket);
 	// handle sending out data on connect
 }
@@ -509,9 +506,10 @@ SocketManager.prototype.handleConnect = function(socket) {
 		networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
 		tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 		netIds = {},
-		events = [],
+		items = [],
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []},
+		path = '/api/burst/' +  helper.generateSalt(25),
 		selected = false;
 
 	networks.forEach(function(network) {
@@ -541,7 +539,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 
 		tab.unread = unreadItems;
 		tab.highlights = unreadHighlights;
-		events = _.union(events, eventResults);
+		items = _.union(items, eventResults);
 		// combine the results
 	});
 	// loop tabs
@@ -555,13 +553,32 @@ SocketManager.prototype.handleConnect = function(socket) {
 	}
 	// get channel users and commands
 
-	socket.send('users', user);
-	socket.send('networks', networks);
-	socket.send('tabs', tabs);
-	socket.send('channelUsers', users);
-	socket.send('events', events);
-	socket.send('commands', commands);
+	application.app.get(path, function(req, res) {
+		var response = {
+			users: [user],
+			networks: networks,
+			tabs: tabs,
+			channelUsers: users,
+			events: items,
+			commands: commands,
+			burstend: true
+		};
+
+		res.header('Content-Type', 'application/json');
+		res.end(JSON.stringify(response));
+	});
+
+	socket.send('burst', {url: path, timeout: 10000});
 	// compile a load of data to send to the frontend
+
+	setTimeout(function() {
+		for (var index in application.app.routes.get) {
+			if (application.app.routes.get[index].path === path) {
+				application.app.routes.get.splice(index, 1);
+				break;
+			}
+		}
+	}, 10000);
 }
 
 /**

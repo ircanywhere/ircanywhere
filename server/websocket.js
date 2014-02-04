@@ -29,7 +29,6 @@ util.inherits(WebSocket, events.EventEmitter);
  * @return 	void
  */
 WebSocket.prototype.bindEvents = function() {
-	console.log(this._socket.__proto__);
 	this._socket.on('data', this.onMessage.bind(this));
 	this._socket.on('close', this.onClose.bind(this));
 }
@@ -58,8 +57,6 @@ WebSocket.prototype.onMessage = function(raw) {
 	var parsed,
 		event,
 		data;
-
-	console.log(raw);
 
 	try {
 		parsed = JSON.parse(raw);

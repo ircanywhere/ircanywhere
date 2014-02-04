@@ -6,7 +6,6 @@ App.Router.map(function() {
 
 App.NetworkRoute = AppRoute.extend({
 	setupController: function(controller, model) {
-		this.updateTab(model.url);
 		controller.set('model', model);
 	},
 
@@ -19,6 +18,22 @@ App.NetworkRoute = AppRoute.extend({
 	},
 
 	actions: {
+		willTransition: function(transition) {
+			var parts = transition.providedModelsArray,
+				url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]),
+				index = this.controllerFor('index'),
+				socket = index.socket,
+				tab = socket.findOne('tabs', {url: url});
+
+			socket.findAll('tabs').setEach('selected', false);
+			tab.set('selected', true);
+			// mark all but this as selected
+
+			index.set('tabId', tab._id);
+			index.socket.update('tabs', {_id: tab._id}, {selected: true});
+			// send update to backend
+		},
+
 		markAsRead: function(id) {
 			this.controller.markAllAsRead(id);
 		},

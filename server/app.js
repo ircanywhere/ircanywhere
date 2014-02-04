@@ -271,7 +271,7 @@ Application.prototype.setupServer = function() {
 	app.use(fibrous.middleware);
 	// setup middleware
 
-	app.get('/*', function(req, res) {
+	app.get(/^\/(?!api\/(.*)).*$/, function(req, res) {
 		res.sendfile('./client/templates/html/index.html');
 	});
 	// setup routes

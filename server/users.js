@@ -6,26 +6,6 @@ var _ = require('lodash'),
 	helper = require('../lib/helpers').Helpers;
 
 /**
- * Generate a random alphanumeric string of a specific length
- * 
- * @method 	_generateSalt
- * @param 	{Number} string_length
- * @private
- * @return 	{String}
- */
-var _generateSalt = function(string_length) {
-	var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz',
-		randomstring = '';
-	
-	for (var i = 0; i < string_length; i++) {
-		var rnum = Math.floor(Math.random() * chars.length);
-		randomstring += chars.substring(rnum, rnum + 1);
-	}
-
-	return randomstring;
-}
-
-/**
  * Responsible for handling user related actions ie registering, logging in, forgot passwords etc
  *
  * @class	UserManager
@@ -136,7 +116,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	}
 	// any errors?
 
-	var salt = _generateSalt(10),
+	var salt = helper.generateSalt(10),
 		user = {
 			email: email,
 			password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
@@ -192,7 +172,7 @@ UserManager.prototype.registerUser = function(req, res) {
 UserManager.prototype.userLogin = function(req, res) {
 	var email = req.param('email', ''),
 		password = req.param('password', ''),
-		token = _generateSalt(25),
+		token = helper.generateSalt(25),
 		expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
 		output = {failed: false, successMessage: '', errors: []},
 		user = application.Users.sync.findOne({email: email});
@@ -247,7 +227,7 @@ UserManager.prototype.userLogin = function(req, res) {
 UserManager.prototype.forgotPassword = function(req, res) {
 	var output = {failed: false, successMessage: '', errors: []},
 		email = req.param('email', ''),
-		token = _generateSalt(25),
+		token = helper.generateSalt(25),
 		expire = new Date(Date.now() + (24 * 60 * 60 * 1000)),
 		user = application.Users.sync.findOne({email: email});
 

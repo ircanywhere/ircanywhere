@@ -1,10 +1,5 @@
 App.TabRoute = AppRoute.extend({
 	setupController: function(controller, model) {
-		/*this.controllerFor('index').socket.findAll('tabs').setEach('selected', false);
-		model.set('selected', true);*/
-		this.updateTab(model.url);
-		// update our local storage immediately so we dont get a delay on tab change
-
 		controller.set('model', model);
 	},
 	
@@ -12,7 +7,7 @@ App.TabRoute = AppRoute.extend({
 		var self = this,
 			index = this.controllerFor('index'),
 			network = this.modelFor('network');
-		
+
 		return new Ember.RSVP.Promise(function(resolve, reject) {
 			var result = index.socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
 			if (result.length) {
@@ -27,49 +22,27 @@ App.TabRoute = AppRoute.extend({
 		// and it keeps things organised and conformed
 	},
 
-	activate: function() {
-		/*var index = this.controllerFor('index'),
-			socket = index.socket,
-			selected = socket.findOne('tabs', {selected: true}),
-			model = this.modelFor('tab');
-		// get the channel model
-
-		if (selected.get('_id') !== model.get('_id')) {
-			socket.update('tabs', {_id: model.get('_id')}, {selected: true});
-			// send the update to the backend
-		}
-
-		index.set('tabId', model.get('_id'));*/
-
-		//this.updateTab(this.modelFor('tab').url);
-	},
-
-	deactivate: function() {
-		/*var index = this.controllerFor('index'),
-			socket = index.socket,
-			tab = socket.findOne('tabs', {url: this.modelFor('network').get('url')}),
-			selected = socket.findOne('tabs', {selected: true});
-		// get the tab model
-
-		if (selected.get('_id') !== tab.get('_id')) {
-			socket.findAll('tabs').setEach('selected', false);
-			tab.set('selected', true);
-			// update our local storage immediately so we dont get a delay on tab change
-
-			index.socket.update('tabs', {_id: tab.get('_id')}, {selected: true});
-			// send the update to the backend
-		}
-
-		index.set('tabId', tab.get('_id'));*/
-
-		//this.updateTab(this.modelFor('network').url);
-	},
-
 	title: function(controller, model) {
 		return model.get('target') + ' - ' + App.get('defaultTitle');
 	},
 
 	actions: {
+		willTransition: function(transition) {
+			var parts = transition.providedModelsArray,
+				url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]),
+				index = this.controllerFor('index'),
+				socket = index.socket,
+				tab = socket.findOne('tabs', {url: url});
+
+			socket.findAll('tabs').setEach('selected', false);
+			tab.set('selected', true);
+			// mark all but this as selected
+
+			index.set('tabId', tab._id);
+			index.socket.update('tabs', {_id: tab._id}, {selected: true});
+			// send update to backend
+		},
+
 		error: function(error, transition) {
 			var socket = this.controllerFor('index').socket,
 				target = transition.params.tab,

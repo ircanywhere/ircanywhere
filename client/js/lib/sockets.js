@@ -93,28 +93,20 @@ Ember.Socket = Ember.Object.extend({
 			self.set('authed', data);
 		}
 
-		if (event === 'users') {
-			self._store('users', [data]);
-		}
-
-		if (event === 'networks') {
-			self._store('networks', data);
-		}
-
-		if (event === 'tabs') {
-			self._store('tabs', data);
-		}
-
-		if (event === 'channelUsers') {
-			self._store('channelUsers', data);
+		if (event === 'burst') {
+			Ember.$.get(data.url, function(data) {
+				for (var type in data) {
+					if (type === 'burstend' && data[type] === true) {
+						self.get('emitter').done();
+					} else {
+						self._store(type, data[type]);
+					}
+				}
+			});
 		}
 
 		if (event === 'events') {
 			self._store('events', data);
-		}
-
-		if (event === 'commands') {
-			self._store('commands', data, true);
 		}
 
 		if (event === 'insert') {
@@ -160,11 +152,9 @@ Ember.Socket = Ember.Object.extend({
 		return controller;
 	},
 
-	_store: function(collection, payload, emit) {
-		var emit = (emit) ? emit : false,
-			self = this,
+	_store: function(collection, payload) {
+		var self = this,
 			col = self.get(collection),
-			count = (payload.length - 1).toString(),
 			exists = false,
 			object = {};
 
@@ -181,14 +171,6 @@ Ember.Socket = Ember.Object.extend({
 			} else {
 				col.pushObject(object);
 			}
-
-			if (emit && i === count) {
-				self.get('emitter').done();
-			}
-		}
-
-		if (payload.length === 0 && emit) {
-			self.get('emitter').done();
 		}
 	},
 
