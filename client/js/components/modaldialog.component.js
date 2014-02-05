@@ -8,7 +8,7 @@ App.ModalDialogComponent = Ember.Component.extend({
 				self.close();
 			}
 		});
-
+		
 		this.$('.modal').slideDown('fast');
 	},
 

@@ -7,17 +7,17 @@
 			{{#if showPasswordForm}}
 				<form method="post" {{action "passwordSubmit" on="submit"}}>
 					<p class="large">You can use the form below to update your current password.</p>
-					{{#if errors}}
+					{{#if passwordErrors}}
 						<div class="alert-message block-message error">
 							<ul>
-								{{#each errors}}
+								{{#each passwordErrors}}
 								<li>{{this.error}}</li>
 								{{/each}}
 							</ul>
 						</div>
 					{{/if}}
-					{{#if success}}
-						<div class="alert-message block-message success"><p>{{success}}</p></div>
+					{{#if passwordMessage}}
+						<div class="alert-message block-message success"><p>{{passwordMessage}}</p></div>
 					{{/if}}
 					<div class="clearfix">
 						<label for="password">Current Password</label>

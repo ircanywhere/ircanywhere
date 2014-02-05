@@ -1,9 +1,9 @@
 App.SettingsController = Ember.ObjectController.extend({
 	title: 'Settings',
 	active: 'settings',
-	errors: [],
-	success: '',
 
+	passwordErrors: [],
+	passwordMessage: '',
 	password: '',
 	newPassword: '',
 
@@ -17,6 +17,9 @@ App.SettingsController = Ember.ObjectController.extend({
 	
 	actions: {
 		close: function() {
+			this.set('passwordErrors', []);
+			this.set('passwordSuccess', '');
+			// reset a load of settings
 			return this.send('closeModal');
 		},
 
@@ -34,17 +37,17 @@ App.SettingsController = Ember.ObjectController.extend({
 	},
 
 	passwordSuccess: function(data) {
-		this.set('errors', false);
-		this.set('success', data.successMessage);
+		this.set('passwordErrors', false);
+		this.set('passwordMessage', data.successMessage);
 	},
 
 	passwordFail: function(data) {
-		this.set('success', false);
+		this.set('passwordMessage', false);
 
 		if (typeof data === 'undefined') {
-			this.set('errors', ['An error has occured']);
+			this.set('passwordErrors', ['An error has occured']);
 		} else {
-			this.set('errors', data.errors);
+			this.set('passwordErrors', data.errors);
 		}
 		// set the errors
 	}

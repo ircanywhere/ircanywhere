@@ -352,10 +352,10 @@ UserManager.prototype.resetPassword = function(req, res) {
  */
 UserManager.prototype.changePassword = function(req, res) {
 	var password = req.param('password', ''),
-		confirmPassword = req.param('confirmPassword', ''),
+		newPassword = req.param('newPassword', ''),
 		user = this.isAuthenticated(req.headers.cookie);
 
-	return this.updatePassword(user, password, confirmPassword);
+	return this.updatePassword(user, newPassword, newPassword, password);
 }
 
 /**
@@ -369,26 +369,29 @@ UserManager.prototype.changePassword = function(req, res) {
  * @extend	true
  * @return 	{Object}
  */
-UserManager.prototype.updatePassword = function(user, password, confirmPassword) {
-	var output = {failed: false, successMessage: '', errors: []};
+UserManager.prototype.updatePassword = function(user, password, confirmPassword, currentPassword) {
+	var currentPassword = currentPassword || '',
+		output = {failed: false, successMessage: '', errors: []};
 
 	if (user === null) {
 		output.failed = true;
-		output.errors.push({error: 'Invalid reset password url'});
-	} else if (password == '' || confirmPassword == '') {
+		output.errors.push({error: (currentPassword) ? 'Not authenticated' : 'Invalid reset password url'});
+	} else if (currentPassword !== '' && user.password !== crypto.createHmac('sha256', user.salt).update(currentPassword).digest('hex')) {
+		output.failed = true;
+		output.errors.push({error: 'The password you have entered is invalid'});
+	} else if (password === '' || confirmPassword === '') {
 		output.failed = true;
 		output.errors.push({error: 'All fields are required'});
 	} else if (!helper.isValidPassword(password) || !helper.isValidPassword(confirmPassword)) {
 		output.failed = true;
-		output.errors.push({error: 'The password you have entered is invalid'});
-	} else if (password != confirmPassword) {
+		output.errors.push({error: 'The password you have entered must be over 6 characters'});
+	} else if (password !== confirmPassword) {
 		output.failed = true;
 		output.errors.push({error: 'The passwords you have entered do not match'});
 	} else {
-		var salt = user.salt,
-			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+		var hash = crypto.createHmac('sha256', user.salt).update(password).digest('hex');
 
-		application.Users.sync.update({'resetToken.token': token}, {$unset: {resetToken: 1}, $set: {password: hash}});
+		application.Users.sync.update({_id: user._id}, {$unset: {resetToken: 1}, $set: {password: hash}});
 		// set the password && unset any reset tokens
 
 		output.successMessage = 'Your password has been reset, you may now login';
