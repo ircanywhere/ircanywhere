@@ -6,8 +6,15 @@ App.SidebarController = Ember.ArrayController.extend({
 			hl = 0;
 			
 		var filtered = events.filter(function(item) {
-			return ((item.type === 'notice' || item.type === 'privmsg' || item.type === 'action') && item.unread);
+			if ((item.type === 'notice' || item.type === 'privmsg' || item.type === 'action') && (!item.read || item.unread)) {
+				item.set('unread', true);
+				item.set('read', true);
+				return true;
+			}
+
+			return false;
 		});
+		// filter the events
 
 		tabs.forEach(function(tab) {
 			i = 0;

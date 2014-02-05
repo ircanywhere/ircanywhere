@@ -9,11 +9,6 @@ App.MessagesController = Ember.ArrayController.extend({
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
 				target = (tab && tab.type === 'network') ? '*' : tab.title;
 				
-			if ((item.type === 'privmsg' || item.type === 'action' || item.type === 'notice') && !item.read) {
-				item.set('unread', true);
-				item.set('read', true);
-			}
-
 			if (tab && item.network === tab.networkName && item.target === target) {
 				accum.pushObject(item);
 			}

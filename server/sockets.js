@@ -341,42 +341,42 @@ SocketManager.prototype.init = function() {
 		}
 
 		if (eventName === 'update' && collection === 'users') {
-			clients.push(Users[doc._id.toString()]);
+			clients.push(Users[doc._id]);
 		} else if (collection === 'networks') {
-			clients.push(Users[doc.internal.userId.toString()]);
+			clients.push(Users[doc.internal.userId]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
 			if ((collection === 'commands' && !doc.backlog) || (eventName === 'update' && collection === 'events')) {
 				return _alterDoc(collection, eventName, doc);
 			}
 			// ignore specific scenarios
 			
-			clients.push(Users[doc.user.toString()]);
+			clients.push(Users[doc.user]);
 		} else if (collection === 'channelUsers' && !doc._burst) {
 			for (var id in Clients) {
 				for (var tabId in Clients[id].internal.tabs) {
 					var tab = Clients[id].internal.tabs[tabId];
 
 					if (tab.networkName == doc.network && doc.channel == tab.target) {
-						clients.push(Users[tab.user.toString()]);
+						clients.push(Users[tab.user]);
 					}
 				}
 			}
 		}
 
-		clients.forEach(function(socketClient) {
-			if (!socketClient) {
+		clients.forEach(function(socket) {
+			if (!socket) {
 				return false;
 			}
 			// bail if its undefined
 
 			if (eventName === 'insert') {
-				socketClient.send(eventName, {collection: collection, record: doc});
+				socket.send(eventName, {collection: collection, record: doc});
 			} else if (eventName === 'update') {
 				if (objectDiff.diffOwnProperties(doc, ext).changed !== 'equal') {
-					socketClient.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
+					socket.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 				}
 			} else if (eventName === 'delete') {
-				socketClient.send(eventName, {collection: collection, id: doc._id.toString()});
+				socket.send(eventName, {collection: collection, id: doc._id.toString()});
 			}
 		});
 		// all of this code works by watching changes via the oplog, that way 
@@ -453,6 +453,7 @@ SocketManager.prototype.handleAuth = function(socket, data) {
 		socket.send('authenticate', false, true);
 	} else {
 		socket._user = user;
+		Users[user._id] = socket;
 
 		this.handleConnect(socket);
 		// handle sending out data on connect

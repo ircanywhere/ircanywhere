@@ -6,7 +6,7 @@ App = Ember.Application.create({
 	Parser: Ember.Parser.create(),
 
 	Socket: Ember.Socket.extend({
-		controllers: ['application', 'index', 'login', 'titlebar', 'network', 'messages', 'input', 'userlist', 'sidebar', 'sidebaritem']
+		controllers: ['application', 'index', 'login', 'settings', 'titlebar', 'network', 'messages', 'input', 'userlist', 'sidebar', 'sidebaritem']
     })
 });
 

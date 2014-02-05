@@ -85,7 +85,7 @@ WebSocket.prototype.onClose = function() {
 	this._socket.removeAllListeners();
 
 	if (this._user) {
-		delete Users[this._user._id.toString()];	
+		delete Users[this._user._id];	
 	}
 	
 	delete Sockets[this._socket.id];

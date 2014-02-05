@@ -139,8 +139,6 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 		return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 	};
 
-	console.log(message.message.match('(' + escape(client.nick) + ')'));
-
 	if (message.message.match('(' + escape(client.nick) + ')')) {
 		return true;
 	}

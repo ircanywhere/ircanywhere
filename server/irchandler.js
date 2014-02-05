@@ -175,7 +175,8 @@ IRCHandler.prototype.lusers = function(client, message) {
  */
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
-		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
+		//time: new Date(new Date(message.time).getTime() - 15).toJSON(),
+		time: message.time,
 		message: _formatRaw(message.raw),
 		raw: message.raw
 	}, 'motd');

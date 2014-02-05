@@ -67,6 +67,13 @@ UserManager.prototype.init = function() {
 		res.end(JSON.stringify(response));
 	});
 
+	application.app.post('/api/settings/updatesettings', function(req, res) {
+		var response = self.updateSettings(req, res);
+
+		res.header('Content-Type', 'application/json');
+		res.end(JSON.stringify(response));
+	});
+
 	application.app.post('/api/settings/changepassword', function(req, res) {
 		var response = self.changePassword(req, res);
 
@@ -152,19 +159,29 @@ UserManager.prototype.registerUser = function(req, res) {
 		nickname = helper.trimInput(nickname);
 		email = helper.trimInput(email);
 
-		if (name == '' || nickname == '' || email == '' || password == '' || confirmPassword == '')
+		if (name === '' || nickname === '' || email === '' || password === '' || confirmPassword === '') {
 			output.errors.push({error: 'All fields are required'});
+		}
 
-		if (!helper.isValidName(name))
+		if (!helper.isValidName(name)) {
 			output.errors.push({error: 'The name you have entered is too long'});
-		if (!helper.isValidNickname(nickname))
+		}
+
+		if (!helper.isValidNickname(nickname)) {
 			output.errors.push({error: 'The nickname you have entered is invalid'});
-		if (!helper.isValidEmail(email))
+		}
+
+		if (!helper.isValidEmail(email)) {
 			output.errors.push({error: 'The email address you have entered is invalid'});
-		if (!helper.isValidPassword(password))
+		}
+
+		if (!helper.isValidPassword(password)) {
 			output.errors.push({error: 'The password you have entered is invalid'});
-		if (password != confirmPassword)
+		}
+
+		if (password != confirmPassword) {
 			output.errors.push({error: 'The passwords you have entered do not match'});
+		}
 	}
 
 	if (output.errors.length > 0) {
@@ -234,40 +251,40 @@ UserManager.prototype.userLogin = function(req, res) {
 		output = {failed: false, successMessage: '', errors: []},
 		user = application.Users.sync.findOne({email: email});
 
-	if (user === null) {
+	if (!user) {
 		output.failed = true;
 		output.errors.push({error: 'User not found'});
-		// invalid user
-	} else {
-		var salt = user.salt,
-			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
-
-		if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
-			output.successMessage = 'Login successful';
-			// check for a token
-		} else {
-			if (hash != user.password) {
-				output.failed = true;
-				output.errors.push({error: 'Password incorrect'});
-			} else {
-				output.successMessage = 'Login successful';
-				// set the output
-
-				var tokens = user.tokens;
-					tokens[token] = {
-						time: expire,
-						ip: req.ip
-					};
-
-				application.Users.sync.update({email: email}, {$set: {tokens: tokens}});
-				res.cookie('token', token, {expires: expire});
-				// set a login key and a cookie
-
-				this.onUserLogin(user);
-			}
-			// check if password matches
-		}
+		return output;
 	}
+
+	var salt = user.salt,
+		hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+
+	if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
+		output.successMessage = 'Login successful';
+		return output;
+	}
+
+	if (hash != user.password) {
+		output.failed = true;
+		output.errors.push({error: 'Password incorrect'});
+	} else {
+		output.successMessage = 'Login successful';
+		// set the output
+
+		var tokens = user.tokens;
+			tokens[token] = {
+				time: expire,
+				ip: req.ip
+			};
+
+		application.Users.sync.update({email: email}, {$set: {tokens: tokens}});
+		res.cookie('token', token, {expires: expire});
+		// set a login key and a cookie
+
+		this.onUserLogin(user);
+	}
+	// check if password matches
 
 	return output;
 }
@@ -288,34 +305,33 @@ UserManager.prototype.forgotPassword = function(req, res) {
 		expire = new Date(Date.now() + (24 * 60 * 60 * 1000)),
 		user = application.Users.sync.findOne({email: email});
 
-	if (user === null) {
+	if (!user) {
 		output.failed = true;
 		output.errors.push({error: 'User not found'});
-		// invalid user
-	} else {
-		var resetToken = {
-			token: token,
-			time: expire,
-			ip: req.ip
-		};
-
-		application.Users.sync.update({email: email}, {$set: {resetToken: resetToken}});
-		// set the reset token
-
-		var link = application.config.url + '/reset/' + token,
-			message = {
-				text: this.parse('./private/emails/reset.txt', {name: user.name, link: link}),
-				from: application.config.email.from,
-				to: email,
-				subject: 'Your new password'
-			};
-		
-		this.server.send(message);
-		// send a email
-
-		output.successMessage = 'Instructions on how to reset your password have been sent';
+		return output;
 	}
 
+	var resetToken = {
+		token: token,
+		time: expire,
+		ip: req.ip
+	};
+
+	application.Users.sync.update({email: email}, {$set: {resetToken: resetToken}});
+	// set the reset token
+
+	var link = application.config.url + '/reset/' + token,
+		message = {
+			text: this.parse('./private/emails/reset.txt', {name: user.name, link: link}),
+			from: application.config.email.from,
+			to: email,
+			subject: 'Your new password'
+		};
+	
+	this.server.send(message);
+	// send a email
+
+	output.successMessage = 'Instructions on how to reset your password have been sent';
 	return output;
 }
 
@@ -337,6 +353,68 @@ UserManager.prototype.resetPassword = function(req, res) {
 		user = application.Users.sync.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
 
 	return this.updatePassword(user, password, confirmPassword);
+}
+
+/**
+ * Handles the call to /api/settings/updatesettings which will update the settings for that user
+ * checking for authentication and validating if necessary
+ *
+ * @method 	updateSettings
+ * @param 	{Object} req
+ * @param 	{Object} res
+ * @extend	true
+ * @return 	{Object}
+ */
+UserManager.prototype.updateSettings = function(req, res) {
+	var name = req.param('name', ''),
+		nickname = req.param('nickname', ''),
+		email = req.param('email', ''),
+		emailUser = application.Users.sync.findOne({email: email}),
+		user = this.isAuthenticated(req.headers.cookie),
+		output = {failed: false, successMessage: '', errors: []};
+
+	if (!user) {
+		output.failed = true;
+		output.errors.push({error: 'Not authenticated'});
+		return output;
+	}
+
+	name = helper.trimInput(name);
+	nickname = helper.trimInput(nickname);
+	email = helper.trimInput(email);
+	// trim output
+
+	if (name === '' || nickname === '' || email === '') {
+		output.errors.push({error: 'All fields are required'});
+	}
+
+	if (!helper.isValidName(name)) {
+		output.errors.push({error: 'The name you have entered is too long'});
+	}
+
+	if (!helper.isValidNickname(nickname)) {
+		output.errors.push({error: 'The nickname you have entered is invalid'});
+	}
+
+	if (user.email !== email && emailUser) {
+		output.errors.push({error: 'The email address you have entered is already in use'});
+	}
+
+	if (!helper.isValidEmail(email)) {
+		output.errors.push({error: 'The email address you have entered is invalid'});
+	}
+
+	if (output.errors.length > 0) {
+		output.failed = true;
+		return output;
+	}
+	// any errors?
+
+	application.Users.sync.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}});
+	// update the settings
+
+	output.successMessage = 'Your settings successfully have been updated.';
+	return output;
 }
 
 /**

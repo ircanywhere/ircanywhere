@@ -28,10 +28,10 @@
 				</div>
 
 				<div class="clearfix">
-					<label for="your-name">Your Name</label>
+					<label for="yourName">Your Name</label>
 					<div class="input">
 						<div class="field">
-							{{input type="text" class="xlarge" valueBinding="model.name" value=name tabindex="1"}}
+							{{input type="text" id="yourName" class="xlarge" valueBinding="model.name" value=name tabindex="1"}}
 						</div>
 						<span class="tooltip">
 							<a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a>
@@ -40,10 +40,10 @@
 				</div>
 
 				<div class="clearfix">
-					<label for="irc-nickname">IRC Nickname</label>
+					<label for="ircNickname">IRC Nickname</label>
 					<div class="input">
 						<div class="field">
-							{{input type="text" class="xlarge" valueBinding="model.nickname" value=nickname tabindex="2"}}
+							{{input type="text" id="ircNickname" class="xlarge" valueBinding="model.nickname" value=nickname tabindex="2"}}
 						</div>
 						<span class="tooltip">
 							<a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a>
@@ -52,10 +52,10 @@
 				</div>
 
 				<div class="clearfix">
-					<label for="email-address">Email Address</label>
+					<label for="emailAddress">Email Address</label>
 					<div class="input">
 						<div class="field">
-							{{input type="text" class="xlarge" valueBinding="model.email" value=email tabindex="3"}}
+							{{input type="text" id="emailAddress" class="xlarge" valueBinding="model.email" value=email tabindex="3"}}
 						</div>
 						<span class="tooltip">
 							<a href="#" rel="twipsy" title="A valid email address.">?</a>
@@ -67,7 +67,7 @@
 					<label for="password">Password</label>
 					<div class="input">
 						<div class="field">
-							{{input type="password" class="xlarge" valueBinding="model.password" value=password tabindex="4"}}
+							{{input type="password" id="password" class="xlarge" valueBinding="model.password" value=password tabindex="4"}}
 						</div>
 						<span class="tooltip">
 							<a href="#" rel="twipsy" title="Your password, longer than 6 characters.">?</a>
@@ -76,10 +76,10 @@
 				</div>
 
 				<div class="clearfix">
-					<label for="password">Confirm Password</label>
+					<label for="confirmPassword">Confirm Password</label>
 					<div class="input">
 						<div class="field">
-							{{input type="password" class="xlarge" valueBinding="model.confirmPassword" value=confirmPassword tabindex="5"}}
+							{{input type="password" id="confirmPassword" class="xlarge" valueBinding="model.confirmPassword" value=confirmPassword tabindex="5"}}
 						</div>
 						<span class="tooltip">
 							<a href="#" rel="twipsy" title="Your password, again.">?</a>
