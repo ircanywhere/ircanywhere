@@ -9,7 +9,7 @@ App.TabRoute = AppRoute.extend({
 			network = this.modelFor('network');
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
-			var result = index.socket.find('tabs', {network: network.get('_id'), title: decodeURIComponent(params.tab)});
+			var result = index.socket.find('tabs', {network: network.get('_id'), target: decodeURIComponent(params.tab).toLowerCase()});
 			if (result.length) {
 				resolve(result[0]);
 			} else {
@@ -28,16 +28,21 @@ App.TabRoute = AppRoute.extend({
 
 	actions: {
 		willTransition: function(transition) {
-			var parts = transition.providedModelsArray;
-
-			if (parts.length === 0) {
-				return;
-			}
-
-			var url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]),
+			var parts = transition.providedModelsArray,
+				url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]).toLowerCase(),
 				index = this.controllerFor('index'),
 				socket = index.socket,
 				tab = socket.findOne('tabs', {url: url});
+
+			if (parts.length === 0) {
+				return transition.abort();
+			}
+
+			if (!tab || tab && tab.selected) {
+				return false;
+			}
+
+			console.log(transition.providedModelsArray, tab);
 
 			socket.findAll('tabs').setEach('selected', false);
 			tab.set('selected', true);

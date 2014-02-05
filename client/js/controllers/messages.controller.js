@@ -7,9 +7,17 @@ App.MessagesController = Ember.ArrayController.extend({
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
-				target = (tab && tab.type === 'network') ? '*' : tab.title;
+				network = this.socket.findOne('networks', {_id: tab.network});
+
+			if (!tab) {
+				return accum;
+			}
 				
-			if (tab && item.network === tab.networkName && item.target === target) {
+			if (item.network === tab.networkName &&
+				((tab.type === 'network' && item.target === '*') ||
+				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
+				(tab.type === 'channel' && item.target === tab.target))) {
+				// messy conditional
 				accum.pushObject(item);
 			}
 
@@ -18,9 +26,17 @@ App.MessagesController = Ember.ArrayController.extend({
 		
 		removedItem: function(accum, item) {
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
-				target = (tab && tab.type === 'network') ? '*' : tab.title;
+				network = this.socket.findOne('networks', {_id: tab.network});
 
-			if (tab && item.network === tab.networkName && item.target === target) {
+			if (!tab) {
+				return accum;
+			}
+				
+			if (item.network === tab.networkName &&
+				((tab.type === 'network' && item.target === '*') ||
+				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
+				(tab.type === 'channel' && item.target === tab.target))) {
+				// messy conditional
 				accum.removeObject(item);
 			}
 

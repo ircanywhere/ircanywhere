@@ -1,6 +1,7 @@
 App.SidebarController = Ember.ArrayController.extend({
 	newUnreadItem: function() {
-		var tabs = this.get('content'),
+		var networks = this.get('networks'),
+			tabs = this.get('content'),
 			events = this.get('events'),
 			i = 0,
 			hl = 0;
@@ -19,9 +20,16 @@ App.SidebarController = Ember.ArrayController.extend({
 		tabs.forEach(function(tab) {
 			i = 0;
 			hl = 0;
-			
+
+			var network = networks.filterProperty('_id', tab.network)[0];
+			// get the network
+
 			filtered.forEach(function(item) {
-				if (tab.type === 'channel' && item.network === tab.networkName && item.target === tab.title) {
+				if (item.network === tab.networkName &&
+					((tab.type === 'channel' && item.target === tab.target) ||
+					(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
+					(tab.type === 'network' && item.target === '*'))) {
+					// messy conditional
 					i++;
 					tab.set('unread', i);
 
@@ -31,6 +39,7 @@ App.SidebarController = Ember.ArrayController.extend({
 					}
 				}
 			});
+			// filter up the messages.. again this will be vastly improved once the event emitter arrives..
 
 			if (i > tab.unread) {
 				tab.set('unread', tab.unread);

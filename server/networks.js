@@ -112,8 +112,10 @@ NetworkManager.prototype.init = function() {
 
 	application.ee.on(['tabs', 'delete'], function(doc, id) {
 		_.each(Clients, function(value, key) {
-			var network = _.find(value.internal.tabs, {'_id': id});
-			delete Clients[key].internal.tabs[network.title];
+			var tab = _.find(value.internal.tabs, {'_id': id});
+			if (tab) {
+				delete Clients[key].internal.tabs[tab.target];
+			}
 		});
 	});
 	// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
@@ -234,14 +236,17 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 
 	var callback = function(err, doc) {
 		if (client.internal.tabs[obj.target]) {
+			console.log('updating existing tab..');
 			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active, selected: select}}, function(err, doc) { });
 		} else {
+			console.log('inserting new tab..');
 			application.Tabs.insert(obj, function(err, doc) { });
 		}
 		// insert to db, or update old record
 	};
 
 	if (select) {
+		console.log('unselecting selected tab..');
 		application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}}, callback);
 	} else {
 		callback(null, null);

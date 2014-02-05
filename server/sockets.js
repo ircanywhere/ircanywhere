@@ -481,7 +481,10 @@ SocketManager.prototype.handleConnect = function(socket) {
 		selected = false;
 
 	networks.forEach(function(network) {
-		netIds[network._id] = network.name;
+		netIds[network._id] = {
+			name: network.name,
+			nick: network.nick.toLowerCase()
+		};
 	});
 
 	tabs.forEach(function(tab, index) {
@@ -494,13 +497,19 @@ SocketManager.prototype.handleConnect = function(socket) {
 		}
 		// determine whether we have a selected tab or not?
 
-		usersQuery['$or'].push({network: netIds[tab.network], channel: tab.title});
-		commandsQuery['$or'].push({network: tab.network, target: tab.title});
+		usersQuery['$or'].push({network: netIds[tab.network].name, channel: tab.target});
+		commandsQuery['$or'].push({network: tab.network, target: tab.target});
 		// construct some queries
 
-		var target = (tab.type === 'network') ? '*' : tab.title,
-			query = {network: netIds[tab.network], target: target, user: user._id},
-			eventResults = application.Events.sync.find(query).sort({$natural: -1}).sync.toArray(),
+		if (tab.type === 'query') {
+			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tab.target}, {'message.nickname': new RegExp(tab.target, 'i'), target: netIds[tab.network].nick}]};
+		} else if (tab.type === 'network') {
+			var query = {network: netIds[tab.network].name, target: '*', user: user._id}
+		} else {
+			var query = {network: netIds[tab.network].name, target: tab.target, user: user._id}
+		}
+
+		var eventResults = application.Events.sync.find(query).sort({$natural: -1}).sync.toArray(),
 			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
 			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
 		// get some information about the unread items/highlights

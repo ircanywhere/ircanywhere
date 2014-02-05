@@ -34,7 +34,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		}
 		// some how this has happened, but lets be safe and not continue anyway
 
-		var target = (tab.type === 'network') ? '*' : tab.title,
+		var target = (tab.type === 'network') ? '*' : tab.target,
 			events = this.socket.findAll('events', {network: tab.networkName, target: target, unread: true});
 		// get the events for the specific tab
 

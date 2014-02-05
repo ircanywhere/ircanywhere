@@ -19,16 +19,21 @@ App.NetworkRoute = AppRoute.extend({
 
 	actions: {
 		willTransition: function(transition) {
-			var parts = transition.providedModelsArray;
-
-			if (parts.length === 0) {
-				return;
-			}
-
-			var url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]),
+			var parts = transition.providedModelsArray,
+				url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]).toLowerCase(),
 				index = this.controllerFor('index'),
 				socket = index.socket,
 				tab = socket.findOne('tabs', {url: url});
+
+			if (parts.length === 0) {
+				return transition.abort();
+			}
+
+			if (!tab || tab && tab.selected) {
+				return false;
+			}
+
+			console.log('net', tab);
 
 			socket.findAll('tabs').setEach('selected', false);
 			tab.set('selected', true);

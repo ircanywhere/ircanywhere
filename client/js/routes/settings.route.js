@@ -14,3 +14,4 @@ App.SettingsRoute = AppRoute.extend({
 		return controller.get('title');
 	}
 });*/
+// XXX - Assign /settings to open modal

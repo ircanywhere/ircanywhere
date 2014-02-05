@@ -65,7 +65,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		if (tab.type === 'network') {
 			return {
 				key: tab.get('_id'),
-				title: tab.get('target'),
+				title: tab.get('title'),
 				modes: '',
 				desc: tab.get('url'),
 				network: tab.get('networkName'),
@@ -74,7 +74,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		} else if (tab.type === 'query') {
 			return {
 				key: tab.get('_id'),
-				title: tab.get('target'),
+				title: tab.get('title'),
 				modes: '',
 				desc: '',
 				network: tab.get('networkName'),
@@ -83,7 +83,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		} else if (tab.type === 'channel') {
 			return {
 				key: tab.get('_id'),
-				title: tab.get('target'),
+				title: tab.get('title'),
 				modes: '+' + tab.get('modes'),
 				desc: (tab.get('topic')) ? tab.get('topic').topic : '',
 				network: tab.get('networkName'),
