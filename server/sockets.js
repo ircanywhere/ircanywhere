@@ -447,49 +447,16 @@ SocketManager.prototype.onSocketOpen = function(socket) {
  * @return 	void
  */
 SocketManager.prototype.handleAuth = function(socket, data) {
-	var parsed = (data) ? data.split('; ') : [],
-		cookies = {};
-
-	parsed.forEach(function(cookie) {
-		var split = cookie.split('=');
-			cookies[split[0]] = split[1];
-	});
-	// get our cookies
-
-	if (!cookies.token) {
-		socket.send('authenticate', false, true);
-		return false;
-	}
-
-	var query = {};
-		query['tokens.' + cookies.token] = {$exists: true};
-	var user = application.Users.sync.findOne(query);
-
+	var user = userManager.isAuthenticated(data);
+	
 	if (!user) {
 		socket.send('authenticate', false, true);
-		return false;
-	}
-
-	if (new Date() > user.tokens[cookies.token].time) {
-		var unset = {};
-			unset['tokens.' + cookies.token] = 1;
-		
-		application.Users.sync.update(query, {$unset: unset});
-		// token is expired, remove it
-
-		socket.send('authenticate', false, true);
-		return false;
 	} else {
 		socket._user = user;
-		// store user in _user in the websocket object
 
-		Users[user._id.toString()] = socket;
-		// also store a reference in Users so we can quickly acquire the correct websocket
+		this.handleConnect(socket);
+		// handle sending out data on connect
 	}
-	// validate the cookie
-
-	this.handleConnect(socket);
-	// handle sending out data on connect
 }
 
 /**

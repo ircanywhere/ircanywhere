@@ -54,10 +54,12 @@ Ember.Parser = Ember.Object.extend({
 
 	init: function() {
 		var c = 0,
-			v, open;
+			v, open, k;
 		
-		for (var k in this.tags) {
+		for (var i = 0, len = this.tags.length; i < len; i++) {
 			c++;
+			k = this.tags[i];
+			
 			this.token_const['OPEN_' + k] = c;
 			
 			v = this.tags[k];

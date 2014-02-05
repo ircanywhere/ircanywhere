@@ -25,7 +25,6 @@ App.SettingsController = Ember.ObjectController.extend({
 		},
 
 		passwordSubmit: function() {
-			console.log('wat');
 			var self = this;
 			
 			Ember.$.post('/api/settings/changepass', this.getProperties('password', 'newPassword')).then(function(data) {

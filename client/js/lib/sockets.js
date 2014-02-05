@@ -158,12 +158,10 @@ Ember.Socket = Ember.Object.extend({
 			exists = false,
 			object = {};
 
-		for (var i in payload) {
-			if (!payload.hasOwnProperty(i)) {
-				continue;
-			}
+		for (var k = 0, len = payload.length; k < len; k++) {
+			var i = payload[k];
 
-			object = Ember.Object.create(payload[i]);
+			object = Ember.Object.create(i);
 			exists = col.findBy('_id', object.get('_id'));
 			
 			if (exists) {

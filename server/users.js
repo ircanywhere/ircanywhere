@@ -70,6 +70,56 @@ UserManager.prototype.init = function() {
 }
 
 /**
+ * Checks the sent in authentication string (should be "token=actualToken")
+ * all in string format, this is how it is sent in the authentication command and
+ * how it lies as a cookie. It also takes a full cookie string, such as
+ * "someKey=1; someOtherKey=2; token=actualToken" and the token will only be parsed and used.
+ *
+ * Returns a valid user object which can be used to set on the socket for example or
+ * HTTP request, returns false if invalid
+ *
+ * @method 	isAuthenticated
+ * @param 	{Object} data
+ * @extend	true
+ * @return 	{Object}
+ */
+UserManager.prototype.isAuthenticated = function(data) {
+	var parsed = (data) ? data.split('; ') : [],
+		cookies = {};
+
+	parsed.forEach(function(cookie) {
+		var split = cookie.split('=');
+			cookies[split[0]] = split[1];
+	});
+	// get our cookies
+
+	if (!cookies.token) {
+		return false;
+	}
+
+	var query = {};
+		query['tokens.' + cookies.token] = {$exists: true};
+	var user = application.Users.sync.findOne(query);
+
+	if (!user) {
+		return false;
+	}
+
+	if (new Date() > user.tokens[cookies.token].time) {
+		var unset = {};
+			unset['tokens.' + cookies.token] = 1;
+		
+		application.Users.sync.update(query, {$unset: unset});
+		// token is expired, remove it
+
+		return false;
+	} else {
+		return user;
+	}
+	// validate the cookie and return user or false
+}
+
+/**
  * Handles user registrations, it takes req and res objects from express at the moment
  * however it should probably stay this way, because the api to register a user is at /api/register
  * I can't see a reason to change this to take individual parameters.
