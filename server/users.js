@@ -66,6 +66,13 @@ UserManager.prototype.init = function() {
 		res.header('Content-Type', 'application/json');
 		res.end(JSON.stringify(response));
 	});
+
+	application.app.post('/api/settings/changepassword', function(req, res) {
+		var response = self.changePassword(req, res);
+
+		res.header('Content-Type', 'application/json');
+		res.end(JSON.stringify(response));
+	});
 	// setup routes
 }
 
@@ -213,7 +220,7 @@ UserManager.prototype.registerUser = function(req, res) {
 /**
  * Handles the login call to /api/login and sets an appropriate cookie if successful
  *
- * @method userLogin
+ * @method 	userLogin
  * @param 	{Object} req
  * @param 	{Object} res
  * @extend	true
@@ -268,7 +275,7 @@ UserManager.prototype.userLogin = function(req, res) {
 /**
  * Handles the call to /api/forgot to send a forgot password link
  * 
- * @method forgotPassword
+ * @method 	forgotPassword
  * @param 	{Object} req
  * @param 	{Object} res
  * @extend	true
@@ -316,19 +323,54 @@ UserManager.prototype.forgotPassword = function(req, res) {
  * Handles the call to /api/reset which will be called when the reset password link is visited
  * Checking is done to make sure a token exists in a user record.
  * 
- * @method resetPassword
+ * @method 	resetPassword
  * @param 	{Object} req
  * @param 	{Object} res
  * @extend	true
  * @return 	{Object}
  */
 UserManager.prototype.resetPassword = function(req, res) {
-	var output = {failed: false, successMessage: '', errors: []},
-		password = req.param('password', ''),
+	var password = req.param('password', ''),
 		confirmPassword = req.param('confirmPassword', ''),
 		token = req.param('token', ''),
 		time = new Date(Date.now()),
 		user = application.Users.sync.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
+
+	return this.updatePassword(user, password, confirmPassword);
+}
+
+/**
+ * Handles the call to /api/settings/changepassword which is almost identical to resetPassword
+ * however it checks for authentication and then changes the password using that user, it doesn't
+ * take a token though.
+ * 
+ * @method 	resetPassword
+ * @param 	{Object} req
+ * @param 	{Object} res
+ * @extend	true
+ * @return 	{Object}
+ */
+UserManager.prototype.changePassword = function(req, res) {
+	var password = req.param('password', ''),
+		confirmPassword = req.param('confirmPassword', ''),
+		user = this.isAuthenticated(req.headers.cookie);
+
+	return this.updatePassword(user, password, confirmPassword);
+}
+
+/**
+ * Updates a users password, doesn't bypass any checkings, just doesn't
+ * define how you select the user, so via a token or direct user object
+ * 
+ * @method 	updatePassword
+ * @param 	{Object} user
+ * @param 	{Object} password
+ * @param 	{Object} confirmPassword
+ * @extend	true
+ * @return 	{Object}
+ */
+UserManager.prototype.updatePassword = function(user, password, confirmPassword) {
+	var output = {failed: false, successMessage: '', errors: []};
 
 	if (user === null) {
 		output.failed = true;
@@ -347,7 +389,7 @@ UserManager.prototype.resetPassword = function(req, res) {
 			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
 		application.Users.sync.update({'resetToken.token': token}, {$unset: {resetToken: 1}, $set: {password: hash}});
-		// set the password
+		// set the password && unset any reset tokens
 
 		output.successMessage = 'Your password has been reset, you may now login';
 	}
@@ -397,7 +439,7 @@ UserManager.prototype.onUserLogin = function(me) {
  * Looks for a template and parses the {{tags}} into the values in replace
  * and returns a string, used to parse emails.
  *
- * @method parse
+ * @method 	parse
  * @param 	{String} file
  * @param 	{Object} replace
  * @extend 	true

@@ -27,7 +27,7 @@ App.SettingsController = Ember.ObjectController.extend({
 		passwordSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/settings/changepass', this.getProperties('password', 'newPassword')).then(function(data) {
+			Ember.$.post('/api/settings/changepassword', this.getProperties('password', 'newPassword')).then(function(data) {
 				self[(data.failed) ? 'passwordFail' : 'passwordSuccess'](data);
 			}, this.passwordFail.bind(this));
 		}
