@@ -455,6 +455,8 @@ SocketManager.prototype.handleAuth = function(socket, data) {
 		socket._user = user;
 		Users[user._id] = socket;
 
+		socket.send('authenticate', true, false);
+
 		this.handleConnect(socket);
 		// handle sending out data on connect
 	}

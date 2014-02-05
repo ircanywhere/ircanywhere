@@ -28,15 +28,23 @@ App.TabRoute = AppRoute.extend({
 
 	actions: {
 		willTransition: function(transition) {
-			var parts = transition.providedModelsArray,
-				url = (parts.length === 1) ? parts[0] : parts[0] + '/' + decodeURIComponent(parts[1]).toLowerCase(),
-				index = this.controllerFor('index'),
-				socket = index.socket,
-				tab = socket.findOne('tabs', {url: url});
+			var params = transition.params,
+				parts = transition.providedModelsArray;
 
 			if (parts.length === 0) {
-				return transition.abort();
+				var url = (!params.tab) ? params.url : params.url + '/' + decodeURIComponent(params.tab).toLowerCase();
+			} else if (parts.length === 1) {
+				var url = parts[0];
+			} else {
+				var url = parts[0] + '/' + decodeURIComponent(parts[1]).toLowerCase();
 			}
+			// attempt to construct a url from resolves models or parameters
+
+			console.log(url);
+			
+			var index = this.controllerFor('index'),
+				socket = index.socket,
+				tab = socket.findOne('tabs', {url: url});
 
 			if (!tab || tab && tab.selected) {
 				return false;

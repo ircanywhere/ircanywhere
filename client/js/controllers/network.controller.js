@@ -48,9 +48,11 @@ App.NetworkController = Ember.ObjectController.extend({
 
 	gotoUnread: function(id) {
 		console.log('goto first unread');
+		// XXX
 	},
 
 	gotoHighlight: function(id) {
 		console.log('goto first highlight');
+		// XXX
 	}
 });

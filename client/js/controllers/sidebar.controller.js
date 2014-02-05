@@ -72,20 +72,5 @@ App.SidebarController = Ember.ArrayController.extend({
 		this.set('content', this.socket.findAll('tabs'));
 		this.set('events', this.socket.findAll('events'));
 		// set that to the tabs collection, it'll update automatically when they change
-	},
-
-	actions: {
-		goto: function(url) {
-			url = url.substring(3);
-			// cut the /t/ off the front
-
-			var split = url.split('/');
-
-			if (split.length === 1) {
-				this.transitionToRoute('network', split[0]);
-			} else {
-				this.transitionToRoute('tab', split[0], split[1]);
-			}
-		}
 	}
 });

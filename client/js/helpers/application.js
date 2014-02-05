@@ -83,7 +83,7 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
-		route = '/t/' + url + '/' + nickname,
+		route = '#/t/' + url + '/' + nickname,
 		html = Ember.Handlebars.compile('<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '" {{action goto "' + route + '"}}>' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>');
 	
 	return html(null, options);
