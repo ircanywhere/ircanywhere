@@ -57,7 +57,7 @@ Ember.Handlebars.registerHelper('group', function(options) {
 	view.appendChild(childView);
 });
 
-Ember.Handlebars.registerBoundHelper('userLink', function(show, user, options) {
+Ember.Handlebars.helper('userLink', function(show, user, options) {
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,

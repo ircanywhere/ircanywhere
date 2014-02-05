@@ -5,31 +5,31 @@
 <ul>
 	{{#if owners}}
 		<li data-type="op" class="head clear"><span class="left">Owners</span><span class="right">{{owners.length}}</span></li>
-		{{#each user in owners}}
+		{{#each user in owners groupedRows=true}}
 			<li data-type="op">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}
 	{{#if admins}}
 		<li data-type="op" class="head clear"><span class="left">Administrators</span><span class="right">{{admins.length}}</span></li>
-		{{#each user in admins}}
+		{{#each user in admins groupedRows=true}}
 			<li data-type="op">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}
 	{{#if operators}}
 		<li data-type="op" class="head clear"><span class="left">Operators</span><span class="right">{{operators.length}}</span></li>
-		{{#each user in operators}}
+		{{#each user in operators groupedRows=true}}
 			<li data-type="op">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}
 	{{#if halfops}}
 		<li data-type="halfop" class="head clear"><span class="left">Half Operators</span><span class="right">{{halfops.length}}</span></li>
-		{{#each user in halfops}}
+		{{#each user in halfops groupedRows=true}}
 			<li data-type="halfop">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}
 	{{#if voiced}}
 		<li data-type="voice" class="head clear"><span class="left">Voiced</span><span class="right">{{voiced.length}}</span></li>
-		{{#each user in voiced}}
+		{{#each user in voiced groupedRows=true}}
 			<li data-type="voice">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}
@@ -37,7 +37,7 @@
 		{{#if displayHeading}}
 			<li data-type="user" class="head clear"><span class="left">Users</span><span class="right">{{normal.length}}</span></li>
 		{{/if}}
-		{{#each user in normal}}
+		{{#each user in normal groupedRows=true}}
 			<li data-type="user">{{userLink true user}}</li>
 		{{/each}}
 	{{/if}}

@@ -42,8 +42,6 @@ App.TabRoute = AppRoute.extend({
 				return false;
 			}
 
-			console.log(transition.providedModelsArray, tab);
-
 			socket.findAll('tabs').setEach('selected', false);
 			tab.set('selected', true);
 			// mark all but this as selected

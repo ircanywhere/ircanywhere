@@ -26,6 +26,13 @@ App.TitlebarView = Ember.View.extend({
 	},
 
 	mouseEnter: function(e) {
+		if (this.get('controller.tab.type') !== 'channel') {
+			return false;
+		} else if (this.get('controller.tab.desc') === '') {
+			return false;
+		}
+		// only show the dropdown for channels, it's really not needed on other tabs
+
 		App.set('timein', setTimeout(function() {
 			Ember.$('.overlay-bar').slideDown('fast');
 		}, 500));

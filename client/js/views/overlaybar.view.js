@@ -7,6 +7,13 @@ App.OverlaybarView = Ember.View.extend({
 	}.property('context.selectedTab.type').cacheable(),
 
 	mouseEnter: function(e) {
+		if (this.get('context.selectedTab.type') !== 'channel') {
+			return false;
+		} else if (this.get('context.selectedTab.type.topic', '') === '') {
+			return false;
+		}
+		// only show the dropdown for channels, it's really not needed on other tabs
+
 		App.set('timein', setTimeout(function() {
 			Ember.$('.overlay-bar').slideDown('fast');
 		}, 500));

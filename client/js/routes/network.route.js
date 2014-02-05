@@ -33,8 +33,6 @@ App.NetworkRoute = AppRoute.extend({
 				return false;
 			}
 
-			console.log('net', tab);
-
 			socket.findAll('tabs').setEach('selected', false);
 			tab.set('selected', true);
 			// mark all but this as selected

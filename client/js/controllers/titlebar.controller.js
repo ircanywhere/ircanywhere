@@ -65,6 +65,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		if (tab.type === 'network') {
 			return {
 				key: tab.get('_id'),
+				type: tab.get('type'),
 				title: tab.get('title'),
 				modes: '',
 				desc: tab.get('url'),
@@ -74,15 +75,17 @@ App.TitlebarController = Ember.ObjectController.extend({
 		} else if (tab.type === 'query') {
 			return {
 				key: tab.get('_id'),
+				type: tab.get('type'),
 				title: tab.get('title'),
 				modes: '',
-				desc: '',
+				desc: tab.get('networkName'),
 				network: tab.get('networkName'),
 				isChannel: false
 			};
 		} else if (tab.type === 'channel') {
 			return {
 				key: tab.get('_id'),
+				type: tab.get('type'),
 				title: tab.get('title'),
 				modes: '+' + tab.get('modes'),
 				desc: (tab.get('topic')) ? tab.get('topic').topic : '',
@@ -98,13 +101,16 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 		if (tab) {
 			this.set('tab', this._formatTab(tab));
+		} else {
+
 		}
 		// update this.tab if we have a new selected tab
 	}.observes('controllers.index.tabId', 'tabs.@each.selected'),
 
 	optionsChanged: function() {
 		var tab = this.socket.findOne('tabs', {_id: this.get('controllers.index.tabId')}),
-			network = this.socket.findOne('networks', {_id: tab.get('network')});
+			id = (tab) ? tab.get('network') : false,
+			network = this.socket.findOne('networks', {_id: id});
 		// get the selected tab
 
 		if (!tab) {
