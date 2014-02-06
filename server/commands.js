@@ -485,9 +485,8 @@ CommandManager.prototype['/close'] = function(user, client, target, params) {
 			ircFactory.destroy(client._id);
 		}
 
-		//networkManager.removeTab(client);
+		networkManager.removeTab(client);
 		// if it's a network /quit and remove tab(s)
-		// XXX - finish this
 	}
 }
 

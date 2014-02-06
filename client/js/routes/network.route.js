@@ -31,8 +31,6 @@ App.NetworkRoute = AppRoute.extend({
 			}
 			// attempt to construct a url from resolves models or parameters
 
-			console.log(url);
-			
 			var index = this.controllerFor('index'),
 				socket = index.socket,
 				tab = socket.findOne('tabs', {url: url});

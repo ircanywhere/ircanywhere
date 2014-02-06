@@ -56,6 +56,17 @@ App.TitlebarController = Ember.ObjectController.extend({
 			});
 		},
 
+		closeWindow: function() {
+			var tab = this.socket.findOne('tabs', {selected: true});
+
+			this.socket.insert('commands', {
+				command: '/close',
+				network: tab.networkName,
+				target: tab.target,
+				backlog: false
+			});
+		},
+
 		toggleProperty: function() {
 			this.toggleProperty('showMenu');
 		}

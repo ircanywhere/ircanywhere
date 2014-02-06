@@ -236,17 +236,14 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 
 	var callback = function(err, doc) {
 		if (client.internal.tabs[obj.target]) {
-			console.log('updating existing tab..');
 			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active, selected: select}}, function(err, doc) { });
 		} else {
-			console.log('inserting new tab..');
 			application.Tabs.insert(obj, function(err, doc) { });
 		}
 		// insert to db, or update old record
 	};
 
 	if (select) {
-		console.log('unselecting selected tab..');
 		application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}}, callback);
 	} else {
 		callback(null, null);

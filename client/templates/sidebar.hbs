@@ -1,6 +1,6 @@
 <div class="header">
 	<h3>IRCAnywhere</h3>
-	<a href="#" {{action "openModal" settings}}>Settings</a> &middot; {{#link-to "index"}}Logout{{/link-to}}
+	<a href="#" {{action "openModal" "settings"}}>Settings</a> &middot; {{#link-to "index"}}Logout{{/link-to}}
 </div>
 <div class="items">
 	<ul>
@@ -11,7 +11,7 @@
 </div>
 <div class="footer">
 	<div class="link">
-		{{#link-to "index"}}Add a new network{{/link-to}}
+		<a href="#" {{action "openModal" "addnetwork"}}>Add a new network</a>
 	</div>
 	<div class="text">
 		&copy; IRCAnywhere 2013 &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a> &middot; <a href="https://github.com/ircanywhere/ircanywhere/issues" target="_blank">Issue tracker</a>
