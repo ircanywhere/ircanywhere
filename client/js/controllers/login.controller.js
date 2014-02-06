@@ -20,9 +20,11 @@ App.LoginController = Ember.ObjectController.extend({
 			email = exports.Helpers.trimInput(email);
 			// validation
 
-			Ember.$.post('/api/login', {email: email, password: password}).then(function(data) {
+			Ember.$.post('/api/login', {email: email, password: password}, function(data) {
 				self[(data.failed) ? 'loginFail' : 'loginSuccess'](data);
-			}, this.loginFail.bind(this));
+			}).fail(function(err) {
+				self.loginFail(false)
+			});
 			// still stuck using jquery, everything seems to depend on it
 			// oh well.
 		},
@@ -34,9 +36,11 @@ App.LoginController = Ember.ObjectController.extend({
 			email = exports.Helpers.trimInput(email);
 			// validation
 
-			Ember.$.post('/api/forgot', {email: email}).then(function(data) {
+			Ember.$.post('/api/forgot', {email: email}, function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
-			}, this.resetFail.bind(this));
+			}).fail(function(err) {
+				self.resetFail(false)
+			});
 		},
 
 		toggleProperty: function() {
@@ -51,7 +55,7 @@ App.LoginController = Ember.ObjectController.extend({
 	},
 
 	loginFail: function(data) {
-		if (typeof data === 'undefined') {
+		if (!data) {
 			this.set('errors', 'An error has occured');
 		} else {
 			this.set('errors', data.errors[0].error);
@@ -67,8 +71,8 @@ App.LoginController = Ember.ObjectController.extend({
 	resetFail: function(data) {
 		this.set('resetSent', false);
 
-		if (typeof data === 'undefined') {
-			this.set('resetErrors', 'An error has occured');
+		if (!data) {
+			this.set('resetErrors', 'An error has occured, contact your system administrator');
 		} else {
 			this.set('resetErrors', data.errors[0].error);
 		}

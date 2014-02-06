@@ -38,9 +38,9 @@ App.SettingsController = Ember.ObjectController.extend({
 	actions: {
 		close: function() {
 			this.set('settingsErrors', []);
-			this.set('settingsSuccess', '');
+			this.set('settingsMessage', '');
 			this.set('passwordErrors', []);
-			this.set('passwordSuccess', '');
+			this.set('passwordMessage', '');
 			// reset a load of settings
 
 			return this.send('closeModal');
@@ -59,17 +59,21 @@ App.SettingsController = Ember.ObjectController.extend({
 		settingsSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/settings/updatesettings', this.getProperties('name', 'nickname', 'email')).then(function(data) {
+			Ember.$.post('/api/settings/updatesettings', this.getProperties('name', 'nickname', 'email'), function(data) {
 				self[(data.failed) ? 'settingsFail' : 'settingsSuccess'](data);
-			}, this.settingsFail.bind(this));
+			}).fail(function(err) {
+				self.settingsFail(false);
+			});
 		},
 
 		passwordSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/settings/changepassword', this.getProperties('password', 'newPassword')).then(function(data) {
+			Ember.$.post('/api/settings/changepassword', this.getProperties('password', 'newPassword'), function(data) {
 				self[(data.failed) ? 'passwordFail' : 'passwordSuccess'](data);
-			}, this.passwordFail.bind(this));
+			}).fail(function(err) {
+				self.passwordFail(false);
+			});
 		}
 	},
 
@@ -81,8 +85,8 @@ App.SettingsController = Ember.ObjectController.extend({
 	settingsFail: function(data) {
 		this.set('settingsMessage', false);
 
-		if (typeof data === 'undefined') {
-			this.set('settingsErrors', ['An error has occured']);
+		if (!data) {
+			this.set('settingsErrors', [{error: 'An error has occured, contact your system administrator'}]);
 		} else {
 			this.set('settingsErrors', data.errors);
 		}
@@ -97,8 +101,8 @@ App.SettingsController = Ember.ObjectController.extend({
 	passwordFail: function(data) {
 		this.set('passwordMessage', false);
 
-		if (typeof data === 'undefined') {
-			this.set('passwordErrors', ['An error has occured']);
+		if (!data) {
+			this.set('passwordErrors', [{error: 'An error has occured, contact your system administrator'}]);
 		} else {
 			this.set('passwordErrors', data.errors);
 		}

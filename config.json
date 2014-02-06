@@ -1,0 +1,112 @@
+{
+	"mongo": "mongodb://127.0.0.1:27017/ircanywhere",
+	/* -- required
+	 * -- string
+	 * -- usage: The mongodb database url */
+
+	"oplog": "mongodb://127.0.0.1:27017/local",
+	/* -- required
+	 * -- string
+	 * -- usage: The mongodb oplog url - Note you may not have this available on shared mongohq and similar hosts */
+
+	"url": "http://10.0.33.34:3000/",
+	/* -- required
+	 * -- string 
+	 * -- usage: The http url of the web server you're running behind */
+
+	"port": 3000,
+	/* -- required
+	 * -- number
+	 * -- usage: The port to listen on */
+
+	"enableRegistrations": true,
+	/* -- required
+	 * -- boolean 
+	 * -- usage: Whether to enable registrations or not */
+
+	"ssl": false,
+	/* -- boolean 
+	 * -- usage: Whether to enable HTTPS or not - you will need certificates
+				 defaults to false. */
+
+	"forkProcess": true,
+	/* -- required
+	 * -- boolean 
+	 * -- usage: Whether to fork a seperate process for irc connections, this will allow connections to stay
+				 online when the main application closes. It'll also probably speed things up. It's recommended 
+				 to only ever set this to false when developing */
+
+	"email": {
+		"siteName": "IRCAnywhere",
+		/* -- string 
+		 * -- usage: The title to use in validation/forgot password emails
+					 defaults to "IRCAnywhere" */
+
+		"from": "IRCAnywhere <no-reply@ircanywhere.com>",
+		/* -- required
+		 * -- string 
+		 * -- usage: The email address to send emails from, can be either email@domain.tld
+					 or Name <email@domain.tld> */
+
+		"smtp": "smtp://username:password@smtp.gmail.com"
+		/* -- required
+		 * -- string 
+		 * -- usage: The smtp server to connect to, it's advised you set this up properly, you can run
+		 			 a local server and pass in a local url, or get free accounts from places like Mailgun */
+	},
+
+	"clientSettings": {
+		"networkLimit": 2,
+		/* -- required
+		 * -- number
+		 * -- usage: Network limit for users, minimum is 1, maximum is 10, at the moment */
+
+		"networkRestriction": "*",
+		/* -- string
+		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
+					 disabled by omitting completely, or setting to empty or * */
+
+		"userNamePrefix": "ia"
+		/* -- required
+		 * -- string 
+		 * -- usage: The username prefix for users, each registered user has it's own ident
+					 based on this prefix + a sequential number */
+	},
+
+	"defaultNetwork": {
+		"server": "localhost",
+		/* -- required
+		 * -- string 
+		 * -- usage: Hostname of the default network to connect new users to */
+
+		"port": 6667,
+		/* -- required
+		 * -- number
+		 * -- usage: Port to connect the default client to, min 1, max 65535 */
+
+		"realname": "IRC Client",
+		/* -- required
+		 * -- string 
+		 * -- usage: The gecos for default irc clients */
+
+		"secure": false,
+		/* -- boolean 
+		 * -- usage: Whether to use ssl for the default irc client, can be omitted
+					 defaults to false if so */
+
+		"password": null,
+		/* -- string
+		 * -- usage: If the server requires a password, enter it here. Set to null to emit it
+					 or remove it completely */
+
+		"channels": [
+			{
+				"channel": "#ircanywhere-test",
+				"password": "channel-password"
+			}
+		]
+		/* -- array > object
+		 * -- usage: An array of channels to connect to on startup, the channel must be the
+					 same as the above object, password is optional, channel is not. */
+	}
+}

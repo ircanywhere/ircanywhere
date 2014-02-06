@@ -14,9 +14,11 @@ App.SignupController = Ember.ObjectController.extend({
 		signupSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/register', this.getProperties('name', 'nickname', 'email', 'password', 'confirmPassword')).then(function(data) {
+			Ember.$.post('/api/register', this.getProperties('name', 'nickname', 'email', 'password', 'confirmPassword'), function(data) {
 				self[(data.failed) ? 'signupFail' : 'signupSuccess'](data);
-			}, this.signupFail.bind(this));
+			}).fail(function(err) {
+				self.signupFail(false);
+			});
 		}
 	},
 
@@ -28,8 +30,8 @@ App.SignupController = Ember.ObjectController.extend({
 	signupFail: function(data) {
 		this.set('success', false);
 
-		if (typeof data === 'undefined') {
-			this.set('errors', 'An error has occured');
+		if (!data) {
+			this.set('errors', [{error: 'An error has occured, contact your system administrator'}]);
 		} else {
 			this.set('errors', data.errors);
 		}

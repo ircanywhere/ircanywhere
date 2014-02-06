@@ -1,4 +1,4 @@
-{{#modal-dialog action="close" header="Settings"}}
+{{#modal-dialog action="close"}}
 	<div class="modal-header">
 		<h3>{{title}}</h3>
 	</div>
@@ -22,10 +22,10 @@
 						<label for="yourName">Your Name</label>
 						<div class="input">
 							<div class="field">
-								{{input type="text" id="yourName" class="xlarge" valueBinding="model.name" value=name tabindex="1"}}
+								{{input type="text" id="yourName" valueBinding="model.name" value=name tabindex="1"}}
 							</div>
 							<span class="tooltip">
-								<a href="#" rel="twipsy" title="Your full name, no more than 35 characters.">?</a>
+								<a href="#" rel="twipsy" title="Your full name, no more than 35 characters">?</a>
 							</span>
 						</div>
 					</div>
@@ -33,10 +33,10 @@
 						<label for="ircNickname">IRC Nickname</label>
 						<div class="input">
 							<div class="field">
-								{{input type="text" id="ircNickname" class="xlarge" valueBinding="model.nickname" value=nickname tabindex="2"}}
+								{{input type="text" id="ircNickname" valueBinding="model.nickname" value=nickname tabindex="2"}}
 							</div>
 							<span class="tooltip">
-								<a href="#" rel="twipsy" title="A valid IRC alias you usually use.">?</a>
+								<a href="#" rel="twipsy" title="A valid IRC alias you usually use">?</a>
 							</span>
 						</div>
 					</div>
@@ -44,10 +44,10 @@
 						<label for="emailAddress">Email Address</label>
 						<div class="input">
 							<div class="field">
-								{{input type="text" id="emailAddress" class="xlarge" valueBinding="model.email" value=email tabindex="3"}}
+								{{input type="text" id="emailAddress" valueBinding="model.email" value=email tabindex="3"}}
 							</div>
 							<span class="tooltip">
-								<a href="#" rel="twipsy" title="A valid email address.">?</a>
+								<a href="#" rel="twipsy" title="A valid email address">?</a>
 							</span>
 						</div>
 					</div>
@@ -78,7 +78,7 @@
 						<label for="password">Current Password</label>
 						<div class="input">
 							<div class="field">
-								{{input type="password" id="password" class="xlarge" valueBinding="model.password" value=password tabindex="1"}}
+								{{input type="password" id="password" valueBinding="model.password" value=password tabindex="1"}}
 							</div>
 							<span class="tooltip">
 								<a href="#" rel="twipsy" title="Your current password">?</a>
@@ -89,10 +89,10 @@
 						<label for="newPassword">New Password</label>
 						<div class="input">
 							<div class="field">
-								{{input type="password" id="newPassword" class="xlarge" valueBinding="model.newPassword" value=newPassword tabindex="2"}}
+								{{input type="password" id="newPassword" valueBinding="model.newPassword" value=newPassword tabindex="2"}}
 							</div>
 							<span class="tooltip">
-								<a href="#" rel="twipsy" title="Your new password, longer than 6 characters.">?</a>
+								<a href="#" rel="twipsy" title="Your new password, longer than 6 characters">?</a>
 							</span>
 						</div>
 					</div>
@@ -112,8 +112,5 @@
 				<li {{bind-attr class="showPasswordForm:active"}}><a href="#" {{action active "password"}}>Change Password</a></li>
 			</ul>
 		</div>
-	</div>
-	<div class="modal-footer">
-
 	</div>
 {{/modal-dialog}}

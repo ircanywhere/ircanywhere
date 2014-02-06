@@ -11,9 +11,11 @@ App.ResetController = Ember.ObjectController.extend({
 		resetSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/reset', this.getProperties('token', 'password', 'confirmPassword')).then(function(data) {
+			Ember.$.post('/api/reset', this.getProperties('token', 'password', 'confirmPassword'), function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
-			}, this.resetFail.bind(this));
+			}).fail(function(err) {
+				self.resetFail(false);
+			});
 		}
 	},
 
@@ -25,8 +27,8 @@ App.ResetController = Ember.ObjectController.extend({
 	resetFail: function(data) {
 		this.set('success', false);
 
-		if (typeof data === 'undefined') {
-			this.set('errors', 'An error has occured');
+		if (!data) {
+			this.set('errors', [{error: 'An error has occured, contact your system administrator'}]);
 		} else {
 			this.set('errors', data.errors);
 		}
