@@ -511,7 +511,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 			var query = {network: netIds[tab.network].name, target: tab.target, user: user._id}
 		}
 
-		var eventResults = application.Events.sync.find(query).sort({$natural: -1}).sync.toArray(),
+		var eventResults = application.Events.sync.find(query).sort({$natural: -1}).limit(50).sync.toArray(),
 			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
 			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
 		// get some information about the unread items/highlights

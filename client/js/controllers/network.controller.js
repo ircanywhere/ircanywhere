@@ -52,10 +52,11 @@ App.NetworkController = Ember.ObjectController.extend({
 
 		if (first) {
 			var firstElement = tabElement.find('[data-id=' + first._id + ']')[0];
-			tabElement[0].scrollTop = firstElement.offsetTop - firstElement.height();
+			tabElement[0].scrollTop = firstElement.offsetTop - firstElement.offsetHeight;
 		} else {
 			tabElement[0].scrollTop = 0;
 		}
+		// XXX - Work on this.. A bit iffy
 	},
 
 	gotoHighlight: function(id) {

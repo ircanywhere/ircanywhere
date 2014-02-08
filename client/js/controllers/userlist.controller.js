@@ -3,10 +3,6 @@ App.UserlistController = Ember.ArrayController.extend({
 	tabs: [],
 	users: [],
 
-	userCount: function() {
-		return this.get('filtered').length;
-	}.property('filtered').cacheable(),
-
 	owners: Ember.computed.filterBy('filtered', 'sort', 1),
 	admins: Ember.computed.filterBy('filtered', 'sort', 2),
 	operators: Ember.computed.filterBy('filtered', 'sort', 3),
