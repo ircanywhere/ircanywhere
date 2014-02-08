@@ -42,7 +42,7 @@
 		 * -- usage: The title to use in validation/forgot password emails
 					 defaults to "IRCAnywhere" */
 
-		"from": "IRCAnywhere <no-reply@ircanywhere.com>",
+		"from": "IRCAnywhere <no-reply@mysite.com>",
 		/* -- required
 		 * -- string 
 		 * -- usage: The email address to send emails from, can be either email@domain.tld
@@ -56,12 +56,12 @@
 	},
 
 	"clientSettings": {
-		"networkLimit": 2,
+		"networkLimit": 10,
 		/* -- required
 		 * -- number
-		 * -- usage: Network limit for users, minimum is 1, maximum is 10, at the moment */
+		 * -- usage: Network limit for users, minimum is 0, maximum is 10, at the moment */
 
-		"networkRestriction": "*",
+		"networkRestriction": "*.freenode.org",
 		/* -- string
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
 					 disabled by omitting completely, or setting to empty or * */

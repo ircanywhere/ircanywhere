@@ -1,5 +1,5 @@
 App.NetworkController = Ember.ObjectController.extend({
-	needs: ['index'],
+	needs: ['index', 'messages'],
 
 	tabChanged: function() {
 		var tab = this.socket.findOne('tabs', {_id: this.get('controllers.index.tabId')}),
@@ -47,8 +47,15 @@ App.NetworkController = Ember.ObjectController.extend({
 	},
 
 	gotoUnread: function(id) {
-		console.log('goto first unread');
-		// XXX
+		var first = this.get('controllers.messages.filtered').filterProperty('unread', true).objectAt(0),
+			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
+
+		if (first) {
+			var firstElement = tabElement.find('[data-id=' + first._id + ']')[0];
+			tabElement[0].scrollTop = firstElement.offsetTop - firstElement.height();
+		} else {
+			tabElement[0].scrollTop = 0;
+		}
 	},
 
 	gotoHighlight: function(id) {

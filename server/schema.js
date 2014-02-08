@@ -53,7 +53,7 @@ exports.schema = {
 	},
 	'clientSettings.networkLimit': {
 		type: 'number',
-		min: 1,
+		min: 0,
 		max: 10,
 		required: true
 	},

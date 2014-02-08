@@ -135,11 +135,7 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 		return false;
 	}
 
-	var escape = function(text) {
-		return text.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
-	};
-
-	if (message.message.match('(' + escape(client.nick) + ')')) {
+	if (message.message.match(new RegExp('(' + helper.escape(client.nick) + ')', 'i'))) {
 		return true;
 	}
 	// does this match our nick?

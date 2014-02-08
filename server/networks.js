@@ -179,6 +179,8 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		password = req.param('password', ''),
 		nick = req.param('nick', ''),
 		name = req.param('name', ''),
+		networkCount = 0,
+		restriction = (application.config.clientSettings.networkRestriction) ? application.config.clientSettings.networkRestriction : '*',
 		user = userManager.isAuthenticated(req.headers.cookie),
 		output = {failed: false, errors: []};
 	// get our parameters
@@ -189,6 +191,8 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		return output;
 	}
 
+	var escapedRestriction = helper.escape(restriction).replace('\\*', '(.*)');
+	networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
 	server = helper.trimInput(server);
 	name = helper.trimInput(name);
 	nick = helper.trimInput(nick);
@@ -207,6 +211,14 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 
 	if (port < 0 || port > 65535) {
 		output.errors.push({error: 'The port you have entered is invalid'});
+	}
+
+	if (networkCount >= application.config.clientSettings.networkLimit) {
+		output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
+	}
+
+	if (!server.match(new RegExp('(' + escapedRestriction + ')', 'i'))) {
+		output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
 	}
 
 	if (output.errors.length > 0) {
