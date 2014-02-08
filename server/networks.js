@@ -266,6 +266,7 @@ NetworkManager.prototype.addNetwork = function(user, network) {
 	// XXX - this looks a bit messy, tidied up at some point? it would be nice
 	//		 if simple-schema could automatically cast these, maybe it can with cast: {}
 
+	network.channels = [];
 	network.internal = {
 		capabilities: {},
 		nodeId: application.nodeId,

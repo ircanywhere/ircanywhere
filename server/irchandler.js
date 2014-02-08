@@ -216,7 +216,7 @@ IRCHandler.prototype.join = function(client, message) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
 	}
-	// if it's us joining a channel we'll mark it in internal.tabs
+	// if it's us joining a channel we'll create a tab for it and request a mode
 
 	channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 	eventManager.insertEvent(client, message, 'join');

@@ -221,10 +221,36 @@ CommandManager.prototype['/me'] = function(user, client, target, params) {
  */
 CommandManager.prototype['/join'] = function(user, client, target, params) {
 	if (params.length !== 0 && helper.isChannel(client, params[0])) {
-		ircFactory.send(client._id, 'join', params);
+		var channel = params[0],
+			password = (params.length === 1) ? '' : params[1];
 	} else {
-		ircFactory.send(client._id, 'join', [target].concat(params));
+		var channel = target,
+			password = (params.length === 0) ? '' : params[0];
 	}
+	// look for our parameters, we're expecting '#channel password' here, or '#channel'
+	// the original IRC protocol accepts '#channel1,#channel2' this command doesn't at
+	// the moment because we're attempting to look for a password so we can remember it
+
+	ircFactory.send(client._id, 'join', [channel, password]);
+	// send the join command
+
+	var index = _.findIndex(client.channels, {channel: channel.toLowerCase()});
+	if (index === -1) {
+		client.channels.push({
+			channel: channel.toLowerCase(),
+			password: password
+		});
+	} else {
+		client.channels[index] = {
+			channel: channel.toLowerCase(),
+			password: password
+		};
+	}
+	// attempt to figure out if we've got an autojoin record set - just defining a
+	// tab isn't enough for us
+
+	application.Networks.sync.update({_id: client._id}, {$set: {channels: client.channels}});
+	// we'll also store it in our reconnect settings
 }
 
 /**

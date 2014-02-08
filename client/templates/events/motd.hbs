@@ -2,7 +2,7 @@
 	<span class="time">{{time content.message.time}}</span>
 	<span class="column message">
 	{{#each item in content.message.message}}
-		{{ircParse item}}<br />
+		{{ircParse item ...parentController.parentController.content._id}}<br />
 	{{/each}}
 	</span>
 </div>

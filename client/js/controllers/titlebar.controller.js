@@ -81,6 +81,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 				modes: '',
 				desc: tab.get('url'),
 				network: tab.get('networkName'),
+				networkId: tab.get('network'),
 				isChannel: false
 			};
 		} else if (tab.type === 'query') {
@@ -91,6 +92,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 				modes: '',
 				desc: tab.get('networkName'),
 				network: tab.get('networkName'),
+				networkId: tab.get('network'),
 				isChannel: false
 			};
 		} else if (tab.type === 'channel') {
@@ -98,9 +100,10 @@ App.TitlebarController = Ember.ObjectController.extend({
 				key: tab.get('_id'),
 				type: tab.get('type'),
 				title: tab.get('title'),
-				modes: '+' + tab.get('modes'),
+				modes: (tab.get('modes')) ? '+' + tab.get('modes') : '',
 				desc: (tab.get('topic')) ? tab.get('topic').topic : '',
 				network: tab.get('networkName'),
+				networkId: tab.get('network'),
 				isChannel: true
 			};
 		}
