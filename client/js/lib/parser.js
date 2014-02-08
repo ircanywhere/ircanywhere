@@ -324,7 +324,7 @@ Ember.Parser = Ember.Object.extend({
 
 		text = text.replace(/(^|[ ]+)(#\S+)/ig, function(input, match, match2) {
 			var route = '#/t/' + network.url + '/' + exports.Helpers.encodeChannel(match2);
-			return (match == ' ') ? ' <a href="' + route + '" rel="channel-link" {{action goto "' + route + '"}}>' + match2 + '</a>' : '<a href="' + route + '" rel="channel-link" {{action goto "' + route + '"}}>' + match2 + '</a>';
+			return (match == ' ') ? ' <a href="' + route + '" rel="channel-link">' + match2 + '</a>' : '<a href="' + route + '" rel="channel-link">' + match2 + '</a>';
 		});
 		// parse channel into link
 
