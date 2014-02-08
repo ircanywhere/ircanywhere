@@ -190,12 +190,14 @@ UserManager.prototype.registerUser = function(req, res) {
 	}
 	// any errors?
 
-	var salt = helper.generateSalt(10),
+	var userCount = application.Users.sync.find().sync.count(),
+		salt = helper.generateSalt(10),
 		user = {
 			email: email,
 			password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
 			salt: salt,
 			tokens: {},
+			ident: application.config.clientSettings.userNamePrefix + userCount,
 			profile: {
 				name: name,
 				nickname: nickname

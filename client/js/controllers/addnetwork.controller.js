@@ -4,7 +4,7 @@ App.AddnetworkController = Ember.ObjectController.extend({
 
 	server: '',
 	secure: false,
-	port: '',
+	port: '6667',
 	sasl: false,
 	password: '',
 	nick: '',

@@ -155,7 +155,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 			this.set('connectionLink', 'Disconnect');
 		}
 		// is the network connected?
-	}.observes('tabs.@each.hiddenUsers', 'tabs.@each.hiddenEvents', 'tabs.@each.active', 'networks.@each.internal.status'),
+	}.observes('tabs.@each.hiddenUsers', 'tabs.@each.hiddenEvents', 'tabs.@each.active', 'networks.@each.internal.status', 'controllers.index.tabId', 'tabs.@each.selected'),
 
 	ready: function() {
 		this.set('networks', this.socket.findAll('networks'));

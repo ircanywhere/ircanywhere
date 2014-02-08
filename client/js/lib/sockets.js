@@ -63,19 +63,17 @@ Ember.Socket = Ember.Object.extend({
 
 		this.set('done', false);
 
-		this.get('emitter').on('done', function() {
+		this.emitter.on('done', function() {
 			self.set('done', true);
 
 			Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
 				var controller = getController(controllerName);
 				// fetch the controller if it's valid.
 
-				if (controller) {
-					if (typeof controller.ready === 'function') {
-						controller.ready.apply(controller);
-					}
-					// invoke the `ready` method if it has been defined on this controller.
+				if (controller && typeof controller.ready === 'function') {
+					controller.ready.apply(controller);
 				}
+				// invoke the `ready` method if it has been defined on this controller.
 			});
 			// bind any connect events to our controllers
 		});
@@ -97,7 +95,7 @@ Ember.Socket = Ember.Object.extend({
 			Ember.$.get(data.url, function(data) {
 				for (var type in data) {
 					if (type === 'burstend' && data[type] === true) {
-						self.get('emitter').done();
+						self.emitter.done();
 					} else {
 						self._store(type, data[type]);
 					}
@@ -270,7 +268,7 @@ Ember.Socket = Ember.Object.extend({
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
 			if (self.get('done') === false) {
-				self.get('emitter').on('done', function() {
+				self.emitter.on('done', function() {
 					_getResults(resolve, reject);
 				});
 				// wait till we've done inserting results

@@ -30,7 +30,7 @@
 					<div class="input">
 						<div class="input-prepend">
 							<div class="field">
-								<label class="add-on">
+								<label {{bind-attr class=":add-on secure:active"}}>
 									{{view Ember.Checkbox id="secure" checkedBinding="secure" tabindex="2"}}
 								</label>
 								{{input type="text" id="port" class="mini" valueBinding="model.port" value=port tabindex="3"}}
@@ -46,10 +46,10 @@
 					<div class="input">
 						<div class="input-prepend">
 							<div class="field">
-								<label class="add-on">
+								<label {{bind-attr class=":add-on sasl:active"}}>
 									{{view Ember.Checkbox id="sasl" checkedBinding="sasl" tabindex="4"}}
 								</label>
-								{{input type="text" id="password" class="mini" valueBinding="model.port" value=port tabindex="5"}}
+								{{input type="text" id="password" class="mini" valueBinding="model.password" value=password tabindex="5"}}
 							</div>
 						</div>
 						<span class="tooltip">

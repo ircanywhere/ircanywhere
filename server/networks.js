@@ -40,7 +40,8 @@ function NetworkManager() {
  * @return 	void
  */
 NetworkManager.prototype.init = function() {
-	var networks = application.Networks.find(),
+	var self = this,
+		networks = application.Networks.find(),
 		tabs = application.Tabs.find();
 
 	networks.each(function(err, doc) {
@@ -120,6 +121,13 @@ NetworkManager.prototype.init = function() {
 	});
 	// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
 	// instead of querying each time which is very inefficient
+
+	application.app.post('/api/addnetwork', function(req, res) {
+		var response = self.addNetworkApi(req, res);
+
+		res.header('Content-Type', 'application/json');
+		res.end(JSON.stringify(response));
+	});
 }
 
 /**
@@ -155,6 +163,72 @@ NetworkManager.prototype.getClients = function() {
 }
 
 /**
+ * Handles the add network api call, basically handling authentication
+ * validating the parameters and input, and on success passes the information
+ * to `addNetwork()` which handles everything else
+ *
+ * @method 	getClients
+ * @extend 	true
+ * @return 	{Object}
+ */
+NetworkManager.prototype.addNetworkApi = function(req, res) {
+	var server = req.param('server', ''),
+		secure = req.param('secure', false),
+		port = parseInt(req.param('port', '6667')),
+		sasl = req.param('sasl', false),
+		password = req.param('password', ''),
+		nick = req.param('nick', ''),
+		name = req.param('name', ''),
+		user = userManager.isAuthenticated(req.headers.cookie),
+		output = {failed: false, errors: []};
+	// get our parameters
+
+	if (!user) {
+		output.failed = true;
+		output.errors.push({error: 'Not authenticated'});
+		return output;
+	}
+
+	server = helper.trimInput(server);
+	name = helper.trimInput(name);
+	nick = helper.trimInput(nick);
+
+	if (server === '' || nick === '' || name === '') {
+		output.errors.push({error: 'The fields, server, nick and name are all required'});
+	}
+
+	if (!helper.isValidName(name)) {
+		output.errors.push({error: 'The name you have entered is too long'});
+	}
+
+	if (!helper.isValidNickname(nick)) {
+		output.errors.push({error: 'The nickname you have entered is invalid'});
+	}
+
+	if (port < 0 || port > 65535) {
+		output.errors.push({error: 'The port you have entered is invalid'});
+	}
+
+	if (output.errors.length > 0) {
+		output.failed = true;
+		return output;
+	}
+	// any errors?
+
+	this.addNetwork(user, {
+		server: server,
+		secure: (secure == 'true') ? true : false,
+		port: port,
+		sasl: (sasl == 'true') ? true : false,
+		password: password,
+		nick: nick,
+		realname: name
+	});
+
+	return output;
+}
+
+/**
  * Adds a network using the settings specified to the user's set of networks
  * This just adds it to the database and doesn't attempt to start it up.
  *
@@ -165,12 +239,9 @@ NetworkManager.prototype.getClients = function() {
  * @return 	{Object}
  */
 NetworkManager.prototype.addNetwork = function(user, network) {
-	var userCount = application.Users.sync.find().sync.count(),
-		userName = application.config.clientSettings.userNamePrefix + userCount;
-
 	network.name = network.server;
-	network.nick = user.profile.nickname;
-	network.user = userName;
+	network.nick = network.nick || user.profile.nickname;
+	network.user = user.ident;
 	network.secure = network.secure || false;
 	network.sasl = network.sasl || false;
 	network.saslUsername = network.saslUsername || undefined;
@@ -235,7 +306,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	// empty, bolt it
 
 	var callback = function(err, doc) {
-		if (client.internal.tabs[obj.target]) {
+		if (client.internal.tabs && client.internal.tabs[obj.target]) {
 			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active, selected: select}}, function(err, doc) { });
 		} else {
 			application.Tabs.insert(obj, function(err, doc) { });
@@ -244,7 +315,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	};
 
 	if (select) {
-		application.Tabs.update({user: client.internal.userId, selected: true}, {$set: {selected: false}}, callback);
+		application.Tabs.update({user: client.internal.userId}, {$set: {selected: false}}, {multi: true}, callback);
 	} else {
 		callback(null, null);
 	}
@@ -290,7 +361,9 @@ NetworkManager.prototype.removeTab = function(client, target) {
 	if (target) {
 		application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target});
 	} else {
-		application.Tabs.sync.remove({user: client.internal.userId, network: client._id});
+		application.Tabs.remove({user: client.internal.userId, network: client._id}, function(err, doc) {
+			application.Networks.remove({_id: client._id}, function(err, doc) { });
+		});
 	}
 	// remove tabs
 }

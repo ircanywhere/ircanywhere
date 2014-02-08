@@ -164,6 +164,10 @@ Application.prototype.setupOplog = function() {
  * @return	void
  */
 Application.prototype.setupWinston = function() {
+	if (!fs.existsSync('./logs')) {
+		fs.mkdirSync('./logs');
+	}
+
 	this.logger = new (winston.Logger)({
 		transports: [
 			new (winston.transports.Console)(),
@@ -263,7 +267,7 @@ Application.prototype.setupServer = function() {
 	// express settings
 
 	app.use(express.compress());
-	//app.use(express.static('client', {maxAge: 86400000}));
+	app.use(express.static('client', {maxAge: 86400000}));
 	app.use(express.static('client'));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());

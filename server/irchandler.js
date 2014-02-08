@@ -68,13 +68,17 @@ IRCHandler.prototype.registered = function(client, message) {
 		title: message.capabilities.network.name,
 		target: message.capabilities.network.name,
 		active: true
-	}});
+	}}, {multi: true});
 	// update the tab
 
 	application.Tabs.sync.update({network: client._id}, {$set: {
 		networkName: message.capabilities.network.name,
-	}});
+	}}, {multi: true});
 	// update any sub tabs
+
+	application.Events.sync.update({user: client.internal.userId, network: client.server}, {$set: {
+		network: message.capabilities.network.name,
+	}}, {multi: true});
 
 	eventManager.insertEvent(client, {
 		nickname: message.nickname,
