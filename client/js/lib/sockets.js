@@ -103,6 +103,10 @@ Ember.Socket = Ember.Object.extend({
 			});
 		}
 
+		if (event === 'channelUsers') {
+			self._store('channelUsers', data);
+		}
+
 		if (event === 'events') {
 			self._store('events', data);
 		}

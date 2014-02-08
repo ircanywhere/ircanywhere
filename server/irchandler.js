@@ -76,10 +76,6 @@ IRCHandler.prototype.registered = function(client, message) {
 	}}, {multi: true});
 	// update any sub tabs
 
-	application.Events.sync.update({user: client.internal.userId, network: client.server}, {$set: {
-		network: message.capabilities.network.name,
-	}}, {multi: true});
-
 	eventManager.insertEvent(client, {
 		nickname: message.nickname,
 		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
@@ -104,6 +100,15 @@ IRCHandler.prototype.registered = function(client, message) {
 		// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 	}
 	// find our channels to automatically join from the network setup
+
+	setTimeout(function() {
+		application.Events.update({user: client.internal.userId, network: client.server}, {$set: {
+			network: message.capabilities.network.name,
+		}}, {multi: true}, function(err, doc) {});
+	}, 5000);
+	// update events later on so when we're totally finished connecting (we can't assume at any point because of half assed ircds
+	// not sending out proper stuff.. we know that we're registered here we just give it 5 seconds for other shit to come in
+	// could be large who lists etc.
 }
 
 /**
