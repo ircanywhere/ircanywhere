@@ -125,7 +125,7 @@ function SocketManager() {
 		 */
 		update: function(uid, query, update) {
 			if (_.has(update, 'selected')) {
-				application.Tabs.sync.update({user: uid, selected: true}, {$set: {selected: false}});
+				application.Tabs.sync.update({user: uid}, {$set: {selected: false}}, {multi: true});
 			}
 			// also check for selected here, if a new tab is being selected then we will
 			// force the de-selection of the others

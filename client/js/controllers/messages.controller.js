@@ -85,17 +85,24 @@ App.MessagesController = Ember.ArrayController.extend({
 				counter = 0;
 				docs = [];
 
+			if (!tab) {
+				return false;
+			}
+
 			events.forEach(function(item) {
-				var el = container.find('div.row[data-id=' + item._id + ']'),
-					topOffset = el[0].offsetTop;
+				var el = container.find('div.row[data-id=' + item._id + ']');
 
-				if (top === 0 || top < topOffset && topOffset < bottom) {
-					// XXX - Handle highlights
+				if (el.get(0)) {
+					var topOffset = el[0].offsetTop;
 
-					item.set('unread', false);
-					if (self.readDocs.indexOf(item._id) === -1) {
-						self.readDocs.push(item._id);
-						counter++;
+					if (top === 0 || top < topOffset && topOffset < bottom) {
+						// XXX - Handle highlights
+
+						item.set('unread', false);
+						if (self.readDocs.indexOf(item._id) === -1) {
+							self.readDocs.push(item._id);
+							counter++;
+						}
 					}
 				}
 			});

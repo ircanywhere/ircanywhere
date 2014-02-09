@@ -156,20 +156,17 @@ Ember.Socket = Ember.Object.extend({
 
 	_store: function(collection, payload) {
 		var self = this,
-			col = self.get(collection),
-			exists = false,
-			object = {};
+			col = self.get(collection);
 
 		for (var k = 0, len = payload.length; k < len; k++) {
 			var i = payload[k];
 
-			object = Ember.Object.create(i);
-			exists = col.findBy('_id', object.get('_id'));
+			var exists = col.findBy('_id', i._id);
 			
 			if (exists) {
-				self._update(collection, exists.get('_id'), object);
+				self._update(collection, exists.get('_id'), Ember.Object.create(i));
 			} else {
-				col.pushObject(object);
+				col.pushObject(Ember.Object.create(i));
 			}
 		}
 	},

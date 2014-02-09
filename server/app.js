@@ -31,6 +31,7 @@ var _ = require('lodash'),
  * @return 	void
  */
 function Application() {
+	this.verbose = (process.env.VERBOSE && process.env.VERBOSE == 'true') ? true : false;
 	this.docs = {};
 	this.ee = new events.EventEmitter2({
 		wildcard: true,
