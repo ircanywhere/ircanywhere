@@ -9,7 +9,7 @@
 	 * -- string
 	 * -- usage: The mongodb oplog url - Note you may not have this available on shared mongohq and similar hosts */
 
-	"url": "http://10.0.33.34:3000/",
+	"url": "http://localhost:3000/",
 	/* -- required
 	 * -- string 
 	 * -- usage: The http url of the web server you're running behind */
@@ -74,7 +74,7 @@
 	},
 
 	"defaultNetwork": {
-		"server": "localhost",
+		"server": "irc.freenode.org",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */

@@ -63,7 +63,7 @@ Next you'll need to build the client source, uou'll need to make sure `grunt-cli
   * `$ npm install -g grunt-cli`
   * `$ grunt`
 
-Finally, edit the configuration file `config.json` a few things will need changed by default, the ip address and port, and you'll need to include a smtp url if you want to be able to send emails out. Your mongodb settings should be fine if you've followed these instructions.
+Finally, edit the configuration file `config.example.json` a few things will need changed by default, the ip address and port, and you'll need to include a smtp url if you want to be able to send emails out. Your mongodb settings should be fine if you've followed these instructions. Finally rename it to `config.json`.
 
 ## Running
 

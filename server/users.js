@@ -190,7 +190,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	}
 	// any errors?
 
-	var userCount = application.Users.sync.find().sync.count(),
+	var userCount = application.Users.sync.find().sync.count() + 1,
 		salt = helper.generateSalt(10),
 		user = {
 			email: email,
