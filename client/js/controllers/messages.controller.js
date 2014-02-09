@@ -4,7 +4,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	events: [],
 	readDocs: [],
 
-	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
+	filtered: Ember.arrayComputed('events', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
 			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
 				network = this.socket.findOne('networks', {_id: tab.network});
@@ -45,7 +45,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	}),
 
 	sorted: function() {
-		var results = this.get('events'),
+		var results = this.get('filtered'),
 			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 				content: results,
 				sortProperties: ['message.time'],
@@ -53,7 +53,7 @@ App.MessagesController = Ember.ArrayController.extend({
 			});
 
 		return sorted;
-	}.property('events').cacheable(),
+	}.property('filtered').cacheable(),
 
 	ready: function() {
 		this.set('tabs', this.socket.findAll('tabs'));

@@ -479,7 +479,6 @@ SocketManager.prototype.handleConnect = function(socket) {
 		items = [],
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []},
-		path = '/api/burst/' +  helper.generateSalt(25),
 		selected = false;
 
 	networks.forEach(function(network) {
@@ -532,32 +531,15 @@ SocketManager.prototype.handleConnect = function(socket) {
 	}
 	// get channel users and commands
 
-	application.app.get(path, function(req, res) {
-		var response = {
-			users: [user],
-			networks: networks,
-			tabs: tabs,
-			channelUsers: users,
-			events: items,
-			commands: commands,
-			burstend: true
-		};
-
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+	socket.sendBurst({
+		users: [user],
+		networks: networks,
+		tabs: tabs,
+		channelUsers: users,
+		events: items,
+		commands: commands,
+		burstend: true
 	});
-
-	socket.send('burst', {url: path, timeout: 10000});
-	// compile a load of data to send to the frontend
-
-	setTimeout(function() {
-		for (var index in application.app.routes.get) {
-			if (application.app.routes.get[index].path === path) {
-				application.app.routes.get.splice(index, 1);
-				break;
-			}
-		}
-	}, 10000);
 }
 
 /**

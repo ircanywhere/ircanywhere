@@ -42,6 +42,12 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 				}
 			}, 100);
 		}
+		// we need to reposition the scrollbar!
+
+		if (this.$()[0].scrollHeight <= this.$()[0].clientHeight) {
+			this.scrolled();
+		}
+		// seems the viewport doesn't have a scrollbar yet, we'll handle this.scrolled to check for unreads though
 	}.observes('controller.filtered.@each'),
 
 	scrolled: function() {

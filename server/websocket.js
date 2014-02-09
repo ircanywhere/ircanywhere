@@ -1,6 +1,7 @@
 var _ = require('lodash'),
 	events = require('events'),
 	util = require('util'),
+	helper = require('../lib/helpers').Helpers,
 	hooks = require('hooks');
 
 /**
@@ -97,7 +98,8 @@ WebSocket.prototype.onClose = function() {
  *
  * @method 	send
  * @param 	{String} event
- * @param	{Object} message
+ * @param	{Object} data
+ * @param	{Boolean} close
  * @extend	true
  * @return 	void
  */
@@ -114,6 +116,45 @@ WebSocket.prototype.send = function(event, data, close) {
 	if (close) {
 		this._socket.close();
 	}
+}
+
+/**
+ * Compiles a temporary GET route and sends it to a socket
+ *
+ * @method 	sendBurst
+ * @param	{Object} data
+ * @extend	true
+ * @return 	void
+ */
+WebSocket.prototype.sendBurst = function(data) {
+	var self = this,
+		path = '/api/burst/' +  helper.generateSalt(25);
+
+	application.app.get(path, function(req, res) {
+		var user = userManager.isAuthenticated(req.headers.cookie);
+
+		if (user._id.toString() === self._user._id.toString()) {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(data));
+		} else {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify({'error': 'unauthenticated'}));
+		}
+	});
+	// generate a temporary route
+
+	this.send('burst', {url: path, timeout: 10000});
+	// compile a load of data to send to the frontend
+
+	setTimeout(function() {
+		for (var index in application.app.routes.get) {
+			if (application.app.routes.get[index].path === path) {
+				application.app.routes.get.splice(index, 1);
+				break;
+			}
+		}
+	}, 10000);
+	// trash the route
 }
 
 exports.WebSocket = _.extend(WebSocket, hooks);

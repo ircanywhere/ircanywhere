@@ -345,7 +345,7 @@ IRCHandler.prototype.who = function(client, message) {
 	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 
 	if (socket) {
-		socket.send('channelUsers', {data: inserts});
+		socket.sendBurst({channelUsers: inserts});
 	}
 	// burst emit these instead of letting the oplog tailer handle it, it's too heavy
 }

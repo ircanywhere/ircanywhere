@@ -65,7 +65,7 @@ CommandManager.prototype.init = function() {
 				client = Clients[doc.network.toString()];
 			// get some variables
 
-			self.parseCommand(user, client, doc.target.toLowerCase(), doc.command);
+			self.parseCommand(user, client, doc.target, doc.command);
 			// success
 		});
 	});
@@ -328,10 +328,8 @@ CommandManager.prototype['/topic'] = function(user, client, target, params) {
  */
 CommandManager.prototype['/mode'] = function(user, client, target, params) {
 	if (helper.isChannel(client, params[0])) {
-		console.log('target exists', params);
 		ircFactory.send(client._id, 'mode', params);
 	} else {
-		console.log('no target', [target].concat(params));
 		ircFactory.send(client._id, 'mode', [target].concat(params));
 	}
 }
@@ -495,6 +493,8 @@ CommandManager.prototype['/unaway'] = function(user, client, target, params) {
 CommandManager.prototype['/close'] = function(user, client, target, params) {
 	var tab = application.Tabs.sync.findOne({target: target, network: client._id});
 	// get the tab in question
+
+	console.log({target: target, network: client._id}, tab);
 
 	if (tab.type === 'channel') {
 		if (tab.active) {
