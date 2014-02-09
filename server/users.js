@@ -53,6 +53,13 @@ UserManager.prototype.init = function() {
 		res.end(JSON.stringify(response));
 	});
 
+	application.app.get('/api/logout', function(req, res) {
+		var response = self.userLogout(req, res);
+
+		res.redirect(307, application.config.url);
+		res.end();
+	});
+
 	application.app.post('/api/forgot', function(req, res) {
 		var response = self.forgotPassword(req, res);
 
@@ -289,6 +296,26 @@ UserManager.prototype.userLogin = function(req, res) {
 	// check if password matches
 
 	return output;
+}
+
+/**
+ * Handles the call to /api/logout which is self explanatory
+ * 
+ * @method 	userLogout
+ * @param 	{Object} req
+ * @param 	{Object} res
+ * @extend	true
+ * @return 	{Object}
+ */
+UserManager.prototype.userLogout = function(req, res) {
+	var user = this.isAuthenticated(req.headers.cookie);
+
+	if (!user) {
+		return false;
+	} else {
+		application.Users.sync.update({_id: user._id}, {$set: {tokens: {}}});
+		return true;
+	}
 }
 
 /**
