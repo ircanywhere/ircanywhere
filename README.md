@@ -82,6 +82,8 @@ Although you probably want to run it with forever to keep it online, and even be
 
 In the future there will be instructions on how to do this and the possibility to serve the css/js files via nginx. I'll also be implementing a way to sticky session via nginx when the system is clustered.
 
+Once you're logged in you will need to connect to the default network with the `/reconnect` command. A help command will be added soon.
+
 ## Issues
 
 Any bugs (preferably) should be reported via the issues page on this repository, it would be ideal if a screenshot of the bug could be provided (if applicable) and any errors in the javascript console log.

@@ -1,6 +1,5 @@
-Ember.Handlebars.helper('json', function(value, options) {
-	console.log(value);
-	return 'null';
+Ember.Handlebars.helper('safeString', function(value, options) {
+	return new Ember.Handlebars.SafeString(value);
 });
 
 Ember.Handlebars.helper('lookup', function(component, context, options) {

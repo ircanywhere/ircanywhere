@@ -1,0 +1,14 @@
+{{#modal-dialog action="close"}}
+	<div class="modal-header">
+		<h3>{{title}}</h3>
+	</div>
+	<div class="modal-body">
+		<div class="full-set">
+			<ul class="help">
+				{{#each helpItems}}
+					<li><span class="command">{{safeString command}}</span><span class="desc">{{safeString desc}}</span></li>
+				{{/each}}
+			</ul>
+		</div>
+	</div>
+{{/modal-dialog}}

@@ -75,6 +75,7 @@ CommandManager.prototype.init = function() {
 	this.createAlias('/cycle', '/hop');
 	this.createAlias('/quit', '/disconnect');
 	this.createAlias('/query', '/q');
+	this.createAlias('/reconnect', '/connect');
 	// setup aliases
 }
 

@@ -465,7 +465,7 @@ div.sidebar {
 	.modal {
 		margin: 30px auto;
 		width: 800px;
-		max-height: 80%;
+		max-height: 90%;
 		z-index: 10000;
 		background: @white;
 		background-clip: padding-box;
@@ -473,6 +473,7 @@ div.sidebar {
 		border-radius: 6px;
 		.box-shadow(0 3px 9px rgba(0, 0, 0, .5));
 		display: none;
+		overflow-y: auto;
 
 		.modal-header {
 			padding: 15px;
@@ -541,6 +542,33 @@ div.sidebar {
 						background: @white;
 						color: @dark-gray;
 						font-weight: bold;
+					}
+				}
+			}
+
+			ul.help {
+				margin: 0;
+
+				li {
+					padding: 5px;
+					font-size: 14px;
+					font-weight: bold;
+					display: flex;
+
+					span.command {
+						display: inline-block;
+						width: 250px;
+						text-align: right;
+					}
+
+					span.desc {
+						font-weight: normal;
+						margin-left: 15px;
+					}
+
+					span strong {
+						font-weight: bold;
+						color: grey;
 					}
 				}
 			}
