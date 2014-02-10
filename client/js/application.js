@@ -4,6 +4,7 @@ App = Ember.Application.create({
 	defaultTitle: 'IRCAnywhere',
 	timeout: null,
 	timein: null,
+	visibility: true,
 	
 	Parser: Ember.Parser.create(),
 

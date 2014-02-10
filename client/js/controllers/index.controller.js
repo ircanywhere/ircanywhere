@@ -1,6 +1,10 @@
-App.IndexController = Ember.ObjectController.extend({
+App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	tabs: [],
 	tabId: null,
+
+	init: function() {
+		this.bindVisibility();
+	},
 
 	tabChanged: function() {
 		var tab = this.get('tabs').filterProperty('selected', true)[0];
