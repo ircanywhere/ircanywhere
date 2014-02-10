@@ -36,7 +36,7 @@ var _formatRaw = function(raw) {
  * @return 	void
  */
 function IRCHandler() {
-
+	this.blacklisted = ['PING'];
 }
 
 /**
@@ -536,8 +536,10 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.unknown = function(client, message) {
-	message.message = message.params.join(' ');
-	eventManager.insertEvent(client, message, 'unknown');
+	if (this.blacklisted.indexOf(message.command) === -1) {
+		message.message = message.params.join(' ');
+		eventManager.insertEvent(client, message, 'unknown');
+	}
 }
 
 /* XXX - Events TODO

@@ -18,9 +18,9 @@ App.Visibility = Ember.Mixin.create({
 
 	visChange: function() {
 		if (this.isHidden()) {
-			App.set('isActive', true);
-		} else {
 			App.set('isActive', false);
+		} else {
+			App.set('isActive', true);
 		}
 	},
 

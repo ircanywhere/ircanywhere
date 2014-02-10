@@ -1,6 +1,6 @@
 App.EventController = Ember.ObjectController.extend({
 	needs: ['tab', 'network'],
-	blacklisted: ['PING', 'RPL_CREATIONTIME'],
+	blacklisted: ['RPL_CREATIONTIME'],
 	
 	classNames: function() {
 		var type = this.get('content.type'),
