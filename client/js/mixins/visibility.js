@@ -5,7 +5,6 @@ App.Visibility = Ember.Mixin.create({
 			var evtname = visProp.replace(/[H|h]idden/,'') + 'visibilitychange';
 			Ember.$(document).on(evtname, this.visChange.bind(this));
 		}
-		console.log(visProp);
 	},
 
 	isHidden: function() {

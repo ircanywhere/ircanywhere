@@ -81,7 +81,7 @@ App.MessagesController = Ember.ArrayController.extend({
 		detectUnread: function(id, top, bottom, container) {
 			var self = this,
 				tab = this.get('tabs').filterProperty('_id', id)[0],
-				events = this.get('filtered').filterProperty('unread', true),
+				events = this.get('sorted').filterProperty('unread', true),
 				counter = 0;
 				docs = [];
 

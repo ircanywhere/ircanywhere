@@ -47,7 +47,7 @@ App.NetworkController = Ember.ObjectController.extend({
 	},
 
 	gotoUnread: function(id) {
-		var first = this.get('controllers.messages.filtered').filterProperty('unread', true).objectAt(0),
+		var first = this.get('controllers.messages.sorted').filterProperty('unread', true).objectAt(0),
 			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
 
 		if (first) {
