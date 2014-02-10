@@ -1,0 +1,117 @@
+<div id="banner">
+	<div id="banner-inner" class="clear">
+		<div class="banner-left">
+			<h2>Sign up to IRCAnywhere</h2>
+		</div>
+	</div>
+</div>
+<div id="main">
+	<div id="main-inner">
+		<form method="post" id="signup-form" {{action "signupSubmit" on="submit"}}><fieldset>
+		<div class="clear body">
+			<div class="left">
+				<p class="large">On registration your account will be activated immediately and ready for use, your IRC connection will be connected the first time you login.</p>
+
+				<div id="message-holder">
+					{{#if errors}}
+						<div class="alert-message block-message error">
+							<ul>
+								{{#each errors}}
+								<li>{{this.error}}</li>
+								{{/each}}
+							</ul>
+						</div>
+					{{/if}}
+					{{#if success}}
+						<div class="alert-message block-message success"><p>{{success}}</p></div>
+					{{/if}}
+				</div>
+
+				<div class="clearfix">
+					<label for="yourName">Your Name</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="yourName" valueBinding="model.name" value=name tabindex="1"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="Your full name, no more than 35 characters">?</a>
+						</span>
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<label for="ircNickname">IRC Nickname</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="ircNickname" valueBinding="model.nickname" value=nickname tabindex="2"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="A valid IRC alias you usually use">?</a>
+						</span>
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<label for="emailAddress">Email Address</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="emailAddress" valueBinding="model.email" value=email tabindex="3"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="A valid email address">?</a>
+						</span>
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<label for="password">Password</label>
+					<div class="input">
+						<div class="field">
+							{{input type="password" id="password" valueBinding="model.password" value=password tabindex="4"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="Your password, longer than 6 characters">?</a>
+						</span>
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<label for="confirmPassword">Confirm Password</label>
+					<div class="input">
+						<div class="field">
+							{{input type="password" id="confirmPassword" valueBinding="model.confirmPassword" value=confirmPassword tabindex="5"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="Your password, again">?</a>
+						</span>
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<div class="input">
+						<div class="field">
+							{{input type="submit" class="btn primary" value="Register" tabindex="6"}}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right">
+				<h3>What we offer.</h3>
+				<div class="indent">
+					<h5>BNC</h5>
+					<p class="large">Our service keeps you connected to your networks when you close your browser so you don't miss out on a thing!</p>
+					<h5>Secure SSL</h5>
+					<p class="large">Connect to IRC over SSL for better security.</p>
+				</div>
+				<h3>Coming soon.</h3>
+				<div class="indent">
+					<h5>Connect from an IRC Client</h5>
+					<p class="large">We are focused on creating a great web interface for IRC, however we are planning on adding the ability to connect to your clients through a traditional IRC Client.</p>
+					<h5>Downloading and searching logs.</h5>
+					<p class="large">We are working on the ability to directly search your logs from the web interface and also download them as formatted text files.</p>
+				</div>
+			</div>
+		</div>
+		</fieldset></form>
+	</div>
+</div>

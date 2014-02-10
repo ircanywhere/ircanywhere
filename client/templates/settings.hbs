@@ -1,0 +1,116 @@
+{{#modal-dialog action="close"}}
+	<div class="modal-header">
+		<h3>{{title}}</h3>
+	</div>
+	<div class="modal-body">
+		<div class="left-set">
+			{{#if showSettingsForm}}
+				<form method="post" {{action "settingsSubmit" on="submit"}}>
+					{{#if settingsErrors}}
+						<div class="alert-message block-message error">
+							<ul>
+								{{#each settingsErrors}}
+								<li>{{this.error}}</li>
+								{{/each}}
+							</ul>
+						</div>
+					{{/if}}
+					{{#if settingsMessage}}
+						<div class="alert-message block-message success"><p>{{settingsMessage}}</p></div>
+					{{/if}}
+					<div class="clearfix">
+						<label for="yourName">Your Name</label>
+						<div class="input">
+							<div class="field">
+								{{input type="text" id="yourName" valueBinding="model.name" value=name tabindex="1"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="Your full name, no more than 35 characters">?</a>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						<label for="ircNickname">IRC Nickname</label>
+						<div class="input">
+							<div class="field">
+								{{input type="text" id="ircNickname" valueBinding="model.nickname" value=nickname tabindex="2"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="A valid IRC alias you usually use">?</a>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						<label for="emailAddress">Email Address</label>
+						<div class="input">
+							<div class="field">
+								{{input type="text" id="emailAddress" valueBinding="model.email" value=email tabindex="3"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="A valid email address">?</a>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						<div class="input">
+							<div class="field">
+								{{input type="submit" class="btn primary" value="Update Settings" tabindex="4" action="settingsSubmit"}}
+							</div>
+						</div>
+					</div>
+				</form>
+			{{/if}}
+			{{#if showPasswordForm}}
+				<form method="post" {{action "passwordSubmit" on="submit"}}>
+					{{#if passwordErrors}}
+						<div class="alert-message block-message error">
+							<ul>
+								{{#each passwordErrors}}
+								<li>{{this.error}}</li>
+								{{/each}}
+							</ul>
+						</div>
+					{{/if}}
+					{{#if passwordMessage}}
+						<div class="alert-message block-message success"><p>{{passwordMessage}}</p></div>
+					{{/if}}
+					<div class="clearfix">
+						<label for="password">Current Password</label>
+						<div class="input">
+							<div class="field">
+								{{input type="password" id="password" valueBinding="model.password" value=password tabindex="1"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="Your current password">?</a>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						<label for="newPassword">New Password</label>
+						<div class="input">
+							<div class="field">
+								{{input type="password" id="newPassword" valueBinding="model.newPassword" value=newPassword tabindex="2"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="Your new password, longer than 6 characters">?</a>
+							</span>
+						</div>
+					</div>
+					<div class="clearfix">
+						<div class="input">
+							<div class="field">
+								{{input type="submit" class="btn primary" value="Change Password" tabindex="3" action="passwordSubmit"}}
+							</div>
+						</div>
+					</div>
+				</form>
+			{{/if}}
+		</div>
+		<div class="right-set">
+			<ul class="setting-tabs">
+				<li {{bind-attr class="showSettingsForm:active"}}><a href="#" {{action active "settings"}}>Settings</a></li>
+				<li {{bind-attr class="showPasswordForm:active"}}><a href="#" {{action active "password"}}>Change Password</a></li>
+			</ul>
+		</div>
+	</div>
+{{/modal-dialog}}

@@ -1,0 +1,185 @@
+@import "header.less";
+
+.backlog {
+	.snap;
+	bottom: 42px;
+	top: 3px;
+	overflow-y: auto;
+
+	.row:extend(.clear) {
+		margin: 0;
+		position: relative;
+		display: -webkit-flex;
+		display: flex;
+
+		&.hide {
+			display: none!important;
+		}
+
+		a[rel=user-link] {
+			color: #383838;
+			font-weight: bold;
+			margin: 0 10px 0 -14px;
+			text-align: right;
+			display: inline-block;
+		}
+
+		span {
+			line-height: 155%;
+
+			&.column {
+				-webkit-flex: 1;
+				flex: 1;
+			}
+
+			&.time {
+				padding: 5px 10px;
+				text-align: right;
+				width: 50px;
+			}
+
+			&.message,
+			&.action,
+			&.event {
+				padding: 3px 10px 3px 6px;
+				font-size: 13px;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+			}
+
+			&.action a[rel=user-link] {
+				margin: 0 10px 0 0!important;
+				font-style: italic;
+				display: inline-block;
+			}
+
+			&.message {
+				padding: 3px 10px 3px 20px;
+			}
+
+			&.prefix {
+				display: inline-block;
+				margin: 0 3px 0 -1px;
+				width: 12px;
+
+				&.op { color: darkRed; }
+				&.halfop { color: darkOrange; }
+				&.voice { color: blue; }
+			}
+		}
+
+		&.other {
+			a[rel=user-link] {
+				font-weight: normal;
+				text-decoration: underline;
+				color: inherit!important;
+				margin: 0!important;
+			}
+
+			span.time {
+				color: #9C9C9C!important;
+			}
+
+			span.message {
+				padding: 3px 10px 3px 20px;
+				white-space: normal;
+			}
+
+			&[data-type=join] {
+				color: darkGreen;
+			}
+
+			&[data-type=part],
+			&[data-type=quit],
+			&[data-type=kick] {
+				color: darkRed;
+			}
+
+			&[data-type=mode],
+			&[data-type=nick],
+			&[data-type=topic] {
+				color: darkBlue;
+			}
+
+			&[data-type=status] {
+				background: #eee;
+
+				.message {
+					font-family: "Courier New", Courier, monospace;
+					font-size: 12px;
+					padding: 5px 10px 4px 20px;
+				}
+			}
+
+			&[data-type=motd] {
+				background: #eee;
+				
+				.time {
+					padding-top: 11px;
+				}
+
+				.message {
+					background: #fff;
+					border: 1px solid #ddd;
+					margin: 5px;
+					font-family: "Courier New", Courier, monospace;
+					font-size: 12px;
+					padding: 5px 15px;
+					.border-radius(5px);
+				}
+			}
+		}
+
+		&[data-highlight] {
+			font-weight: bold;
+			color: red!important;
+		}
+
+		&[data-self] { background: linen; }
+		&[data-type=notice] {
+			background: lavender;
+
+			a[rel=user-link] {
+				margin: 0 10px 0 0!important;
+				font-weight: bold;
+				text-decoration: none;
+			}
+		}
+	}
+}
+
+/* irc formatting colours and bgs */
+
+span.white { color: white; }
+span.black { color: black; }
+span.navy { color: darkBlue; }
+span.green { color: green; }
+span.red { color: red; }
+span.maroon { color: maroon; }
+span.purple { color: purple; }
+span.orange { color: orange; }
+span.yellow { color: yellow; }
+span.lime { color: lime; }
+span.teal { color: teal; }
+span.cyan { color: cyan; }
+span.blue { color: blue; }
+span.magenta { color: magenta; }
+span.grey { color: gray; }
+span.silver { color: silver; }
+
+span.bg-white { background-color: white; }
+span.bg-black { background-color: black; }
+span.bg-navy { background-color: darkBlue; }
+span.bg-green { background-color: green; }
+span.bg-red { background-color: red; }
+span.bg-maroon { background-color: maroon; }
+span.bg-purple { background-color: purple; }
+span.bg-orange { background-color: orange; }
+span.bg-yellow { background-color: yellow; }
+span.bg-lime { background-color: lime; }
+span.bg-teal { background-color: teal; }
+span.bg-cyan { background-color: cyan; }
+span.bg-blue { background-color: blue; }
+span.bg-magenta { background-color: magenta; }
+span.bg-grey { background-color: gray; }
+span.bg-silver { background-color: silver; }

@@ -1,6 +1,6 @@
 private/node.json
-packages
-logs/*
-.build*
+client/build/*
+node_modules
+logs
 *.sublime*
-smart.lock
+config.json

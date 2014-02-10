@@ -1,0 +1,92 @@
+{{#modal-dialog action="close"}}
+	<div class="modal-header">
+		<h3>{{title}}</h3>
+	</div>
+	<div class="modal-body">
+		<form method="post" {{action "networkSubmit" on="submit"}}>
+			<div class="full-set">
+				{{#if errors}}
+					<div class="alert-message block-message error">
+						<ul>
+							{{#each errors}}
+							<li>{{this.error}}</li>
+							{{/each}}
+						</ul>
+					</div>
+				{{/if}}
+				<div class="clearfix">
+					<label for="server">Hostname</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="server" valueBinding="model.server" value=server tabindex="1"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="The hostname of the network">?</a>
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<label for="port">Port (SSL?)</label>
+					<div class="input">
+						<div class="input-prepend">
+							<div class="field">
+								<label {{bind-attr class=":add-on secure:active"}}>
+									{{view Ember.Checkbox id="secure" checkedBinding="secure" tabindex="2"}}
+								</label>
+								{{input type="text" id="port" class="mini" valueBinding="model.port" value=port tabindex="3"}}
+							</div>
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="The port to connect to, usually 6667 and 6697 on SSL">?</a>
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<label for="password">Password (SASL?)</label>
+					<div class="input">
+						<div class="input-prepend">
+							<div class="field">
+								<label {{bind-attr class=":add-on sasl:active"}}>
+									{{view Ember.Checkbox id="sasl" checkedBinding="sasl" tabindex="4"}}
+								</label>
+								{{input type="text" id="password" class="mini" valueBinding="model.password" value=password tabindex="5"}}
+							</div>
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="Some servers require a password to connect to, if you are using SASL this is your nickserv password">?</a>
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<label for="nick">Nickname</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="nick" valueBinding="model.nick" value=nick tabindex="6"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="The nickname to connect with">?</a>
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<label for="name">Realname</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="name" valueBinding="model.name" value=name tabindex="7"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="The nickname to connect with">?</a>
+						</span>
+					</div>
+				</div>
+				<div class="clearfix">
+					<div class="input">
+						<div class="field">
+							{{input type="submit" class="btn primary" value="Add Network" tabindex="8" action="networkSubmit"}}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{{/modal-dialog}}

@@ -1,0 +1,127 @@
+@import "header.less";
+
+#no-networks {
+	padding: 10px 20px;
+	.snap;
+
+	h3 {
+		font-size: 18px;
+		line-height: 36px;
+		font-weight: bold;
+	}
+
+	p {
+		font-size: 13px;
+		line-height: 18px;
+		margin-bottom: 9px;
+	}
+}
+
+.tab {
+	position: relative;
+	height: 100%;
+	width: 100%;
+	display: none;
+
+	&.selected {
+		display: flex;
+	}
+
+	.messages {
+		color: @black;
+		background: @white;
+		padding: 0;
+		overflow-y: auto;
+		position: relative;
+		height: 100%;
+		width: 100%;
+		flex: 1;
+
+		.overlay-bar {
+			z-index: 20;
+			position: relative;
+			border-bottom: 1px solid #B8DBFF;
+			background: #F7FEFF;
+			padding: 8px;
+			zoom: 1;
+			filter: alpha(opacity=90);
+			opacity: 0.9;
+			line-height: 150%;
+			font-size: 13px;
+			display: none;
+
+			span.channel-name {
+				font-weight: bold;
+				display: inline-block;
+				padding-right: 15px;
+			}
+
+			span.modes {
+				font-weight: bold;
+				display: inline-block;
+				padding-right: 14px;
+			}
+		}
+
+		.message-bar {
+			z-index: 15;
+			position: relative;
+			background: #70AFC4;
+			color: @white;
+			padding: 6px 8px;
+			top: 3px;
+			zoom: 1;
+			line-height: 150%;
+			font-size: 12px;
+			cursor: pointer;
+
+			&:hover {
+				background: @message-bar-bg;
+			}
+
+			span {
+				font-weight: bold;
+
+				&.left {
+					float: left;
+				}
+
+				&.right {
+					float: right;
+					display: inline-block;
+
+					a {
+						background: @message-bar-bg;
+						color: white;
+						padding: 3px 5px;
+						margin: 6px 0px;
+						content: "Mark as read";
+						.border-radius(3px);
+
+						&:hover {
+							text-decoration: none;
+							color: @dark-gray;
+							background: #ADD8C7;
+						}
+					}
+				}
+
+				&.alert {
+					padding: 2px 4px 3px 4px;
+					margin: 0 4px;
+					.border-radius(3px);
+				}
+
+				&.alert.unread {
+					background: @light-gray;
+					color: @dark-gray;
+				}
+
+				&.alert.highlight {
+					background: @red;
+					color: @white;
+				}
+			}
+		}
+	}
+}

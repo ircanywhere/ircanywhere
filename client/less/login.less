@@ -1,0 +1,62 @@
+@import "header.less";
+
+#login-box {
+	padding: 0;
+	margin: 10px 10px 0 10px;
+	background: @white;
+	border-right: 1px solid @login-box-border;
+	border-bottom: 1px solid @login-box-border;
+	.border-radius(3px);
+
+	form, fieldset {
+		.padding-margin;
+	}
+
+	.box {
+		padding: 0 10px;
+		margin: 0;
+		clear: both;
+	}
+
+	.actions, .actions-no-rounded {
+		padding: 10px;
+		margin: 0;
+		background: @login-box-action-bg;
+		clear: both;
+	}
+
+	.actions {
+		.border-radius(0 0 3px 3px);
+
+		input { margin-top: -2px; }
+		a {
+			margin-left: 12px;
+			margin-top: 1px;
+			padding: 5px 12px 7px 12px;
+		}
+	}
+
+	h5 {
+		color: @dark-gray;
+		font-weight: bold;
+		line-height: 36px;
+		font-size: 14px;
+		padding: 0;
+		margin: 0 0 5px 0;
+	}
+
+	.field {
+		width: 275px;
+		margin-bottom: 10px;
+	}
+
+	input.login-input {
+		width: 263px;
+
+		&.focus {
+			outline: 0;
+			color: @black;
+			border-color: #52A8EC;
+		}
+	}
+}

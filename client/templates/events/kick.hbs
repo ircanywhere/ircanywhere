@@ -1,0 +1,4 @@
+<div data-type="kick" {{bind-attr class=classNames data-id=content._id}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column event">{{#if content.extra.self}}&larr; You have been kicked from {{content.message.channel}} ({{ircParse content.message.message ...parentController.parentController.content._id}}){{else}}&larr; {{userLink false null}} has kicked {{content.message.kicked}} ({{ircParse content.message.message ...parentController.parentController.content._id}}){{/if}}</span>
+</div>

@@ -1,0 +1,8 @@
+<div data-type="motd" {{bind-attr class=classNames data-id=content._id}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column message">
+	{{#each item in content.message.message}}
+		{{ircParse item ...parentController.parentController.content._id}}<br />
+	{{/each}}
+	</span>
+</div>

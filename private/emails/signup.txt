@@ -1,0 +1,13 @@
+Welcome to IRCAnywhere
+
+Hello {{name}}, welcome to IRCAnywhere.
+
+IRCAnywhere is a new service that allows you to keep connected to your favourite IRC servers no matter where you are.
+
+We've setup your first connection to our server ready to join our channel when you log in. Feel free to stay in our support channel and give us some feedback.
+
+Please note the service is in alpha stages and is quite a while a way from being a finished product, please let us know of any bugs you find. Unfortunately this service costs money to run so you are limited to two connections at the moment, one being our support server and another being a network of choice.
+
+If you have any queries feel free to contact us on any method, or directly reply to this email!
+
+Thank you, IRCAnywhere Team.

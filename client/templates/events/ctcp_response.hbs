@@ -1,0 +1,4 @@
+<div data-type="notice" {{bind-attr class=classNames data-unread=content.unread data-id=content._id}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column message">{{userLink false null}}{{content.message.type}} {{ircParse content.message.message ...parentController.parentController.content._id}}</span>
+</div>

@@ -1,0 +1,54 @@
+<div id="banner">
+	<div id="banner-inner" class="clear">
+		<div class="banner-left">
+			<h1>IRCAnywhere</h1>
+			<h3>IRC on the web, no matter where you are.</h3>
+			{{#link-to "signup" class="btn primary large"}}Sign up for a free account now{{/link-to}}
+		</div>
+		<div class="banner-right">
+			<div id="login-box">
+				<form method="post" {{action "loginSubmit" on="submit"}}><fieldset>
+					<div class="box">
+						<h5>Login</h5>
+						
+						<div {{bind-attr class="errors:show:hide"}}>
+							<div class="alert-message block-message error">{{errors}}</div>
+						</div>
+						
+						<div class="field">
+							{{view App.InputBlur class="login-input" value=email valueBinding="model.email" default="Email Address"}}
+						</div>
+						<div class="field">
+							{{view App.InputBlur type="password" class="login-input" value=password valueBinding="model.password" default="Password"}}
+						</div>
+					</div>
+					<div class="actions">
+						{{input type="submit" class="btn primary" value="Login"}}
+						<a href="#" id="forgot-password-link" class="btn secondary" {{action toggleProperty 'forgotPassword'}}>Forgot password?</a>
+					</div>
+				</fieldset></form>
+				{{#if forgotPassword}}
+					<form method="post" {{action "resetSubmit" on="submit"}}><fieldset>
+						<div class="box">
+							<h5>Forgot Password</h5>
+
+							<div class="alert-message block-message error hide" {{bind-attr class="resetErrors:show"}}>
+								{{resetErrors}}
+							</div>
+							<div class="alert-message block-message success hide" {{bind-attr class="resetSent:show"}}>
+								{{resetSent}}
+							</div>
+
+							<div class="field">
+								{{view App.InputBlur type="text" class="login-input" value=resetEmail valueBinding="model.resetEmail" default="Email Address"}}
+							</div>
+						</div>
+						<div class="actions">
+							{{input type="submit" class="btn primary" value="Reset"}}
+						</div>
+					</fieldset></form>
+				{{/if}}
+			</div>
+		</div>
+	</div>
+</div>

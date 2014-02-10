@@ -1,0 +1,4 @@
+<div data-type="nick" {{bind-attr class=classNames data-id=content._id}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column event">{{#if content.extra.self}}&ndash;  You have changed your nickname to {{content.message.newnick}}{{else}}&ndash;  {{userLink false null}} has changed their nickname to {{content.message.newnick}}{{/if}}</span>
+</div>

@@ -1,0 +1,44 @@
+<div class="members-title clear">
+	<span class="left">Users</span>
+	<span class="right">{{filtered.length}}</span>
+</div>
+<ul>
+	{{#if owners}}
+		<li data-type="op" class="head clear"><span class="left">Owners</span><span class="right">{{owners.length}}</span></li>
+		{{#each user in owners groupedRows=true}}
+			<li data-type="op">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+	{{#if admins}}
+		<li data-type="op" class="head clear"><span class="left">Administrators</span><span class="right">{{admins.length}}</span></li>
+		{{#each user in admins groupedRows=true}}
+			<li data-type="op">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+	{{#if operators}}
+		<li data-type="op" class="head clear"><span class="left">Operators</span><span class="right">{{operators.length}}</span></li>
+		{{#each user in operators groupedRows=true}}
+			<li data-type="op">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+	{{#if halfops}}
+		<li data-type="halfop" class="head clear"><span class="left">Half Operators</span><span class="right">{{halfops.length}}</span></li>
+		{{#each user in halfops groupedRows=true}}
+			<li data-type="halfop">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+	{{#if voiced}}
+		<li data-type="voice" class="head clear"><span class="left">Voiced</span><span class="right">{{voiced.length}}</span></li>
+		{{#each user in voiced groupedRows=true}}
+			<li data-type="voice">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+	{{#if normal}}
+		{{#if displayHeading}}
+			<li data-type="user" class="head clear"><span class="left">Users</span><span class="right">{{normal.length}}</span></li>
+		{{/if}}
+		{{#each user in normal groupedRows=true}}
+			<li data-type="user">{{userLink true user}}</li>
+		{{/each}}
+	{{/if}}
+</ul>

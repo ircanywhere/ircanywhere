@@ -1,0 +1,4 @@
+<div data-type="action" {{bind-attr class=classNames data-id=content._id data-unread=content.unread data-self=content.extra.self data-highlight=content.extra.highlight}}>
+	<span class="time">{{time content.message.time}}</span>
+	<span class="column action">&ndash;  {{userLink true null}}{{ircParse content.message.message ...parentController.parentController.content._id}}</span>
+</div>

@@ -1,0 +1,12 @@
+<div class="topbar clear main">
+	<ul id="main-menu">
+		<li class="logo">{{#link-to "index"}}IRCAnywhere{{/link-to}}{{view.name}}</li>
+		<li>{{#link-to "signup"}}Sign up{{/link-to}}</li>
+	</ul>
+	<div class="topbar inner"></div>
+</div>
+{{yield}}
+<div id="main-footer">
+	<p>{{#link-to "signup"}}Sign up{{/link-to}} &middot; <a href="https://twitter.com/ircanywhere" target="_blank">@ircanywhere</a></p>
+	<p>© 2013 IRCAnywhere. All rights reserved.</p>
+</div>
