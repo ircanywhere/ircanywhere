@@ -1,7 +1,5 @@
 App.UserlistController = Ember.ArrayController.extend({
 	needs: ['index', 'network', 'tab'],
-	tabs: [],
-	users: [],
 
 	owners: Ember.computed.filterBy('filtered', 'sort', 1),
 	admins: Ember.computed.filterBy('filtered', 'sort', 2),
@@ -16,7 +14,7 @@ App.UserlistController = Ember.ArrayController.extend({
 
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+			var tab = this.get('socket.tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 
 			if (tab && item.network === tab.networkName && item.channel === tab.target) {
 				accum.pushObject(item);
@@ -26,7 +24,7 @@ App.UserlistController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+			var tab = this.get('socket.tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
 
 			if (tab && item.network === tab.networkName && item.channel === tab.target) {
 				accum.removeObject(item);
@@ -37,7 +35,7 @@ App.UserlistController = Ember.ArrayController.extend({
 	}),
 
 	sorted: function() {
-		var results = this.get('users'),
+		var results = this.get('socket.channelUsers'),
 			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 				content: results,
 				sortProperties: ['sort', 'nickname'],
@@ -45,10 +43,5 @@ App.UserlistController = Ember.ArrayController.extend({
 			});
 
 		return sorted;
-	}.property('users').cacheable(),
-
-	ready: function() {
-		this.set('users', this.socket.findAll('channelUsers'));
-		this.set('tabs', this.socket.findAll('tabs'));
-	}
+	}.property('socket.channelUsers').cacheable()
 });

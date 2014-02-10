@@ -1,8 +1,8 @@
 App.SidebarController = Ember.ArrayController.extend({
 	newUnreadItem: function() {
-		var networks = this.get('networks'),
+		var networks = this.get('socket.networks'),
 			tabs = this.get('content'),
-			events = this.get('events'),
+			events = this.get('socket.events'),
 			i = 0,
 			hl = 0;
 			
@@ -52,7 +52,7 @@ App.SidebarController = Ember.ArrayController.extend({
 		// XXX - I'm kind of unhappy about this loop inside a loop, this will be replaced though
 		// 		 when I write the event emitter, we'll probably just use that to calculate unreads etc
 		//		 NOTE - I'm also not using .get() here to speed things up.
-	}.observes('events.length'),
+	}.observes('socket.events.length'),
 
 	statusChanged: function() {
 		Ember.$.each(Ember.View.views, function() {
@@ -62,15 +62,13 @@ App.SidebarController = Ember.ArrayController.extend({
 		});
 		// XXX - i don't really like this but hey it works, I'll come back to it at some
 		// point in the future and see if theres a better way
-	}.observes('networks.@each.internal'),
+	}.observes('socket.networks.@each.internal'),
 	
 	sortProperties: ['url'],
 	sortAscending: true,
 
 	ready: function() {
-		this.set('networks', this.socket.findAll('networks'));
-		this.set('content', this.socket.findAll('tabs'));
-		this.set('events', this.socket.findAll('events'));
+		this.set('content', this.get('socket.tabs'));
 		// set that to the tabs collection, it'll update automatically when they change
 	}
 });

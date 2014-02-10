@@ -33,13 +33,13 @@ App.NetworkRoute = AppRoute.extend({
 
 			var index = this.controllerFor('index'),
 				socket = index.socket,
-				tab = socket.findOne('tabs', {url: url});
+				tab = socket.tabs.findBy('url', url);
 
 			if (!tab || tab && tab.selected) {
 				return false;
 			}
 
-			socket.findAll('tabs').setEach('selected', false);
+			socket.get('tabs').setEach('selected', false);
 			tab.set('selected', true);
 			// mark all but this as selected
 

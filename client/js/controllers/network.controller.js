@@ -2,13 +2,9 @@ App.NetworkController = Ember.ObjectController.extend({
 	needs: ['index', 'messages'],
 
 	tabChanged: function() {
-		var tab = this.socket.findOne('tabs', {_id: this.get('controllers.index.tabId')}),
-			content = this.get('content');
+		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
+			content = this.get('socket.networks').findBy('_id', tab.get('network'));
 		// get the selected tab
-
-		if (!content) {
-			content = this.socket.findOne('tabs', {network: tab.get('network')});
-		}
 
 		if (tab) {
 			delete tab.selectedTab;
@@ -20,14 +16,10 @@ App.NetworkController = Ember.ObjectController.extend({
 			// the network's object for quick access
 		}
 		// update this.tab if we have a new selected tab
-	}.observes('controllers.index.tabId', 'tabs.@each.selected'),
-
-	ready: function() {
-		this.tabChanged();
-	},
+	}.observes('controllers.index.tabId', 'socket.tabs.@each.selected'),
 
 	markAllAsRead: function(id) {
-		var tab = this.socket.findOne('tabs', {_id: id});
+		var tab = this.get('socket.tabs').findBy('_id', id);
 
 		if (!tab) {
 			return false;
@@ -62,5 +54,9 @@ App.NetworkController = Ember.ObjectController.extend({
 	gotoHighlight: function(id) {
 		console.log('goto first highlight');
 		// XXX
+	},
+
+	ready: function() {
+		this.tabChanged();
 	}
 });

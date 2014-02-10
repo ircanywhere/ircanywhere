@@ -1,7 +1,5 @@
 App.TitlebarController = Ember.ObjectController.extend({
 	needs: ['index', 'network', 'tab'],
-	networks: [],
-	tabs: [],
 	tab: {},
 
 	showMenu: false,
@@ -16,7 +14,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		toggleUsers: function() {
-			var tab = this.socket.findOne('tabs', {selected: true}),
+			var tab = this.get('socket.tabs').findBy('selected', true),
 				attribute = tab.get('hiddenUsers');
 
 			this.socket.update('tabs', {_id: tab.get('_id')}, {hiddenUsers: !attribute});
@@ -25,7 +23,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		toggleEvents: function() {
-			var tab = this.socket.findOne('tabs', {selected: true}),
+			var tab = this.get('socket.tabs').findBy('selected', true),
 				attribute = tab.get('hiddenEvents');
 
 			this.socket.update('tabs', {_id: tab.get('_id')}, {hiddenEvents: !attribute});
@@ -34,7 +32,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		toggleCycle: function() {
-			var tab = this.socket.findOne('tabs', {selected: true});
+			var tab = this.get('socket.tabs').findBy('selected', true);
 
 			this.socket.insert('commands', {
 				command: (tab.active) ? '/leave' : '/join',
@@ -45,8 +43,8 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		toggleConnect: function() {
-			var tab = this.socket.findOne('tabs', {selected: true}),
-				network = this.socket.findOne('networks', {_id: tab.get('network')});
+			var tab = this.get('socket.tabs').findBy('selected', true),
+				network = this.get('socket.networks').findBy('_id', tab.get('network'));
 				
 			this.socket.insert('commands', {
 				command: (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed') ? '/reconnect' : '/disconnect',
@@ -57,7 +55,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		closeWindow: function() {
-			var tab = this.socket.findOne('tabs', {selected: true});
+			var tab = this.get('socket.tabs').findBy('selected', true);
 
 			this.socket.insert('commands', {
 				command: '/close',
@@ -110,7 +108,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 	},
 
 	tabChanged: function() {
-		var tab = this.socket.findOne('tabs', {_id: this.get('controllers.index.tabId')});
+		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 		// get the selected tab
 
 		if (tab) {
@@ -119,12 +117,12 @@ App.TitlebarController = Ember.ObjectController.extend({
 			window.history.back();
 		}
 		// update this.tab if we have a new selected tab
-	}.observes('controllers.index.tabId', 'tabs.@each.selected'),
+	}.observes('controllers.index.tabId', 'socket.tabs.@each.selected'),
 
 	optionsChanged: function() {
-		var tab = this.socket.findOne('tabs', {_id: this.get('controllers.index.tabId')}),
+		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
 			id = (tab) ? tab.get('network') : false,
-			network = this.socket.findOne('networks', {_id: id});
+			network = this.get('socket.networks').findBy('_id', id);
 		// get the selected tab
 
 		if (!tab) {
@@ -158,12 +156,10 @@ App.TitlebarController = Ember.ObjectController.extend({
 			this.set('connectionLink', 'Disconnect');
 		}
 		// is the network connected?
-	}.observes('tabs.@each.hiddenUsers', 'tabs.@each.hiddenEvents', 'tabs.@each.active', 'networks.@each.internal.status', 'controllers.index.tabId', 'tabs.@each.selected'),
+	}.observes('socket.tabs.@each.hiddenUsers', 'socket.tabs.@each.hiddenEvents', 'socket.tabs.@each.active', 'socket.networks.@each.internal.status', 'socket.tabs.@each.selected', 'controllers.index.tabId'),
 
 	ready: function() {
-		this.set('networks', this.socket.findAll('networks'));
-		this.set('tabs', this.socket.findAll('tabs'));
-		// load the tabs into this controller so we can define what we're gonna do
-		// with them
+		this.tabChanged();
+		this.optionsChanged();
 	}
 });

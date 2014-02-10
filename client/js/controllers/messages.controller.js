@@ -1,13 +1,12 @@
 App.MessagesController = Ember.ArrayController.extend({
 	needs: ['index'],
-	tabs: [],
 	events: [],
 	readDocs: [],
 
 	filtered: Ember.arrayComputed('events', 'controllers.index.tabId', {
 		addedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
-				network = this.socket.findOne('networks', {_id: tab.network});
+			var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
+				network = this.get('socket.networks').findBy('_id', tab.network);
 
 			if (!tab) {
 				return accum;
@@ -25,8 +24,8 @@ App.MessagesController = Ember.ArrayController.extend({
 		},
 		
 		removedItem: function(accum, item) {
-			var tab = this.get('tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0],
-				network = this.socket.findOne('networks', {_id: tab.network});
+			var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
+				network = this.get('socket.networks').findBy('_id', tab.network);
 
 			if (!tab) {
 				return accum;
@@ -55,14 +54,6 @@ App.MessagesController = Ember.ArrayController.extend({
 		return sorted;
 	}.property('filtered').cacheable(),
 
-	ready: function() {
-		this.set('tabs', this.socket.findAll('tabs'));
-		this.set('events', this.socket.findAll('events'));
-		// we have to use the direct data set for events because we wont be able to
-		// take advantage of it's live pushing and popping
-		// ie new events immediately becoming visible with no effort
-	},
-
 	markAsRead: function() {
 		var query = {'$or': []};
 		this.get('readDocs').forEach(function(id) {
@@ -80,7 +71,7 @@ App.MessagesController = Ember.ArrayController.extend({
 	actions: {
 		detectUnread: function(id, top, bottom, container) {
 			var self = this,
-				tab = this.get('tabs').filterProperty('_id', id)[0],
+				tab = this.get('socket.tabs').findBy('_id', id),
 				events = this.get('sorted').filterProperty('unread', true),
 				counter = 0;
 				docs = [];
@@ -95,7 +86,7 @@ App.MessagesController = Ember.ArrayController.extend({
 				if (el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
-					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
+					if (top === 0 || top < topOffset && topOffset < bottom) {
 						// XXX - Handle highlights
 
 						item.set('unread', false);
@@ -124,5 +115,9 @@ App.MessagesController = Ember.ArrayController.extend({
 
 			this.set('timeout', scrollTimeout);
 		}
+	},
+
+	ready: function() {
+		this.set('events', this.socket.get('events'));
 	}
 });

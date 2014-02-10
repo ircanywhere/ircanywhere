@@ -22,7 +22,7 @@ App.SidebaritemView = Ember.View.extend({
 	getClass: function() {
 		var classNames = [''],
 			tab = this.get('controller.content'),
-			network = this.get('controller.parentController.networks').findBy('_id', tab.network);
+			network = this.get('controller.parentController.socket.networks').findBy('_id', tab.network);
 
 		if (tab.get('type') === 'network' && network.get('internal').status === 'connecting') {
 			classNames.push('net-loader');

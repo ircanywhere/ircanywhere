@@ -268,7 +268,7 @@ Application.prototype.setupServer = function() {
 	// express settings
 
 	app.use(express.compress());
-	app.use(express.static('client', {maxAge: 86400000}));
+	//app.use(express.static('client', {maxAge: 86400000}));
 	app.use(express.static('client'));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());

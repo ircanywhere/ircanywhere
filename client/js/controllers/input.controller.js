@@ -1,13 +1,11 @@
 App.InputController = Ember.ObjectController.extend({
 	needs: ['network', 'tab'],
 
-	commands: [],
 	commandIndex: 0,
 	inputValue: '',
 
 	ready: function() {
-		this.set('commands', this.socket.findAll('commands'));
-		this.set('commandIndex', this.get('commands').length);
+		this.set('commandIndex', this.get('socket.commands').length);
 	},
 
 	nick: function() {
@@ -16,7 +14,7 @@ App.InputController = Ember.ObjectController.extend({
 
 	actions: {
 		sendCommand: function() {
-			var tab = this.socket.findOne('tabs', {selected: true});
+			var tab = this.get('socket.tabs').findBy('selected', true);
 
 			this.socket.insert('commands', {
 				command: this.get('inputValue'),
@@ -33,11 +31,11 @@ App.InputController = Ember.ObjectController.extend({
 
 		toggleUp: function() {
 			var index = this.get('commandIndex') - 1,
-				command = this.get('commands')[index];
+				command = this.get('socket.commands')[index];
 
 			if (!command) {
 				this.set('inputValue', '');
-				this.set('commandIndex', this.get('commands').length);
+				this.set('commandIndex', this.get('socket.commands').length);
 			} else {
 				this.set('inputValue', command.command);
 				this.set('commandIndex', index);
@@ -47,8 +45,8 @@ App.InputController = Ember.ObjectController.extend({
 
 		toggleDown: function() {
 			var index = this.get('commandIndex') + 1;
-				index = (index === (this.get('commands').length + 1)) ? 0 : index;
-			var command = this.get('commands')[index];
+				index = (index === (this.get('socket.commands').length + 1)) ? 0 : index;
+			var command = this.get('socket.commands').objectAt(index);
 
 			if (!command) {
 				this.set('inputValue', '');

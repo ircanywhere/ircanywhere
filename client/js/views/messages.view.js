@@ -9,6 +9,11 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		this.bindScrolling({debounce: 50, element: this.$()});
 		// scroll handler
+
+		if (this.$()[0].scrollHeight <= this.$()[0].clientHeight) {
+			this.scrolled();
+		}
+		// immediately run this when the element is inserted
 	},
 
 	willRemoveElement: function() {

@@ -21,7 +21,7 @@ App.AddnetworkController = Ember.ObjectController.extend({
 	}.observes('user'),
 
 	ready: function() {
-		this.set('user', this.socket.findAll('users')[0]);
+		this.set('user', this.get('socket.users').objectAt(0));
 	},
 
 	actions: {

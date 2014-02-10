@@ -243,10 +243,6 @@ Ember.Socket = Ember.Object.extend({
 		this.socket.send(JSON.stringify({event: event, data: payload}));
 	},
 
-	findOne: function(type, query) {
-		return this._find(false, type, query);
-	},
-
 	find: function(type, query) {
 		return this._find(true, type, query);
 	},

@@ -148,7 +148,7 @@ NetworkManager.prototype.getClients = function() {
 	networks.forEach(function(network) {
 		var reconnect = false;
 
-		if (network.internal.status !== self.flags.disconnected) {
+		if (network.internal && network.internal.status !== self.flags.disconnected) {
 			reconnect = true;
 		}
 
