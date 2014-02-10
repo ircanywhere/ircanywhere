@@ -1,5 +1,6 @@
 App.EventController = Ember.ObjectController.extend({
 	needs: ['tab', 'network'],
+	blacklisted: ['PING', 'RPL_CREATIONTIME'],
 	
 	classNames: function() {
 		var type = this.get('content.type'),
@@ -10,6 +11,13 @@ App.EventController = Ember.ObjectController.extend({
 	}.property('content.type', 'controllers.tab.model.hiddenEvents').cacheable(),
 
 	templateName: function() {
-		return 'events/' + this.get('content.type');
+		var content = this.get('content'),
+			type = content.type;
+
+		if (type !== 'unknown' || (type === 'unknown' && this.blacklisted.indexOf(content.message.command) === -1)) {
+			return 'events/' + type;
+		} else {
+			return false;
+		}
 	}.property('content.type').cacheable()
 });

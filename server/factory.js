@@ -99,9 +99,9 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 		});
 	}
 	
-	if (application.verbose) {
+	//if (application.verbose) {
 		console.log(event, object);
-	}
+	//}
 }
 
 /**

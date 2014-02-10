@@ -220,7 +220,7 @@ CommandManager.prototype['/me'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/join'] = function(user, client, target, params) {
-	if (params.length !== 0 && helper.isChannel(client, params[0])) {
+	if (params.length > 0 && helper.isChannel(client, params[0])) {
 		var channel = params[0],
 			password = (params.length === 1) ? '' : params[1];
 	} else {

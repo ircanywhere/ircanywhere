@@ -6,7 +6,7 @@ Ember.Handlebars.helper('json', function(value, options) {
 Ember.Handlebars.helper('lookup', function(component, context, options) {
 	if (Ember.TEMPLATES[component]) {
 		Ember.TEMPLATES[component](this, options);
-	} else {
+	} else if (component !== false) {
 		console.warn('Got event, but template for:', component, 'does not exist');
 	}
 });

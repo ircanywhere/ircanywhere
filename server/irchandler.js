@@ -212,7 +212,7 @@ IRCHandler.prototype.join = function(client, message) {
 	};
 	// just a standard user object, although with a modes object aswell
 
-	if (message.nickname == client.nick) {
+	if (message.nickname === client.nick) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
 	}
@@ -235,7 +235,7 @@ IRCHandler.prototype.join = function(client, message) {
 IRCHandler.prototype.part = function(client, message) {
 	channelManager.removeUsers(client.name, message.channel, [message.nickname]);
 
-	if (message.nickname == client.nick) {
+	if (message.nickname === client.nick) {
 		networkManager.activeTab(client, message.channel, false);
 	}
 	// we're leaving, mark the tab as inactive
@@ -255,7 +255,7 @@ IRCHandler.prototype.part = function(client, message) {
 IRCHandler.prototype.kick = function(client, message) {
 	channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
-	if (message.kicked == client.nick) {
+	if (message.kicked === client.nick) {
 		networkManager.activeTab(client, message.channel, false);
 	}
 	// we're leaving, remove the tab
@@ -287,7 +287,7 @@ IRCHandler.prototype.quit = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.nick = function(client, message) {
-	if (message.nickname == client.nick) {
+	if (message.nickname === client.nick) {
 		Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
 	}
 	// update the nickname because its us changing our nick

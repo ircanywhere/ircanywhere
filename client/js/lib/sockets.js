@@ -5,8 +5,6 @@ Ember.SocketEmitter = Ember.Object.extend(Ember.Evented, {
 });
 
 Ember.Socket = Ember.Object.extend({
-	controllers: [],
-
 	socket: null,
 	done: false,
 	authed: null,
@@ -66,7 +64,7 @@ Ember.Socket = Ember.Object.extend({
 		this.emitter.on('done', function() {
 			self.set('done', true);
 
-			Ember.EnumerableUtils.forEach(controllers, function(controllerName) {
+			controllers.forEach(function(controllerName) {
 				var controller = getController(controllerName);
 				// fetch the controller if it's valid.
 
@@ -149,7 +147,7 @@ Ember.Socket = Ember.Object.extend({
 		if (!controller || ('ready' in controller === false)) {
 			return false;
 		}
-		// don't do anything with this controller if it hasn't defined a `events` hash.
+		// don't do anything with this controller if it doesnt have a ready function
 
 		return controller;
 	},
