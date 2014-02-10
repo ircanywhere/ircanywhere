@@ -61,8 +61,6 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
-		username = context.username || context.message.username,
-		hostname = context.hostname || context.message.hostname,
 		prefixClass = '',
 		url = this.get('controllers.network.model').url;
 
@@ -84,7 +82,7 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		route = '#/t/' + url + '/' + nickname,
-		html = (user) ? '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span></a>' : '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '" data-username="' + username + '" data-hostname="' + hostname + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
+		html = (user) ? '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '">' + prefixSpan + '<span class="name">' + nickname + '</span></a>' : '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
 	
 	return new Ember.Handlebars.SafeString(html);
 	// return the element

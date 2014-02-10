@@ -375,6 +375,12 @@ SocketManager.prototype.init = function() {
 			// ignore specific scenarios
 			
 			clients.push(Users[doc.user]);
+			// get the client
+
+			if (collection === 'events') {
+				doc = _.omit(doc, 'user');
+			}
+			// alter the document if need be
 		} else if (collection === 'channelUsers' && !doc._burst) {
 			for (var id in Clients) {
 				for (var tabId in Clients[id].internal.tabs) {
@@ -385,6 +391,10 @@ SocketManager.prototype.init = function() {
 					}
 				}
 			}
+			// find the client list
+
+			doc = _.omit(doc, 'username', 'hostname', '_burst');
+			// alter the document if need be
 		}
 
 		clients.forEach(function(socket) {
@@ -534,7 +544,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 			var query = {network: netIds[tab.network].name, target: tab.target, user: user._id}
 		}
 
-		var eventResults = application.Events.sync.find(query).sort({$natural: -1}).limit(50).sync.toArray(),
+		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({$natural: -1}).limit(50).sync.toArray(),
 			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
 			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
 		// get some information about the unread items/highlights
@@ -550,7 +560,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 		var users = [],
 			commands = [];
 	} else {
-		var users = application.ChannelUsers.sync.find(usersQuery).sync.toArray(),
+		var users = application.ChannelUsers.sync.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).sync.toArray(),
 			commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sync.toArray();
 	}
 	// get channel users and commands
