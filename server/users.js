@@ -236,7 +236,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	this.server.send(message);
 	// send a email
 
-	networkManager.addNetwork(user, application.config.defaultNetwork);
+	networkManager.addNetwork(user, _.clone(application.config.defaultNetwork));
 	// create a network for them
 
 	output.successMessage = 'Your account has been successfully created, you may now login';
