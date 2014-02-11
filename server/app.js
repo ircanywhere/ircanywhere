@@ -276,7 +276,7 @@ Application.prototype.setupServer = function() {
 
 	var winstonStream = {
 		write: function(message, encoding) {
-			self.logger.log('info', message);
+			self.logger.log('info', message.slice(0, -1));
 		}
 	};
 	// enable web server logging; pipe those log messages through winston
