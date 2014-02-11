@@ -20,7 +20,7 @@ var _insert = function(client, message, type, user, force) {
 	fibrous.run(function() {
 		var force = force || false,
 			user = user || false,
-			network = client.name,
+			network = (client.name) ? client.name : client.server,
 			ours = (message.nickname === client.nick),
 			channel = (message.channel && !message.target) ? message.channel : message.target,
 			user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});

@@ -206,6 +206,7 @@ UserManager.prototype.registerUser = function(req, res) {
 			tokens: {},
 			ident: application.config.clientSettings.userNamePrefix + userCount,
 			newUser: true,
+			selectedTab: '',
 			profile: {
 				name: name,
 				nickname: nickname

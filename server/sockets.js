@@ -518,6 +518,12 @@ SocketManager.prototype.handleConnect = function(socket) {
 		commandsQuery = {$or: []},
 		selected = false;
 
+	var tabUrls = _.map(tabs, 'url');
+	if (tabUrls.indexOf(user.selectedTab) === -1) {
+		user.selectedTab = tabs[0].url;
+	}
+	// determine whether we have a selected tab or not?
+
 	networks.forEach(function(network) {
 		netIds[network._id] = {
 			name: network.name,
@@ -526,15 +532,6 @@ SocketManager.prototype.handleConnect = function(socket) {
 	});
 
 	tabs.forEach(function(tab, index) {
-		if (tab.selected) {
-			selected = true;
-		}
-
-		if (index === (tabs.length - 1) && selected === false) {
-			tab.selected = true;
-		}
-		// determine whether we have a selected tab or not?
-
 		usersQuery['$or'].push({network: netIds[tab.network].name, channel: tab.target});
 		commandsQuery['$or'].push({network: tab.network, target: tab.target});
 		// construct some queries
@@ -579,7 +576,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 	});
 	// send the info
 
-	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date()}}, function(err, doc) { });
+	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, function(err, doc) { });
 	// update last seen time
 }
 

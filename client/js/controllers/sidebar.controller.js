@@ -68,6 +68,7 @@ App.SidebarController = Ember.ArrayController.extend({
 	sortAscending: true,
 
 	ready: function() {
+		this.set('user', this.get('socket.users')[0]);
 		this.set('content', this.get('socket.tabs'));
 		// set that to the tabs collection, it'll update automatically when they change
 	}
