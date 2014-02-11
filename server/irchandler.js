@@ -36,7 +36,7 @@ var _formatRaw = function(raw) {
  * @return 	void
  */
 function IRCHandler() {
-	this.blacklisted = ['PING'];
+	this.blacklisted = ['PING', 'RPL_CREATIONTIME'];
 }
 
 /**
@@ -224,10 +224,11 @@ IRCHandler.prototype.join = function(client, message) {
 	if (message.nickname === client.nick) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
+	} else {
+		channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 	}
 	// if it's us joining a channel we'll create a tab for it and request a mode
 
-	channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 	eventManager.insertEvent(client, message, 'join');
 	// event
 }
@@ -354,7 +355,7 @@ IRCHandler.prototype.who = function(client, message) {
 	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 
 	if (socket) {
-		socket.send('channelUsers', {data: inserts});
+		socket.send('channelUsers', inserts);
 	}
 	// burst emit these instead of letting the oplog tailer handle it, it's too heavy
 }

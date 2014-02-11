@@ -35,7 +35,7 @@ App.UserlistController = Ember.ArrayController.extend({
 	}),
 
 	sorted: function() {
-		var results = this.get('socket.channelUsers'),
+		var results = this.get('channelUsers'),
 			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 				content: results,
 				sortProperties: ['sort', 'nickname'],
@@ -43,5 +43,13 @@ App.UserlistController = Ember.ArrayController.extend({
 			});
 
 		return sorted;
-	}.property('socket.channelUsers').cacheable()
+	}.property('channelUsers').cacheable(),
+
+	ready: function() {
+		this.set('channelUsers', this.socket.channelUsers);
+	},
+	
+	updated: function() {
+		this.set('channelUsers', this.socket.channelUsers);
+	}
 });

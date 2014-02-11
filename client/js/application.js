@@ -9,6 +9,6 @@ App = Ember.Application.create({
 	Parser: Ember.Parser.create(),
 
 	Socket: Ember.Socket.extend({
-		controllers: ['addnetwork', 'input', 'messages', 'network', 'settings', 'sidebar', 'titlebar']
+		controllers: ['addnetwork', 'input', 'messages', 'network', 'settings', 'sidebar', 'titlebar', 'userlist']
 	})
 });

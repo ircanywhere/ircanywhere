@@ -105,7 +105,7 @@ App.HelpController = Ember.ObjectController.extend({
 				'desc': 'Unban a user or hostmask',
 			},
 			{
-				'command': '/ctcp target <strong>message</strong>',
+				'command': '/ctcp <strong>target</strong> <strong>message</strong>',
 				'desc': 'Send a ctcp request out',
 			},
 			{

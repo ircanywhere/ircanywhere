@@ -1,6 +1,19 @@
 Ember.SocketEmitter = Ember.Object.extend(Ember.Evented, {
 	done: function() {
 		this.trigger('done');
+	},
+
+	_propagate: function(controllers, getController, fn) {
+		controllers.forEach(function(controllerName) {
+			var controller = getController(controllerName);
+			// fetch the controller if it's valid.
+
+			if (controller && typeof controller[fn] === 'function') {
+				controller[fn].apply(controller);
+			}
+			// invoke the `fn` method if it has been defined on this controller.
+		});
+		// bind any connect events to our controllers
 	}
 });
 
@@ -63,17 +76,11 @@ Ember.Socket = Ember.Object.extend({
 
 		this.emitter.on('done', function() {
 			self.set('done', true);
+			this._propagate(controllers, getController, 'ready');
+		});
 
-			controllers.forEach(function(controllerName) {
-				var controller = getController(controllerName);
-				// fetch the controller if it's valid.
-
-				if (controller && typeof controller.ready === 'function') {
-					controller.ready.apply(controller);
-				}
-				// invoke the `ready` method if it has been defined on this controller.
-			});
-			// bind any connect events to our controllers
+		this.emitter.on('updated', function() {
+			this._propagate(controllers, getController, 'updated');
 		});
 
 		this._send('authenticate', document.cookie);
@@ -103,10 +110,12 @@ Ember.Socket = Ember.Object.extend({
 
 		if (event === 'channelUsers') {
 			self._store('channelUsers', data);
+			this.emit('updated');
 		}
 
 		if (event === 'events') {
 			self._store('events', data);
+			this.emit('updated');
 		}
 
 		if (event === 'insert') {
@@ -157,12 +166,11 @@ Ember.Socket = Ember.Object.extend({
 			col = self.get(collection);
 
 		for (var k = 0, len = payload.length; k < len; k++) {
-			var i = payload[k];
-
-			var exists = col.findBy('_id', i._id);
+			var i = payload[k],
+				exists = col.findBy('_id', i._id);
 			
 			if (exists) {
-				self._update(collection, exists.get('_id'), Ember.Object.create(i));
+				exists.setProperties(i);
 			} else {
 				col.pushObject(Ember.Object.create(i));
 			}

@@ -2,16 +2,17 @@ App.NetworkController = Ember.ObjectController.extend({
 	needs: ['index', 'messages'],
 
 	tabChanged: function() {
-		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
-			content = this.get('socket.networks').findBy('_id', tab.get('network'));
+		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 		// get the selected tab
 
 		if (tab) {
+			var network = this.get('socket.networks').findBy('_id', tab.get('network'));
+
 			delete tab.selectedTab;
 			// delete this because it'll cause a circular reference
 
-			content.set('selectedTab', tab);
-			this.set('content', content);
+			network.set('selectedTab', tab);
+			this.set('content', network);
 			// set content.selectedTab (network) - so we can find the full selected tab object in
 			// the network's object for quick access
 		}
@@ -26,14 +27,24 @@ App.NetworkController = Ember.ObjectController.extend({
 		}
 		// some how this has happened, but lets be safe and not continue anyway
 
-		var events = this.socket.findAll('events', {_id: id, unread: true});
+		var network = this.get('socket.networks').findBy('_id', tab.get('network'));
+
+		if (tab.type === 'network') {
+			var query = {network: tab.networkName, read: false, target: '*'};
+		} else if (tab.type === 'query') {
+			var query = {network: tab.networkName, read: false, $or: [{target: tab.target}, {'message.nickname': tab.target, target: network.nick}]};
+		} else if (tab.type === 'channel') {
+			var query = {network: tab.networkName, read: false, target: tab.target};
+		}
+
+		var events = this.get('controllers.messages.sorted').filterProperty('unread', true);
 		// get the events for the specific tab
 
 		events.setEach('unread', false);
 		tab.set('unread', 0);
 		// mark them as unread to hide the bar
 
-		this.socket.update('events', {_id: id, read: false}, {read: true});
+		this.socket.update('events', query, {read: true});
 		// update the records
 	},
 
