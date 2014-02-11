@@ -4,6 +4,10 @@
 	"version": "0.2.0-alpha",
 	"author": "Ricki Hastings <ricki@ircanywhere.com> (https://ircanywhere.com)",
 	"homepage": "https://ircanywhere.com",
+	"main": "./server/ircanywhere",
+	"scripts": {
+		"start": "node ./server/ircanywhere start"
+	},
 	"contributors": [
 		{
 			"name": "Ricki Hastings",
@@ -19,6 +23,7 @@
 		"grunt-contrib-watch": "0.5.3"
 	},
 	"dependencies": {
+		"daemonize2": "~0.4.2",
 		"emailjs": "0.3.6",
 		"express": "~3.4.0",
 		"eventemitter2": "~0.4.13",
@@ -47,7 +52,6 @@
 		"mail": "support@ircanywhere.com",
 		"url": "http://github.com/ircanywhere/ircanywhere/issues"
 	},
-	"main": "server/main",
 	"licenses": [
 		{
 			"type": "GNU",

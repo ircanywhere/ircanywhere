@@ -4,3 +4,4 @@ node_modules
 logs
 *.sublime*
 config.json
+*.pid

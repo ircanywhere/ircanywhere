@@ -51,11 +51,10 @@ rs0:PRIMARY>
 
 If you see the `:PRIMARY>` suffix then you've set the replica set up successfully. If you're still having trouble you can try following this more detailed guide at [http://meteorhacks.com/lets-scale-meteor.html](http://meteorhacks.com/lets-scale-meteor.html).
 
-The next step is to clone the github repo (if you fancy living dangerously, although you can still checkout to the latest stable branch or release tags). Although I'd recommend using the tarball if you're not planning on doing any development/plugin work.
+The next step is to clone the github repo, or you can install from `0.2-alpha` however at the moment I would recommend cloning from the development branch.
 
   * `$ git clone https://github.com/ircanywhere/ircanywhere.git`
   * `$ cd ircanywhere`
-  * `$ git checkout v0.2-alpha`
   * **or**
   * `$ wget https://github.com/ircanywhere/ircanywhere/archive/v0.2-alpha.tar.gz`
   * `$ tar xvf v0.2-alpha.tar.gz`
@@ -74,13 +73,21 @@ Finally, edit the configuration file `config.example.json` a few things will nee
 
 ## Running
 
-  * `$ node .`
+There is multiple ways you can run ircanywhere, you probably want to run it detaching from the console so it runs as a daemon, you can do that with the following commands;
+
+  * `$ npm start`
+  * **or**
+  * `$ node . start`
+
+If you want to run it attached to the console (probably for debugging if you're developing), then you can run;
+
+* `$ VERBOSE=true node . run`
+
+The verbose environment flag is optional bug provides raw IRC events for debugging purposes. I would avoid running it with forever as it restarts the detached processes (irc-factory) which means your IRC connections will be brought down on restarts. You can see logs in the `logs` folder, any catchable stack traces will be dropped in `logs/error.log`.
 
 The url is set to what you specified in the config, although it defaults to `http://localhost:3000`. Note that SSL is not supported yet (happy to take PR though).
 
-Although you probably want to run it with forever to keep it online, and even better if you're running in production behind nginx.
-
-In the future there will be instructions on how to do this and the possibility to serve the css/js files via nginx. I'll also be implementing a way to sticky session via nginx when the system is clustered.
+If you're running in a production environment it would be better to run this behind a nginx proxy or similar. In the future there will be instructions on how to do this and the possibility to serve the css/js files via nginx. I'll also be implementing a way to sticky session via nginx when the system is clustered.
 
 Once you're logged in you will need to connect to the default network with the `/reconnect` command. A help command will be added soon.
 

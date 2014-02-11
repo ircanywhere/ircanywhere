@@ -44,6 +44,9 @@ function Application() {
 
 	fibrous.run(this.init.bind(this));
 	// initiate the module
+
+	process.title = 'ircanywhere';
+	// set process title
 }
 
 /**
@@ -176,6 +179,7 @@ Application.prototype.setupWinston = function() {
 				name: 'error',
 				level: 'error',
 				filename: './logs/error.log',
+				handleExceptions: true,
 				json: false,
 				timestamp: true
 			}),
@@ -193,7 +197,8 @@ Application.prototype.setupWinston = function() {
 				json: false,
 				timestamp: true
 			})
-		]
+		],
+		exitOnError: false
 	});
 }
 
@@ -249,6 +254,7 @@ Application.prototype.setupNode = function() {
 			throw err;
 		}
 	});
+	// XXX - Clean this shit up before 0.2 final it's horrible
 }
 
 /**
@@ -259,7 +265,8 @@ Application.prototype.setupNode = function() {
  * @return	void
  */
 Application.prototype.setupServer = function() {
-	var app = express(),
+	var self = this,
+		app = express(),
 		server = require('http').createServer(app),
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 	// setup a http server
@@ -267,9 +274,16 @@ Application.prototype.setupServer = function() {
 	app.enable('trust proxy');
 	// express settings
 
+	var winstonStream = {
+		write: function(message, encoding) {
+			self.logger.log('info', message);
+		}
+	};
+	// enable web server logging; pipe those log messages through winston
+
+	app.use(express.logger({stream: winstonStream}));
 	app.use(express.compress());
-	//app.use(express.static('client', {maxAge: 86400000}));
-	app.use(express.static('client'));
+	app.use(express.static('client', {maxAge: 86400000}));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());
 	app.use(express.urlencoded());
