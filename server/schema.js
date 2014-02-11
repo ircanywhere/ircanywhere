@@ -23,10 +23,6 @@ exports.schema = {
 		type: 'boolean',
 		required: true
 	},
-	'ssl': {
-		type: 'boolean',
-		required: false
-	},
 	'forkProcess': {
 		type: 'boolean',
 		required: true

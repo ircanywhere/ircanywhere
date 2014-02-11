@@ -24,11 +24,6 @@
 	 * -- boolean 
 	 * -- usage: Whether to enable registrations or not */
 
-	"ssl": false,
-	/* -- boolean 
-	 * -- usage: Whether to enable HTTPS or not - you will need certificates
-				 defaults to false. */
-
 	"forkProcess": true,
 	/* -- required
 	 * -- boolean 
