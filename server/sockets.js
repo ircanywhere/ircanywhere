@@ -366,6 +366,9 @@ SocketManager.prototype.init = function() {
 
 		if (eventName === 'update' && collection === 'users') {
 			clients.push(Users[doc._id]);
+
+			doc = _.omit(doc, 'salt', 'password', 'tokens');
+			// alter the document if need be
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
@@ -566,7 +569,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 	// get channel users and commands
 
 	socket.sendBurst({
-		users: [user],
+		users: [_.omit(user, 'salt', 'password', 'tokens')],
 		networks: networks,
 		tabs: tabs,
 		channelUsers: users,

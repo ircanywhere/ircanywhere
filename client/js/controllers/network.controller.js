@@ -26,15 +26,14 @@ App.NetworkController = Ember.ObjectController.extend({
 		}
 		// some how this has happened, but lets be safe and not continue anyway
 
-		var target = (tab.type === 'network') ? '*' : tab.target,
-			events = this.socket.findAll('events', {network: tab.networkName, target: target, unread: true});
+		var events = this.socket.findAll('events', {_id: id, unread: true});
 		// get the events for the specific tab
 
 		events.setEach('unread', false);
 		tab.set('unread', 0);
 		// mark them as unread to hide the bar
 
-		this.socket.update('events', {network: tab.networkName, target: target, read: false}, {read: true});
+		this.socket.update('events', {_id: id, read: false}, {read: true});
 		// update the records
 	},
 

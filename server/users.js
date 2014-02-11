@@ -205,6 +205,7 @@ UserManager.prototype.registerUser = function(req, res) {
 			salt: salt,
 			tokens: {},
 			ident: application.config.clientSettings.userNamePrefix + userCount,
+			newUser: true,
 			profile: {
 				name: name,
 				nickname: nickname
@@ -236,7 +237,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	this.server.send(message);
 	// send a email
 
-	networkManager.addNetwork(user, _.clone(application.config.defaultNetwork));
+	networkManager.addNetwork(user, _.clone(application.config.defaultNetwork), networkManager.flags.closed);
 	// create a network for them
 
 	output.successMessage = 'Your account has been successfully created, you may now login';
@@ -287,11 +288,11 @@ UserManager.prototype.userLogin = function(req, res) {
 				ip: req.ip
 			};
 
-		application.Users.sync.update({email: email}, {$set: {tokens: tokens}});
+		application.Users.sync.update({email: email}, {$set: {tokens: tokens, newUser: false}});
 		res.cookie('token', token, {expires: expire});
 		// set a login key and a cookie
 
-		this.onUserLogin(user);
+		this.onUserLogin(user, user.newUser);
 	}
 	// check if password matches
 
@@ -517,8 +518,9 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  * @extend	true
  * @return 	void
  */
-UserManager.prototype.onUserLogin = function(me) {
-	var userId = me._id; 
+UserManager.prototype.onUserLogin = function(me, force) {
+	var force = force || false,
+		userId = me._id; 
 
 	if (me == null) {
 		return;
@@ -531,7 +533,7 @@ UserManager.prototype.onUserLogin = function(me) {
 		var network = networks[netId],
 			reconnect = false;
 
-		if (network.internal.status !== networkManager.flags.disconnected) {
+		if (network.internal.status !== networkManager.flags.disconnected && force) {
 			reconnect = true;
 		}
 

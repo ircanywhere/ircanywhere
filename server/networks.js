@@ -235,7 +235,10 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		password: password,
 		nick: nick,
 		realname: name
-	});
+	}, this.flags.closed);
+	// add network
+
+	this.connectNetwork(network);
 
 	return output;
 }
@@ -250,7 +253,12 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
  * @extend 	true
  * @return 	{Object}
  */
-NetworkManager.prototype.addNetwork = function(user, network) {
+NetworkManager.prototype.addNetwork = function(user, network, status) {
+	if (!(status in this.flags)) {
+		application.logger.log('warn', 'invalid status flag for addNetwork', helper.cleanObjectIds(network));
+		return;
+	}
+
 	network.name = network.server;
 	network.nick = network.nick || user.profile.nickname;
 	network.user = user.ident;
@@ -271,7 +279,7 @@ NetworkManager.prototype.addNetwork = function(user, network) {
 		capabilities: {},
 		nodeId: application.nodeId,
 		userId: user._id,
-		status: this.flags.disconnected
+		status: status
 	}
 	// this stores internal information about the network, it will be available to
 	// the client but they wont be able to edit it, it also wont be able to be enforced
@@ -412,7 +420,7 @@ NetworkManager.prototype.connectNetwork = function(network) {
  */
 NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {
-		application.logger.log('warn', 'invalid status flag', helper.cleanObjectIds({flag: status, network: query}));
+		application.logger.log('warn', 'invalid status flag for changeStatus', helper.cleanObjectIds({flag: status, network: query}));
 		return;
 	}
 
