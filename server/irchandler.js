@@ -73,6 +73,7 @@ IRCHandler.prototype.registered = function(client, message) {
 
 	application.Tabs.sync.update({network: client._id}, {$set: {
 		networkName: message.capabilities.network.name,
+		active: true
 	}}, {multi: true});
 	// update any sub tabs
 
@@ -132,6 +133,11 @@ IRCHandler.prototype.closed = function(client, message) {
 		time: new Date().toJSON(),
 		message: (message.reconnecting) ? 'Connection closed. Attempting reconnect number ' + message.attempts : 'You have disconnected.',
 	}, 'closed');
+
+	if (!message.reconnecting) {
+		ircFactory.destroy(client._id);
+	}
+	// destroy the client if we're not coming back
 }
 
 /**
@@ -154,6 +160,9 @@ IRCHandler.prototype.failed = function(client, message) {
 		time: new Date().toJSON(),
 		message: 'Connection closed. Retry attempts exhausted.',
 	}, 'closed');
+
+	ircFactory.destroy(client._id);
+	// destroy the client
 }
 
 /**
