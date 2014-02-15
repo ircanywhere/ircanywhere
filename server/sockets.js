@@ -67,6 +67,57 @@ function SocketManager() {
 	// collections with allowed update rules
 	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
+	this.allow('users', {
+		/**
+		 * An allow rule for updates to the user record, we can only change the selectedTab
+		 * value here and it only works for the logged in user.
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	{Boolean}
+		 */
+		update: function(uid, query, update) {
+			var allow = false,
+				allowed = ['selectedTab'];
+			
+			_.forOwn(update, function(value, item) {
+				if ((item === 'selectedTab') && typeof value === 'string') {
+					allow = true;
+				}
+				// check the values?
+
+				if (_.indexOf(allowed, item) === -1) {
+					allow = false;
+				}
+				// invalid key
+			});
+			
+			return allow;
+		}
+	});
+
+	this.rules('users', {
+		/**
+		 * An update rule to execute when we've passed the allow rules
+		 *
+		 * @method 	update
+		 * @param 	{ObjectID} uid
+		 * @param 	{Object} query
+		 * @param 	{Object} update
+		 * @extend 	false
+		 * @private
+		 * @return 	void
+		 */
+		update: function(uid, query, update) {
+			application.Users.sync.update({_id: uid}, {$set: update});
+			// update
+		}
+	});
+
 	this.allow('tabs', {
 		/**
 		 * An allow rule for updates to the tab collections, checks the correct properties
@@ -82,22 +133,22 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		update: function(uid, query, update) {
-			var deny = true,
-				allowed = ['hiddenUsers', 'hiddenEvents', 'selected'];
+			var allow = false,
+				allowed = ['hiddenUsers', 'hiddenEvents'];
 			
-			_.forOwn(update, function(item, value) {
-				if ((item === 'hiddenUsers' || item == 'hiddenEvents' || item === 'selected') && typeof value === 'boolean') {
-					deny = false;
+			_.forOwn(update, function(value, item) {
+				if ((item === 'hiddenUsers' || item == 'hiddenEvents') && typeof value === 'boolean') {
+					allow = true;
 				}
 				// check the values?
 
 				if (_.indexOf(allowed, item) === -1) {
-					deny = true;
+					allow = false;
 				}
 				// invalid key
 			});
 			
-			return deny;
+			return allow;
 		},
 
 		/**
@@ -112,26 +163,26 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		insert: function(uid, insert) {
-			var deny = true,
+			var allow = false,
 				allowed = ['target', 'network', 'selected'];
 			
-			_.forOwn(insert, function(item, value) {
+			_.forOwn(insert, function(value, item) {
 				if ((item === 'target' || item === 'network') && typeof value === 'string') {
-					deny = false;
+					allow = true;
 				}
 
 				if (item === 'selected' && typeof value === 'boolean') {
-					deny = false;
+					allow = true;
 				}
 				// check the values?
 
 				if (_.indexOf(allowed, item) === -1) {
-					deny = true;
+					allow = false;
 				}
 				// invalid key
 			});
 			
-			return deny;
+			return allow;
 		}
 	});
 
@@ -148,12 +199,6 @@ function SocketManager() {
 		 * @return 	void
 		 */
 		update: function(uid, query, update) {
-			if (_.has(update, 'selected')) {
-				application.Tabs.sync.update({user: uid}, {$set: {selected: false}}, {multi: true});
-			}
-			// also check for selected here, if a new tab is being selected then we will
-			// force the de-selection of the others
-
 			application.Tabs.sync.update(_.extend(query, {user: uid}), {$set: update});
 			// update
 		},
@@ -192,26 +237,26 @@ function SocketManager() {
 		 * @return 	{Boolean}
 		 */
 		insert: function(uid, insert) {
-			var deny = true,
+			var allow = false,
 				allowed = ['command', 'network', 'target', 'backlog'];
 			
-			_.forOwn(insert, function(item, value) {
+			_.forOwn(insert, function(value, item) {
 				if ((item === 'command' || item === 'network' || item === 'target') && typeof value === 'string') {
-					deny = false;
+					allow = true;
 				}
 
 				if (item === 'backlog' && typeof value === 'boolean') {
-					deny = false;
+					allow = true;
 				}
 				// check the values?
 
 				if (_.indexOf(allowed, item) === -1) {
-					deny = true;
+					allow = false;
 				}
 				// invalid key
 			});
 			
-			return deny;
+			return allow;
 		}
 	});
 
@@ -515,8 +560,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 		netIds = {},
 		items = [],
 		usersQuery = {$or: []},
-		commandsQuery = {$or: []},
-		selected = false;
+		commandsQuery = {$or: []};
 
 	var tabUrls = _.map(tabs, 'url');
 	if (tabUrls.indexOf(user.selectedTab) === -1) {
@@ -610,23 +654,19 @@ SocketManager.prototype.handleInsert = function(socket, data) {
 		user = socket._user;
 
 	if (!collection || !insert) {
-		socket.send('error', {command: 'insert', error: 'invalid format'});
-		return;
+		return socket.send('error', {command: 'insert', error: 'invalid format'});
 	}
 
 	if (!_.isFunction(this.allowRules[collection]['insert']) || !_.isFunction(this.operationRules[collection]['insert'])) {
-		socket.send('error', {command: 'insert', error: 'cant insert'});
-		return;
+		return socket.send('error', {command: 'insert', error: 'cant insert'});
 	}
 
-	if (!this.allowRules[collection]['insert'](user._id, insert)) {
-		socket.send('error', {command: 'insert', error: 'not allowed'});
-		return;
+	if (this.allowRules[collection]['insert'](user._id, insert)) {
+		this.operationRules[collection]['insert'](user._id, insert);
+	} else {
+		return socket.send('error', {command: 'insert', error: 'not allowed'});
 	}
 	// have we been denied?
-
-	this.operationRules[collection]['insert'](user._id, insert);
-	// insert
 }
 
 /**
@@ -656,13 +696,12 @@ SocketManager.prototype.handleUpdate = function(socket, data) {
 	}
 	// update it to a proper mongo id
 
-	if (!this.allowRules[collection]['update'](user._id, query, update)) {
+	if (this.allowRules[collection]['update'](user._id, query, update)) {
+		this.operationRules[collection]['update'](user._id, query, update);
+	} else {
 		return socket.send('error', {command: 'update', error: 'not allowed'});
 	}
 	// have we been denied?
-
-	this.operationRules[collection]['update'](user._id, query, update);
-	// update
 }
 
 exports.SocketManager = _.extend(SocketManager, hooks);

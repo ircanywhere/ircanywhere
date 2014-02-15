@@ -39,12 +39,11 @@ App.NetworkRoute = AppRoute.extend({
 				return false;
 			}
 
-			socket.get('tabs').setEach('selected', false);
-			tab.set('selected', true);
-			// mark all but this as selected
+			//socket.get('users').setEach('selectedTab', url);
+			// mark tab as selected
 
 			index.set('tabId', tab._id);
-			index.socket.update('tabs', {_id: tab._id}, {selected: true});
+			index.socket.update('users', {}, {selectedTab: tab.url});
 			// send update to backend
 		},
 

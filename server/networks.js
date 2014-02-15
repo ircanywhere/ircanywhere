@@ -317,7 +317,6 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 			target: target.toLowerCase(),
 			title: target,
 			type: type,
-			selected: select,
 			active: active
 		};
 
@@ -328,7 +327,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 
 	var callback = function(err, doc) {
 		if (client.internal.tabs && client.internal.tabs[obj.target]) {
-			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active, selected: select}}, function(err, doc) { });
+			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active}}, function(err, doc) { });
 		} else {
 			application.Tabs.insert(obj, function(err, doc) { });
 		}
@@ -336,7 +335,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	};
 
 	if (select) {
-		application.Tabs.update({user: client.internal.userId}, {$set: {selected: false}}, {multi: true}, callback);
+		application.Users.update({_id: client.internal.userId}, {$set: {selectedTab: obj.url}}, callback);
 	} else {
 		callback(null, null);
 	}
