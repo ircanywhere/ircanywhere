@@ -130,6 +130,9 @@ UserManager.prototype.timeOutInactive = function() {
 				// ok we have our inactive users now lets find their networks
 
 				networks.forEach(function(network) {
+					networkManager.changeStatus(network._id, networkManager.flags.disconnected);
+					// mark as connecting and mark the tab as active again
+
 					ircFactory.send(network._id, 'disconnect', ['Timed out']);
 				});
 				// loop through the active networks
