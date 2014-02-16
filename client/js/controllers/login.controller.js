@@ -51,7 +51,6 @@ App.LoginController = Ember.ObjectController.extend({
 	loginSuccess: function(data) {
 		this.socket.connect();
 		this.set('errors', false);
-		this.transitionToRoute('index');
 	},
 
 	loginFail: function(data) {

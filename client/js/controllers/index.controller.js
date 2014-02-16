@@ -6,7 +6,8 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	},
 
 	tabChanged: function() {
-		var tab = this.get('socket.tabs').findBy('selected', true);
+		var user = this.get('socket.users').objectAt(0),
+			tab = this.get('socket.tabs').findBy('url', user.selectedTab);
 
 		if (tab) {
 			var url = tab.get('url').split('/');
@@ -21,11 +22,15 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 			this.set('tabId', tab.get('_id'));
 			// change the tab id
 		}
-	}.observes('socket.tabs.@each.selected'),
+	}.observes('socket.users.@each.selectedTab'),
 	
 	determinePath: function() {
 		if (this.socket.authed === false) {
 			this.transitionToRoute('login');
 		}
-	}.observes('socket.authed')
+	}.observes('socket.authed'),
+
+	ready: function() {
+		this.tabChanged();
+	}
 });

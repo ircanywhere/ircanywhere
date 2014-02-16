@@ -1,5 +1,5 @@
 App = Ember.Application.create({
-	LOG_TRANSITIONS: false,
+	LOG_TRANSITIONS: true,
 	
 	defaultTitle: 'IRCAnywhere',
 	timeout: null,
@@ -9,6 +9,6 @@ App = Ember.Application.create({
 	Parser: Ember.Parser.create(),
 
 	Socket: Ember.Socket.extend({
-		controllers: ['addnetwork', 'input', 'messages', 'network', 'settings', 'sidebar', 'titlebar', 'userlist']
+		controllers: ['index', 'addnetwork', 'input', 'messages', 'network', 'settings', 'sidebar', 'titlebar', 'userlist']
 	})
 });

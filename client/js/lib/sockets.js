@@ -38,14 +38,8 @@ Ember.Socket = Ember.Object.extend({
 
 	connect: function() {
 		var self = this,
-			socket = new SockJS('/websocket'),
-			existing = this.socket;
-		// connect
-
-		if (existing) {
 			socket = new SockJS('/websocket');
-		}
-		// socket exists
+		// connect
 
 		socket.onclose = function() {
 			// XXX - Handle reconnect
@@ -66,11 +60,7 @@ Ember.Socket = Ember.Object.extend({
 	_setup: function() {
 		var controllers = Ember.get(this, 'controllers'),
 			getController = this._getController.bind(this),
-			self = this,
-			respond = function() {
-				var eventData = Array.prototype.slice.call(arguments);
-				module._update.call(module, this, eventData);
-			};
+			self = this;
 
 		this.set('done', false);
 
@@ -99,6 +89,7 @@ Ember.Socket = Ember.Object.extend({
 		if (event === 'burst') {
 			Ember.$.get(data.url, function(data) {
 				for (var type in data) {
+					console.log(type);
 					if (type === 'burstend' && data[type] === true) {
 						self.emitter.done();
 					} else {

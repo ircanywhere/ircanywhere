@@ -410,19 +410,13 @@ SocketManager.prototype.init = function() {
 		}
 
 		if (eventName === 'update' && collection === 'users') {
-			doc.lastSeen = doc.lastSeen.toString();
-			ext.lastSeen = ext.lastSeen.toString();
-			var changed = objectDiff.diffOwnProperties(doc, ext);
-			// figure out which one has been changed
+			delete doc.lastSeen;
+			delete ext.lastSeen;
+			
+			clients.push(Users[doc._id]);
 
-			if (changed.changed !== 'equal' && changed.value.lastSeen && changed.value.lastSeen.changed === 'equal') {
-				console.log('propogate');
-				clients.push(Users[doc._id]);
-
-				doc = _.omit(doc, 'salt', 'password', 'tokens');
-				// alter the document if need be
-			}
-			// ignore changes that include altering the lastSeen value
+			doc = _.omit(doc, 'salt', 'password', 'tokens');
+			// alter the document if need be
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
