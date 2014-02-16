@@ -146,15 +146,8 @@ NetworkManager.prototype.getClients = function() {
 	// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
 	networks.forEach(function(network) {
-		var reconnect = false;
-
 		if (network.internal && network.internal.status !== self.flags.disconnected) {
-			reconnect = true;
-		}
-
-		if (reconnect) {
 			clients[network._id] = network;
-			// add the client into our local cache
 		}
 	});
 	// here we just mark them for connection by passing them into this.reconnect

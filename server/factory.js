@@ -93,7 +93,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 		e = event[1],
 		client = Clients[key];
 
-	if (_.isFunction(ircHandler[e])) {
+	if (_.isFunction(ircHandler[e]) && object !== false) {
 		fibrous.run(function() {
 			ircHandler[e].call(ircHandler, client, object);
 		});
