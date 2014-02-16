@@ -47,6 +47,10 @@ exports.schema = {
 		type: 'object',
 		required: true
 	},
+	'clientSettings.activityTimeout': {
+		type: 'number',
+		required: true
+	},
 	'clientSettings.networkLimit': {
 		type: 'number',
 		min: 0,

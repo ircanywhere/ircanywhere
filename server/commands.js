@@ -144,6 +144,9 @@ CommandManager.prototype.parseCommand = function(user, client, target, command) 
 		this['/msg'](user, client, target, command.split(' '));
 		// just split it to follow standards with other commands, it'll be rejoined before sent out
 	}
+
+	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date()}}, {safe: false});
+	// update last seen time
 }
 
 /**

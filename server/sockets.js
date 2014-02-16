@@ -410,10 +410,19 @@ SocketManager.prototype.init = function() {
 		}
 
 		if (eventName === 'update' && collection === 'users') {
-			clients.push(Users[doc._id]);
+			doc.lastSeen = doc.lastSeen.toString();
+			ext.lastSeen = ext.lastSeen.toString();
+			var changed = objectDiff.diffOwnProperties(doc, ext);
+			// figure out which one has been changed
 
-			doc = _.omit(doc, 'salt', 'password', 'tokens');
-			// alter the document if need be
+			if (changed.changed !== 'equal' && changed.value.lastSeen && changed.value.lastSeen.changed === 'equal') {
+				console.log('propogate');
+				clients.push(Users[doc._id]);
+
+				doc = _.omit(doc, 'salt', 'password', 'tokens');
+				// alter the document if need be
+			}
+			// ignore changes that include altering the lastSeen value
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
@@ -620,7 +629,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 	});
 	// send the info
 
-	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, function(err, doc) { });
+	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
 	// update last seen time
 }
 

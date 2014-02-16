@@ -14,7 +14,12 @@ var _ = require('lodash'),
  * @return 	void
  */
 function UserManager() {
-	var self = this;
+	var d = new Date(),
+		secondsPastHour = (d.getMinutes() * 60) + d.getSeconds(),
+		self = this;
+
+	this.intervalId = setInterval(this.timeOutInactive.bind(this), ((60 * 60 * 1000) - (secondsPastHour * 1000)));
+	// set our inactivity timeout function to run every hour
 
 	application.ee.on('ready', function() {
 		fibrous.run(self.init.bind(self));
@@ -22,7 +27,7 @@ function UserManager() {
 }
 		
 /**
- * Description
+ * Sets up the api urls and anything else needed by the user manager class
  *
  * @method 	init
  * @extend	true
@@ -88,6 +93,59 @@ UserManager.prototype.init = function() {
 		res.end(JSON.stringify(response));
 	});
 	// setup routes
+}
+
+/**
+ * Responsible for disconnecting any inactive users
+ *
+ * This function is ran every hour or so, but not perfectly precise, but it shouldn't
+ * drift off too much because it re-corrects it self.
+ *
+ * @method 	timeOutInactive
+ * @extend	true
+ * @return 	void
+ */
+UserManager.prototype.timeOutInactive = function() {
+	var d = new Date(),
+		timeoutDate = new Date(),
+		timeout = application.config.clientSettings.activityTimeout,
+		secondsPastHour = (d.getMinutes() * 60) + d.getSeconds();
+
+	if (timeout > 0) {
+		var updateIds = [];
+
+		timeoutDate.setHours(timeoutDate.getHours() - timeout);
+		// alter the date as per configuration
+
+		application.Users.find({lastSeen: {$lt: timeoutDate}}).toArray(function(err, docs) {
+			if (err || !docs) {
+				return;
+			}
+
+			docs.forEach(function(doc) {
+				var networks = _.filter(Clients, function(client) {
+					return (client.internal.userId.toString() === doc._id.toString() &&
+							(client.internal.status === 'connected' || client.internal.status === 'connecting'));
+				});
+				// ok we have our inactive users now lets find their networks
+
+				networks.forEach(function(network) {
+					ircFactory.send(network._id, 'disconnect', ['Timed out']);
+				});
+				// loop through the active networks
+
+				updateIds.push(doc._id);
+			});
+
+			application.Users.update({_id: {$in: updateIds}}, {$set: {lastSeen: d}}, {safe: false});
+			// re-update the last seen date so we don't see these record again next time	
+		});
+		// perform our hourly task of looking for invalid users
+	}
+
+	clearInterval(this.intervalId);
+	this.intervalId = setInterval(this.timeOutInactive.bind(this), ((60 * 60 * 1000) - (secondsPastHour * 1000)));
+	// re-set the intervalId to prevent drifting
 }
 
 /**

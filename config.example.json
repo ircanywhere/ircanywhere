@@ -51,6 +51,11 @@
 	},
 
 	"clientSettings": {
+		"activityTimeout": 0,
+		/* -- number
+		 * -- usage: The amount of hours to timeout irc clients after inactivity, not required
+		 			 and can be set to 0 or below to deactivate timeouts */
+
 		"networkLimit": 10,
 		/* -- required
 		 * -- number

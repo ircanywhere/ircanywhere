@@ -116,7 +116,7 @@ Application.prototype.setupOplog = function() {
 	// storing all the documents in self.docs so we can have a handle
 	// on what documents are getting deleted etc
 
-	this.Oplog.find({}, {'tailable': true}).each(function(err, item) {
+	this.Oplog.find({}, {tailable: true, timeout: false}).each(function(err, item) {
 		if (err) {
 			throw err;
 		}
@@ -179,9 +179,9 @@ Application.prototype.setupWinston = function() {
 				name: 'error',
 				level: 'error',
 				filename: './logs/error.log',
-				handleExceptions: true,
+				handleExceptions: false,
 				json: false,
-				timestamp: true
+				timestamp: false
 			}),
 			new (winston.transports.File)({
 				name: 'warn',

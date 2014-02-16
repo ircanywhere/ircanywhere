@@ -327,9 +327,9 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 
 	var callback = function(err, doc) {
 		if (client.internal.tabs && client.internal.tabs[obj.target]) {
-			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active}}, function(err, doc) { });
+			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active}}, {safe: false});
 		} else {
-			application.Tabs.insert(obj, function(err, doc) { });
+			application.Tabs.insert(obj, {safe: false});
 		}
 		// insert to db, or update old record
 	};
@@ -382,7 +382,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
 		application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target});
 	} else {
 		application.Tabs.remove({user: client.internal.userId, network: client._id}, function(err, doc) {
-			application.Networks.remove({_id: client._id}, function(err, doc) { });
+			application.Networks.remove({_id: client._id}, {safe: false});
 		});
 	}
 	// remove tabs

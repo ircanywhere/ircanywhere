@@ -193,7 +193,6 @@ IRCHandler.prototype.lusers = function(client, message) {
  */
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
-		//time: new Date(new Date(message.time).getTime() - 15).toJSON(),
 		time: message.time,
 		message: _formatRaw(message.raw),
 		raw: message.raw
@@ -213,6 +212,10 @@ IRCHandler.prototype.motd = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.join = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.channel) {
+		return false;
+	}
+
 	var user = {
 		username: message.username,
 		hostname: message.hostname,
@@ -243,6 +246,10 @@ IRCHandler.prototype.join = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.part = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.channel) {
+		return false;
+	}
+
 	channelManager.removeUsers(client.name, message.channel, [message.nickname]);
 
 	if (message.nickname === client.nick) {
@@ -263,6 +270,10 @@ IRCHandler.prototype.part = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.kick = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.channel || !message.kicked) {
+		return false;
+	}
+
 	channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
 	if (message.kicked === client.nick) {
@@ -283,6 +294,10 @@ IRCHandler.prototype.kick = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.quit = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'quit');
 	channelManager.removeUsers(client.name, [message.nickname]);
 }
@@ -297,6 +312,10 @@ IRCHandler.prototype.quit = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.nick = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.newnick) {
+		return false;
+	}
+
 	if (message.nickname === client.nick) {
 		Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
 	}
@@ -322,6 +341,10 @@ IRCHandler.prototype.nick = function(client, message) {
  * @return 	void 
  */
 IRCHandler.prototype.who = function(client, message) {
+	if (!message.who || !message.channel) {
+		return false;
+	}
+
 	var users = [],
 		socket = Users[client.internal.userId.toString()],
 		prefixes = _.invert(client.internal.capabilities.modes.prefixmodes);
@@ -370,6 +393,10 @@ IRCHandler.prototype.who = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.names = function(client, message) {
+	if (!message.names || !message.channel) {
+		return false;
+	}
+
 	var channelUsers = application.ChannelUsers.sync.find({network: client.name, channel: message.channel.toLowerCase()}).sync.toArray(),
 		users = [],
 		keys = [],
@@ -403,6 +430,10 @@ IRCHandler.prototype.names = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.mode = function(client, message) {
+	if (!message.mode || !message.channel) {
+		return false;
+	}
+
 	channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
 }
 
@@ -415,6 +446,10 @@ IRCHandler.prototype.mode = function(client, message) {
  * @return 
  */
 IRCHandler.prototype.mode_change = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.mode || !message.channel) {
+		return false;
+	}
+
 	channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
 	eventManager.insertEvent(client, message, 'mode');
 }
@@ -429,6 +464,10 @@ IRCHandler.prototype.mode_change = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.topic = function(client, message) {
+	if (!message.topic || !message.topicBy || !message.channel) {
+		return false;
+	}
+
 	channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
 }
 
@@ -442,6 +481,10 @@ IRCHandler.prototype.topic = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.topic_change = function(client, message) {
+	if (!message.topic || !message.topicBy || !message.channel) {
+		return false;
+	}
+
 	var split = message.topicBy.split(/[!@]/);
 
 	message.nickname = split[0];
@@ -463,6 +506,10 @@ IRCHandler.prototype.topic_change = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.privmsg = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'privmsg');
 }
 
@@ -476,6 +523,10 @@ IRCHandler.prototype.privmsg = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.action = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'action');
 }
 
@@ -489,6 +540,10 @@ IRCHandler.prototype.action = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.notice = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'notice');
 }
 
@@ -502,6 +557,10 @@ IRCHandler.prototype.notice = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.usermode = function(client, message) {
+	if (!message.nickname || !message.mode) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'usermode');
 }
 
@@ -515,6 +574,10 @@ IRCHandler.prototype.usermode = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.ctcp_response = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.type || !message.message) {
+		return false;
+	}
+
 	eventManager.insertEvent(client, message, 'ctcp_response');
 }
 
@@ -528,6 +591,10 @@ IRCHandler.prototype.ctcp_response = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.ctcp_request = function(client, message) {
+	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.type || !message.message) {
+		return false;
+	}
+
 	if (message.type.toUpperCase() == 'VERSION') {
 		var version = 'IRCAnywhere v' + application.packagejson.version + ' ' + application.packagejson.homepage;
 		ircFactory.send(client._id, 'ctcp', [message.nickname, 'VERSION', version]);
