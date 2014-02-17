@@ -39,17 +39,10 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_setup: function() {
-		var controllers = Ember.get(this, 'controllers'),
-			getController = this._getController.bind(this),
-			self = this;
+		var self = this;
 
-		this.emitter.setup(getController, controllers, {
-			done: 'ready',
-			updated: 'updated',
-			privmsg: 'onPrivmsg'
-		});
-		// map events to controller functions. Trigger via this.emitter.trigger(event, param1, param2)
-		// they will be passed into controllers properly.
+		this.emitter.setup(this.container, this.controllers);
+		// setup the event emitter
 
 		this.set('done', false);
 		this.emitter.on('done', function() {
@@ -119,19 +112,6 @@ Ember.Socket = Ember.Object.extend({
 		// for sake of ease - like meteor, however we can get collection records in bulk
 		// there is an event for each collection apart from channelUsers, along with 3 additional events
 		// that indicate whether to insert/update/remove a record from one of the collections
-	},
-
-	_getController: function(name) {
-		name = 'controller:%@'.fmt(name);
-		var controller = this.container.lookup(name);
-		// format the `name` to match what the lookup container is expecting, and then
-		// we'll locate the controller from the `container`.
-
-		if (!controller) {
-			return false;
-		}
-
-		return controller;
 	},
 
 	_store: function(collection, payload) {
@@ -234,7 +214,7 @@ Ember.Socket = Ember.Object.extend({
 	_send: function(event, payload) {
 		this.socket.send(JSON.stringify({event: event, data: payload}));
 	},
-	
+
 	findOne: function(type, query) {
 		return this._find(false, type, query);
 	},

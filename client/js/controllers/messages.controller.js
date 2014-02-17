@@ -111,7 +111,7 @@ App.MessagesController = Ember.ArrayController.extend({
 			var scrollTimeout = setTimeout(function() {
 				self.markAsRead();
 				self.set('timeout', null);
-			}, 5000);
+			}, 2500);
 
 			this.set('timeout', scrollTimeout);
 		}
