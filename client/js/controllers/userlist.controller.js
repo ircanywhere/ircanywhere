@@ -13,8 +13,18 @@ App.UserlistController = Ember.ArrayController.extend({
 	}.property('filtered.length', 'normal.length'),
 
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
-		addedItem: function(accum, item) {
-			var tab = this.get('socket.tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+		initialize: function(array, changeMeta, instanceMeta) {
+			if (!this.get('controllers.index.tabId')) {
+				return false;
+			}
+
+			instanceMeta.tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
+
+			return instanceMeta;
+		},
+
+		addedItem: function(accum, item, changeMeta, instanceMeta) {
+			var tab = instanceMeta.tab;
 
 			if (tab && item.network === tab.networkName && item.channel === tab.target) {
 				accum.pushObject(item);
@@ -23,8 +33,8 @@ App.UserlistController = Ember.ArrayController.extend({
 			return accum;
 		},
 		
-		removedItem: function(accum, item) {
-			var tab = this.get('socket.tabs').filterProperty('_id', this.get('controllers.index.tabId'))[0];
+		removedItem: function(accum, item, changeMeta, instanceMeta) {
+			var tab = instanceMeta.tab;
 
 			if (tab && item.network === tab.networkName && item.channel === tab.target) {
 				accum.removeObject(item);

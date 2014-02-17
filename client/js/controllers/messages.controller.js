@@ -3,10 +3,27 @@ App.MessagesController = Ember.ArrayController.extend({
 	events: [],
 	readDocs: [],
 
-	filtered: Ember.arrayComputed('events', 'controllers.index.tabId', {
-		addedItem: function(accum, item) {
+	sortProperties: ['message.time'],
+	sortAscending: true,
+
+	content: Ember.arrayComputed('events', 'controllers.index.tabId', {
+		initialize: function(array, changeMeta, instanceMeta) {
+			if (!this.get('controllers.index.tabId')) {
+				return false;
+			}
+
 			var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
 				network = this.get('socket.networks').findBy('_id', tab.network);
+
+			instanceMeta.tab = tab;
+			instanceMeta.network = network;
+
+			return instanceMeta;
+		},
+
+		addedItem: function(accum, item, changeMeta, instanceMeta) {
+			var tab = instanceMeta.tab,
+				network = instanceMeta.network;
 
 			if (!tab) {
 				return accum;
@@ -23,9 +40,9 @@ App.MessagesController = Ember.ArrayController.extend({
 			return accum;
 		},
 		
-		removedItem: function(accum, item) {
-			var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId')),
-				network = this.get('socket.networks').findBy('_id', tab.network);
+		removedItem: function(accum, item, changeMeta, instanceMeta) {
+			var tab = instanceMeta.tab,
+				network = instanceMeta.network;
 
 			if (!tab) {
 				return accum;
@@ -42,17 +59,6 @@ App.MessagesController = Ember.ArrayController.extend({
 			return accum;
 		}
 	}),
-
-	sorted: function() {
-		var results = this.get('filtered'),
-			sorted = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
-				content: results,
-				sortProperties: ['message.time'],
-				sortAscending: true
-			});
-
-		return sorted;
-	}.property('filtered').cacheable(),
 
 	markAsRead: function() {
 		var query = {'$or': []};
@@ -72,7 +78,7 @@ App.MessagesController = Ember.ArrayController.extend({
 		detectUnread: function(id, top, bottom, container) {
 			var self = this,
 				tab = this.get('socket.tabs').findBy('_id', id),
-				events = this.get('sorted.content').filterProperty('unread', true),
+				events = this.get('content').filterProperty('unread', true),
 				counter = 0;
 				docs = [];
 

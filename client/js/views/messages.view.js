@@ -3,8 +3,10 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	classNames: 'backlog',
 
 	didInsertElement: function() {
-		this.$().context.scrollTop = this.$().context.scrollHeight;
-		this.set('scrollPosition', this.$().context.scrollHeight);
+		Ember.run.later(this, function() {
+			this.$().context.scrollTop = this.$().context.scrollHeight;
+			this.set('scrollPosition', this.$().context.scrollHeight);
+		}, 100);
 		// scroll to bottom on render
 
 		this.bindScrolling({debounce: 50, element: this.$()});

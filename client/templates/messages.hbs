@@ -1,5 +1,5 @@
 <div class="inside-backlog">
-	{{#each event in sorted itemController="event" groupedRows=true}}
+	{{#each event in controller itemController="event" groupedRows=true}}
 		{{lookup event.templateName event.content}}
 	{{/each}}
 </div>

@@ -61,5 +61,9 @@ App.SidebarController = Ember.ArrayController.extend({
 
 	onPrivmsg: function(object) {
 		this.newTabMessage(object);
+	},
+
+	onRemovedTab: function(object) {
+		window.history.back();
 	}
 });
