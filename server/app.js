@@ -179,7 +179,7 @@ Application.prototype.setupWinston = function() {
 				name: 'error',
 				level: 'error',
 				filename: './logs/error.log',
-				handleExceptions: false,
+				handleExceptions: true,
 				json: false,
 				timestamp: false
 			}),
