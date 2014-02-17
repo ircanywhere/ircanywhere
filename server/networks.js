@@ -110,17 +110,9 @@ NetworkManager.prototype.init = function() {
 	application.ee.on(['tabs', 'update'], function(doc) {
 		Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 	});
-
-	application.ee.on(['tabs', 'delete'], function(doc, id) {
-		_.each(Clients, function(value, key) {
-			var tab = _.find(value.internal.tabs, {'_id': id});
-			if (tab) {
-				delete Clients[key].internal.tabs[tab.target];
-			}
-		});
-	});
 	// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
 	// instead of querying each time which is very inefficient
+	// - the delete is handled in sockets.js after we've propogated it
 
 	application.app.post('/api/addnetwork', function(req, res) {
 		var response = self.addNetworkApi(req, res);

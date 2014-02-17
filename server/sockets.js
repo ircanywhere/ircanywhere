@@ -395,7 +395,21 @@ SocketManager.prototype.init = function() {
 			// alter the document if need be
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId]);
-		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
+		} else if (collection === 'tabs') {
+			if (eventName === 'delete') {
+				_.each(Clients, function(value, key) {
+					var tab = _.find(value.internal.tabs, {'_id': doc});
+					if (tab) {
+						clients.push(Users[value.internal.userId]);
+						delete Clients[key].internal.tabs[tab.target];
+					}
+				});
+				// find out which user this tab belongs to?
+			} else {
+				clients.push(Users[doc.user]);
+				// get the client
+			}
+		} else if (collection === 'events' || collection === 'commands') {
 			if ((collection === 'commands' && !doc.backlog) || (eventName === 'update' && collection === 'events')) {
 				return false;
 			}
@@ -419,7 +433,6 @@ SocketManager.prototype.init = function() {
 				}
 			}
 			// find the client list
-
 			doc = _.omit(doc, 'username', 'hostname', '_burst');
 			// alter the document if need be
 		}
@@ -435,7 +448,7 @@ SocketManager.prototype.init = function() {
 			} else if (eventName === 'update') {
 				socket.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 			} else if (eventName === 'delete') {
-				socket.send(eventName, {collection: collection, id: doc._id.toString()});
+				socket.send(eventName, {collection: collection, id: doc});
 			}
 		});
 		// all of this code works by watching changes via the oplog, that way 
