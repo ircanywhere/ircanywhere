@@ -1,28 +1,9 @@
-Ember.SocketEmitter = Ember.Object.extend(Ember.Evented, {
-	done: function() {
-		this.trigger('done');
-	},
-
-	_propagate: function(controllers, getController, fn) {
-		controllers.forEach(function(controllerName) {
-			var controller = getController(controllerName);
-			// fetch the controller if it's valid.
-
-			if (controller && typeof controller[fn] === 'function') {
-				controller[fn].apply(controller);
-			}
-			// invoke the `fn` method if it has been defined on this controller.
-		});
-		// bind any connect events to our controllers
-	}
-});
-
 Ember.Socket = Ember.Object.extend({
 	socket: null,
 	done: false,
 	authed: null,
 
-	emitter: Ember.SocketEmitter.create(),
+	emitter: Ember.Emitter.create(),
 
 	init: function() {
 		this.set('users', Ember.A());
@@ -62,16 +43,19 @@ Ember.Socket = Ember.Object.extend({
 			getController = this._getController.bind(this),
 			self = this;
 
-		this.set('done', false);
+		this.emitter.setup(getController, controllers, {
+			done: 'ready',
+			updated: 'updated',
+			privmsg: 'onPrivmsg'
+		});
+		// map events to controller functions. Trigger via this.emitter.trigger(event, param1, param2)
+		// they will be passed into controllers properly.
 
+		this.set('done', false);
 		this.emitter.on('done', function() {
 			self.set('done', true);
-			this._propagate(controllers, getController, 'ready');
 		});
-
-		this.emitter.on('updated', function() {
-			this._propagate(controllers, getController, 'updated');
-		});
+		// alter the done variable when we're actually done
 
 		this._send('authenticate', document.cookie);
 		// authenticate
@@ -90,7 +74,7 @@ Ember.Socket = Ember.Object.extend({
 			Ember.$.get(data.url, function(data) {
 				for (var type in data) {
 					if (type === 'burstend' && data[type] === true) {
-						self.emitter.done();
+						self.emitter.trigger('done');
 					} else {
 						self._store(type, data[type]);
 					}
@@ -143,10 +127,9 @@ Ember.Socket = Ember.Object.extend({
 		// format the `name` to match what the lookup container is expecting, and then
 		// we'll locate the controller from the `container`.
 
-		if (!controller || ('ready' in controller === false)) {
+		if (!controller) {
 			return false;
 		}
-		// don't do anything with this controller if it doesnt have a ready function
 
 		return controller;
 	},
@@ -162,7 +145,12 @@ Ember.Socket = Ember.Object.extend({
 			if (exists) {
 				exists.setProperties(i);
 			} else {
-				col.pushObject(Ember.Object.create(i));
+				var obj = Ember.Object.create(i);
+				col.pushObject(obj);
+				// add the object
+
+				self.emitter.determineEvent(collection, 'new', obj);
+				// figure out what event to push
 			}
 		}
 	},
@@ -185,6 +173,9 @@ Ember.Socket = Ember.Object.extend({
 
 		object.setProperties(changes);
 		// overwrite them in the set
+
+		self.emitter.determineEvent(type, 'update', object);
+		// figure out what event to push
 	},
 
 	_delete: function(type, id) {
@@ -200,6 +191,9 @@ Ember.Socket = Ember.Object.extend({
 
 		collection.removeObject(object);
 		// bump it out
+
+		self.emitter.determineEvent(type, 'delete', object);
+		// figure out what event to push
 	},
 
 	_search: function(query, obj) {
@@ -239,6 +233,10 @@ Ember.Socket = Ember.Object.extend({
 
 	_send: function(event, payload) {
 		this.socket.send(JSON.stringify({event: event, data: payload}));
+	},
+	
+	findOne: function(type, query) {
+		return this._find(false, type, query);
 	},
 
 	find: function(type, query) {
