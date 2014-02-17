@@ -1,7 +1,6 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers,
-	objectDiff = require('objectdiff'),
 	WebSocket = require('./websocket').WebSocket,
 	mongo = require('mongodb');
 
@@ -28,27 +27,6 @@ var _ = require('lodash'),
  * 		These would just inject the rpc methods / allow rules into the main RPC manager (this).
  *		Or something similar. I'll spend time ironing out the details at some point
  */
-
-/**
- * Updates the global repository of documents with the new document, this is done after
- * the event emitters are handled.
- *
- * @method 	_alterDoc
- * @param 	{String} collection
- * @param 	{String} operation
- * @param 	{Object} doc
- * @extend 	false
- * @private
- * @return 	void
- */
-var _alterDoc = function(collection, operation, doc) {
-	if (operation === 'insert' || operation === 'update') {
-		application.docs[collection][doc._id.toString()] = doc;
-	} else if (operation === 'delete') {
-		delete application.docs[collection][doc._id.toString()];
-	}
-	// alter our global document collection
-};
 
 /**
  * Responsible for handling all the websockets and their RPC-style commands
@@ -400,28 +378,26 @@ SocketManager.prototype.rules = function(collection, object) {
 SocketManager.prototype.init = function() {
 	var self = this;
 
-	application.ee.on(['*', '*'], function(doc, ext) {
+	application.ee.on(['*', '*'], function(doc) {
 		var collection = this.event[0],
 			eventName = this.event[1],
 			clients = [];
 
-		if (_.indexOf(self.propogate, collection) == -1) {
-			return _alterDoc(collection, eventName, doc);
+		if (_.indexOf(self.propogate, collection) === -1) {
+			return false;
 		}
 
 		if (eventName === 'update' && collection === 'users') {
-			delete doc.lastSeen;
-			delete ext.lastSeen;
-			
 			clients.push(Users[doc._id]);
-
+			
+			delete doc.lastSeen;
 			doc = _.omit(doc, 'salt', 'password', 'tokens');
 			// alter the document if need be
 		} else if (collection === 'networks') {
 			clients.push(Users[doc.internal.userId]);
 		} else if (collection === 'tabs' || collection === 'events' || collection === 'commands') {
 			if ((collection === 'commands' && !doc.backlog) || (eventName === 'update' && collection === 'events')) {
-				return _alterDoc(collection, eventName, doc);
+				return false;
 			}
 			// ignore specific scenarios
 			
@@ -457,9 +433,7 @@ SocketManager.prototype.init = function() {
 			if (eventName === 'insert') {
 				socket.send(eventName, {collection: collection, record: doc});
 			} else if (eventName === 'update') {
-				if (objectDiff.diffOwnProperties(doc, ext).changed !== 'equal') {
-					socket.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
-				}
+				socket.send(eventName, {collection: collection, id: doc._id.toString(), record: doc});
 			} else if (eventName === 'delete') {
 				socket.send(eventName, {collection: collection, id: doc._id.toString()});
 			}
@@ -468,8 +442,6 @@ SocketManager.prototype.init = function() {
 		// we dont need to worry about updating the database AND sending changes
 		// to the frontend clients, we can just send the document down when we spot a change
 		// to the clients who need to see it, a bit like meteor, without subscriptions
-
-		return _alterDoc(collection, eventName, doc);
 	});
 }
 

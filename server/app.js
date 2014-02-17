@@ -102,27 +102,11 @@ Application.prototype.init = function() {
  */
 Application.prototype.setupOplog = function() {
 	var self = this,
-		start = Math.floor(+new Date() / 1000),
-		collections = ['nodes', 'users', 'networks', 'tabs', 'channelUsers', 'events', 'commands'];
+		start = (new Date().getTime() / 1000);
 
-	collections.forEach(function(name) {
-		var data = self.mongo.collection(name).sync.find({}).sync.toArray();
-		
-		self.docs[name] = {};
-		data.forEach(function(doc) {
-			self.docs[name][doc._id.toString()] = doc;
-		});
-	});
-	// storing all the documents in self.docs so we can have a handle
-	// on what documents are getting deleted etc
-
-	this.Oplog.find({}, {tailable: true, timeout: false}).each(function(err, item) {
+	this.Oplog.find({ts: {$gte: new mongo.Timestamp(start, start)}}, {tailable: true, timeout: false}).each(function(err, item) {
 		if (err) {
 			throw err;
-		}
-
-		if (!(item.ts.high_ >= start)) {
-			return false;
 		}
 		
 		var collection = item.ns.split('.'),
@@ -141,12 +125,12 @@ Application.prototype.setupOplog = function() {
 				break;
 			case 'u':
 				self.mongo.collection(col).findOne(item.o2, function(err, doc) {
-					self.ee.emit([col, 'update'], doc, self.docs[col][doc._id.toString()]);
+					self.ee.emit([col, 'update'], doc);
 				});
 				// get the new full document
 				break;
 			case 'd':
-				self.ee.emit([col, 'delete'], self.docs[col][item.o._id.toString()], item.o._id);
+				self.ee.emit([col, 'delete'], item.o._id);
 				// emit
 				break;
 			case 'c':
