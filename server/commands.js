@@ -543,7 +543,7 @@ CommandManager.prototype['/query'] = function(user, client, target, params) {
  * @return 	void
  */
 CommandManager.prototype['/quit'] = function(user, client, target, params) {
-	networkManager.changeStatus(client._id, networkManager.flags.disconnected);
+	networkManager.changeStatus({_id: client._id}, networkManager.flags.disconnected);
 	// mark as connecting and mark the tab as active again
 
 	ircFactory.send(client._id, 'disconnect', [params]);

@@ -89,7 +89,6 @@ Ember.Socket = Ember.Object.extend({
 		if (event === 'burst') {
 			Ember.$.get(data.url, function(data) {
 				for (var type in data) {
-					console.log(type);
 					if (type === 'burstend' && data[type] === true) {
 						self.emitter.done();
 					} else {

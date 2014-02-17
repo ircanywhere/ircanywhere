@@ -122,7 +122,7 @@ IRCHandler.prototype.registered = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.closed = function(client, message) {
-	networkManager.changeStatus({_id: client._id, 'internal.status': {$ne: networkManager.closed}}, networkManager.flags.closed);
+	networkManager.changeStatus({_id: client._id, 'internal.status': {$ne: networkManager.flags.disconnected}}, networkManager.flags.closed);
 	// Whats happening is were looking for networks that match the id and their status has not been set to disconnected
 	// which means someone has clicked disconnected, if not, just set it as closed (means we've disconnected for whatever reason)
 
@@ -540,7 +540,7 @@ IRCHandler.prototype.action = function(client, message) {
  * @return 	void
  */
 IRCHandler.prototype.notice = function(client, message) {
-	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
+	if (!message.target || !message.message) {
 		return false;
 	}
 
