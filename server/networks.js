@@ -416,7 +416,7 @@ NetworkManager.prototype.changeStatus = function(query, status) {
 		return;
 	}
 
-	application.Networks.sync.update(query, {$set: {'internal.status': status}});
+	application.Networks.update(query, {$set: {'internal.status': status}}, {safe: false});
 }
 
 exports.NetworkManager = _.extend(NetworkManager, hooks);
