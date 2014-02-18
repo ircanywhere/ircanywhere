@@ -8,10 +8,10 @@ var _ = require('lodash'),
 /**
  * Responsible for handling user related actions ie registering, logging in, forgot passwords etc
  *
- * @class	UserManager
- * @method 	UserManager
- * @extend	false
- * @return 	void
+ * @class UserManager
+ * @method UserManager
+ * @extend false
+ * @return void
  */
 function UserManager() {
 	var d = new Date(),
@@ -29,9 +29,9 @@ function UserManager() {
 /**
  * Sets up the api urls and anything else needed by the user manager class
  *
- * @method 	init
- * @extend	true
- * @return 	void
+ * @method init
+ * @extend true
+ * @return void
  */
 UserManager.prototype.init = function() {
 	var self = this,
@@ -101,9 +101,9 @@ UserManager.prototype.init = function() {
  * This function is ran every hour or so, but not perfectly precise, but it shouldn't
  * drift off too much because it re-corrects it self.
  *
- * @method 	timeOutInactive
- * @extend	true
- * @return 	void
+ * @method timeOutInactive
+ * @extend true
+ * @return void
  */
 UserManager.prototype.timeOutInactive = function() {
 	var d = new Date(),
@@ -160,10 +160,10 @@ UserManager.prototype.timeOutInactive = function() {
  * Returns a valid user object which can be used to set on the socket for example or
  * HTTP request, returns false if invalid
  *
- * @method 	isAuthenticated
- * @param 	{Object} data
- * @extend	true
- * @return 	{Object}
+ * @method isAuthenticated
+ * @param {Object} data
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.isAuthenticated = function(data) {
 	var parsed = (data) ? data.split('; ') : [],
@@ -206,11 +206,11 @@ UserManager.prototype.isAuthenticated = function(data) {
  * however it should probably stay this way, because the api to register a user is at /api/register
  * I can't see a reason to change this to take individual parameters.
  *
- * @method 	registerUser
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method registerUser
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.registerUser = function(req, res) {
 	var name = req.param('name', ''),
@@ -309,11 +309,11 @@ UserManager.prototype.registerUser = function(req, res) {
 /**
  * Handles the login call to /api/login and sets an appropriate cookie if successful
  *
- * @method 	userLogin
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method userLogin
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.userLogin = function(req, res) {
 	var email = req.param('email', ''),
@@ -364,11 +364,11 @@ UserManager.prototype.userLogin = function(req, res) {
 /**
  * Handles the call to /api/logout which is self explanatory
  * 
- * @method 	userLogout
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method userLogout
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.userLogout = function(req, res) {
 	var user = this.isAuthenticated(req.headers.cookie);
@@ -384,11 +384,11 @@ UserManager.prototype.userLogout = function(req, res) {
 /**
  * Handles the call to /api/forgot to send a forgot password link
  * 
- * @method 	forgotPassword
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method forgotPassword
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.forgotPassword = function(req, res) {
 	var output = {failed: false, successMessage: '', errors: []},
@@ -431,11 +431,11 @@ UserManager.prototype.forgotPassword = function(req, res) {
  * Handles the call to /api/reset which will be called when the reset password link is visited
  * Checking is done to make sure a token exists in a user record.
  * 
- * @method 	resetPassword
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method resetPassword
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.resetPassword = function(req, res) {
 	var password = req.param('password', ''),
@@ -451,11 +451,11 @@ UserManager.prototype.resetPassword = function(req, res) {
  * Handles the call to /api/settings/updatesettings which will update the settings for that user
  * checking for authentication and validating if necessary
  *
- * @method 	updateSettings
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method updateSettings
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.updateSettings = function(req, res) {
 	var name = req.param('name', ''),
@@ -514,11 +514,11 @@ UserManager.prototype.updateSettings = function(req, res) {
  * however it checks for authentication and then changes the password using that user, it doesn't
  * take a token though.
  * 
- * @method 	resetPassword
- * @param 	{Object} req
- * @param 	{Object} res
- * @extend	true
- * @return 	{Object}
+ * @method resetPassword
+ * @param {Object} req
+ * @param {Object} res
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.changePassword = function(req, res) {
 	var password = req.param('password', ''),
@@ -532,12 +532,12 @@ UserManager.prototype.changePassword = function(req, res) {
  * Updates a users password, doesn't bypass any checkings, just doesn't
  * define how you select the user, so via a token or direct user object
  * 
- * @method 	updatePassword
- * @param 	{Object} user
- * @param 	{Object} password
- * @param 	{Object} confirmPassword
- * @extend	true
- * @return 	{Object}
+ * @method updatePassword
+ * @param {Object} user
+ * @param {Object} password
+ * @param {Object} confirmPassword
+ * @extend true
+ * @return {Object}
  */
 UserManager.prototype.updatePassword = function(user, password, confirmPassword, currentPassword) {
 	var currentPassword = currentPassword || '',
@@ -575,10 +575,10 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  * the handler for /api/login because it's specific to a different section of the application
  * which is the networkManager and ircFactory.
  * 
- * @method 	onUserLogin
- * @param 	{Object} me
- * @extend	true
- * @return 	void
+ * @method onUserLogin
+ * @param {Object} me
+ * @extend true
+ * @return void
  */
 UserManager.prototype.onUserLogin = function(me, force) {
 	var force = force || false,
@@ -613,11 +613,11 @@ UserManager.prototype.onUserLogin = function(me, force) {
  * Looks for a template and parses the {{tags}} into the values in replace
  * and returns a string, used to parse emails.
  *
- * @method 	parse
- * @param 	{String} file
- * @param 	{Object} replace
- * @extend 	true
- * @return	{String}
+ * @method parse
+ * @param {String} file
+ * @param {Object} replace
+ * @extend true
+ * @return {String}
  */
 UserManager.prototype.parse = function(file, replace) {
 	var template = fs.readFileSync(file).toString();

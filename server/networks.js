@@ -7,10 +7,10 @@ var _ = require('lodash'),
  * Responsible for handling everything related to networks, such as tracking changes
  * removing, creating, changing tabs, creating and deleting networks etc.
  *
- * @class	NetworkManager
- * @method 	NetworkManager
- * @extend	false
- * @return 	void
+ * @class NetworkManager
+ * @method NetworkManager
+ * @extend false
+ * @return void
  */
 function NetworkManager() {
 	var self = this;
@@ -35,9 +35,9 @@ function NetworkManager() {
  * to essentially keep the object in sync with the collection so we can do fast lookups, but
  * writes to the collection will propogate through and update Clients
  *
- * @method 	init
- * @extend 	true
- * @return 	void
+ * @method init
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.init = function() {
 	var self = this,
@@ -127,9 +127,9 @@ NetworkManager.prototype.init = function() {
  * to determine who to connect on startup, doesn't ever really need to be called
  * also can be modified with hooks to return more information if needed.
  *
- * @method 	getClients
- * @extend 	true
- * @return 	{Object}
+ * @method getClients
+ * @extend true
+ * @return {Object}
  */
 NetworkManager.prototype.getClients = function() {
 	var self = this,
@@ -152,9 +152,9 @@ NetworkManager.prototype.getClients = function() {
  * validating the parameters and input, and on success passes the information
  * to `addNetwork()` which handles everything else
  *
- * @method 	getClients
- * @extend 	true
- * @return 	{Object}
+ * @method getClients
+ * @extend true
+ * @return {Object}
  */
 NetworkManager.prototype.addNetworkApi = function(req, res) {
 	var server = req.param('server', ''),
@@ -232,11 +232,11 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
  * Adds a network using the settings specified to the user's set of networks
  * This just adds it to the database and doesn't attempt to start it up.
  *
- * @method 	addNetwork
- * @param 	{Object} user
- * @param 	{Object} network
- * @extend 	true
- * @return 	{Object}
+ * @method addNetwork
+ * @param {Object} user
+ * @param {Object} network
+ * @extend true
+ * @return {Object}
  */
 NetworkManager.prototype.addNetwork = function(user, network, status) {
 	if (!(status in this.flags)) {
@@ -283,13 +283,13 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
  * Adds a tab to the client's (network unique to user) tabs, this can be a
  * channel or a username.
  *
- * @method 	addTab
- * @param 	{Object} client
- * @param 	{String} target
- * @param 	{String} type
- * @param 	{Boolean} [optional] select
- * @extend 	true
- * @return 	void
+ * @method addTab
+ * @param {Object} client
+ * @param {String} target
+ * @param {String} type
+ * @param {Boolean} [optional] select
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.addTab = function(client, target, type, select, active) {
 	var select = (select !== undefined) ? select : false,
@@ -333,12 +333,12 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
  * (#ircanywhere) instead of #ircanywhere
  * We can omit target and call activeTab(client, false) to set them all to false (such as on disconnect)
  *
- * @method 	activeTab
- * @param 	{Object} client
- * @param 	{String} target
- * @param 	{Boolean} [optional] activate
- * @extend 	true
- * @return 	void
+ * @method activeTab
+ * @param {Object} client
+ * @param {String} target
+ * @param {Boolean} [optional] activate
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
@@ -353,11 +353,11 @@ NetworkManager.prototype.activeTab = function(client, target, activate) {
  * Removes the specified tab, be careful because this doesn't re-select one, you're expected to look
  * for a removed tab, if it's the currently selected one, go back to a different one.
  *
- * @method 	removeTab
- * @param 	{Object} client
- * @param 	{String} target
- * @extend 	true
- * @return 	void
+ * @method removeTab
+ * @param {Object} client
+ * @param {String} target
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.removeTab = function(client, target) {
 	// it's now up to the client to re-select the tab when they get a message saying it's been
@@ -385,10 +385,10 @@ NetworkManager.prototype.removeTab = function(client, target) {
  * key is the same. We could consider looking at the response from factory synchronize
  * but it might not yield a good result because of newly created clients since startup.
  *
- * @method 	connectNetwork
- * @param 	{Object} network
- * @extend 	true
- * @return 	void
+ * @method connectNetwork
+ * @param {Object} network
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.connectNetwork = function(network) {
 	ircFactory.create(network);
@@ -396,11 +396,11 @@ NetworkManager.prototype.connectNetwork = function(network) {
 
 /**
  * Description
- * @method 	changeStatus
- * @param 	{Object} query
- * @param 	{Boolean} status
- * @extend 	true
- * @return  void
+ * @method changeStatus
+ * @param {Object} query
+ * @param {Boolean} status
+ * @extend true
+ * @return void
  */
 NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {

@@ -7,11 +7,11 @@ var _ = require('lodash'),
 /**
  * Wrapper for sock.js sockets
  *
- * @class 	WebSocket
- * @method 	WebSocket
- * @param	{Object} socket
- * @extend	false
- * @return 	void
+ * @class WebSocket
+ * @method WebSocket
+ * @param {Object} socket
+ * @extend false
+ * @return void
  */
 function WebSocket(socket) {
 	this._socket = socket;
@@ -24,10 +24,10 @@ util.inherits(WebSocket, events.EventEmitter);
 /**
  * Binds our sock.js events to _socket
  *
- * @method 	bindEvents
- * @param 	{Object} raw
- * @extend	true
- * @return 	void
+ * @method bindEvents
+ * @param {Object} raw
+ * @extend true
+ * @return void
  */
 WebSocket.prototype.bindEvents = function() {
 	this._socket.on('data', this.onMessage.bind(this));
@@ -37,10 +37,10 @@ WebSocket.prototype.bindEvents = function() {
 /**
  * Checks if an incoming message object is valid
  *
- * @method 	isValid
- * @param 	{Object} parsed
- * @extend	true
- * @return 	{Boolean}
+ * @method isValid
+ * @param {Object} parsed
+ * @extend true
+ * @return {Boolean}
  */
 WebSocket.prototype.isValid = function(parsed) {
 	return (parsed.event !== undefined || parsed.data !== undefined);
@@ -49,10 +49,10 @@ WebSocket.prototype.isValid = function(parsed) {
 /**
  * Handles an incoming message
  *
- * @method 	onMessage
- * @param 	{Object} raw
- * @extend	true
- * @return 	void
+ * @method onMessage
+ * @param {Object} raw
+ * @extend true
+ * @return void
  */
 WebSocket.prototype.onMessage = function(raw) {
 	var parsed,
@@ -78,9 +78,9 @@ WebSocket.prototype.onMessage = function(raw) {
 /**
  * Handles closing the connection
  *
- * @method 	onClose
- * @extend	true
- * @return 	void
+ * @method onClose
+ * @extend true
+ * @return void
  */
 WebSocket.prototype.onClose = function() {
 	this._socket.removeAllListeners();
@@ -96,12 +96,12 @@ WebSocket.prototype.onClose = function() {
 /**
  * Sends outgoing packets
  *
- * @method 	send
- * @param 	{String} event
- * @param	{Object} data
- * @param	{Boolean} close
- * @extend	true
- * @return 	void
+ * @method send
+ * @param {String} event
+ * @param {Object} data
+ * @param {Boolean} close
+ * @extend true
+ * @return void
  */
 WebSocket.prototype.send = function(event, data, close) {
 	var close = close || false;
@@ -121,10 +121,10 @@ WebSocket.prototype.send = function(event, data, close) {
 /**
  * Compiles a temporary GET route and sends it to a socket
  *
- * @method 	sendBurst
- * @param	{Object} data
- * @extend	true
- * @return 	void
+ * @method sendBurst
+ * @param {Object} data
+ * @extend true
+ * @return void
  */
 WebSocket.prototype.sendBurst = function(data) {
 	var self = this,

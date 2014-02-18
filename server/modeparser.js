@@ -8,10 +8,10 @@ var _ = require('lodash');
  * needed and could be malicious if people are altering mode string, bugs relating to this
  * are difficult to find, if you want to hook a mode change hook to IRCHandler.mode_change()
  * 
- * @class	ModeParser
- * @method 	ModeParser
- * @extend	false
- * @return 	void
+ * @class ModeParser
+ * @method ModeParser
+ * @extend false
+ * @return void
  */
 function ModeParser() {
 
@@ -21,11 +21,11 @@ function ModeParser() {
  * Sorts a mode string into an object of instructions that we can use to perform actions
  * based on what the mode string suggests, ie apply operator to 'someone', or set +m on the channel
  *
- * @method 	sortModes
- * @param 	{Object} capabilities
- * @param 	{String} modes
- * @extend	false
- * @return 	{Object}
+ * @method sortModes
+ * @param {Object} capabilities
+ * @param {String} modes
+ * @extend false
+ * @return {Object}
  */
 ModeParser.prototype.sortModes = function(capabilities, modes) {
 	var params = [],
@@ -109,12 +109,12 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 /**
  * Handles the object of instructions returned from sortModes, and applies them
  *
- * @method 	changeModes
- * @param 	{Object} capabilities
- * @param 	{Object} modes
- * @param 	{Object} modeArray
- * @extend 	false
- * @return 	{Object}
+ * @method changeModes
+ * @param {Object} capabilities
+ * @param {Object} modes
+ * @param {Object} modeArray
+ * @extend false
+ * @return {Object}
  */
 ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),
@@ -229,12 +229,12 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
  * 	minus: rickibalboa: -o > will remove the o flag from the nickname record
  *  minus: rickibalboa: +v > will set the v flag on the nickname record
  *
- * @method 	handleParams
- * @param 	{Object} capabilities
- * @param 	{Object} users
- * @param 	{Object} modeArray
- * @extend 	false
- * @return 	{Object}
+ * @method handleParams
+ * @param {Object} capabilities
+ * @param {Object} users
+ * @param {Object} modeArray
+ * @extend false
+ * @return {Object}
  */
 ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),

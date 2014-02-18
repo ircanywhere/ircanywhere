@@ -31,10 +31,10 @@ var _ = require('lodash'),
 /**
  * Responsible for handling all the websockets and their RPC-style commands
  *
- * @class 	SocketManager
- * @method 	SocketManager
- * @extend	false
- * @return 	void
+ * @class SocketManager
+ * @method SocketManager
+ * @extend false
+ * @return void
  */
 function SocketManager() {
 	var self = this;
@@ -50,13 +50,12 @@ function SocketManager() {
 		 * An allow rule for updates to the user record, we can only change the selectedTab
 		 * value here and it only works for the logged in user.
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	{Boolean}
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return {Boolean}
 		 */
 		update: function(uid, query, update) {
 			var allow = false,
@@ -82,13 +81,12 @@ function SocketManager() {
 		/**
 		 * An update rule to execute when we've passed the allow rules
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return void
 		 */
 		update: function(uid, query, update) {
 			application.Users.sync.update({_id: uid}, {$set: update});
@@ -102,13 +100,12 @@ function SocketManager() {
 		 * are being updated and their type, also then checks if they are allowed to update
 		 * the specific document.
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	{Boolean}
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return {Boolean}
 		 */
 		update: function(uid, query, update) {
 			var allow = false,
@@ -133,12 +130,11 @@ function SocketManager() {
 		 * An allow rule for inserts to the tab collection, we check for target, type and
 		 * network id
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} insert
-		 * @extend 	false
-		 * @private
-		 * @return 	{Boolean}
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} insert
+		 * @extend false
+		 * @return {Boolean}
 		 */
 		insert: function(uid, insert) {
 			var allow = false,
@@ -168,13 +164,12 @@ function SocketManager() {
 		/**
 		 * An update rule to execute when we've passed the allow rules
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return void
 		 */
 		update: function(uid, query, update) {
 			application.Tabs.sync.update(_.extend(query, {user: uid}), {$set: update});
@@ -184,12 +179,11 @@ function SocketManager() {
 		/**
 		 * An insert rule for the tab collection
 		 *
-		 * @method 	insert
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} insert
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method insert
+		 * @param {ObjectID} uid
+		 * @param {Object} insert
+		 * @extend false
+		 * @return void
 		 */
 		insert: function(uid, insert) {
 			var ircClient = Clients[new mongo.ObjectID(insert.network)];
@@ -207,12 +201,11 @@ function SocketManager() {
 		 * An allow rule for inserts to the commands collection, similar to the one above
 		 * checks for parameters then their uid to see if they can insert a command into that tab
 		 *
-		 * @method 	insert
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} insert
-		 * @extend 	false
-		 * @private
-		 * @return 	{Boolean}
+		 * @method insert
+		 * @param {ObjectID} uid
+		 * @param {Object} insert
+		 * @extend false
+		 * @return {Boolean}
 		 */
 		insert: function(uid, insert) {
 			var allow = false,
@@ -242,12 +235,11 @@ function SocketManager() {
 		/**
 		 * An insert date rule to execute when we've passed the allow rules
 		 *
-		 * @method 	insert
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method insert
+		 * @param {ObjectID} uid
+		 * @param {Object} update
+		 * @extend false
+		 * @return void
 		 */
 		insert: function(uid, insert) {
 			var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
@@ -271,13 +263,12 @@ function SocketManager() {
 		/**
 		 * An update rule to execute when we've passed the allow rules
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return void
 		 */
 		update: function(uid, query, update) {
 			return (_.difference(_.keys(update), ['read']).length === 0 && typeof update.read === 'boolean');
@@ -288,13 +279,12 @@ function SocketManager() {
 		/**
 		 * An update rule to execute when we've passed the allow rules
 		 *
-		 * @method 	update
-		 * @param 	{ObjectID} uid
-		 * @param 	{Object} query
-		 * @param 	{Object} update
-		 * @extend 	false
-		 * @private
-		 * @return 	void
+		 * @method update
+		 * @param {ObjectID} uid
+		 * @param {Object} query
+		 * @param {Object} update
+		 * @extend false
+		 * @return void
 		 */
 		update: function(uid, query, update) {
 			if ('$or' in query) {
@@ -322,11 +312,11 @@ function SocketManager() {
  * Responsible for setting allow rules on collection modifications from the client side
  * currently only compatible with inserts and updates.
  *
- * @method 	allow
- * @param 	{String} collection
- * @param 	{Object} object
- * @extend	true
- * @return 	void
+ * @method allow
+ * @param {String} collection
+ * @param {Object} object
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.allow = function(collection, object) {
 	var self = this;
@@ -345,11 +335,11 @@ SocketManager.prototype.allow = function(collection, object) {
 /**
  * Responsible for setting operation rules on how to update things
  *
- * @method 	rules
- * @param 	{String} collection
- * @param 	{Object} object
- * @extend	true
- * @return 	void
+ * @method rules
+ * @param {String} collection
+ * @param {Object} object
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.rules = function(collection, object) {
 	var self = this;
@@ -371,9 +361,9 @@ SocketManager.prototype.rules = function(collection, object) {
  *
  * We also setup the websocket connection handlers and everything relating to that here.
  *
- * @method 	init
- * @extend 	true
- * @return 	void
+ * @method init
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.init = function() {
 	var self = this;
@@ -461,10 +451,10 @@ SocketManager.prototype.init = function() {
 /**
  * Handles a new websocket opening
  *
- * @method 	onSocketOpen
- * @param 	{Object} socket
- * @extend	true
- * @return 	void
+ * @method onSocketOpen
+ * @param {Object} socket
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.onSocketOpen = function(socket) {
 	// so here we handle incoming websocket connections
@@ -509,12 +499,12 @@ SocketManager.prototype.onSocketOpen = function(socket) {
  * Authenticates us against login tokens in the user record, disconnects if
  * expired or incorrect.
  *
- * @method 	handleAuth
- * @param 	{Object} socket
- * @param 	{Object} data
- * @param 	{Function} callback
- * @extend	true
- * @return 	void
+ * @method handleAuth
+ * @param {Object} socket
+ * @param {Object} data
+ * @param {Function} callback
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.handleAuth = function(socket, data) {
 	var user = userManager.isAuthenticated(data);
@@ -536,10 +526,10 @@ SocketManager.prototype.handleAuth = function(socket, data) {
  * Handles new websocket clients, this is only done after
  * they have been authenticated and it's been accepted.
  * 
- * @method 	handleConnect
- * @param 	{Object} socket
- * @extend	true
- * @return 	void
+ * @method handleConnect
+ * @param {Object} socket
+ * @extend true
+ * @return void
  */
 SocketManager.prototype.handleConnect = function(socket) {
 	var user = socket._user,
@@ -615,10 +605,10 @@ SocketManager.prototype.handleConnect = function(socket) {
 /**
  * Handles queries to the events collection
  *
- * @method 	handleEvents
- * @param 	{Object} socket
- * @param 	{Object} data
- * @return 	void
+ * @method handleEvents
+ * @param {Object} socket
+ * @param {Object} data
+ * @return void
  */
 SocketManager.prototype.handleEvents = function(socket, data) {
 	var response = application.Events.sync.find(data).sync.toArray();
@@ -631,10 +621,10 @@ SocketManager.prototype.handleEvents = function(socket, data) {
 /**
  * Handles insert rpc calls
  *
- * @method 	handleInsert
- * @param 	{Object} socket
- * @param 	{Object} data
- * @return 	void
+ * @method handleInsert
+ * @param {Object} socket
+ * @param {Object} data
+ * @return void
  */
 SocketManager.prototype.handleInsert = function(socket, data) {
 	var collection = data.collection,
@@ -660,10 +650,10 @@ SocketManager.prototype.handleInsert = function(socket, data) {
 /**
  * Handles update rpc calls
  *
- * @method 	handleUpdate
- * @param 	{Object} socket
- * @param 	{Object} data
- * @return 	void
+ * @method handleUpdate
+ * @param {Object} socket
+ * @param {Object} data
+ * @return void
  */
 SocketManager.prototype.handleUpdate = function(socket, data) {
 	var collection = data.collection,

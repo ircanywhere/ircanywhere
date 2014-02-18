@@ -6,10 +6,10 @@ var _ = require('lodash'),
  * the handling of joins/parts/mode changes/topic changes and such.
  * As always these functions are extendable and can be prevented or extended by using hooks.
  *
- * @class	ChannelManager
- * @method	ChannelManager
- * @extend	false
- * @return	void
+ * @class ChannelManager
+ * @method ChannelManager
+ * @extend false
+ * @return void
  */
 function ChannelManager() {
 	this.channel = {
@@ -24,11 +24,11 @@ function ChannelManager() {
 /**
  * Gets a tab record from the passed in network and channel, this is not specific to users
  *
- * @method	getChannel
- * @param 	{String} network
- * @param 	{String} channel
- * @extend	true
- * @return	{Object} tab object
+ * @method getChannel
+ * @param {String} network
+ * @param {String} channel
+ * @extend true
+ * @return {Object} tab object
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
 	var chan = application.Tabs.sync.findOne({network: network, title: channel});
@@ -46,14 +46,14 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * Inserts a user or an array of users into a channel record matching the network key
  * network name and channel name, with the option to force an overwrite
  * 
- * @method	insertUsers
- * @param 	{ObjectID} key
- * @param 	{String} network
- * @param 	{String} channel
- * @param 	{Array} users
- * @param 	{Boolean} force
- * @extend	true
- * @return	{Array} array of the users inserted
+ * @method insertUsers
+ * @param {ObjectID} key
+ * @param {String} network
+ * @param {String} channel
+ * @param {Array} users
+ * @param {Boolean} force
+ * @extend true
+ * @return {Array} array of the users inserted
  */
 ChannelManager.prototype.insertUsers = function(key, network, channel, users, force) {
 	var force = force || false,
@@ -103,12 +103,12 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
  * Removes a specific user from a channel, if users is omitted, channel should be equal to a nickname
  * and that nickname will be removed from all channels records on that network
  * 
- * @method	removeUsers
- * @param 	{String} network
- * @param 	{String} channel
- * @param 	{Array} [optional] users
- * @extend	true
- * @return	void
+ * @method removeUsers
+ * @param {String} network
+ * @param {String} channel
+ * @param {Array} [optional] users
+ * @extend true
+ * @return void
  */
 ChannelManager.prototype.removeUsers = function(network, channel, users) {
 	var channel = (_.isArray(channel)) ? channel : channel.toLowerCase(),
@@ -128,13 +128,13 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
 /**
  * Updates a user or an array of users from the specific channel with the values passed in
  *
- * @method 	updateUsers
- * @param 	{ObjectID} key
- * @param 	{String} network
- * @param 	{Array} users
- * @param 	{Object} values
- * @extend	true
- * @return 	void
+ * @method updateUsers
+ * @param {ObjectID} key
+ * @param {String} network
+ * @param {Array} users
+ * @param {Object} values
+ * @extend true
+ * @return void
  */
 ChannelManager.prototype.updateUsers = function(key, network, users, values) {
 	var update = {};
@@ -163,14 +163,14 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  * the specific channel. This handles user updates and such, it shouldn't really be called
  * externally, however can be pre and post hooked like all other functions in this object.
  *
- * @method 	updateModes
- * @param 	{ObjectID} key
- * @param 	{Object} capab
- * @param 	{String} network
- * @param 	{String} channel
- * @param 	{String} mode
- * @extend	true
- * @return 	void
+ * @method updateModes
+ * @param {ObjectID} key
+ * @param {Object} capab
+ * @param {String} network
+ * @param {String} channel
+ * @param {String} mode
+ * @extend true
+ * @return void
  */
 ChannelManager.prototype.updateModes = function(key, capab, network, channel, mode) {
 	var channel = channel.toLowerCase(),
@@ -205,13 +205,13 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 /**
  * Updates the specific channel's topic and setby in the internal records
  *
- * @method 	updateTopic
- * @param 	{ObjectID} key
- * @param 	{String} channel
- * @param 	{String} topic
- * @param 	{String} setby
- * @extend	true
- * @return 	void
+ * @method updateTopic
+ * @param {ObjectID} key
+ * @param {String} channel
+ * @param {String} topic
+ * @param {String} setby
+ * @extend true
+ * @return void
  */
 ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	var channel = channel.toLowerCase(),

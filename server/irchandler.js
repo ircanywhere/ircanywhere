@@ -6,10 +6,9 @@ var _ = require('lodash'),
  * Formats an array of RAW IRC strings, taking off the :leguin.freenode.net 251 ricki- :
  * at the start, returns an array of strings with it removed
  *
- * @method 	_insert
- * @param 	{Array} raw
- * @private	
- * @return 	{Array}
+ * @method _insert
+ * @param {Array} raw
+ * @return {Array}
  */
 var _formatRaw = function(raw) {
 	var output = [];
@@ -31,9 +30,9 @@ var _formatRaw = function(raw) {
  * or have their actions prevented or replaced. The function names equal directly
  * to irc-factory events and are case sensitive to them.
  *
- * @class	IRCHandler
- * @method 	IRCHandler
- * @return 	void
+ * @class IRCHandler
+ * @method IRCHandler
+ * @return void
  */
 function IRCHandler() {
 	this.blacklisted = ['PING', 'RPL_CREATIONTIME'];
@@ -42,11 +41,11 @@ function IRCHandler() {
 /**
  * Handles a registered client
  *
- * @method 	registered
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method registered
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.registered = function(client, message) {
 	var channels = {};
@@ -116,10 +115,10 @@ IRCHandler.prototype.registered = function(client, message) {
  * Handles a closed connection
  *
  * @method closed
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.closed = function(client, message) {
 	networkManager.changeStatus({_id: client._id, 'internal.status': {$ne: networkManager.flags.disconnected}}, networkManager.flags.closed);
@@ -144,10 +143,10 @@ IRCHandler.prototype.closed = function(client, message) {
  * Handles a failed event, which is emitted when the retry attempts are exhaused
  *
  * @method failed
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.failed = function(client, message) {
 	networkManager.changeStatus({_id: client._id}, networkManager.flags.failed);
@@ -168,11 +167,11 @@ IRCHandler.prototype.failed = function(client, message) {
 /**
  * Handles an incoming lusers
  *
- * @method 	lusers
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method lusers
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.lusers = function(client, message) {
 	eventManager.insertEvent(client, {
@@ -185,11 +184,11 @@ IRCHandler.prototype.lusers = function(client, message) {
 /**
  * Handles an incoming motd
  *
- * @method 	motd
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method motd
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
@@ -206,10 +205,10 @@ IRCHandler.prototype.motd = function(client, message) {
  * Handles an incoming join
  *
  * @method join
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.join = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.channel) {
@@ -240,10 +239,10 @@ IRCHandler.prototype.join = function(client, message) {
  * Handles an incoming part
  *
  * @method part
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.part = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.channel) {
@@ -264,10 +263,10 @@ IRCHandler.prototype.part = function(client, message) {
  * Handles an incoming kick
  *
  * @method kick
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.kick = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.channel || !message.kicked) {
@@ -288,10 +287,10 @@ IRCHandler.prototype.kick = function(client, message) {
  * Handles an incoming quit
  *
  * @method quit
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.quit = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname) {
@@ -306,10 +305,10 @@ IRCHandler.prototype.quit = function(client, message) {
  * Handles an incoming nick change
  *
  * @method nick
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.nick = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.newnick) {
@@ -335,10 +334,10 @@ IRCHandler.prototype.nick = function(client, message) {
  * Handles an incoming who
  *
  * @method who
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void 
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void 
  */
 IRCHandler.prototype.who = function(client, message) {
 	if (!message.who || !message.channel) {
@@ -387,10 +386,10 @@ IRCHandler.prototype.who = function(client, message) {
  * Handles an incoming names
  *
  * @method names
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.names = function(client, message) {
 	if (!message.names || !message.channel) {
@@ -424,10 +423,10 @@ IRCHandler.prototype.names = function(client, message) {
  * Handles an incoming mode notify
  *
  * @method mode
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.mode = function(client, message) {
 	if (!message.mode || !message.channel) {
@@ -441,8 +440,8 @@ IRCHandler.prototype.mode = function(client, message) {
  * Handles an incoming mode change
  *
  * @method mode_change
- * @param {} client
- * @param {} message
+ * @param {Object} client
+ * @param {Object} message
  * @return 
  */
 IRCHandler.prototype.mode_change = function(client, message) {
@@ -458,10 +457,10 @@ IRCHandler.prototype.mode_change = function(client, message) {
  * Handles an incoming topic notify
  *
  * @method topic
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.topic = function(client, message) {
 	if (!message.topic || !message.topicBy || !message.channel) {
@@ -475,10 +474,10 @@ IRCHandler.prototype.topic = function(client, message) {
  * Handles an incoming topic change
  *
  * @method topic_change
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.topic_change = function(client, message) {
 	if (!message.topic || !message.topicBy || !message.channel) {
@@ -500,10 +499,10 @@ IRCHandler.prototype.topic_change = function(client, message) {
  * Handles an incoming privmsg
  *
  * @method privmsg
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.privmsg = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
@@ -517,10 +516,10 @@ IRCHandler.prototype.privmsg = function(client, message) {
  * Handles an incoming action
  *
  * @method action
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.action = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.message) {
@@ -533,11 +532,11 @@ IRCHandler.prototype.action = function(client, message) {
 /**
  * Handles an incoming notice
  *
- * @method 	notice
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method notice
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.notice = function(client, message) {
 	if (!message.target || !message.message) {
@@ -550,11 +549,11 @@ IRCHandler.prototype.notice = function(client, message) {
 /**
  * Handles an incoming usermode
  *
- * @method 	usermode
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method usermode
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.usermode = function(client, message) {
 	if (!message.nickname || !message.mode) {
@@ -567,11 +566,11 @@ IRCHandler.prototype.usermode = function(client, message) {
 /**
  * Handles an incoming ctcp_response
  *
- * @method 	ctcp_response
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method ctcp_response
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.ctcp_response = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.type || !message.message) {
@@ -584,11 +583,11 @@ IRCHandler.prototype.ctcp_response = function(client, message) {
 /**
  * Handles an incoming ctcp request
  *
- * @method 	ctcp_request
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method ctcp_request
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.ctcp_request = function(client, message) {
 	if (!message.username || !message.hostname || !message.nickname || !message.target || !message.type || !message.message) {
@@ -606,11 +605,11 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
 /**
  * Handles an incoming unknown
  *
- * @method 	unknown
- * @param 	{Object} client
- * @param 	{Object} message
- * @extend 	true
- * @return 	void
+ * @method unknown
+ * @param {Object} client
+ * @param {Object} message
+ * @extend true
+ * @return void
  */
 IRCHandler.prototype.unknown = function(client, message) {
 	if (this.blacklisted.indexOf(message.command) === -1) {

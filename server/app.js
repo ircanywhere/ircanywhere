@@ -20,15 +20,17 @@ var _ = require('lodash'),
  *
  * Examples:
  *
- *		application.post('init', function(next) {
- *			console.log('do something after init() is run');
- *			next();
- *		});
+ *	```
+ *	application.post('init', function(next) {
+ *		console.log('do something after init() is run');
+ *		next();
+ *	});
+ *	```
  *
- * @class	Application
- * @method	Application
- * @extend	false
- * @return 	void
+ * @class Application
+ * @method Application
+ * @extend false
+ * @return void
  */
 function Application() {
 	this.verbose = (process.env.VERBOSE && process.env.VERBOSE == 'true') ? true : false;
@@ -52,9 +54,9 @@ function Application() {
 /**
  * The main entry point for the application
  *
- * @method	init
- * @extend	true
- * @return	void
+ * @method init
+ * @extend true
+ * @return void
  */
 Application.prototype.init = function() {
 	validate(this.config, schema);
@@ -96,9 +98,9 @@ Application.prototype.init = function() {
 /**
  * Sets up the oplog tracker
  *
- * @method	setupOplog
- * @extend	true
- * @return	void
+ * @method setupOplog
+ * @extend true
+ * @return void
  */
 Application.prototype.setupOplog = function() {
 	var self = this,
@@ -147,9 +149,9 @@ Application.prototype.setupOplog = function() {
 /**
  * Sets up the winston loggers
  *
- * @method	setupWinston
- * @extend	true
- * @return	void
+ * @method setupWinston
+ * @extend true
+ * @return void
  */
 Application.prototype.setupWinston = function() {
 	if (!fs.existsSync('./logs')) {
@@ -191,9 +193,9 @@ Application.prototype.setupWinston = function() {
  * This is done to generate a 'unique' but always the same ID to identify
  * the system so we can make way for clustering in the future
  * 
- * @method	setupNode
- * @extend	true
- * @return	void
+ * @method setupNode
+ * @extend true
+ * @return void
  */
 Application.prototype.setupNode = function() {
 	var data = '',
@@ -244,9 +246,9 @@ Application.prototype.setupNode = function() {
 /**
  * Sets up the express and sockjs server to handle all HTTP / WebSocket requests
  *
- * @method	setupServer
- * @extend	true
- * @return	void
+ * @method setupServer
+ * @extend true
+ * @return void
  */
 Application.prototype.setupServer = function() {
 	var self = this,

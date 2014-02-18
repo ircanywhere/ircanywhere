@@ -10,10 +10,10 @@ var _ = require('lodash'),
  * functions when they hook into it, the results could be disasterous. If incoming events
  * need to be hooked onto you could hook onto the IRCHandler object.
  *
- * @class	IRCFactory
- * @method 	IRCFactory
- * @extend	false
- * @return 	void
+ * @class IRCFactory
+ * @method IRCFactory
+ * @extend false
+ * @return void
  */
 function IRCFactory() {
 	var self = this;
@@ -34,9 +34,9 @@ function IRCFactory() {
  * Initiates the irc factory and it's connection and sets up an event handler
  * when the application is ready to run
  *
- * @method 	init
- * @extend 	true
- * @return 	void
+ * @method init
+ * @extend true
+ * @return void
  */
 IRCFactory.prototype.init = function() {
 	var self = this,
@@ -72,6 +72,7 @@ IRCFactory.prototype.init = function() {
 /**
  * Handles incoming factory events, events are expected to come in the following format:
  *
+ * ```
  * [ '52d3fc718132f8486dcde1d0', 'privmsg' ] { nickname: 'ricki-',
  * 		username: 'ia1',
  * 		hostname: '127.0.0.1',
@@ -79,14 +80,15 @@ IRCFactory.prototype.init = function() {
  * 		message: '#ircanywhere-test WORD UP BROSEPTH',
  * 		time: '2014-01-22T18:20:57.323Z',
  * 		raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
+ * ```
  *
  * More advanced docs can be found at https://github.com/ircanywhere/irc-factory/wiki/Events
  *
- * @method 	handleEvent
- * @param 	{Array} event
- * @param 	{Object} object
- * @extend 	false
- * @return 	void
+ * @method handleEvent
+ * @param {Array} event
+ * @param {Object} object
+ * @extend false
+ * @return void
  */
 IRCFactory.prototype.handleEvent = function(event, object) {
 	var key = event[0],
@@ -107,10 +109,10 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 /**
  * Sends the command to create a new irc client with the given settings
  *
- * @method 	create
- * @param 	{Object} network
- * @extend 	false
- * @return 	void
+ * @method create
+ * @param {Object} network
+ * @extend false
+ * @return void
  */
 IRCFactory.prototype.create = function(network) {
 	var key = network._id.toString();
@@ -127,10 +129,10 @@ IRCFactory.prototype.create = function(network) {
 /**
  * Sends the command to destroy a client with the given key
  * 
- * @method 	destroy
- * @param 	{ObjectID} key
- * @extend 	false
- * @return 	void
+ * @method destroy
+ * @param {ObjectID} key
+ * @extend false
+ * @return void
  */
 IRCFactory.prototype.destroy = function(key) {
 	application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
@@ -143,12 +145,12 @@ IRCFactory.prototype.destroy = function(key) {
  * Calls an RPC command on the irc-factory client, usually used to send
  * commands such as /WHO etc. It's probably best to use CommandManager in most cases
  *
- * @method 	send
- * @param 	{ObjectID} key
- * @param 	{String} command
- * @param 	{Array} args
- * @extend 	false
- * @return	void
+ * @method send
+ * @param {ObjectID} key
+ * @param {String} command
+ * @param {Array} args
+ * @extend false
+ * @return void
  */
 IRCFactory.prototype.send = function(key, command, args) {
 	this.rpc.emit('call', key.toString(), command, args);

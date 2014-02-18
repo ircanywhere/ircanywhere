@@ -8,13 +8,12 @@ var channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'p
  * Inserts an event into a backlog after all the checking has been done
  * this api is private and EventManager.insertEvent should be used instead
  *
- * @method 	_insert
- * @param 	{Object} client
- * @param 	{Object} message
- * @param 	{String} type
- * @param 	{Object} [optional] user
- * @private	
- * @return 	void
+ * @method _insert
+ * @param {Object} client
+ * @param {Object} message
+ * @param {String} type
+ * @param {Object} [optional] user
+ * @return void
  */
 var _insert = function(client, message, type, user, force) {
 	fibrous.run(function() {
@@ -59,10 +58,10 @@ var _insert = function(client, message, type, user, force) {
 /**
  * Description
  *
- * @class 	EventManager
- * @method 	EventManager
- * @extend	false
- * @return 	void
+ * @class EventManager
+ * @method EventManager
+ * @extend false
+ * @return void
  */
 function EventManager() {
 
@@ -72,12 +71,12 @@ function EventManager() {
  * Inserts an event into the backlog, takes a client and message object and a type
  * Usually 'privmsg' or 'join' etc.
  *
- * @method 	insertEvent
- * @param 	{Object} client
- * @param 	{Object} message
- * @param 	{String} type
- * @extend	true
- * @return 	void
+ * @method insertEvent
+ * @param {Object} client
+ * @param {Object} message
+ * @param {String} type
+ * @extend true
+ * @return void
  */
 EventManager.prototype.insertEvent = function(client, message, type) {
 	if (type == 'nick' || type == 'quit') {
@@ -122,13 +121,13 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 
 /**
  * Description
- * @method 	determineHighlight
- * @param 	{} client
- * @param 	{} message
- * @param 	{} type
- * @param 	{} ours
- * @extend	true
- * @return 	{Boolean}
+ * @method determineHighlight
+ * @param {Object} client
+ * @param {Object} message
+ * @param {String} type
+ * @param {Boolean} ours
+ * @extend true
+ * @return {Boolean}
  */
 EventManager.prototype.determineHighlight = function(client, message, type, ours) {
 	if (ours || (type !== 'privmsg' && type !== 'action')) {
@@ -148,11 +147,11 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 /**
  * Gets the prefix for the irc client and the user object.
  * 
- * @method 	getPrefix
- * @param 	{Object} client
- * @param 	{Object} user
- * @extend	true
- * @return 	{Object}
+ * @method getPrefix
+ * @param {Object} client
+ * @param {Object} user
+ * @extend true
+ * @return {Object}
  */
 EventManager.prototype.getPrefix = function(client, user) {
 	if (user === null || _.isEmpty(user.modes)) {
