@@ -1,32 +1,40 @@
+/**
+ * IRCAnywhere server/sockets.js
+ *
+ * XXX: I want to rename this to observer/rpc at some point in 0.2.0 final and merge the commands
+ *      into a more RPC style which are probably defined in websocket.js, because the majority
+ *      of this code is handling the mongo observer stuff and handling allow rules. Little of it
+ *      is socket based code, and only a bit of it is socket managing code.
+ *
+ *      I also want to incorporate it all (especially the allow rules) into a more DI based style
+ *      where any modules can inject their own RPC methods and allow rules by just putting
+ *      items into the prototype (is this possible?) or extend based, for example;
+ *
+ *      ```
+ *      CustomModule = _.extend(BaseModule, {
+ *          'allow.collection': {
+ *              insert: function() { ... }
+ *          },
+ *          rpc: {
+ *              mySocketCommand: function() { ... }
+ *          }
+ *      });
+ *      ```
+ *
+ *      These would just inject the rpc methods / allow rules into the main RPC manager (this).
+ *      Or something similar. I'll spend time ironing out the details at some point
+ *
+ * @title IRCAnywhere Daemon
+ * @copyright (c) 2013-2014 http://ircanywhere.com
+ * @license GPL v2
+ * @author Ricki Hastings
+*/
+
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers,
 	WebSocket = require('./websocket').WebSocket,
 	mongo = require('mongodb');
-
-/*
- * XXX:
- *		I want to rename this to observer/rpc at some point in 0.2.0 final and merge the commands
- * 		into a more RPC style which are probably defined in websocket.js, because the majority
- * 		of this code is handling the mongo observer stuff and handling allow rules. Little of it
- *		is socket based code, and only a bit of it is socket managing code.
- *
- *		I also want to incorporate it all (especially the allow rules) into a more DI based style
- *		where any modules can inject their own RPC methods and allow rules by just putting
- *		items into the prototype (is this possible?) or extend based, for example;
- *
- *		CustomModule = _.extend(BaseModule, {
- *			'allow.collection': {
- *				insert:	function() { ... }
- * 			},
- *			rpc: {
- *				mySocketCommand: function() { ... }
- *			}
- *		});
- *
- * 		These would just inject the rpc methods / allow rules into the main RPC manager (this).
- *		Or something similar. I'll spend time ironing out the details at some point
- */
 
 /**
  * Responsible for handling all the websockets and their RPC-style commands

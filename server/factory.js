@@ -1,3 +1,12 @@
+/**
+ * IRCAnywhere server/factory.js
+ *
+ * @title IRCAnywhere Daemon
+ * @copyright (c) 2013-2014 http://ircanywhere.com
+ * @license GPL v2
+ * @author Ricki Hastings
+*/
+
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	crypto = require('crypto'),
@@ -72,15 +81,15 @@ IRCFactory.prototype.init = function() {
 /**
  * Handles incoming factory events, events are expected to come in the following format:
  *
- * ```
- * [ '52d3fc718132f8486dcde1d0', 'privmsg' ] { nickname: 'ricki-',
- * 		username: 'ia1',
- * 		hostname: '127.0.0.1',
- * 		target: '#ircanywhere-test',
- * 		message: '#ircanywhere-test WORD UP BROSEPTH',
- * 		time: '2014-01-22T18:20:57.323Z',
- * 		raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
- * ```
+ * ::
+ *
+ *     [ '52d3fc718132f8486dcde1d0', 'privmsg' ] { nickname: 'ricki-',
+ * 	        username: 'ia1',
+ * 	        hostname: '127.0.0.1',
+ * 	        target: '#ircanywhere-test',
+ * 	        message: '#ircanywhere-test WORD UP BROSEPTH',
+ * 	        time: '2014-01-22T18:20:57.323Z',
+ *          raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
  *
  * More advanced docs can be found at https://github.com/ircanywhere/irc-factory/wiki/Events
  *

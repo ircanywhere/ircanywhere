@@ -1,3 +1,12 @@
+/**
+ * IRCAnywhere server/networks.js
+ *
+ * @title IRCAnywhere Daemon
+ * @copyright (c) 2013-2014 http://ircanywhere.com
+ * @license GPL v2
+ * @author Ricki Hastings
+*/
+
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	mongo = require('mongodb'),

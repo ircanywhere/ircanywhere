@@ -1,3 +1,12 @@
+/**
+ * IRCAnywhere server/app.js
+ *
+ * @title IRCAnywhere Daemon
+ * @copyright (c) 2013-2014 http://ircanywhere.com
+ * @license GPL v2
+ * @author Ricki Hastings
+*/
+
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	winston = require('winston'),
@@ -20,12 +29,12 @@ var _ = require('lodash'),
  *
  * Examples:
  *
- *	```
- *	application.post('init', function(next) {
- *		console.log('do something after init() is run');
- *		next();
- *	});
- *	```
+ *	::
+ *
+ *	    application.post('init', function(next) {
+ *	        console.log('do something after init() is run');
+ *	        next();
+ *	    });
  *
  * @class Application
  * @method Application
