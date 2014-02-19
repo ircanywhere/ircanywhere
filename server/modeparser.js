@@ -232,8 +232,8 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 
 /**
  * Applies any mode changes that contain status related modes, usually qaohv modes
- * 	minus: rickibalboa: -o > will remove the o flag from the nickname record
- *  minus: rickibalboa: +v > will set the v flag on the nickname record
+ * minus: rickibalboa: -o > will remove the o flag from the nickname record
+ * minus: rickibalboa: +v > will set the v flag on the nickname record
  *
  * @method handleParams
  * @param {Object} capabilities A valid capabilities object from a client

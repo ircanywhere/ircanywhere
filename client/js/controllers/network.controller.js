@@ -37,7 +37,7 @@ App.NetworkController = Ember.ObjectController.extend({
 			var query = {network: tab.networkName, read: false, target: tab.target};
 		}
 
-		var events = this.get('controllers.messages.sorted').filterProperty('unread', true);
+		var events = this.get('controllers.messages.content').filterProperty('unread', true);
 		// get the events for the specific tab
 
 		events.setEach('unread', false);
@@ -49,7 +49,7 @@ App.NetworkController = Ember.ObjectController.extend({
 	},
 
 	gotoUnread: function(id) {
-		var first = this.get('controllers.messages.sorted').filterProperty('unread', true).objectAt(0),
+		var first = this.get('controllers.messages.content').filterProperty('unread', true).objectAt(0),
 			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
 
 		if (first) {

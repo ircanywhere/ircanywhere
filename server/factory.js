@@ -46,7 +46,7 @@ function IRCFactory() {
 /**
  * @member {Object} options The `irc-factory` options to use
  */
-Application.prototype.options = {
+IRCFactory.prototype.options = {
 	events: 31920,
 	rpc: 31930,
 	automaticSetup: true

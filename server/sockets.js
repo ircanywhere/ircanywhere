@@ -46,9 +46,6 @@ function SocketManager() {
 
 	this.allowRules = {};
 	this.operationRules = {};
-	this.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers', 'commands'];
-	// collections with allowed update rules
-	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
 	this.allow('users', {
 		update: function(uid, query, update) {
@@ -211,6 +208,11 @@ function SocketManager() {
 		fibrous.run(self.init.bind(self));
 	});
 }
+
+/**
+ * @member {Array} propogate An array of collections to propoagate to the client when changes occur
+ */
+SocketManager.prototype.propogate = ['users', 'networks', 'tabs', 'events', 'channelUsers', 'commands'];
 
 /**
  * Responsible for setting allow rules on collection modifications from the client side
