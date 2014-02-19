@@ -381,7 +381,7 @@ SocketManager.prototype.init = function() {
 			eventName = this.event[1],
 			clients = [];
 
-		if (_.indexOf(self.propogate, collection) === -1) {
+		if (_.indexOf(self.propogate, collection) === -1 || !doc) {
 			return false;
 		}
 
@@ -549,7 +549,7 @@ SocketManager.prototype.handleConnect = function(socket) {
 		commandsQuery = {$or: []};
 
 	var tabUrls = _.map(tabs, 'url');
-	if (tabUrls.indexOf(user.selectedTab) === -1) {
+	if (tabUrls.indexOf(user.selectedTab) === -1 && tabs.length > 0) {
 		user.selectedTab = tabs[0].url;
 	}
 	// determine whether we have a selected tab or not?

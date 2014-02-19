@@ -193,7 +193,7 @@ Application.prototype.setupWinston = function() {
 				timestamp: true
 			})
 		],
-		exitOnError: false
+		exitOnError: true
 	});
 }
 
