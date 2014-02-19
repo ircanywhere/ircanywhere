@@ -116,7 +116,7 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
  * @method removeUsers
  * @param {String} network A valid network name
  * @param {String} [channel] A valid channel name
- * @param {Array} An array of users to remove from the network `or` channel
+ * @param {Array} users An array of users to remove from the network `or` channel
  * @return void
  */
 ChannelManager.prototype.removeUsers = function(network, channel, users) {
@@ -141,7 +141,7 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
  * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
  * @param {String} network The name of the network
  * @param {Array} users A valid users array
- * @param {Object} A hash of keys and values to be replaced in the users array
+ * @param {Object} values A hash of keys and values to be replaced in the users array
  * @return void
  */
 ChannelManager.prototype.updateUsers = function(key, network, users, values) {
@@ -213,7 +213,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
  * Updates the specific channel's topic and setby in the internal records.
  *
  * @method updateTopic
- * @param {ObjectID} A valid Mongo ObjectID for the networks collection
+ * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
  * @param {String} channel A valid channel name
  * @param {String} topic The new topic
  * @param {String} setby A setter string, usually in the format of 'nickname!username@hostname'

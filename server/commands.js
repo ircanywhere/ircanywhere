@@ -97,7 +97,7 @@ CommandManager.prototype._ban = function(client, channel, nickname, ban) {
  *
  * @method createAlias
  * @param {String} command A command to alias
- * @param {String} ... A command to map to
+ * @param {...String} alias A command to map to
  * @return void
  */
 CommandManager.prototype.createAlias = function() {
