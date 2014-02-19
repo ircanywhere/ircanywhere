@@ -1,12 +1,3 @@
-/**
- * IRCAnywhere server/schema.js
- *
- * @title IRCAnywhere Daemon
- * @copyright (c) 2013-2014 http://ircanywhere.com
- * @license GPL v2
- * @author Ricki Hastings
-*/
-
 exports.schema = {
 	'mongo': {
 		type: 'string',

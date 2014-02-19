@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/app.js
  *
- * @title IRCAnywhere Daemon
+ * @title Application
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -27,31 +27,24 @@ var _ = require('lodash'),
  * All of the objects contained in this prototype are extendable by standard
  * rules.
  *
- * Examples:
+ * Examples: ::
  *
- *	::
- *
- *	    application.post('init', function(next) {
- *	        console.log('do something after init() is run');
- *	        next();
- *	    });
+ * 	application.post('init', function(next) {
+ * 		console.log('do something after init() is run');
+ * 		next();
+ * 	});
  *
  * @class Application
  * @method Application
- * @extend false
  * @return void
  */
 function Application() {
-	this.verbose = (process.env.VERBOSE && process.env.VERBOSE == 'true') ? true : false;
-	this.docs = {};
 	this.ee = new events.EventEmitter2({
 		wildcard: true,
 		delimiter: '.',
 		maxListeners: 0
 	});
-	this.config = JSON.parse(jsonminify(raw));
-	this.packagejson = JSON.parse(fs.readFileSync('./package.json').toString());
-	// predefine our variables
+	// setup our event emitter
 
 	fibrous.run(this.init.bind(this));
 	// initiate the module
@@ -61,10 +54,26 @@ function Application() {
 }
 
 /**
- * The main entry point for the application
+ * @member {Boolean} verbose A flag to determine whether verbose logging is enabled or not
+ */
+Application.prototype.verbose = (process.env.VERBOSE && process.env.VERBOSE == 'true') ? true : false;
+
+/**
+ * @member {Object} config A copy of the parsed config object
+ */
+Application.prototype.config = JSON.parse(jsonminify(raw));
+
+/**
+ * @member {Object} packagejson A copy of the project's package.json object
+ */
+Application.prototype.packagejson = JSON.parse(fs.readFileSync('./package.json').toString());
+
+/**
+ * This is the main entry point for the application, it should NOT be called under any circumstances.
+ * However it can safely be extended by hooking onto the front or back of it using pre and post hooks.
+ * Treat this method like the main() function in a C application.
  *
  * @method init
- * @extend true
  * @return void
  */
 Application.prototype.init = function() {
@@ -105,13 +114,17 @@ Application.prototype.init = function() {
 }
 
 /**
- * Sets up the oplog tracker
+ * This method initiates the oplog tailing query which will look for any incoming changes on the database.
+ * Incoming changes are then handled and sent to the global event emitter where other classes and modules
+ * can listen to for inserts, updates and deletes to a collection to do what they wish with the changes.
  *
  * @method setupOplog
- * @extend true
  * @return void
  */
 Application.prototype.setupOplog = function() {
+	// XXX - This needs to be re-ran every time a connection is established because if it's ran
+ 	//		 and the database driver disconnects then we're fucked!
+	
 	var self = this,
 		start = (new Date().getTime() / 1000);
 
@@ -156,10 +169,11 @@ Application.prototype.setupOplog = function() {
 }
 
 /**
- * Sets up the winston loggers
+ * This function sets up our winston logging levels and transports. You can safely extend
+ * or override this function and re-run it to re-initiate the winston loggers if you want to
+ * change the transport to send to loggly or something via a plugin.
  *
  * @method setupWinston
- * @extend true
  * @return void
  */
 Application.prototype.setupWinston = function() {
@@ -200,10 +214,9 @@ Application.prototype.setupWinston = function() {
 /**
  * Checks for a node record to store in the file system and database
  * This is done to generate a 'unique' but always the same ID to identify
- * the system so we can make way for clustering in the future
+ * the system so we can make way for clustering in the future.
  * 
  * @method setupNode
- * @extend true
  * @return void
  */
 Application.prototype.setupNode = function() {
@@ -253,10 +266,11 @@ Application.prototype.setupNode = function() {
 }
 
 /**
- * Sets up the express and sockjs server to handle all HTTP / WebSocket requests
+ * This function is responsible for setting up the express webserver we use to serve the static files and
+ * the sock.js server which hooks onto it to handle the websockets. None of the routes or rpc callbacks
+ * are handled here.
  *
  * @method setupServer
- * @extend true
  * @return void
  */
 Application.prototype.setupServer = function() {

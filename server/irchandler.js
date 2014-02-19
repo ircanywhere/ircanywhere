@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/irchandler.js
  *
- * @title IRCAnywhere Daemon
+ * @title IRCHandler
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -12,14 +12,33 @@ var _ = require('lodash'),
 	helper = require('../lib/helpers').Helpers;
 
 /**
+ * The object responsible for handling an event from IRCFactory
+ * none of these should be called directly, however they can be hooked onto
+ * or have their actions prevented or replaced. The function names equal directly
+ * to irc-factory events and are case sensitive to them.
+ *
+ * @class IRCHandler
+ * @method IRCHandler
+ * @return void
+ */
+function IRCHandler() {
+	
+}
+
+/**
+ * @member {Array} blacklisted An array of blacklisted commands which should be ignored
+ */
+IRCHandler.prototype.blacklisted = ['PING', 'RPL_CREATIONTIME'];
+
+/**
  * Formats an array of RAW IRC strings, taking off the :leguin.freenode.net 251 ricki- :
  * at the start, returns an array of strings with it removed
  *
- * @method _insert
- * @param {Array} raw
- * @return {Array}
+ * @method _formatRaw
+ * @param {Array} raw An array of raw IRC strings to format
+ * @return {Array} A formatted array of the inputted strings
  */
-var _formatRaw = function(raw) {
+IRCHandler.prototype._formatRaw = function(raw) {
 	var output = [];
 	raw.forEach(function(line) {
 		var split = line.split(' ');
@@ -34,26 +53,13 @@ var _formatRaw = function(raw) {
 };
 
 /**
- * The object responsible for handling an event from IRCFactory
- * none of these should be called directly, however they can be hooked onto
- * or have their actions prevented or replaced. The function names equal directly
- * to irc-factory events and are case sensitive to them.
- *
- * @class IRCHandler
- * @method IRCHandler
- * @return void
- */
-function IRCHandler() {
-	this.blacklisted = ['PING', 'RPL_CREATIONTIME'];
-}
-
-/**
- * Handles a registered client
+ * Handles the registered event, this will only ever be called when an IRC connection has been
+ * fully established and we've recieved the `registered` events. This means when we reconnect to
+ * an already established connection we won't get this event again.
  *
  * @method registered
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.registered = function(client, message) {
@@ -88,7 +94,7 @@ IRCHandler.prototype.registered = function(client, message) {
 	eventManager.insertEvent(client, {
 		nickname: message.nickname,
 		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
-		message: _formatRaw(message.raw),
+		message: this._formatRaw(message.raw),
 		raw: message.raw
 	}, 'registered');
 	// a bit of a hack here we'll spin the timestamp back 15ms to make sure it
@@ -124,9 +130,8 @@ IRCHandler.prototype.registered = function(client, message) {
  * Handles a closed connection
  *
  * @method closed
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.closed = function(client, message) {
@@ -152,9 +157,8 @@ IRCHandler.prototype.closed = function(client, message) {
  * Handles a failed event, which is emitted when the retry attempts are exhaused
  *
  * @method failed
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.failed = function(client, message) {
@@ -174,35 +178,33 @@ IRCHandler.prototype.failed = function(client, message) {
 }
 
 /**
- * Handles an incoming lusers
+ * Handles an incoming lusers event
  *
  * @method lusers
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.lusers = function(client, message) {
 	eventManager.insertEvent(client, {
 		time: message.time,
-		message: _formatRaw(message.raw),
+		message: this._formatRaw(message.raw),
 		raw: message.raw
 	}, 'lusers');
 }
 
 /**
- * Handles an incoming motd
+ * Handles an incoming motd event
  *
  * @method motd
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.motd = function(client, message) {
 	eventManager.insertEvent(client, {
 		time: message.time,
-		message: _formatRaw(message.raw),
+		message: this._formatRaw(message.raw),
 		raw: message.raw
 	}, 'motd');
 	// again spin this back 15ms to prevent a rare but possible race condition where
@@ -211,12 +213,11 @@ IRCHandler.prototype.motd = function(client, message) {
 }
 
 /**
- * Handles an incoming join
+ * Handles an incoming join event
  *
  * @method join
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.join = function(client, message) {
@@ -245,12 +246,11 @@ IRCHandler.prototype.join = function(client, message) {
 }
 
 /**
- * Handles an incoming part
+ * Handles an incoming part event
  *
  * @method part
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.part = function(client, message) {
@@ -269,12 +269,11 @@ IRCHandler.prototype.part = function(client, message) {
 }
 
 /**
- * Handles an incoming kick
+ * Handles an incoming kick event
  *
  * @method kick
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.kick = function(client, message) {
@@ -293,12 +292,11 @@ IRCHandler.prototype.kick = function(client, message) {
 }
 
 /**
- * Handles an incoming quit
+ * Handles an incoming quit event
  *
  * @method quit
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.quit = function(client, message) {
@@ -311,12 +309,11 @@ IRCHandler.prototype.quit = function(client, message) {
 }
 
 /**
- * Handles an incoming nick change
+ * Handles an incoming nick change event
  *
  * @method nick
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.nick = function(client, message) {
@@ -340,12 +337,11 @@ IRCHandler.prototype.nick = function(client, message) {
 }
 
 /**
- * Handles an incoming who
+ * Handles an incoming who event
  *
  * @method who
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void 
  */
 IRCHandler.prototype.who = function(client, message) {
@@ -392,12 +388,11 @@ IRCHandler.prototype.who = function(client, message) {
 }
 
 /**
- * Handles an incoming names
+ * Handles an incoming names event
  *
  * @method names
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.names = function(client, message) {
@@ -429,12 +424,11 @@ IRCHandler.prototype.names = function(client, message) {
 }
 
 /**
- * Handles an incoming mode notify
+ * Handles an incoming mode notify event
  *
  * @method mode
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.mode = function(client, message) {
@@ -446,11 +440,11 @@ IRCHandler.prototype.mode = function(client, message) {
 }
 
 /**
- * Handles an incoming mode change
+ * Handles an incoming mode change event
  *
  * @method mode_change
- * @param {Object} client
- * @param {Object} message
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return 
  */
 IRCHandler.prototype.mode_change = function(client, message) {
@@ -463,12 +457,11 @@ IRCHandler.prototype.mode_change = function(client, message) {
 }
 
 /**
- * Handles an incoming topic notify
+ * Handles an incoming topic notify event
  *
  * @method topic
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.topic = function(client, message) {
@@ -480,12 +473,11 @@ IRCHandler.prototype.topic = function(client, message) {
 }
 
 /**
- * Handles an incoming topic change
+ * Handles an incoming topic change event
  *
  * @method topic_change
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.topic_change = function(client, message) {
@@ -505,12 +497,11 @@ IRCHandler.prototype.topic_change = function(client, message) {
 }
 
 /**
- * Handles an incoming privmsg
+ * Handles an incoming privmsg event
  *
  * @method privmsg
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.privmsg = function(client, message) {
@@ -522,12 +513,11 @@ IRCHandler.prototype.privmsg = function(client, message) {
 }
 
 /**
- * Handles an incoming action
+ * Handles an incoming action event
  *
  * @method action
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.action = function(client, message) {
@@ -539,12 +529,11 @@ IRCHandler.prototype.action = function(client, message) {
 }
 
 /**
- * Handles an incoming notice
+ * Handles an incoming notice event
  *
  * @method notice
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.notice = function(client, message) {
@@ -556,12 +545,11 @@ IRCHandler.prototype.notice = function(client, message) {
 }
 
 /**
- * Handles an incoming usermode
+ * Handles an incoming usermode event
  *
  * @method usermode
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.usermode = function(client, message) {
@@ -573,12 +561,11 @@ IRCHandler.prototype.usermode = function(client, message) {
 }
 
 /**
- * Handles an incoming ctcp_response
+ * Handles an incoming ctcp_response event
  *
  * @method ctcp_response
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.ctcp_response = function(client, message) {
@@ -590,12 +577,11 @@ IRCHandler.prototype.ctcp_response = function(client, message) {
 }
 
 /**
- * Handles an incoming ctcp request
+ * Handles an incoming ctcp request event
  *
  * @method ctcp_request
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.ctcp_request = function(client, message) {
@@ -612,12 +598,11 @@ IRCHandler.prototype.ctcp_request = function(client, message) {
 }
 
 /**
- * Handles an incoming unknown
+ * Handles an incoming unknown event
  *
  * @method unknown
- * @param {Object} client
- * @param {Object} message
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
  * @return void
  */
 IRCHandler.prototype.unknown = function(client, message) {

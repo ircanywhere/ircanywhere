@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/factory.js
  *
- * @title IRCAnywhere Daemon
+ * @title IRCFactory
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -19,20 +19,24 @@ var _ = require('lodash'),
  * functions when they hook into it, the results could be disasterous. If incoming events
  * need to be hooked onto you could hook onto the IRCHandler object.
  *
+ * The default `irc-factory` options are below: ::
+ *
+ * 	{
+ * 		events: 31920,
+ * 		rpc: 31930,
+ * 		automaticSetup: true
+ * 	}
+ *
+ * The `fork` setting comes from our configuration object and is inserted when `init` is ran. 
+ *
  * @class IRCFactory
  * @method IRCFactory
- * @extend false
  * @return void
  */
 function IRCFactory() {
 	var self = this;
 
 	this.api = new factory();
-	this.options = {
-		events: 31920,
-		rpc: 31930,
-		automaticSetup: true
-	};
 
 	application.ee.on('ready', function() {
 		fibrous.run(self.init.bind(self));
@@ -40,11 +44,19 @@ function IRCFactory() {
 }
 
 /**
+ * @member {Object} options The `irc-factory` options to use
+ */
+Application.prototype.options = {
+	events: 31920,
+	rpc: 31930,
+	automaticSetup: true
+}
+
+/**
  * Initiates the irc factory and it's connection and sets up an event handler
- * when the application is ready to run
+ * when the application is ready to run. 
  *
  * @method init
- * @extend true
  * @return void
  */
 IRCFactory.prototype.init = function() {
@@ -79,24 +91,21 @@ IRCFactory.prototype.init = function() {
 }
 
 /**
- * Handles incoming factory events, events are expected to come in the following format:
+ * Handles incoming factory events, events are expected to come in the following format: ::
  *
- * ::
- *
- *     [ '52d3fc718132f8486dcde1d0', 'privmsg' ] { nickname: 'ricki-',
- * 	        username: 'ia1',
- * 	        hostname: '127.0.0.1',
- * 	        target: '#ircanywhere-test',
- * 	        message: '#ircanywhere-test WORD UP BROSEPTH',
- * 	        time: '2014-01-22T18:20:57.323Z',
- *          raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
+ * 	[ '52d3fc718132f8486dcde1d0', 'privmsg' ] { nickname: 'ricki-',
+ * 		username: 'ia1',
+ * 		hostname: '127.0.0.1',
+ * 		target: '#ircanywhere-test',
+ * 		message: '#ircanywhere-test WORD UP BROSEPTH',
+ * 		time: '2014-01-22T18:20:57.323Z',
+ * 		raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
  *
  * More advanced docs can be found at https://github.com/ircanywhere/irc-factory/wiki/Events
  *
  * @method handleEvent
- * @param {Array} event
- * @param {Object} object
- * @extend false
+ * @param {Array[String]} event A valid event array from irc-factory `['52d3fc718132f8486dcde1d0', 'privmsg']`
+ * @param {Object} object A valid event object from irc-factory
  * @return void
  */
 IRCFactory.prototype.handleEvent = function(event, object) {
@@ -116,11 +125,11 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 }
 
 /**
- * Sends the command to create a new irc client with the given settings
+ * Sends the command to `irc-factory` to create a new irc client with the given settings.
+ * If the client already exists it will be dropped by `irc-factory`.
  *
  * @method create
- * @param {Object} network
- * @extend false
+ * @param {Object} network A valid client object
  * @return void
  */
 IRCFactory.prototype.create = function(network) {
@@ -136,11 +145,11 @@ IRCFactory.prototype.create = function(network) {
 },
 
 /**
- * Sends the command to destroy a client with the given key
+ * Sends the command to destroy a client with the given key. If the client doesn't exist
+ * the command will just be dropped.
  * 
  * @method destroy
- * @param {ObjectID} key
- * @extend false
+ * @param {ObjectID} key A client key which has the type of a Mongo ObjectID
  * @return void
  */
 IRCFactory.prototype.destroy = function(key) {
@@ -155,10 +164,9 @@ IRCFactory.prototype.destroy = function(key) {
  * commands such as /WHO etc. It's probably best to use CommandManager in most cases
  *
  * @method send
- * @param {ObjectID} key
- * @param {String} command
- * @param {Array} args
- * @extend false
+ * @param {ObjectID} key A client key which has the type of a Mongo ObjectID
+ * @param {String} command An IRC command to send, such as 'mode' or 'join'
+ * @param {Array} args An array of arguments to send delimited by a space.
  * @return void
  */
 IRCFactory.prototype.send = function(key, command, args) {

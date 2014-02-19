@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/events.js
  *
- * @title IRCAnywhere Daemon
+ * @title EventManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -11,20 +11,35 @@ var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers;
 
-var channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action'];
+/**
+ * Constructor, does nothing
+ *
+ * @class EventManager
+ * @method EventManager
+ * @return void
+ */
+function EventManager() {
+	/**
+	 * @member channelEvents A list of events relating to channels
+	 */
+	this.channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action'];
+}
 
 /**
  * Inserts an event into a backlog after all the checking has been done
  * this api is private and EventManager.insertEvent should be used instead
  *
- * @method _insert
- * @param {Object} client
- * @param {Object} message
- * @param {String} type
- * @param {Object} [optional] user
+ * @method this._insert
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object from `irc-message`
+ * @param {String} type Event type
+ * @param {Object} [user] An optional user object
+ * @param {Boolean} [force] An optional force boolean to force the event into the '*' status window
  * @return void
  */
-var _insert = function(client, message, type, user, force) {
+EventManager.prototype._insert = function(client, message, type, user, force) {
+	var self = this;
+
 	fibrous.run(function() {
 		var force = force || false,
 			user = user || false,
@@ -40,7 +55,7 @@ var _insert = function(client, message, type, user, force) {
 		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
-		var target = (_.indexOf(channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
+		var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
 			target = (force) ? '*' : target;
 		// anything else goes in '*' so it's forwarded to the server log
 
@@ -65,26 +80,13 @@ var _insert = function(client, message, type, user, force) {
 }
 
 /**
- * Description
- *
- * @class EventManager
- * @method EventManager
- * @extend false
- * @return void
- */
-function EventManager() {
-
-}
-
-/**
  * Inserts an event into the backlog, takes a client and message object and a type
  * Usually 'privmsg' or 'join' etc.
  *
  * @method insertEvent
- * @param {Object} client
- * @param {Object} message
- * @param {String} type
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object from `irc-message`
+ * @param {String} type Event type
  * @return void
  */
 EventManager.prototype.insertEvent = function(client, message, type) {
@@ -98,20 +100,20 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 			}
 			
 			message.channel = chan.channel;
-			_insert(client, message, type, chan);
+			this._insert(client, message, type, chan);
 			// we're in here because the user either changing their nick
 			// or quitting, exists in this channel, lets add it to the event
 		});
 
 		if (_.has(client.internal.tabs, message.nickname)) {
-			_insert(client, message, type);
+			this._insert(client, message, type);
 		}
 		// these two types wont have a target, or a channel, so
 		// we'll have to do some calculating to determine where we want them
 		// we shall put them in channel and privmsg tab events
 
 		if (message.nickname === client.nick) {
-			_insert(client, message, type, null, true);
+			this._insert(client, message, type, null, true);
 		}
 		// we can also push it into the * backlog if it's us
 	} else if (type == 'privmsg' || type == 'action') {
@@ -122,21 +124,22 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 		}
 		// create the tab if its undefined
 
-		_insert(client, message, type);
+		this._insert(client, message, type);
 	} else {
-		_insert(client, message, type);
+		this._insert(client, message, type);
 	}
 }
 
 /**
- * Description
+ * Determine whether a message should be marked as a highlight or not for the specific
+ * IRC client. Currently this does not support anything other than looking at their nickname.
+ *
  * @method determineHighlight
- * @param {Object} client
- * @param {Object} message
- * @param {String} type
- * @param {Boolean} ours
- * @extend true
- * @return {Boolean}
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object from `irc-message`
+ * @param {String} type Event type
+ * @param {Boolean} ours Whether this message comes from this client
+ * @return {Boolean} true or false
  */
 EventManager.prototype.determineHighlight = function(client, message, type, ours) {
 	if (ours || (type !== 'privmsg' && type !== 'action')) {
@@ -154,13 +157,15 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 }
 
 /**
- * Gets the prefix for the irc client and the user object.
+ * Gets the channel prefix for the irc client and the user object. A valid object returned is
+ * in the format of: ::
+ *
+ *	{prefix: '+', sort: 5};
  * 
  * @method getPrefix
- * @param {Object} client
- * @param {Object} user
- * @extend true
- * @return {Object}
+ * @param {Object} client A valid client object
+ * @param {Object} user A valid user object
+ * @return {Object} A valid prefix object
  */
 EventManager.prototype.getPrefix = function(client, user) {
 	if (user === null || _.isEmpty(user.modes)) {

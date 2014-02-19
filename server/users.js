@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/users.js
  *
- * @title IRCAnywhere Daemon
+ * @title UserManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -15,11 +15,11 @@ var _ = require('lodash'),
 	helper = require('../lib/helpers').Helpers;
 
 /**
- * Responsible for handling user related actions ie registering, logging in, forgot passwords etc
+ * Responsible for handling user related actions ie registering, logging in, forgot passwords etc.
+ * Most of these actions are triggered via API calls.
  *
  * @class UserManager
  * @method UserManager
- * @extend false
  * @return void
  */
 function UserManager() {
@@ -36,10 +36,10 @@ function UserManager() {
 }
 		
 /**
- * Sets up the api urls and anything else needed by the user manager class
+ * Sets up the API routes and anything else needed by the user manager class.
+ * Such as timers and the SMTP connection
  *
  * @method init
- * @extend true
  * @return void
  */
 UserManager.prototype.init = function() {
@@ -111,7 +111,6 @@ UserManager.prototype.init = function() {
  * drift off too much because it re-corrects it self.
  *
  * @method timeOutInactive
- * @extend true
  * @return void
  */
 UserManager.prototype.timeOutInactive = function() {
@@ -170,8 +169,7 @@ UserManager.prototype.timeOutInactive = function() {
  * HTTP request, returns false if invalid
  *
  * @method isAuthenticated
- * @param {Object} data
- * @extend true
+ * @param {Object} data A valid data object from sock.js
  * @return {Object}
  */
 UserManager.prototype.isAuthenticated = function(data) {
@@ -212,14 +210,13 @@ UserManager.prototype.isAuthenticated = function(data) {
 
 /**
  * Handles user registrations, it takes req and res objects from express at the moment
- * however it should probably stay this way, because the api to register a user is at /api/register
+ * however it should probably stay this way, because the api to register a user is at /api/register.
  * I can't see a reason to change this to take individual parameters.
  *
  * @method registerUser
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.registerUser = function(req, res) {
 	var name = req.param('name', ''),
@@ -316,13 +313,12 @@ UserManager.prototype.registerUser = function(req, res) {
 }
 
 /**
- * Handles the login call to /api/login and sets an appropriate cookie if successful
+ * Handles the login call to /api/login and sets an appropriate cookie if successful.
  *
  * @method userLogin
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.userLogin = function(req, res) {
 	var email = req.param('email', ''),
@@ -371,13 +367,12 @@ UserManager.prototype.userLogin = function(req, res) {
 }
 
 /**
- * Handles the call to /api/logout which is self explanatory
+ * Handles the call to /api/logout which is self explanatory.
  * 
  * @method userLogout
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.userLogout = function(req, res) {
 	var user = this.isAuthenticated(req.headers.cookie);
@@ -394,10 +389,9 @@ UserManager.prototype.userLogout = function(req, res) {
  * Handles the call to /api/forgot to send a forgot password link
  * 
  * @method forgotPassword
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.forgotPassword = function(req, res) {
 	var output = {failed: false, successMessage: '', errors: []},
@@ -441,10 +435,9 @@ UserManager.prototype.forgotPassword = function(req, res) {
  * Checking is done to make sure a token exists in a user record.
  * 
  * @method resetPassword
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.resetPassword = function(req, res) {
 	var password = req.param('password', ''),
@@ -458,13 +451,12 @@ UserManager.prototype.resetPassword = function(req, res) {
 
 /**
  * Handles the call to /api/settings/updatesettings which will update the settings for that user
- * checking for authentication and validating if necessary
+ * checking for authentication and validating if necessary.
  *
  * @method updateSettings
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.updateSettings = function(req, res) {
 	var name = req.param('name', ''),
@@ -524,10 +516,9 @@ UserManager.prototype.updateSettings = function(req, res) {
  * take a token though.
  * 
  * @method resetPassword
- * @param {Object} req
- * @param {Object} res
- * @extend true
- * @return {Object}
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.changePassword = function(req, res) {
 	var password = req.param('password', ''),
@@ -542,11 +533,11 @@ UserManager.prototype.changePassword = function(req, res) {
  * define how you select the user, so via a token or direct user object
  * 
  * @method updatePassword
- * @param {Object} user
- * @param {Object} password
- * @param {Object} confirmPassword
- * @extend true
- * @return {Object}
+ * @param {Object} user A valid user object from `isAuthenticated`
+ * @param {String} password The new password to set
+ * @param {String} confirmPassword The same password again
+ * @param {String} [currentPassword] The current password
+ * @return {Object} An output object for the API call
  */
 UserManager.prototype.updatePassword = function(user, password, confirmPassword, currentPassword) {
 	var currentPassword = currentPassword || '',
@@ -585,8 +576,8 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  * which is the networkManager and ircFactory.
  * 
  * @method onUserLogin
- * @param {Object} me
- * @extend true
+ * @param {Object} me A valid user object
+ * @param {Boolean} [force] Whether to force the reconnect of a disconnected client
  * @return void
  */
 UserManager.prototype.onUserLogin = function(me, force) {
@@ -620,13 +611,13 @@ UserManager.prototype.onUserLogin = function(me, force) {
 
 /**
  * Looks for a template and parses the {{tags}} into the values in replace
- * and returns a string, used to parse emails.
+ * and returns a string, used to parse emails. Very basic parsing which will
+ * probably be replaced by something more powerful in the future with HTML outputs.
  *
  * @method parse
- * @param {String} file
- * @param {Object} replace
- * @extend true
- * @return {String}
+ * @param {String} file The name of the email template
+ * @param {Object} replace A hash of keys and values to replace in the template
+ * @return {String} A parsed email template
  */
 UserManager.prototype.parse = function(file, replace) {
 	var template = fs.readFileSync(file).toString();

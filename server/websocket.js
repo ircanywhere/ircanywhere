@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/websocket.js
  *
- * @title IRCAnywhere Daemon
+ * @title WebSocket
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -14,12 +14,11 @@ var _ = require('lodash'),
 	hooks = require('hooks');
 
 /**
- * Wrapper for sock.js sockets
+ * Wrapper for sock.js sockets.
  *
  * @class WebSocket
  * @method WebSocket
- * @param {Object} socket
- * @extend false
+ * @param {Object} socket A valid sock.js socket
  * @return void
  */
 function WebSocket(socket) {
@@ -31,11 +30,9 @@ function WebSocket(socket) {
 util.inherits(WebSocket, events.EventEmitter);
 
 /**
- * Binds our sock.js events to _socket
+ * Binds our sock.js events to _socket.
  *
  * @method bindEvents
- * @param {Object} raw
- * @extend true
  * @return void
  */
 WebSocket.prototype.bindEvents = function() {
@@ -44,23 +41,21 @@ WebSocket.prototype.bindEvents = function() {
 }
 
 /**
- * Checks if an incoming message object is valid
+ * Checks if an incoming message object is valid.
  *
  * @method isValid
- * @param {Object} parsed
- * @extend true
- * @return {Boolean}
+ * @param {Object} parsed An incoming message object to parse
+ * @return {Boolean} Whether the object is valid or not
  */
 WebSocket.prototype.isValid = function(parsed) {
 	return (parsed.event !== undefined || parsed.data !== undefined);
 }
 
 /**
- * Handles an incoming message
+ * Handles an incoming message.
  *
  * @method onMessage
- * @param {Object} raw
- * @extend true
+ * @param {String} raw A raw line from a sock.js websocket
  * @return void
  */
 WebSocket.prototype.onMessage = function(raw) {
@@ -85,10 +80,9 @@ WebSocket.prototype.onMessage = function(raw) {
 }
 
 /**
- * Handles closing the connection
+ * Handles closing the websocket connection.
  *
  * @method onClose
- * @extend true
  * @return void
  */
 WebSocket.prototype.onClose = function() {
@@ -106,10 +100,9 @@ WebSocket.prototype.onClose = function() {
  * Sends outgoing packets
  *
  * @method send
- * @param {String} event
- * @param {Object} data
- * @param {Boolean} close
- * @extend true
+ * @param {String} event The event to send
+ * @param {Object} data The data object to send, should be JSON
+ * @param {Boolean} [close] Whether to close the connection after the data has been sent or not
  * @return void
  */
 WebSocket.prototype.send = function(event, data, close) {
@@ -131,8 +124,7 @@ WebSocket.prototype.send = function(event, data, close) {
  * Compiles a temporary GET route and sends it to a socket
  *
  * @method sendBurst
- * @param {Object} data
- * @extend true
+ * @param {Object} data The data object to push into a route and send down the socket
  * @return void
  */
 WebSocket.prototype.sendBurst = function(data) {

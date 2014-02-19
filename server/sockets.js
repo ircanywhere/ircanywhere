@@ -1,30 +1,28 @@
 /**
  * IRCAnywhere server/sockets.js
  *
- * XXX: I want to rename this to observer/rpc at some point in 0.2.0 final and merge the commands
- *      into a more RPC style which are probably defined in websocket.js, because the majority
- *      of this code is handling the mongo observer stuff and handling allow rules. Little of it
- *      is socket based code, and only a bit of it is socket managing code.
+ * NOTE: I want to rename this to observer/rpc at some point in 0.2.0 final and merge the commands
+ * into a more RPC style which are probably defined in websocket.js, because the majority
+ * of this code is handling the mongo observer stuff and handling allow rules. Little of it
+ * is socket based code, and only a bit of it is socket managing code.
  *
- *      I also want to incorporate it all (especially the allow rules) into a more DI based style
- *      where any modules can inject their own RPC methods and allow rules by just putting
- *      items into the prototype (is this possible?) or extend based, for example;
+ * I also want to incorporate it all (especially the allow rules) into a more DI based style
+ * where any modules can inject their own RPC methods and allow rules by just putting
+ * items into the prototype (is this possible?) or extend based, for example; ::
  *
- *      ```
- *      CustomModule = _.extend(BaseModule, {
- *          'allow.collection': {
- *              insert: function() { ... }
- *          },
- *          rpc: {
- *              mySocketCommand: function() { ... }
- *          }
- *      });
- *      ```
+ * 	CustomModule = _.extend(BaseModule, {
+ * 		'allow.collection': {
+ * 			insert: function() { ... }
+ * 		},
+ * 		rpc: {
+ * 			mySocketCommand: function() { ... }
+ * 		}
+ * 	});
  *
- *      These would just inject the rpc methods / allow rules into the main RPC manager (this).
- *      Or something similar. I'll spend time ironing out the details at some point
+ * These would just inject the rpc methods / allow rules into the main RPC manager (this).
+ * Or something similar. I'll spend time ironing out the details at some point
  *
- * @title IRCAnywhere Daemon
+ * @title SocketManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -41,7 +39,6 @@ var _ = require('lodash'),
  *
  * @class SocketManager
  * @method SocketManager
- * @extend false
  * @return void
  */
 function SocketManager() {
@@ -54,17 +51,6 @@ function SocketManager() {
 	// very similar to Meteor - basically just reimplementing it, doesn't support advanced queries though
 
 	this.allow('users', {
-		/**
-		 * An allow rule for updates to the user record, we can only change the selectedTab
-		 * value here and it only works for the logged in user.
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return {Boolean}
-		 */
 		update: function(uid, query, update) {
 			var allow = false,
 				allowed = ['selectedTab'];
@@ -86,16 +72,6 @@ function SocketManager() {
 	});
 
 	this.rules('users', {
-		/**
-		 * An update rule to execute when we've passed the allow rules
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return void
-		 */
 		update: function(uid, query, update) {
 			application.Users.sync.update({_id: uid}, {$set: update});
 			// update
@@ -103,18 +79,6 @@ function SocketManager() {
 	});
 
 	this.allow('tabs', {
-		/**
-		 * An allow rule for updates to the tab collections, checks the correct properties
-		 * are being updated and their type, also then checks if they are allowed to update
-		 * the specific document.
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return {Boolean}
-		 */
 		update: function(uid, query, update) {
 			var allow = false,
 				allowed = ['hiddenUsers', 'hiddenEvents'];
@@ -134,16 +98,6 @@ function SocketManager() {
 			return allow;
 		},
 
-		/**
-		 * An allow rule for inserts to the tab collection, we check for target, type and
-		 * network id
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} insert
-		 * @extend false
-		 * @return {Boolean}
-		 */
 		insert: function(uid, insert) {
 			var allow = false,
 				allowed = ['target', 'network', 'selected'];
@@ -169,30 +123,11 @@ function SocketManager() {
 	});
 
 	this.rules('tabs', {
-		/**
-		 * An update rule to execute when we've passed the allow rules
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return void
-		 */
 		update: function(uid, query, update) {
 			application.Tabs.sync.update(_.extend(query, {user: uid}), {$set: update});
 			// update
 		},
 
-		/**
-		 * An insert rule for the tab collection
-		 *
-		 * @method insert
-		 * @param {ObjectID} uid
-		 * @param {Object} insert
-		 * @extend false
-		 * @return void
-		 */
 		insert: function(uid, insert) {
 			var ircClient = Clients[new mongo.ObjectID(insert.network)];
 
@@ -205,16 +140,6 @@ function SocketManager() {
 	})
 
 	this.allow('commands', {
-		/**
-		 * An allow rule for inserts to the commands collection, similar to the one above
-		 * checks for parameters then their uid to see if they can insert a command into that tab
-		 *
-		 * @method insert
-		 * @param {ObjectID} uid
-		 * @param {Object} insert
-		 * @extend false
-		 * @return {Boolean}
-		 */
 		insert: function(uid, insert) {
 			var allow = false,
 				allowed = ['command', 'network', 'target', 'backlog'];
@@ -240,15 +165,6 @@ function SocketManager() {
 	});
 
 	this.rules('commands', {
-		/**
-		 * An insert date rule to execute when we've passed the allow rules
-		 *
-		 * @method insert
-		 * @param {ObjectID} uid
-		 * @param {Object} update
-		 * @extend false
-		 * @return void
-		 */
 		insert: function(uid, insert) {
 			var find = application.Tabs.sync.findOne({networkName: insert.network, user: uid, target: insert.target});
 			// try and find a valid tab
@@ -268,32 +184,12 @@ function SocketManager() {
 	});
 
 	this.allow('events', {
-		/**
-		 * An update rule to execute when we've passed the allow rules
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return void
-		 */
 		update: function(uid, query, update) {
 			return (_.difference(_.keys(update), ['read']).length === 0 && typeof update.read === 'boolean');
 		}
 	});
 
 	this.rules('events', {
-		/**
-		 * An update rule to execute when we've passed the allow rules
-		 *
-		 * @method update
-		 * @param {ObjectID} uid
-		 * @param {Object} query
-		 * @param {Object} update
-		 * @extend false
-		 * @return void
-		 */
 		update: function(uid, query, update) {
 			if ('$or' in query) {
 				for (var i in query['$or']) {
@@ -321,9 +217,8 @@ function SocketManager() {
  * currently only compatible with inserts and updates.
  *
  * @method allow
- * @param {String} collection
- * @param {Object} object
- * @extend true
+ * @param {String} collection An existing Mongo collection
+ * @param {Object} object An object containing valid operation functions `update` and `insert`
  * @return void
  */
 SocketManager.prototype.allow = function(collection, object) {
@@ -344,9 +239,8 @@ SocketManager.prototype.allow = function(collection, object) {
  * Responsible for setting operation rules on how to update things
  *
  * @method rules
- * @param {String} collection
- * @param {Object} object
- * @extend true
+ * @param {String} collection An existing Mongo collection
+ * @param {Object} object An object containing valid operation functions `update` and `insert`
  * @return void
  */
 SocketManager.prototype.rules = function(collection, object) {
@@ -370,7 +264,6 @@ SocketManager.prototype.rules = function(collection, object) {
  * We also setup the websocket connection handlers and everything relating to that here.
  *
  * @method init
- * @extend true
  * @return void
  */
 SocketManager.prototype.init = function() {
@@ -457,11 +350,10 @@ SocketManager.prototype.init = function() {
 }
 
 /**
- * Handles a new websocket opening
+ * Handles a new websocket opening and attaches the RPC events
  *
  * @method onSocketOpen
- * @param {Object} socket
- * @extend true
+ * @param {Object} socket A valid sock.js socket
  * @return void
  */
 SocketManager.prototype.onSocketOpen = function(socket) {
@@ -504,14 +396,12 @@ SocketManager.prototype.onSocketOpen = function(socket) {
 
 /**
  * Handles the authentication command sent to us from websocket clients
- * Authenticates us against login tokens in the user record, disconnects if
- * expired or incorrect.
+ * Authenticates us against login tokens in the user record, disconnects
+ * if expired or incorrect.
  *
  * @method handleAuth
- * @param {Object} socket
- * @param {Object} data
- * @param {Function} callback
- * @extend true
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
  * @return void
  */
 SocketManager.prototype.handleAuth = function(socket, data) {
@@ -535,8 +425,7 @@ SocketManager.prototype.handleAuth = function(socket, data) {
  * they have been authenticated and it's been accepted.
  * 
  * @method handleConnect
- * @param {Object} socket
- * @extend true
+ * @param {Object} socket A valid sock.js socket
  * @return void
  */
 SocketManager.prototype.handleConnect = function(socket) {
@@ -614,8 +503,8 @@ SocketManager.prototype.handleConnect = function(socket) {
  * Handles queries to the events collection
  *
  * @method handleEvents
- * @param {Object} socket
- * @param {Object} data
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
  * @return void
  */
 SocketManager.prototype.handleEvents = function(socket, data) {
@@ -630,8 +519,8 @@ SocketManager.prototype.handleEvents = function(socket, data) {
  * Handles insert rpc calls
  *
  * @method handleInsert
- * @param {Object} socket
- * @param {Object} data
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
  * @return void
  */
 SocketManager.prototype.handleInsert = function(socket, data) {
@@ -659,8 +548,8 @@ SocketManager.prototype.handleInsert = function(socket, data) {
  * Handles update rpc calls
  *
  * @method handleUpdate
- * @param {Object} socket
- * @param {Object} data
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
  * @return void
  */
 SocketManager.prototype.handleUpdate = function(socket, data) {

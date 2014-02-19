@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/channels.js
  *
- * @title IRCAnywhere Daemon
+ * @title ChannelManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -17,7 +17,6 @@ var _ = require('lodash'),
  *
  * @class ChannelManager
  * @method ChannelManager
- * @extend false
  * @return void
  */
 function ChannelManager() {
@@ -31,13 +30,16 @@ function ChannelManager() {
 }
 
 /**
- * Gets a tab record from the passed in network and channel, this is not specific to users
+ * Gets a tab record from the parameters passed in, strictly speaking this doesn't have to
+ * be a channel, a normal query window will also be returned. However this class doesn't
+ * need to work with anything other than channels.
+ *
+ * A new object is created but not inserted into the database if the channel doesn't exist.
  *
  * @method getChannel
- * @param {String} network
- * @param {String} channel
- * @extend true
- * @return {Object} tab object
+ * @param {String} network A network string such as 'freenode'
+ * @param {String} channel The name of a channel **with** the hash key '#ircanywhere'
+ * @return {Object} A channel object straight out of the database.
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
 	var chan = application.Tabs.sync.findOne({network: network, title: channel});
@@ -56,13 +58,12 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * network name and channel name, with the option to force an overwrite
  * 
  * @method insertUsers
- * @param {ObjectID} key
- * @param {String} network
- * @param {String} channel
- * @param {Array} users
- * @param {Boolean} force
- * @extend true
- * @return {Array} array of the users inserted
+ * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
+ * @param {String} network The network name, such as 'freenode'
+ * @param {String} channel The channel name '#ircanywhere'
+ * @param {Array[Object]} users An array of valid user objects usually from a who/join output
+ * @param {Boolean} [force] Optional boolean whether to overwrite the contents of the channelUsers
+ * @return {Array} The final array of the users inserted
  */
 ChannelManager.prototype.insertUsers = function(key, network, channel, users, force) {
 	var force = force || false,
@@ -110,13 +111,12 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 
 /**
  * Removes a specific user from a channel, if users is omitted, channel should be equal to a nickname
- * and that nickname will be removed from all channels records on that network
+ * and that nickname will be removed from all channels records on that network.
  * 
  * @method removeUsers
- * @param {String} network
- * @param {String} channel
- * @param {Array} [optional] users
- * @extend true
+ * @param {String} network A valid network name
+ * @param {String} [channel] A valid channel name
+ * @param {Array} An array of users to remove from the network `or` channel
  * @return void
  */
 ChannelManager.prototype.removeUsers = function(network, channel, users) {
@@ -135,14 +135,13 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
 }
 
 /**
- * Updates a user or an array of users from the specific channel with the values passed in
+ * Updates a user or an array of users from the specific channel with the values passed in.
  *
  * @method updateUsers
- * @param {ObjectID} key
- * @param {String} network
- * @param {Array} users
- * @param {Object} values
- * @extend true
+ * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
+ * @param {String} network The name of the network
+ * @param {Array} users A valid users array
+ * @param {Object} A hash of keys and values to be replaced in the users array
  * @return void
  */
 ChannelManager.prototype.updateUsers = function(key, network, users, values) {
@@ -173,12 +172,11 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  * externally, however can be pre and post hooked like all other functions in this object.
  *
  * @method updateModes
- * @param {ObjectID} key
- * @param {Object} capab
- * @param {String} network
- * @param {String} channel
- * @param {String} mode
- * @extend true
+ * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
+ * @param {Object} capab A valid capabilities object from the 'registered' event
+ * @param {String} network Network name
+ * @param {String} channel Channel name
+ * @param {String} mode Mode string
  * @return void
  */
 ChannelManager.prototype.updateModes = function(key, capab, network, channel, mode) {
@@ -212,14 +210,13 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 }
 
 /**
- * Updates the specific channel's topic and setby in the internal records
+ * Updates the specific channel's topic and setby in the internal records.
  *
  * @method updateTopic
- * @param {ObjectID} key
- * @param {String} channel
- * @param {String} topic
- * @param {String} setby
- * @extend true
+ * @param {ObjectID} A valid Mongo ObjectID for the networks collection
+ * @param {String} channel A valid channel name
+ * @param {String} topic The new topic
+ * @param {String} setby A setter string, usually in the format of 'nickname!username@hostname'
  * @return void
  */
 ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {

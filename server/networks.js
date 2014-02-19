@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/networks.js
  *
- * @title IRCAnywhere Daemon
+ * @title NetworkManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -18,24 +18,26 @@ var _ = require('lodash'),
  *
  * @class NetworkManager
  * @method NetworkManager
- * @extend false
  * @return void
  */
 function NetworkManager() {
 	var self = this;
 
-	this.flags = {
-		connected: 'connected',
-		disconnected: 'disconnected',
-		connecting: 'connecting',
-		closed: 'closed',
-		failed: 'failed'
-	};
-
 	application.ee.on('ready', function() {
 		fibrous.run(self.init.bind(self));
 	});
 	// run this.init when we get the go ahead
+}
+
+/**
+ * @member {Object} flags An object containing the valid network statuses
+ */
+NetworkManager.prototype.flags = {
+	connected: 'connected',
+	disconnected: 'disconnected',
+	connecting: 'connecting',
+	closed: 'closed',
+	failed: 'failed'
 }
 	
 /**
@@ -45,7 +47,6 @@ function NetworkManager() {
  * writes to the collection will propogate through and update Clients
  *
  * @method init
- * @extend true
  * @return void
  */
 NetworkManager.prototype.init = function() {
@@ -137,8 +138,7 @@ NetworkManager.prototype.init = function() {
  * also can be modified with hooks to return more information if needed.
  *
  * @method getClients
- * @extend true
- * @return {Object}
+ * @return {Object} An object containing the clients that should be started up
  */
 NetworkManager.prototype.getClients = function() {
 	var self = this,
@@ -161,9 +161,10 @@ NetworkManager.prototype.getClients = function() {
  * validating the parameters and input, and on success passes the information
  * to `addNetwork()` which handles everything else
  *
- * @method getClients
- * @extend true
- * @return {Object}
+ * @method addNetworkApi
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
  */
 NetworkManager.prototype.addNetworkApi = function(req, res) {
 	var server = req.param('server', ''),
@@ -242,10 +243,10 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
  * This just adds it to the database and doesn't attempt to start it up.
  *
  * @method addNetwork
- * @param {Object} user
- * @param {Object} network
- * @extend true
- * @return {Object}
+ * @param {Object} user A valid user object from the `users` collection
+ * @param {Object} network A valid network object to insert
+ * @param {String} status A valid network status
+ * @return {Object} The network inserted or null if not
  */
 NetworkManager.prototype.addNetwork = function(user, network, status) {
 	if (!(status in this.flags)) {
@@ -293,11 +294,11 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
  * channel or a username.
  *
  * @method addTab
- * @param {Object} client
- * @param {String} target
- * @param {String} type
- * @param {Boolean} [optional] select
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {String} target The name of the tab being created
+ * @param {String} type The type of the tab either 'query', 'channel' or 'network'
+ * @param {Boolean} [select] Whether to mark the tab as selected or not, defaults to false
+ * @param {Boolean} [active] Whether to mark the tab as active or not, defaults to true
  * @return void
  */
 NetworkManager.prototype.addTab = function(client, target, type, select, active) {
@@ -343,10 +344,9 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
  * We can omit target and call activeTab(client, false) to set them all to false (such as on disconnect)
  *
  * @method activeTab
- * @param {Object} client
- * @param {String} target
- * @param {Boolean} [optional] activate
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {String} [target] The name of the tab being altered, discard to mark all as active or inactive.
+ * @param {Boolean} activate Whether to set the tab as active or not
  * @return void
  */
 NetworkManager.prototype.activeTab = function(client, target, activate) {
@@ -363,9 +363,8 @@ NetworkManager.prototype.activeTab = function(client, target, activate) {
  * for a removed tab, if it's the currently selected one, go back to a different one.
  *
  * @method removeTab
- * @param {Object} client
- * @param {String} target
- * @extend true
+ * @param {Object} client A valid client object
+ * @param {String} [target] The name of the tab being altered, discard to remove all.
  * @return void
  */
 NetworkManager.prototype.removeTab = function(client, target) {
@@ -395,8 +394,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
  * but it might not yield a good result because of newly created clients since startup.
  *
  * @method connectNetwork
- * @param {Object} network
- * @extend true
+ * @param {Object} network A valid network or client object
  * @return void
  */
 NetworkManager.prototype.connectNetwork = function(network) {
@@ -404,11 +402,15 @@ NetworkManager.prototype.connectNetwork = function(network) {
 }
 
 /**
- * Description
+ * Update the status for a specific network specified by a MongoDB query. The reason for
+ * this and not a straight ID is so we can do certain things such as checking if a network
+ * is marked as 'disconnected' during the `closed` event to determine whether to keep it as
+ * 'disconnected' or mark it as 'closed'. So we can do much more elaborate queries here than
+ * just ID checking
+ *
  * @method changeStatus
- * @param {Object} query
- * @param {Boolean} status
- * @extend true
+ * @param {Object} query A MongoDB query to select a network
+ * @param {Boolean} status A valid network status
  * @return void
  */
 NetworkManager.prototype.changeStatus = function(query, status) {

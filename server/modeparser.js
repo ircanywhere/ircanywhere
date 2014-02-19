@@ -1,7 +1,7 @@
 /**
  * IRCAnywhere server/modeparser.js
  *
- * @title IRCAnywhere Daemon
+ * @title ModeParser
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Ricki Hastings
@@ -19,7 +19,6 @@ var _ = require('lodash');
  * 
  * @class ModeParser
  * @method ModeParser
- * @extend false
  * @return void
  */
 function ModeParser() {
@@ -31,10 +30,9 @@ function ModeParser() {
  * based on what the mode string suggests, ie apply operator to 'someone', or set +m on the channel
  *
  * @method sortModes
- * @param {Object} capabilities
- * @param {String} modes
- * @extend false
- * @return {Object}
+ * @param {Object} capabilities A valid capabilities object from a client
+ * @param {String} modes A mode string `+no-v rickibalboa Gnasher`
+ * @return {Object} A valid modeArray object
  */
 ModeParser.prototype.sortModes = function(capabilities, modes) {
 	var params = [],
@@ -119,11 +117,10 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
  * Handles the object of instructions returned from sortModes, and applies them
  *
  * @method changeModes
- * @param {Object} capabilities
- * @param {Object} modes
- * @param {Object} modeArray
- * @extend false
- * @return {Object}
+ * @param {Object} capabilities A valid capabilities object from a client
+ * @param {Object} modes The current mode string for the channel (not including all parameters)
+ * @param {Object} modeArray A valid modeArray object from `sortModes()`
+ * @return {String} The channel mode string with the changes applied.
  */
 ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),
@@ -239,11 +236,10 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
  *  minus: rickibalboa: +v > will set the v flag on the nickname record
  *
  * @method handleParams
- * @param {Object} capabilities
- * @param {Object} users
- * @param {Object} modeArray
- * @extend false
- * @return {Object}
+ * @param {Object} capabilities A valid capabilities object from a client
+ * @param {Object} users A valid users array for a channel
+ * @param {Object} modeArray A valid modeArray from `sortModes`
+ * @return {Array[Object]} An array of users that have been affected by the mode change
  */
 ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),
