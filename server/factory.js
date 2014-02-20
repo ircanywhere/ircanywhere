@@ -82,7 +82,7 @@ IRCFactory.prototype.init = function() {
 				}
 				// the clients we're going to actually attempt to boot up
 
-				application.logger.log('warn', 'factory synchronize', helper.cleanObjectIds(message));
+				application.logger.log('info', 'factory synchronize', helper.cleanObjectIds(message));
 			} else {
 				self.handleEvent(message.event, message.message);
 			}
@@ -117,6 +117,8 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 		fibrous.run(function() {
 			ircHandler[e].call(ircHandler, client, object);
 		});
+	} else {
+		application.logger.log('warn', 'invalid irc-factory event', {key: key, event: e, data: object});
 	}
 	
 	if (application.verbose) {

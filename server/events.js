@@ -29,7 +29,7 @@ function EventManager() {
  * Inserts an event into a backlog after all the checking has been done
  * this api is private and EventManager.insertEvent should be used instead
  *
- * @method this._insert
+ * @method _insert
  * @param {Object} client A valid client object
  * @param {Object} message A valid message object from `irc-message`
  * @param {String} type Event type
@@ -90,6 +90,8 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
  * @return void
  */
 EventManager.prototype.insertEvent = function(client, message, type) {
+	var self = this;
+
 	if (type == 'nick' || type == 'quit') {
 		var chans = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname});
 		// find the channel, we gotta construct a query (kinda messy)
@@ -100,20 +102,20 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 			}
 			
 			message.channel = chan.channel;
-			this._insert(client, message, type, chan);
+			self._insert(client, message, type, chan);
 			// we're in here because the user either changing their nick
 			// or quitting, exists in this channel, lets add it to the event
 		});
 
 		if (_.has(client.internal.tabs, message.nickname)) {
-			this._insert(client, message, type);
+			self._insert(client, message, type);
 		}
 		// these two types wont have a target, or a channel, so
 		// we'll have to do some calculating to determine where we want them
 		// we shall put them in channel and privmsg tab events
 
 		if (message.nickname === client.nick) {
-			this._insert(client, message, type, null, true);
+			self._insert(client, message, type, null, true);
 		}
 		// we can also push it into the * backlog if it's us
 	} else if (type == 'privmsg' || type == 'action') {
@@ -124,9 +126,9 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 		}
 		// create the tab if its undefined
 
-		this._insert(client, message, type);
+		self._insert(client, message, type);
 	} else {
-		this._insert(client, message, type);
+		self._insert(client, message, type);
 	}
 }
 

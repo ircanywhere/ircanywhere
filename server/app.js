@@ -13,6 +13,7 @@ var _ = require('lodash'),
 	events = require('eventemitter2'),
 	os = require('os'),
 	fs = require('fs'),
+	util = require('util'),
 	raw = fs.readFileSync('./config.json').toString(),
 	schema = require('./schema').schema,
 	path = require('path'),
@@ -77,40 +78,64 @@ Application.prototype.packagejson = JSON.parse(fs.readFileSync('./package.json')
  * @return void
  */
 Application.prototype.init = function() {
+	var self = this;
+
+	this.setupWinston();
+	// setup winston first
+
 	validate(this.config, schema);
 	// attempt to validate our config file
 
 	this.database = {
 		mongo: this.config.mongo.split(/\//i),
-		oplog: this.config.oplog.split(/\//i)
+		oplog: this.config.oplog.split(/\//i),
+		settings: {
+			db: {
+				native_parser: true
+			},
+			server: {
+				auto_reconnect: true
+			}
+			// XXX - Add repl set options and tie to config file
+		}
 	};
 
-	this.mongo = mongo.MongoClient.sync.connect(this.config.mongo);
-	this.oplog = mongo.MongoClient.sync.connect(this.config.oplog);
-	// two db connections because we're greedy
+	mongo.MongoClient.connect(this.config.mongo, this.database.settings, function(err, db) {
+		if (err) {
+			throw err;
+		}
 
-	this.Nodes = this.mongo.collection('nodes');
-	this.Users = this.mongo.collection('users');
-	this.Networks = this.mongo.collection('networks');
-	this.Tabs = this.mongo.collection('tabs');
-	this.ChannelUsers = this.mongo.collection('channelUsers');
-	this.Events = this.mongo.collection('events');
-	this.Commands = this.mongo.collection('commands');
-	this.Oplog = this.oplog.collection('oplog.rs');
+		self.mongo = db;
+		self.Nodes = db.collection('nodes');
+		self.Users = db.collection('users');
+		self.Networks = db.collection('networks');
+		self.Tabs = db.collection('tabs');
+		self.ChannelUsers = db.collection('channelUsers');
+		self.Events = db.collection('events');
+		self.Commands = db.collection('commands');
 
-	this.setupOplog();
-	// setup our oplog tailer, this gives us Meteor-like observes
+		mongo.MongoClient.connect(self.config.oplog, self.database.settings, function(oerr, odb) {
+			if (oerr) {
+				throw oerr;
+			}
 
-	this.setupWinston();
-	this.setupNode();
-	// next thing to do if we're all alright is setup our node
-	// this has been implemented now in the way for clustering
+			self.oplog = odb;
+			self.Oplog = odb.collection('oplog.rs');
 
-	this.setupServer();
-	// setup express server
+			self.setupOplog();
+			// setup the oplog tailer when we connect
+		});
 
-	this.ee.emit('ready');
-	// initiate sub-objects
+		self.setupNode();
+		// next thing to do if we're all alright is setup our node
+		// this has been implemented now in the way for clustering
+
+		self.setupServer();
+		// setup express server
+
+		self.ee.emit('ready');
+		// initiate sub-objects
+	});
 }
 
 /**
@@ -122,9 +147,6 @@ Application.prototype.init = function() {
  * @return void
  */
 Application.prototype.setupOplog = function() {
-	// XXX - This needs to be re-ran every time a connection is established because if it's ran
- 	//		 and the database driver disconnects then we're fucked!
-	
 	var self = this,
 		start = (new Date().getTime() / 1000);
 
@@ -177,20 +199,26 @@ Application.prototype.setupOplog = function() {
  * @return void
  */
 Application.prototype.setupWinston = function() {
+	var self = this;
+
 	if (!fs.existsSync('./logs')) {
 		fs.mkdirSync('./logs');
 	}
 
 	this.logger = new (winston.Logger)({
 		transports: [
-			new (winston.transports.Console)(),
+			new (winston.transports.Console)({
+				colorize: true,
+				prettyPrint: true,
+				timestamp: true
+			}),
 			new (winston.transports.File)({
 				name: 'error',
 				level: 'error',
 				filename: './logs/error.log',
-				handleExceptions: true,
-				json: false,
-				timestamp: false
+				prettyPrint: false,
+				timestamp: true,
+				json: false
 			}),
 			new (winston.transports.File)({
 				name: 'warn',
@@ -206,8 +234,13 @@ Application.prototype.setupWinston = function() {
 				json: false,
 				timestamp: true
 			})
-		],
-		exitOnError: true
+		]
+	});
+
+	process.on('uncaughtException', function(err) {
+		self.logger.log('error', err.stack, function() {
+			process.exit(0);
+		});
 	});
 }
 
@@ -220,7 +253,8 @@ Application.prototype.setupWinston = function() {
  * @return void
  */
 Application.prototype.setupNode = function() {
-	var data = '',
+	var self = this,
+		data = '',
 		json = {},
 		query = {_id: null},
 		defaultJson = {
@@ -238,31 +272,35 @@ Application.prototype.setupNode = function() {
 		json = defaultJson;
 	}
 
-	var node = this.Nodes.sync.findOne(query);
-	if (node !== null) {
-		this.Nodes.update(query, defaultJson, {safe: false});
-		json = _.extend(node, defaultJson);
-		json._id = json._id.toString();
-	} else {
-		this.Nodes.sync.insert(defaultJson, {safe: false});
-		json = defaultJson;
-	}
-
-	json._id = json._id.toString();
-	this.nodeId = json._id;
-	data = (data == '') ? {} : JSON.parse(data);
-	// house keeping
-
-	if (_.isEqual(data, json)) {
-		return false;
-	}
-
-	fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+	this.Nodes.findOne(query, function(err, doc) {
 		if (err) {
 			throw err;
 		}
+
+		if (!doc) {
+			self.Nodes.update(query, defaultJson, {safe: false});
+			json = _.extend(doc, defaultJson);
+			json._id = json._id.toString();
+		} else {
+			self.Nodes.sync.insert(defaultJson, {safe: false});
+			json = defaultJson;
+		}
+
+		json._id = json._id.toString();
+		self.nodeId = json._id;
+		data = (data == '') ? {} : JSON.parse(data);
+		// house keeping
+
+		if (_.isEqual(data, json)) {
+			return false;
+		}
+
+		fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+			if (err) {
+				throw err;
+			}
+		});
 	});
-	// XXX - Clean this shit up before 0.2 final it's horrible
 }
 
 /**
