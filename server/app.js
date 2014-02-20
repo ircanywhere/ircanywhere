@@ -314,9 +314,20 @@ Application.prototype.setupNode = function() {
 Application.prototype.setupServer = function() {
 	var self = this,
 		app = express(),
-		server = require('http').createServer(app),
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
-	// setup a http server
+
+	if (application.config.ssl) {
+		var https = require('https'),
+			options = {
+				key: fs.readFileSync('./private/certs/key.pem'),
+				cert: fs.readFileSync('./private/certs/cert.pem'),
+			},
+			server = https.createServer(options, app);
+	} else {
+		var http = require('http'),
+			server = http.createServer(app);
+	}
+	// setup a http(s) server
 
 	app.enable('trust proxy');
 	// express settings

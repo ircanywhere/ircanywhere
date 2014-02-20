@@ -1,4 +1,5 @@
 private/node.json
+private/certs/*
 client/build/*
 node_modules
 logs

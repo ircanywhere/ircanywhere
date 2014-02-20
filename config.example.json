@@ -19,6 +19,12 @@
 	 * -- number
 	 * -- usage: The port to listen on */
 
+	"ssl": false,
+	/* -- required
+	 * -- boolean
+	 * -- usage: Whether to setup the http server with SSL or not. Certificates will be required in
+	 			 private/certs/key.pem and private/certs/cert.pem */
+
 	"enableRegistrations": true,
 	/* -- required
 	 * -- boolean 

@@ -15,6 +15,10 @@ exports.schema = {
 		type: 'number',
 		required: true
 	},
+	'ssl': {
+		type: 'boolean',
+		required: true,
+	},
 	'reverseDns': {
 		type: 'string',
 		required: true
