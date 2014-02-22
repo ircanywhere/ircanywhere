@@ -17,7 +17,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 			var tab = this.get('socket.tabs').findBy('selected', true),
 				attribute = tab.get('hiddenUsers');
 
-			this.socket.update('tabs', {_id: tab.get('_id')}, {hiddenUsers: !attribute});
+			this.socket.send('updateTab', tab.get('_id'), {hiddenUsers: !attribute});
 			this.set('showMenu', false);
 			// update & close the menu
 		},
@@ -26,7 +26,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 			var tab = this.get('socket.tabs').findBy('selected', true),
 				attribute = tab.get('hiddenEvents');
 
-			this.socket.update('tabs', {_id: tab.get('_id')}, {hiddenEvents: !attribute});
+			this.socket.send('updateTab', tab.get('_id'), {hiddenEvents: !attribute});
 			this.set('showMenu', false);
 			// update & close the menu
 		},
@@ -34,11 +34,10 @@ App.TitlebarController = Ember.ObjectController.extend({
 		toggleCycle: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true);
 
-			this.socket.insert('commands', {
+			this.socket.send('execCommand', {
 				command: (tab.active) ? '/leave' : '/join',
 				network: tab.networkName,
-				target: tab.target,
-				backlog: false
+				target: tab.target
 			});
 		},
 
@@ -46,22 +45,20 @@ App.TitlebarController = Ember.ObjectController.extend({
 			var tab = this.get('socket.tabs').findBy('selected', true),
 				network = this.get('socket.networks').findBy('_id', tab.get('network'));
 				
-			this.socket.insert('commands', {
+			this.socket.send('execCommand', {
 				command: (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed') ? '/reconnect' : '/disconnect',
 				network: tab.networkName,
-				target: tab.target,
-				backlog: false
+				target: tab.target
 			});
 		},
 
 		closeWindow: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true);
 
-			this.socket.insert('commands', {
+			this.socket.send('execCommand', {
 				command: '/close',
 				network: tab.networkName,
-				target: tab.target,
-				backlog: false
+				target: tab.target
 			});
 		},
 

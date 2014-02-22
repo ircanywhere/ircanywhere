@@ -44,7 +44,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		tab.set('unread', 0);
 		// mark them as unread to hide the bar
 
-		this.socket.update('events', query, {read: true});
+		this.socket.send('readEvents', query, {read: true});
 		// update the records
 	},
 

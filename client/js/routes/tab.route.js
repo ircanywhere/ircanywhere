@@ -52,7 +52,7 @@ App.TabRoute = AppRoute.extend({
 			// mark tab as selected
 
 			index.set('tabId', tab._id);
-			index.socket.update('users', {}, {selectedTab: tab.url});
+			index.socket.send('selectTab', tab.url);
 			// send update to backend
 		},
 
@@ -61,7 +61,7 @@ App.TabRoute = AppRoute.extend({
 				target = transition.params.tab,
 				network = this.modelFor('network').get('_id');
 
-			socket.insert('tabs', {target: target, network: network, selected: true});
+			socket.send('insertTab', {target: target, network: network, selected: true});
 		}
 	}
 });

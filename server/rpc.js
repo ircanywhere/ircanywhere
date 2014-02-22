@@ -215,23 +215,47 @@ RPCHandler.prototype.onSocketOpen = function(socket) {
 		});
 	});
 
-	/*webSocket.on('events', function(data) {
+	webSocket.on('sendCommand', function(data) {
 		fibrous.run(function() {
-			socketManager.handleEvents(webSocket, data);
+			self.handleCommand(webSocket, data, false);
 		});
 	});
 
-	webSocket.on('insert', function(data) {
+	webSocket.on('execCommand', function(data) {
 		fibrous.run(function() {
-			socketManager.handleInsert(webSocket, data);
+			self.handleCommand(webSocket, data, true);
 		});
 	});
 
-	webSocket.on('update', function(data) {
+	webSocket.on('readEvents', function(data) {
 		fibrous.run(function() {
-			socketManager.handleUpdate(webSocket, data);
+			self.handleReadEvents(webSocket, data);
 		});
-	});*/
+	});
+
+	webSocket.on('selectTab', function(data) {
+		fibrous.run(function() {
+			self.handleSelectTab(webSocket, data);
+		});
+	});
+
+	webSocket.on('updateTab', function(data) {
+		fibrous.run(function() {
+			self.handleUpdateTab(webSocket, data);
+		});
+	});
+
+	webSocket.on('insertTab', function(data) {
+		fibrous.run(function() {
+			self.handleInsertTab(webSocket, data);
+		});
+	});
+
+	webSocket.on('getEvents', function(data) {
+		fibrous.run(function() {
+			self.handleGetEvents(webSocket, data);
+		});
+	});
 
 	Sockets[socket.id] = webSocket;
 }
@@ -339,6 +363,249 @@ RPCHandler.prototype.handleConnect = function(socket) {
 
 	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
 	// update last seen time
+}
+
+/**
+ * Handles the exec command RPC call. Which should be used to execute /commands
+ * from the clientside without inserting them into the backlog.
+ *
+ * @method handleCommand
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @param {Boolean} exec Whether to exec the command or backlog it
+ * @return void
+ */
+RPCHandler.prototype.handleCommand = function(socket, data, exec) {
+	var exec = exec || false,
+		allow = false,
+		allowed = ['command', 'network', 'target'],
+		command = (exec) ? 'execCommand' : 'sendCommand',
+		user = socket._user,
+		data = data.object;
+
+	if (!data) {
+		return socket.send('error', {command: command, error: 'invalid format, see API docs'});
+	}
+
+	_.forOwn(data, function(value, item) {
+		if ((item === 'command' || item === 'network' || item === 'target') && typeof value === 'string') {
+			allow = true;
+		}
+
+		if (_.indexOf(allowed, item) === -1) {
+			allow = false;
+		}
+		// invalid key
+	});
+	
+	if (!allow) {
+		return socket.send('error', {command: command, error: 'invalid document properties, see API docs'});
+	}
+
+	var find = application.Tabs.sync.findOne({networkName: data.network, user: user._id, target: data.target});
+	// try and find a valid tab
+
+	if (!find) {
+		return socket.send('error', {command: command, error: 'not authorised to call this command'});
+	}
+
+	data.user = user._id;
+	data.timestamp = +new Date();
+	data.network = find.network;
+	data.backlog = !exec;
+	// bail if we can't find the tab, if we can re-set the network value
+
+	application.Commands.insert(data, {safe: false});
+	// insert
+}
+
+/**
+ * Handles the command which marks events as read. It takes a MongoDB query and updates
+ * them with that query.
+ *
+ * @method handleReadEvents
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @return void
+ */
+RPCHandler.prototype.handleReadEvents = function(socket, data) {
+	var user = socket._user,
+		query = data.query,
+		object = data.object;
+
+	if (!query || !object) {
+		return socket.send('error', {command: 'readEvents', error: 'invalid format, see API docs'});
+	}
+
+	if (!_.difference(_.keys(object), ['read']).length === 0 && typeof object.read === 'boolean') {
+		return socket.send('error', {command: 'readEvents', error: 'invalid document properties, see API docs'});
+	}
+
+	if (query._id) {
+		query._id = new mongo.ObjectID(query._id);
+	}
+	// update it to a proper mongo id
+
+	if ('$or' in query) {
+		for (var i in query['$or']) {
+			var subQuery = query['$or'][i];
+
+			if ('_id' in subQuery) {
+				subQuery._id = new mongo.ObjectID(subQuery._id);
+				query.$or[i] = subQuery;
+			}
+		}
+	}
+	// convert _id to proper mongo IDs
+	
+	application.Events.update(query, {$set: object}, {multi: true, safe: false});
+}
+
+/**
+ * Handles the selectTab command which is used to change the currently active tab
+ * for that user.
+ *
+ * @method handleSelectTab
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @return void
+ */
+RPCHandler.prototype.handleSelectTab = function(socket, data) {
+	var user = socket._user,
+		exists = false;
+		url = data.object;
+
+	if (!url) {
+		return socket.send('error', {command: 'selectTab', error: 'invalid format, see API docs'});
+	}
+
+	_.each(Clients, function(value, key) {
+		if (value.internal.userId.toString() !== user._id.toString()) {
+			return;
+		}
+
+		exists = _.find(value.internal.tabs, {'url': url});
+	});
+
+	if (!exists) {
+		return socket.send('error', {command: 'selectTab', error: 'invalid document properties, see API docs'});
+	}
+
+	application.Users.update({_id: user._id}, {$set: {selectedTab: url}}, {safe: false});
+}
+
+/**
+ * Handles the update tab command, we're allowed to change client side only settings here
+ * ``hiddenUsers`` and ``hiddenEvents`` only at the moment.
+ *
+ * @method handleUpdateTab
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @return void
+ */
+RPCHandler.prototype.handleUpdateTab = function(socket, data) {
+	var user = socket._user,
+		allow = false,
+		allowed = ['hiddenUsers', 'hiddenEvents'],
+		tab = data.query,
+		data = data.object;
+
+	if (!tab || !data) {
+		return socket.send('error', {command: 'updateTab', error: 'invalid format, see API docs'});
+	}
+
+	_.forOwn(data, function(value, item) {
+		if ((item === 'hiddenUsers' || item == 'hiddenEvents') && typeof value === 'boolean') {
+			allow = true;
+		}
+		// check the values?
+
+		if (_.indexOf(allowed, item) === -1) {
+			allow = false;
+		}
+		// invalid key
+	});
+
+	if (!allow) {
+		return socket.send('error', {command: 'updateTab', error: 'invalid document properties, see API docs'});
+	}
+
+	tab = new mongo.ObjectID(tab);
+	// update it to a proper mongo id
+
+	application.Tabs.update({_id: tab, user: user._id}, {$set: data}, {safe: false});
+	// update
+}
+
+/**
+ * Allows users to create new tabs on the fly from the client side. Restricted to ``channel`` and ``query`` tabs.
+ *
+ * @method handleInsertTab
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @return void
+ */
+RPCHandler.prototype.handleInsertTab = function(socket, data) {
+	var user = socket._user,
+		allow = false,
+		allowed = ['target', 'network', 'selected'],
+		data = data.object;
+
+	if (!data) {
+		return socket.send('error', {command: 'insertTab', error: 'invalid format, see API docs'});
+	}
+
+	_.forOwn(insert, function(value, item) {
+		if ((item === 'target' || item === 'network') && typeof value === 'string') {
+			allow = true;
+		}
+
+		if (item === 'selected' && typeof value === 'boolean') {
+			allow = true;
+		}
+		// check the values?
+
+		if (_.indexOf(allowed, item) === -1) {
+			allow = false;
+		}
+		// invalid key
+	});
+
+	if (!allow) {
+		return socket.send('error', {command: 'insertTab', error: 'invalid document properties, see API docs'});
+	}
+
+	var nid = new mongo.ObjectID(insert.network),
+		ircClient = Clients[nid];
+
+	if (ircClient && ircClient.internal.userId.toString() === user._id.toString()) {
+		var type = (helper.isChannel(ircClient, insert.target)) ? 'channel' : 'query';
+		networkManager.addTab(ircClient, insert.target, type, insert.selected);
+	}
+	// we're allowed to continue, use network manager to add the tab
+}
+
+/**
+ * Handles queries to the events collection
+ *
+ * @method handleGetEvents
+ * @param {Object} socket A valid sock.js socket
+ * @param {Object} data A valid data object from sock.js
+ * @return void
+ */
+RPCHandler.prototype.handleGetEvents = function(socket, data) {
+	var user = socket._user,
+		data = data.object;
+
+	if (!data) {
+		return socket.send('error', {command: 'getEvents', error: 'invalid format, see API docs'});
+	}
+
+	var response = application.Events.sync.find(_.extend({user: user._id}, data.query)).sync.toArray();
+	// perform the query
+
+	socket.sendBurst({events: response});
+	// get the data
 }
 
 exports.RPCHandler = _.extend(RPCHandler, hooks);

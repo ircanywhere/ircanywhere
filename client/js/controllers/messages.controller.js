@@ -68,7 +68,7 @@ App.MessagesController = Ember.ArrayController.extend({
 		// construct a query from docs
 
 		if (this.get('readDocs').length > 0) {
-			this.socket.update('events', query, {read: true});
+			this.socket.send('readEvents', query, {read: true});
 			this.set('readDocs', []);
 		}
 		// send the update out

@@ -16,11 +16,10 @@ App.InputController = Ember.ObjectController.extend({
 		sendCommand: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true);
 
-			this.socket.insert('commands', {
+			this.socket.send('sendCommand', {
 				command: this.get('inputValue'),
 				network: tab.networkName,
-				target: tab.target,
-				backlog: true
+				target: tab.target
 			});
 			// unlike the last codebase, we don't need to piss about with inserting
 			// into a buffer or anything, the commands collection does this for us.

@@ -83,13 +83,13 @@ Ember.Socket = Ember.Object.extend({
 				this.emit('updated');
 				break;
 			case 'updateUser':
-				self._update('users', data.id, data);
+				self._update('users', data._id, data);
 				break;
 			case 'addNetwork':
 				self._store('networks', [data]);
 				break;
 			case 'updateNetwork':
-				self._update('networks', data.id, data);
+				self._update('networks', data._id, data);
 				break;
 			case 'removeNetwork':
 				self._delete('networks', data);
@@ -98,7 +98,7 @@ Ember.Socket = Ember.Object.extend({
 				self._store('tabs', [data]);
 				break;
 			case 'updateTab':
-				self._update('tabs', data.id, data);
+				self._update('tabs', data._id, data);
 				break;
 			case 'removeTab':
 				self._delete('tabs', data);
@@ -113,7 +113,7 @@ Ember.Socket = Ember.Object.extend({
 				self._store('channelUsers', [data]);
 				break;
 			case 'updateChannelUser':
-				self._update('channelUsers', data.id, data);
+				self._update('channelUsers', data._id, data);
 				break;
 			case 'deleteChannelUser':
 				self._delete('channelUsers', data);
@@ -153,7 +153,7 @@ Ember.Socket = Ember.Object.extend({
 			return false;
 		}
 
-		var object = collection.findProperty('_id', id);
+		var object = collection.findBy('_id', id);
 		// find the object
 
 		if (!object) {
@@ -273,6 +273,14 @@ Ember.Socket = Ember.Object.extend({
 		var self = this;
 
 		self._send(type, query);
+	},
+
+	send: function(command, query, data) {
+		if (!command || !query) {
+			return false;
+		}
+
+		this._send(command, (data) ? {query: query, object: data} : {object: query});
 	},
 
 	insert: function(type, insert) {

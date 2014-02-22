@@ -43,7 +43,7 @@ App.NetworkRoute = AppRoute.extend({
 			// mark tab as selected
 
 			index.set('tabId', tab._id);
-			index.socket.update('users', {}, {selectedTab: tab.url});
+			index.socket.send('selectTab', tab.url);
 			// send update to backend
 		},
 
