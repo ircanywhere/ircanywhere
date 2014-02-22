@@ -353,7 +353,7 @@ Application.prototype.setupServer = function() {
 	});
 	// setup routes
 
-	sockjsServer.on('connection', socketManager.onSocketOpen.bind(socketManager));
+	sockjsServer.on('connection', rpcHandler.onSocketOpen.bind(rpcHandler));
 	// websocket routes
 
 	sockjsServer.installHandlers(server, {prefix: '/websocket'});

@@ -7,7 +7,7 @@ var Application = require('./app').Application,
 	IRCHandler = require('./irchandler').IRCHandler,
 	IRCFactory = require('./factory').IRCFactory,
 	CommandManager = require('./commands').CommandManager,
-	SocketManager = require('./sockets').SocketManager;
+	RPCHandler = require('./rpc').RPCHandler;
 	fibrous = require('fibrous');
 
 Sockets = {};
@@ -21,7 +21,7 @@ application = new Application();
 userManager = new UserManager();
 // user manager
 
-socketManager = new SocketManager();
+rpcHandler = new RPCHandler();
 // websocket engine
 
 modeParser = new ModeParser();

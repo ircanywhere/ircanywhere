@@ -59,59 +59,69 @@ Ember.Socket = Ember.Object.extend({
 			event = incoming.event,
 			data = incoming.data;
 
-		if (event === 'authenticate') {
-			self.set('authed', data);
-		}
-
-		if (event === 'burst') {
-			Ember.$.get(data.url, function(data) {
-				for (var type in data) {
-					if (type === 'burstend' && data[type] === true) {
-						self.emitter.trigger('done');
-					} else {
-						self._store(type, data[type]);
+		switch (event) {
+			case 'authenticate':
+				self.set('authed', data);
+				break;
+			case 'burst':
+				Ember.$.get(data.url, function(data) {
+					for (var type in data) {
+						if (type === 'burstend' && data[type] === true) {
+							self.emitter.trigger('done');
+						} else {
+							self._store(type, data[type]);
+						}
 					}
-				}
-			});
+				});
+				break;
+			case 'channelUsers':
+				self._store('channelUsers', data);
+				this.emit('updated');
+				break;
+			case 'events':
+				self._store('events', data);
+				this.emit('updated');
+				break;
+			case 'updateUser':
+				self._update('users', data.id, data);
+				break;
+			case 'addNetwork':
+				self._store('networks', [data]);
+				break;
+			case 'updateNetwork':
+				self._update('networks', data.id, data);
+				break;
+			case 'removeNetwork':
+				self._delete('networks', data);
+				break;
+			case 'addTab':
+				self._store('tabs', [data]);
+				break;
+			case 'updateTab':
+				self._update('tabs', data.id, data);
+				break;
+			case 'removeTab':
+				self._delete('tabs', data);
+				break;
+			case 'newEvent':
+				self._store('events', [data]);
+				break;
+			case 'newBacklog':
+				self._store('commands', [data]);
+				break;
+			case 'newChannelUser':
+				self._store('channelUsers', [data]);
+				break;
+			case 'updateChannelUser':
+				self._update('channelUsers', data.id, data);
+				break;
+			case 'deleteChannelUser':
+				self._delete('channelUsers', data);
+				break;
+			default:
+				console.warn('Recieved unknown RPC event:', event, data);
+				break;
 		}
-
-		if (event === 'channelUsers') {
-			self._store('channelUsers', data);
-			this.emit('updated');
-		}
-
-		if (event === 'events') {
-			self._store('events', data);
-			this.emit('updated');
-		}
-
-		if (event === 'insert') {
-			if (!data.collection || !data.record) {
-				return false;
-			}
-
-			self._store(data.collection, [data.record]);
-		}
-
-		if (event === 'update') {
-			if (!data.collection || !data.id || !data.record) {
-				return false;
-			}
-
-			self._update(data.collection, data.id, data.record);
-		}
-
-		if (event === 'delete') {
-			if (!data.collection || !data.id) {
-				return false;
-			}
-
-			self._delete(data.collection, data.id);
-		}
-		// handle our events individually
-		// for sake of ease - like meteor, however we can get collection records in bulk
-		// there is an event for each collection apart from channelUsers, along with 3 additional events
-		// that indicate whether to insert/update/remove a record from one of the collections
 	},
 
 	_store: function(collection, payload) {

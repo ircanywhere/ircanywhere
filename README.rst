@@ -46,10 +46,10 @@ Finally, edit the configuration file ``config.example.json`` a few things will n
 HTTPS
 ~~~~~
 
-IRCAnywhere can also be served via HTTPS. Setting it up involves little more than editing the configuration and setting the `ssl` property to `true`. Once this is done you will need to add the following files into `private/certs`
+IRCAnywhere can also be served via HTTPS. Setting it up involves little more than editing the configuration and setting the ``ssl`` property to ``true``. Once this is done you will need to add the following files into ``private/certs``
 
-* `private/certs/key.pem`
-* `private/certs/cert.pem`
+* ``private/certs/key.pem``
+* ``private/certs/cert.pem``
 
 Running
 ~~~~~~~

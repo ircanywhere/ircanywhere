@@ -272,7 +272,7 @@ SocketManager.prototype.init = function() {
 	var self = this;
 
 	application.ee.on(['*', '*'], function(doc) {
-		var collection = this.event[0],
+		/*var collection = this.event[0],
 			eventName = this.event[1],
 			clients = [];
 
@@ -343,7 +343,7 @@ SocketManager.prototype.init = function() {
 			} else if (eventName === 'delete') {
 				socket.send(eventName, {collection: collection, id: doc});
 			}
-		});
+		});*/
 		// all of this code works by watching changes via the oplog, that way 
 		// we dont need to worry about updating the database AND sending changes
 		// to the frontend clients, we can just send the document down when we spot a change
