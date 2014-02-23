@@ -105,7 +105,7 @@ NetworkManager.prototype.init = function() {
 		});
 	});
 
-	application.ee.on(['networks', 'delete'], function(doc, id) {
+	application.ee.on(['networks', 'delete'], function(id) {
 		delete Clients[id.toString()];
 	});
 	// just sync clients up to this, instead of manually doing it
@@ -250,7 +250,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
  */
 NetworkManager.prototype.addNetwork = function(user, network, status) {
 	if (!(status in this.flags)) {
-		application.logger.log('warn', 'invalid status flag for addNetwork', helper.cleanObjectIds(network));
+		application.logger.log('warn', 'Invalid status flag for NetworkManager.addNetwork()', helper.cleanObjectIds(network));
 		return;
 	}
 
@@ -415,7 +415,7 @@ NetworkManager.prototype.connectNetwork = function(network) {
  */
 NetworkManager.prototype.changeStatus = function(query, status) {
 	if (!(status in this.flags)) {
-		application.logger.log('warn', 'invalid status flag for changeStatus', helper.cleanObjectIds({flag: status, network: query}));
+		application.logger.log('warn', 'Invalid status flag for NetworkManager.changeStatus()', helper.cleanObjectIds({flag: status, network: query}));
 		return;
 	}
 

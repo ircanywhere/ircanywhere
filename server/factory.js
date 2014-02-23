@@ -113,12 +113,16 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 		e = event[1],
 		client = Clients[key];
 
+	if (!client) {
+		return application.logger.log('warn', 'Invalid client object for IRCFactory.handleEvent()', {key: key, event: e, data: object});
+	}
+
 	if (_.isFunction(ircHandler[e]) && object !== false) {
 		fibrous.run(function() {
 			ircHandler[e].call(ircHandler, client, object);
 		});
 	} else {
-		application.logger.log('warn', 'invalid irc-factory event', {key: key, event: e, data: object});
+		application.logger.log('warn', 'Unhandled event in IRCFactory.handleEvent()', {key: key, event: e, data: object});
 	}
 	
 	if (application.verbose) {
