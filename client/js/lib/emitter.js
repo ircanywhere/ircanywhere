@@ -52,38 +52,38 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 		});
 	},
 
-	determineEvent: function(collection, type, object) {
+	determineEvent: function(collection, type, object, backlog) {
 		if (this[type + '_' + collection]) {
-			this[type + '_' + collection](object);
+			this[type + '_' + collection](object, backlog);
 		}
 	},
 
-	new_tabs: function(object) {
-		this.trigger('newTab', object);
+	new_tabs: function(object, backlog) {
+		this.trigger('newTab', object, backlog);
 	},
 
-	update_tabs: function(object) {
-		this.trigger('updatedTab', object);
+	update_tabs: function(object, backlog) {
+		this.trigger('updatedTab', object, backlog);
 	},
 
-	delete_tabs: function(object) {
-		this.trigger('removedTab', object);
+	delete_tabs: function(object, backlog) {
+		this.trigger('removedTab', object, backlog);
 	},
 
-	new_network: function(object) {
-		this.trigger('newNetwork', object);
+	new_network: function(object, backlog) {
+		this.trigger('newNetwork', object, backlog);
 	},
 
-	update_network: function(object) {
-		this.trigger('updateNetwork', object);
+	update_network: function(object, backlog) {
+		this.trigger('updateNetwork', object, backlog);
 	},
 
-	delete_network: function(object) {
-		this.trigger('deleteNetwork', object);
+	delete_network: function(object, backlog) {
+		this.trigger('deleteNetwork', object, backlog);
 	},
 
-	new_events: function(object) {
-		this.trigger(object.type, object);
+	new_events: function(object, backlog) {
+		this.trigger(object.type, object, backlog);
 		// we can just trigger all our types directly like this
 	}
 });

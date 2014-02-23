@@ -1,4 +1,9 @@
 <div class="inside-backlog">
+	{{#if this.parentController.selectedTab.loading}}
+		<img src="/images/loader-1.gif" alt="Loading..." class="loading-icon" />
+	{{else}}
+		<a href="#" class="backlog-load btn secondary" {{action 'loadBacklog'}}>Load previous messages</a>
+	{{/if}}
 	{{#each event in controller itemController="event" groupedRows=true}}
 		{{lookup event.templateName event.content}}
 	{{/each}}

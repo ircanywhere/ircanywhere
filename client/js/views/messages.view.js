@@ -1,6 +1,11 @@
 App.MessagesView = Ember.View.extend(App.Scrolling, {
 	templateName: 'messages',
 	classNames: 'backlog',
+	classNameBindings: ['push'],
+
+	push: function() {
+		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
+	}.property('controller.target.content.selectedTab.unread').cacheable(),
 
 	didInsertElement: function() {
 		Ember.run.later(this, function() {

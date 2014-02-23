@@ -20,26 +20,30 @@ App.SidebarController = Ember.ArrayController.extend({
 		// set that to the tabs collection, it'll update automatically when they change
 	},
 
-	newTabMessage: function(object) {
+	newTabMessage: function(object, backlog) {
 		var self = this;
 
 		this.get('socket.tabs').forEach(function(tab) {
 			var network = self.get('socket.networks').findBy('_id', tab.network);
 
 			if (tab.type === 'channel' && object.target === tab.target) {
-				self.incrementCounters(network, tab, object);
+				self.incrementCounters(network, tab, object, backlog);
 			} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
-				self.incrementCounters(network, tab, object);
+				self.incrementCounters(network, tab, object, backlog);
 			} else if (tab.type === 'network' && object.target === '*') {
-				self.incrementCounters(network, tab, object);
+				self.incrementCounters(network, tab, object, backlog);
 			}
 		});
 		// we need to dig a little deeper to find out the exact tab this message is in
 	},
 
-	incrementCounters: function(network, tab, object) {
+	incrementCounters: function(network, tab, object, backlog) {
 		if (tab && network && (!object.read || object.unread)) {
 			object.set('unread', true).set('read', true);
+
+			if (backlog) {
+				return false;
+			}
 
 			if (object.extra.highlight && this.increment) {
 				tab.incrementProperty('highlights', 1);
@@ -51,16 +55,30 @@ App.SidebarController = Ember.ArrayController.extend({
 		}
 	},
 
-	onNotice: function(object) {
-		this.newTabMessage(object);
+	onNotice: function(object, backlog) {
+		this.newTabMessage(object, backlog);
 	},
 
-	onAction: function(object) {
-		this.newTabMessage(object);
+	onAction: function(object, backlog) {
+		this.newTabMessage(object, backlog);
 	},
 
-	onPrivmsg: function(object) {
-		this.newTabMessage(object);
+	onPrivmsg: function(object, backlog) {
+		this.newTabMessage(object, backlog);
+	},
+
+	onNewTab: function(object) {
+		var network = this.get('socket.networks').findBy('_id', object.get('network'));
+
+		if (object.type === 'network') {
+			var query = {network: object.networkName, target: '*'};
+		} else if (object.type === 'query') {
+			var query = {network: object.networkName, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
+		} else if (object.type === 'channel') {
+			var query = {network: object.networkName, target: object.target};
+		}
+
+		object.set('query', query);
 	},
 
 	onRemovedTab: function(object) {

@@ -32,6 +32,7 @@
 		background: @white;
 		padding: 0;
 		overflow-y: auto;
+		overflow-x: hidden;
 		position: relative;
 		height: 100%;
 		width: 100%;
@@ -39,7 +40,8 @@
 
 		.overlay-bar {
 			z-index: 20;
-			position: relative;
+			position: absolute;
+			width: 100%;
 			border-bottom: 1px solid #B8DBFF;
 			background: #F7FEFF;
 			padding: 8px;

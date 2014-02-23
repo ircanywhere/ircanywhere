@@ -317,8 +317,8 @@ RPCHandler.prototype.handleConnect = function(socket) {
 	});
 
 	tabs.forEach(function(tab, index) {
-		usersQuery['$or'].push({network: netIds[tab.network].name, channel: tab.target});
-		commandsQuery['$or'].push({network: tab.network, target: tab.target});
+		usersQuery.$or.push({network: netIds[tab.network].name, channel: tab.target});
+		commandsQuery.$or.push({network: tab.network, target: tab.target});
 		// construct some queries
 
 		if (tab.type === 'query') {
@@ -329,7 +329,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			var query = {network: netIds[tab.network].name, target: tab.target, user: user._id}
 		}
 
-		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({$natural: -1}).limit(50).sync.toArray(),
+		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).sync.toArray(),
 			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
 			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
 		// get some information about the unread items/highlights
@@ -446,9 +446,17 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 	}
 	// update it to a proper mongo id
 
+	if ('$in' in query) {
+		for (var i in query.$in) {
+			query.$in = new mongo.ObjectID(query.$in);
+		}
+
+		query = {_id: query};
+	}
+
 	if ('$or' in query) {
-		for (var i in query['$or']) {
-			var subQuery = query['$or'][i];
+		for (var i in query.$or) {
+			var subQuery = query.$or[i];
 
 			if ('_id' in subQuery) {
 				subQuery._id = new mongo.ObjectID(subQuery._id);
@@ -595,16 +603,33 @@ RPCHandler.prototype.handleInsertTab = function(socket, data) {
  */
 RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	var user = socket._user,
-		data = data.object;
+		query = data.query,
+		limit = data.object || 50;
 
-	if (!data) {
+	if (!query) {
 		return socket.send('error', {command: 'getEvents', error: 'invalid format, see API docs'});
 	}
 
-	var response = application.Events.sync.find(_.extend({user: user._id}, data.query)).sync.toArray();
-	// perform the query
+	if (limit > 50) {
+		limit = 50;
+	}
+	// reset back to 50
 
-	socket.sendBurst({events: response});
+	if (query._id) {
+		for (var op in query._id) {
+			var _id = query._id[op];
+			
+			if (_id) {
+				query._id[op] = new mongo.ObjectID(_id);
+			}
+		}
+	}
+	// convert _id to proper mongo IDs
+
+	var response = application.Events.sync.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).sync.toArray();
+	// perform the query 
+
+	socket.send('events', response);
 	// get the data
 }
 

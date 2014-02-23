@@ -592,9 +592,21 @@ CommandManager.prototype.reconnect = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.raw = function(user, client, target, params) {
-	if (params.length > 0) {
+	if (params.length === 0) {
+		return false;
+	}
+
+	var command = params[0].toUpperCase(),
+		blacklist = ['LIST', 'WHO'];
+
+	if (_.indexOf(blacklist, command) === -1) {
 		ircFactory.send(client._id, 'raw', params);
 	}
+	// XXX: here we do a little cheat and intercept their command
+	// 		theres a few blacklisted commands at the moment (LIST, WHO)
+	// 		we don't really ever need to do request a who list from the server
+	// 		for a channel if we know we're in the channel because we have it stored in
+	// 		a database.. And we want to avoid accepting LISTs for large networks full stop
 }
 
 exports.CommandManager = _.extend(CommandManager, hooks);

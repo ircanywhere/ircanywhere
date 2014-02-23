@@ -61,20 +61,42 @@ App.MessagesController = Ember.ArrayController.extend({
 	}),
 
 	markAsRead: function() {
-		var query = {'$or': []};
+		var query = {'$in': []};
 		this.get('readDocs').forEach(function(id) {
-			query['$or'].push({_id: id});
+			query['$in'].push(id);
 		});
 		// construct a query from docs
 
 		if (this.get('readDocs').length > 0) {
-			this.socket.send('readEvents', query, {read: true});
+			//this.socket.send('readEvents', query, {read: true});
+			console.log(query);
 			this.set('readDocs', []);
 		}
 		// send the update out
 	},
 
 	actions: {
+		loadBacklog: function() {
+			var tab = this.get('parentController.selectedTab'),
+				container = Ember.$('.inside-backlog');
+
+			if (!tab || tab.loading || container.length === 0) {
+				return false;
+			}
+
+			var query = Ember.copy(tab.query),
+				top = container.find('div.row:first').attr('data-id'),
+				item = this.socket.events.findBy('_id', top),
+				query = {'message.time': {$lt: item.message.time}};
+			// get some query variables
+
+			tab.set('loading', true);
+			tab.set('preBacklogId', top);
+			// record the scroll position by remembering what the top id was
+
+			this.socket.send('getEvents', query, 50);
+		},
+
 		detectUnread: function(id, top, bottom, container) {
 			var self = this,
 				tab = this.get('socket.tabs').findBy('_id', id),
@@ -87,7 +109,12 @@ App.MessagesController = Ember.ArrayController.extend({
 			}
 
 			events.forEach(function(item) {
-				var el = container.find('div.row[data-id=' + item._id + ']');
+				var el = container.find('div.row[data-id=' + item._id + ']'),
+					type = el.attr('data-type');
+
+				if (type !== 'privmsg' && type !== 'action' && type !== 'notice') {
+					return;
+				}
 
 				if (el.get(0)) {
 					var topOffset = el[0].offsetTop;
@@ -125,5 +152,23 @@ App.MessagesController = Ember.ArrayController.extend({
 
 	ready: function() {
 		this.set('events', this.socket.get('events'));
+	},
+
+	updated: function() {
+		var tab = this.get('parentController.selectedTab'),
+			container = Ember.$('.backlog');
+
+		if (!tab || tab.loading === false || container.length === 0) {
+			return false;
+		}
+
+		if (tab.preBacklogId) {
+			Ember.run.later(function() {
+				var element = container.find('div.row[data-id=' + tab.preBacklogId + ']');
+				container[0].scrollTop = element[0].offsetTop;
+			}, 100);
+		}
+
+		tab.set('loading', false);
 	}
 });

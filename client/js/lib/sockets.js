@@ -69,18 +69,18 @@ Ember.Socket = Ember.Object.extend({
 						if (type === 'burstend' && data[type] === true) {
 							self.emitter.trigger('done');
 						} else {
-							self._store(type, data[type]);
+							self._store(type, data[type], true);
 						}
 					}
 				});
 				break;
 			case 'channelUsers':
 				self._store('channelUsers', data);
-				this.emit('updated');
+				self.emitter.trigger('updated');
 				break;
 			case 'events':
-				self._store('events', data);
-				this.emit('updated');
+				self._store('events', data, true);
+				self.emitter.trigger('updated');
 				break;
 			case 'updateUser':
 				self._update('users', data._id, data);
@@ -124,10 +124,11 @@ Ember.Socket = Ember.Object.extend({
 		}
 	},
 
-	_store: function(collection, payload) {
+	_store: function(collection, payload, noEvent) {
 		var self = this,
+			noEvent = noEvent || false,
 			col = self.get(collection);
-
+		
 		for (var k = 0, len = payload.length; k < len; k++) {
 			var i = payload[k],
 				exists = col.findBy('_id', i._id);
@@ -139,7 +140,7 @@ Ember.Socket = Ember.Object.extend({
 				col.pushObject(obj);
 				// add the object
 
-				self.emitter.determineEvent(collection, 'new', obj);
+				self.emitter.determineEvent(collection, 'new', obj, noEvent);
 				// figure out what event to push
 			}
 		}
@@ -269,32 +270,12 @@ Ember.Socket = Ember.Object.extend({
 		return collection;
 	},
 
-	request: function(type, query) {
-		var self = this;
-
-		self._send(type, query);
-	},
-
 	send: function(command, query, data) {
 		if (!command || !query) {
 			return false;
 		}
 
 		this._send(command, (data) ? {query: query, object: data} : {object: query});
-	},
-
-	insert: function(type, insert) {
-		var self = this,
-			payload = {collection: type, insert: insert};
-
-		self._send('insert', payload);
-	},
-
-	update: function(type, query, update) {
-		var self = this,
-			payload = {collection: type, query: query, update: update};
-
-		self._send('update', payload);
 	}
 });
 

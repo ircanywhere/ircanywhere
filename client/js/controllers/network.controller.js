@@ -27,19 +27,11 @@ App.NetworkController = Ember.ObjectController.extend({
 		}
 		// some how this has happened, but lets be safe and not continue anyway
 
-		var network = this.get('socket.networks').findBy('_id', tab.get('network'));
-
-		if (tab.type === 'network') {
-			var query = {network: tab.networkName, read: false, target: '*'};
-		} else if (tab.type === 'query') {
-			var query = {network: tab.networkName, read: false, $or: [{target: tab.target}, {'message.nickname': tab.target, target: network.nick}]};
-		} else if (tab.type === 'channel') {
-			var query = {network: tab.networkName, read: false, target: tab.target};
-		}
-
-		var events = this.get('controllers.messages.content').filterProperty('unread', true);
+		var query = Ember.copy(tab.query),
+			events = this.get('controllers.messages.content').filterProperty('unread', true);
 		// get the events for the specific tab
 
+		query.read = false;
 		events.setEach('unread', false);
 		tab.set('unread', 0);
 		// mark them as unread to hide the bar
