@@ -280,7 +280,6 @@ Application.prototype.setupNode = function() {
 		if (!doc) {
 			self.Nodes.update(query, defaultJson, {safe: false});
 			json = _.extend(doc, defaultJson);
-			json._id = json._id.toString();
 		} else {
 			self.Nodes.sync.insert(defaultJson, {safe: false});
 			json = defaultJson;
