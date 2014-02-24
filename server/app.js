@@ -273,31 +273,32 @@ Application.prototype.setupNode = function() {
 	}
 
 	this.Nodes.findOne(query, function(err, doc) {
-		if (err) {
-			throw err;
-		}
-
-		if (!doc) {
-			self.Nodes.update(query, defaultJson, {safe: false});
-			json = _.extend(doc, defaultJson);
-		} else {
-			self.Nodes.sync.insert(defaultJson, {safe: false});
-			json = defaultJson;
-		}
-
-		json._id = json._id.toString();
-		self.nodeId = json._id;
-		data = (data == '') ? {} : JSON.parse(data);
-		// house keeping
-
-		if (_.isEqual(data, json)) {
-			return false;
-		}
-
-		fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+		fibrous.run(function() {
 			if (err) {
 				throw err;
 			}
+
+			if (!doc) {
+				json = self.Nodes.sync.insert(defaultJson)[0];
+			} else {
+				self.Nodes.sync.update(query, defaultJson);
+				json = _.extend(doc, defaultJson);
+			}
+
+			json._id = json._id.toString();
+			self.nodeId = json._id;
+			data = (data == '') ? {} : JSON.parse(data);
+			// house keeping
+
+			if (_.isEqual(data, json)) {
+				return false;
+			}
+
+			fs.writeFile('./private/node.json', JSON.stringify(json), function(err) {
+				if (err) {
+					throw err;
+				}
+			});
 		});
 	});
 }

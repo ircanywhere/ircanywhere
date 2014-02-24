@@ -583,12 +583,12 @@ RPCHandler.prototype.handleInsertTab = function(socket, data) {
 		return socket.send('error', {command: 'insertTab', error: 'invalid document properties, see API docs'});
 	}
 
-	var nid = new mongo.ObjectID(insert.network),
+	var nid = new mongo.ObjectID(data.network),
 		ircClient = Clients[nid];
 
 	if (ircClient && ircClient.internal.userId.toString() === user._id.toString()) {
-		var type = (helper.isChannel(ircClient, insert.target)) ? 'channel' : 'query';
-		networkManager.addTab(ircClient, insert.target, type, insert.selected);
+		var type = (helper.isChannel(ircClient, data.target)) ? 'channel' : 'query';
+		networkManager.addTab(ircClient, data.target, type, data.selected);
 	}
 	// we're allowed to continue, use network manager to add the tab
 }
