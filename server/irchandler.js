@@ -322,7 +322,7 @@ IRCHandler.prototype.nick = function(client, message) {
 	}
 
 	if (message.nickname === client.nick) {
-		Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
+		application.Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
 	}
 	// update the nickname because its us changing our nick
 

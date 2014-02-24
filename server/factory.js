@@ -109,7 +109,7 @@ IRCFactory.prototype.init = function() {
  * @return void
  */
 IRCFactory.prototype.handleEvent = function(event, object) {
-	var key = event[0],
+	var key = event[0].toString(),
 		e = event[1],
 		client = Clients[key];
 

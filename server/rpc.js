@@ -563,7 +563,7 @@ RPCHandler.prototype.handleInsertTab = function(socket, data) {
 		return socket.send('error', {command: 'insertTab', error: 'invalid format, see API docs'});
 	}
 
-	_.forOwn(insert, function(value, item) {
+	_.forOwn(data, function(value, item) {
 		if ((item === 'target' || item === 'network') && typeof value === 'string') {
 			allow = true;
 		}
