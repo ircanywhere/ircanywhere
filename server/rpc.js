@@ -55,6 +55,10 @@ RPCHandler.prototype.init = function() {
  * @return void
  */
 RPCHandler.prototype.handleUsersUpdate = function(doc) {
+	if (!doc) {
+		return false;
+	}
+	
 	var socket = Users[doc._id];
 
 	delete doc.lastSeen;
@@ -74,6 +78,10 @@ RPCHandler.prototype.handleUsersUpdate = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleNetworksAll = function(doc) {
+	if (!doc || !doc.internal) {
+		return false;
+	}
+
 	var eventName = this.event[1],
 		socket = Users[doc.internal.userId];
 
@@ -96,6 +104,10 @@ RPCHandler.prototype.handleNetworksAll = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleTabsAll = function(doc) {
+	if (!doc) {
+		return false;
+	}
+
 	var eventName = this.event[1],
 		socket = false;
 
@@ -131,6 +143,10 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleEventsInsert = function(doc) {
+	if (!doc) {
+		return false;
+	}
+
 	var socket = Users[doc.user];
 
 	doc = _.omit(doc, 'user');
@@ -149,6 +165,10 @@ RPCHandler.prototype.handleEventsInsert = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleCommandsInsert = function(doc) {
+	if (!doc) {
+		return false;
+	}
+
 	var socket = Users[doc.user];
 
 	if (socket && !doc.backlog) {
@@ -165,6 +185,10 @@ RPCHandler.prototype.handleCommandsInsert = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleChannelUsersAll = function(doc) {
+	if (!doc) {
+		return false;
+	}
+
 	var eventName = this.event[1],
 		socket = false;
 
@@ -448,7 +472,7 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 
 	if ('$in' in query) {
 		for (var i in query.$in) {
-			query.$in = new mongo.ObjectID(query.$in);
+			query.$in[i] = new mongo.ObjectID(query.$in[i]);
 		}
 
 		query = {_id: query};
