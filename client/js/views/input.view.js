@@ -28,11 +28,14 @@ App.InputView = Ember.View.extend({
 		if (keyCode === key.enter) {
 			this.get('controller').send('sendCommand');
 		} else if (keyCode === key.tab) {
-			// XXX - todo
+			this.get('controller').send('tabComplete');
+			e.preventDefault();
 		} else if (keyCode === key.up) {
-			this.get('controller').send('toggleUp');
+			this.get('controller').send('toggleUp').send('resetTabCompletion');
 		} else if (keyCode === key.down) {
-			this.get('controller').send('toggleDown');
+			this.get('controller').send('toggleDown').send('resetTabCompletion');
+		} else {
+			this.get('controller').send('resetTabCompletion');
 		}
 	}
 });
