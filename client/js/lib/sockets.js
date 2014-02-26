@@ -2,6 +2,7 @@ Ember.Socket = Ember.Object.extend({
 	socket: null,
 	done: false,
 	authed: null,
+	open: false,
 
 	emitter: Ember.Emitter.create(),
 
@@ -23,6 +24,7 @@ Ember.Socket = Ember.Object.extend({
 		// connect
 
 		socket.onclose = function() {
+			self.set('open', false);
 			App.__container__.lookup('controller:disconnected').send('openIfClosed');
 		}
 
@@ -48,6 +50,7 @@ Ember.Socket = Ember.Object.extend({
 		this.emitter.setup(this.container, this.controllers);
 		// setup the event emitter
 
+		this.set('open', true);
 		this.set('done', false);
 		this.emitter.on('done', function() {
 			self.set('done', true);
@@ -230,7 +233,9 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_send: function(event, payload) {
-		this.socket.send(JSON.stringify({event: event, data: payload}));
+		if (this.socket && this.open) {	
+			this.socket.send(JSON.stringify({event: event, data: payload}));
+		}
 	},
 
 	findOne: function(type, query) {
