@@ -93,23 +93,26 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
-		var chans = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname});
+		var userRecords = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname});
 		// find the channel, we gotta construct a query
 
-		chans.each(function(err, chan) {
-			if (err || chan === null) {
+		userRecords.sync.toArray().forEach(function(user) {
+			if (!user) {
 				return;
 			}
 			
-			message.channel = chan.channel;
-			self._insert(client, message, type, chan);
+			var cloned = _.clone(message);
+			cloned.channel = user.channel;
+			self._insert(client, cloned, type, user);
 			// we're in here because the user either changing their nick
 			// or quitting, exists in this channel, lets add it to the event
 		});
 
-		if (_.has(client.internal.tabs, message.nickname)) {
-			self._insert(client, message, type);
-		}
+		_.each(client.internal.tabs, function(value, key) {
+			if (value.target === message.nickname.toLowerCase()) {
+				self._insert(client, message, type);
+			}
+		});
 		// these two types wont have a target, or a channel, so
 		// we'll have to do some calculating to determine where we want them
 		// we shall put them in channel and privmsg tab events

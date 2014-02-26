@@ -1,4 +1,4 @@
 <div data-type="part" {{bind-attr class=classNames data-id=content._id}}>
 	<span class="time">{{time content.message.time}}</span>
-	<span class="column event">{{#if content.extra.self}}&rarr; You have left {{content.message.channel}}{{else}}&rarr; {{userLink false null}} ({{content.message.username}}@{{content.message.hostname}}) has left {{content.message.channel}}{{/if}}</span>
+	<span class="column event">{{#if content.extra.self}}&larr; You have left {{content.message.channel}}{{else}}&larr; {{userLink false null}} ({{content.message.username}}@{{content.message.hostname}}) has left {{content.message.channel}}{{/if}}</span>
 </div>

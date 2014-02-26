@@ -5,7 +5,7 @@ App = Ember.Application.create({
 	defaultTitle: 'IRCAnywhere',
 	timeout: null,
 	timein: null,
-	isActive: false,
+	isActive: true,
 	// global variables
 	
 	Parser: Ember.Parser.create(),

@@ -150,6 +150,15 @@ Application.prototype.setupOplog = function() {
 	var self = this,
 		start = (new Date().getTime() / 1000);
 
+	this.channelUserDocs = {};
+	this.ChannelUsers.find({}).each(function(err, item) {
+		if (err || !item) {
+			throw err;
+		}
+
+		self.channelUserDocs[item._id] = item;
+	});
+
 	this.Oplog.find({ts: {$gte: new mongo.Timestamp(start, start)}}, {tailable: true, timeout: false}).each(function(err, item) {
 		if (err) {
 			throw err;
@@ -166,18 +175,32 @@ Application.prototype.setupOplog = function() {
 
 		switch(item.op) {
 			case 'i':
+				if (col === 'channelUsers') {
+					self.channelUserDocs[item.o._id] = item.o;
+				}
+
 				self.ee.emit([col, 'insert'], item.o);
 				// emit an event
 				break;
 			case 'u':
 				self.mongo.collection(col).findOne(item.o2, function(err, doc) {
+					if (col === 'channelUsers') {
+						self.channelUserDocs[doc._id] = doc;
+					}
+
 					self.ee.emit([col, 'update'], doc);
 				});
 				// get the new full document
 				break;
 			case 'd':
-				self.ee.emit([col, 'delete'], item.o._id);
+				self.ee.emit([col, 'delete'], item.o._id, self.channelUserDocs[item.o._id]);
 				// emit
+
+				setTimeout(function() {
+					if (self.channelUserDocs[item.o._id]) {
+						delete self.channelUserDocs[item.o._id];
+					}
+				}, 5000);
 				break;
 			case 'c':
 				for (var cmd in item.o) {

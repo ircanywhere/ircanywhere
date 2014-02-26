@@ -184,16 +184,17 @@ RPCHandler.prototype.handleCommandsInsert = function(doc) {
  * @param {Object} doc A valid MongoDB document with an _id
  * @return void
  */
-RPCHandler.prototype.handleChannelUsersAll = function(doc) {
+RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 	if (!doc) {
 		return false;
 	}
 
-	var eventName = this.event[1],
+	var query = (ext) ? {'networkName': ext.network, 'target': ext.channel} : {'networkName': doc.network, 'target': doc.channel},
+		eventName = this.event[1],
 		socket = false;
 
 	_.each(Clients, function(value, key) {
-		var tab = _.find(value.internal.tabs, {'networkName': doc.network, 'target': doc.channel});
+		var tab = _.find(value.internal.tabs, query);
 		if (tab) {
 			socket = Users[tab.user];
 		}
