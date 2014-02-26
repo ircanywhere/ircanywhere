@@ -553,10 +553,7 @@ CommandManager.prototype.quit = function(user, client, target, params) {
 	networkManager.changeStatus({_id: client._id}, networkManager.flags.disconnected);
 	// mark as connecting and mark the tab as active again
 
-	ircFactory.send(client._id, 'disconnect', [params]);
-	// it's important we don't destroy the network here, because
-	// doing a .connect to try and reconnect wont work, if the user closes the network
-	// tab then we can call destroy then remove the tab and network record
+	ircFactory.destroy(client._id);
 }
 
 /**
