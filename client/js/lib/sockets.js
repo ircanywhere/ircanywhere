@@ -23,7 +23,7 @@ Ember.Socket = Ember.Object.extend({
 		// connect
 
 		socket.onclose = function() {
-			// XXX - Handle reconnect
+			App.__container__.lookup('controller:disconnected').send('openIfClosed');
 		}
 
 		socket.onopen = function() {
@@ -36,6 +36,10 @@ Ember.Socket = Ember.Object.extend({
 		// bind events
 
 		this.set('socket', socket);
+	},
+
+	attemptReconnect: function() {
+
 	},
 
 	_setup: function() {
@@ -52,6 +56,9 @@ Ember.Socket = Ember.Object.extend({
 
 		this._send('authenticate', document.cookie);
 		// authenticate
+
+		App.__container__.lookup('controller:disconnected').send('closeIfOpen');
+		// close if a modal window is open
 	},
 
 	_listen: function(incoming) {

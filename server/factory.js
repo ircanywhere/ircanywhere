@@ -10,6 +10,7 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	crypto = require('crypto'),
+	util = require('util'),
 	factory = require('irc-factory').Api,
 	helper = require('../lib/helpers').Helpers;
 
@@ -126,7 +127,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 	}
 	
 	if (application.verbose) {
-		console.log(event, object);
+		console.log(new Date().toJSON(), '-', util.inspect({key: key, event: e, data: object}, {colors: true}));
 	}
 }
 
