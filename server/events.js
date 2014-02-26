@@ -89,12 +89,12 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
  * @param {String} type Event type
  * @return void
  */
-EventManager.prototype.insertEvent = function(client, message, type) {
+EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
 		var chans = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname});
-		// find the channel, we gotta construct a query (kinda messy)
+		// find the channel, we gotta construct a query
 
 		chans.each(function(err, chan) {
 			if (err || chan === null) {
@@ -129,6 +129,10 @@ EventManager.prototype.insertEvent = function(client, message, type) {
 		self._insert(client, message, type);
 	} else {
 		self._insert(client, message, type);
+	}
+
+	if (cb) {
+		cb();
 	}
 }
 

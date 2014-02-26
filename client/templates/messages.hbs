@@ -4,7 +4,7 @@
 	{{else}}
 		<a href="#" class="backlog-load btn secondary" {{action 'loadBacklog'}}>Load previous messages</a>
 	{{/if}}
-	{{#each event in controller itemController="event" groupedRows=true}}
+	{{#each event in filtered itemController="event" groupedRows=true}}
 		{{lookup event.templateName event.content}}
 	{{/each}}
 </div>

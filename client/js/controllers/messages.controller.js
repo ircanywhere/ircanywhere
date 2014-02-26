@@ -3,9 +3,6 @@ App.MessagesController = Ember.ArrayController.extend({
 	events: [],
 	readDocs: [],
 
-	sortProperties: ['message.time'],
-	sortAscending: true,
-
 	content: Ember.arrayComputed('events', 'controllers.index.tabId', {
 		initialize: function(array, changeMeta, instanceMeta) {
 			if (!this.get('controllers.index.tabId')) {
@@ -60,6 +57,22 @@ App.MessagesController = Ember.ArrayController.extend({
 		}
 	}),
 
+	filtered: function() {
+		var tab = this.get('socket.tabs').findBy('selected', true),
+			events = this.get('content'),
+			limit = (tab) ? tab.get('messageLimit', 50) : 50,
+			slice = events.length - limit;
+			slice = (slice < 0 || tab.requestedBacklog) ? 0 : slice;
+
+		var proxy = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
+			content: events,
+			sortProperties: ['message.time'],
+			sortAscending: true
+		});
+
+		return proxy.slice(slice);
+	}.property('content.@each', 'socket.tabs.@each.selected', 'socket.tabs.@each.messageLimit'),
+
 	markAsRead: function() {
 		var query = {'$in': []};
 		this.get('readDocs').forEach(function(id) {
@@ -76,7 +89,8 @@ App.MessagesController = Ember.ArrayController.extend({
 
 	actions: {
 		loadBacklog: function() {
-			var tab = this.get('parentController.selectedTab'),
+			var tab = this.get('socket.tabs').findBy('selected', true),
+				count = 50,
 				container = Ember.$('.inside-backlog');
 
 			if (!tab || tab.loading || container.length === 0) {
@@ -89,11 +103,18 @@ App.MessagesController = Ember.ArrayController.extend({
 				query = {'message.time': {$lt: item.message.time}};
 			// get some query variables
 
+			tab.set('requestedBacklog', true);
 			tab.set('loading', true);
 			tab.set('preBacklogId', top);
 			// record the scroll position by remembering what the top id was
 
-			this.socket.send('getEvents', query, 50);
+			if (this.get('content').length > this.get('filtered').length) {
+				tab.set('messageLimit', this.get('content').length);
+				this.updated();
+			} else {
+				tab.set('messageLimit', tab.messageLimit + count);
+				this.socket.send('getEvents', query, count);
+			}
 		},
 
 		detectUnread: function(id, top, bottom, container) {
@@ -118,7 +139,7 @@ App.MessagesController = Ember.ArrayController.extend({
 				if (el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
-					if (top === 0 || top < topOffset && topOffset < bottom) {
+					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
 						// XXX - Handle highlights
 
 						item.set('unread', false);

@@ -304,8 +304,9 @@ IRCHandler.prototype.quit = function(client, message) {
 		return false;
 	}
 
-	eventManager.insertEvent(client, message, 'quit');
-	channelManager.removeUsers(client.name, [message.nickname]);
+	eventManager.insertEvent(client, message, 'quit', function() {
+		channelManager.removeUsers(client.name, [message.nickname]);
+	});
 }
 
 /**
@@ -332,8 +333,9 @@ IRCHandler.prototype.nick = function(client, message) {
 	}
 	// is this a client we're chatting to whos changed their nickname?
 	
-	eventManager.insertEvent(client, message, 'nick');
-	channelManager.updateUsers(client._id, client.name, [message.nickname], {nickname: message.newnick});
+	eventManager.insertEvent(client, message, 'nick', function() {
+		channelManager.updateUsers(client._id, client.name, [message.nickname], {nickname: message.newnick});
+	});
 }
 
 /**

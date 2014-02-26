@@ -59,6 +59,7 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 	},
 
 	new_tabs: function(object, backlog) {
+		object.set('messageLimit', 50);
 		this.trigger('newTab', object, backlog);
 	},
 

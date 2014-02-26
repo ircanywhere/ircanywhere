@@ -39,8 +39,10 @@ App.NetworkRoute = AppRoute.extend({
 				return false;
 			}
 
-			//socket.get('users').setEach('selectedTab', url);
-			// mark tab as selected
+			socket.get('users').setEach('selectedTab', url);
+			tab.set('requestedBacklog', false);
+			tab.set('messageLimit', 50);
+			// mark tab as selected and reset some tab related settings
 
 			index.set('tabId', tab._id);
 			index.socket.send('selectTab', tab.url);
