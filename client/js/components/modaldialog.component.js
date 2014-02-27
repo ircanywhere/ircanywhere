@@ -10,10 +10,16 @@ App.ModalDialogComponent = Ember.Component.extend({
 		});
 		
 		this.$('.modal').slideDown('fast');
+		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
 	},
 
 	willDestroyElement: function() {
 		this.$('.overlay').off();
+		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
+	},
+
+	nullifyLink: function(e) {
+		e.preventDefault();
 	},
 
 	close: function() {

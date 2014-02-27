@@ -629,7 +629,38 @@ body {
 			margin-left: 20px;
 		}
 	}
+}
+
+a[rel=twipsy] {
+	display: inline;
+	position: relative;
+
+	&:hover:before {
+		content: "";
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 5px 6px 5px 0;
+		border-color: transparent #000333 transparent transparent;
+		position: absolute;
+		left: 15px;
+		bottom: 2px;
 	}
+
+	&:hover:after {
+		background: #333;
+		bottom: -4px;
+		color: #fff;
+		content: attr(title);
+		left: 21px;
+		padding: 6px;
+		position: absolute;
+		z-index: 98;
+		width: 150px;
+		font-weight: 400;
+		font-size: 11px;
+	}
+}
 
 div.tooltip {
 	position: absolute;
