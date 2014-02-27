@@ -24,8 +24,9 @@ Ember.Socket = Ember.Object.extend({
 		// connect
 
 		socket.onclose = function() {
-			self._flushData();
-			App.__container__.lookup('controller:disconnected').send('openIfClosed');
+			if (self.authed) {
+				Ember.run.later(self._flushData.bind(self), 1000);
+			}
 		}
 
 		socket.onopen = function() {
@@ -47,6 +48,8 @@ Ember.Socket = Ember.Object.extend({
 		this.set('events', Ember.A());
 		this.set('commands', Ember.A());
 		// empty some collections
+
+		App.__container__.lookup('controller:disconnected').send('openIfClosed');
 	},
 
 	_setup: function() {
