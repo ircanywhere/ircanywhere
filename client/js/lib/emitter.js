@@ -68,7 +68,7 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 	},
 
 	delete_tabs: function(object, backlog) {
-		this.trigger('removedTab', object, backlog);
+		this.trigger('removeTab', object, backlog);
 	},
 
 	new_network: function(object, backlog) {
@@ -80,7 +80,7 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 	},
 
 	delete_network: function(object, backlog) {
-		this.trigger('deleteNetwork', object, backlog);
+		this.trigger('removeNetwork', object, backlog);
 	},
 
 	new_events: function(object, backlog) {

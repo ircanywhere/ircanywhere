@@ -124,7 +124,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	} else if (type == 'privmsg' || type == 'action') {
 		var tab = client.internal.tabs[message.target];
 
-		if (!tab) {
+		if (!tab && message.nickname !== client.nick) {
 			networkManager.addTab(client, message.nickname, 'query', false);
 		}
 		// create the tab if its undefined

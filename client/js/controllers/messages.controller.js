@@ -93,25 +93,32 @@ App.MessagesController = Ember.ArrayController.extend({
 				count = 50,
 				container = Ember.$('.inside-backlog');
 
-			if (!tab || tab.loading || container.length === 0) {
+			if (!tab || tab.loading) {
 				return false;
 			}
 
 			var query = Ember.copy(tab.query),
+				contentLength = this.get('content').length,
+				filteredLength = this.get('filtered').length,
 				top = container.find('div.row:first').attr('data-id'),
-				item = this.socket.events.findBy('_id', top),
-				query = {'message.time': {$lt: item.message.time}};
+				item = this.socket.events.findBy('_id', top);
 			// get some query variables
+
+			if (contentLength > 0) {
+				query['message.time'] = {$lt: item.message.time};
+			}
 
 			tab.set('requestedBacklog', true);
 			tab.set('loading', true);
 			tab.set('preBacklogId', top);
 			// record the scroll position by remembering what the top id was
 
-			if (this.get('content').length > this.get('filtered').length) {
-				tab.set('messageLimit', this.get('content').length);
+			console.log(contentLength, filteredLength, query);
+
+			if (contentLength > filteredLength) {
+				tab.set('messageLimit', contentLength);
 				this.updated();
-			} else {
+			} else if (contentLength === 0 || filteredLength === 0 || contentLength <= filteredLength) {
 				tab.set('messageLimit', tab.messageLimit + count);
 				this.socket.send('getEvents', query, count);
 			}
