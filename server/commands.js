@@ -45,7 +45,7 @@ CommandManager.prototype.init = function() {
 				client = Clients[doc.network.toString()];
 			// get some variables
 
-			self.parseCommand(user, client, doc.target, doc.command);
+			self.parseCommand(user, client, doc.target, doc.command, doc._id);
 			// success
 		});
 	});
@@ -127,7 +127,7 @@ CommandManager.prototype.createAlias = function() {
  * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.parseCommand = function(user, client, target, command) {
+CommandManager.prototype.parseCommand = function(user, client, target, command, id) {
 	if (client === undefined) {
 		return false;
 	}
@@ -139,21 +139,46 @@ CommandManager.prototype.parseCommand = function(user, client, target, command) 
 			params.shift();
 
 		if (_.isFunction(this[execute])) {
-			this[execute].call(this, user, client, target, params);
+			this[execute].call(this, user, client, target, params, false, id);
 		} else {
-			this['raw'](user, client, target, params);
+			this['raw'](user, client, target, [execute].concat(params));
 		}
 		// is this a command? if it's prefixed with one / then yes
 	} else {
 		command = (command.charAt(1) === '/') ? command.substr(1) : command;
 		// strip one of the /'s off if it has two at the start
 
-		this['msg'](user, client, target, command.split(' '));
+		this['msg'](user, client, target, command.split(' '), true);
 		// just split it to follow standards with other commands, it'll be rejoined before sent out
 	}
 
 	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date()}}, {safe: false});
 	// update last seen time
+}
+
+/**
+ * '/nickserv' command
+ *
+ * @method msg
+ * @param {Object} user A valid user object
+ * @param {Object} client A valid client object
+ * @param {String} target Target to send command to, usually a channel or username
+ * @param {String} command The command string
+ * @param {Boolean} out Used to force the message to target or params[0]
+ * @param {ObjectID} id The object id of the command so we can remove it if we need to
+ * @return void
+ */
+CommandManager.prototype.nickserv = function(user, client, target, params, out, id) {
+	if (params.length == 0) {
+		return false;
+	}
+
+	ircFactory.send(client._id, 'raw', ['nickserv'].concat(params));
+
+	if (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login') {
+		application.Commands.sync.remove({_id: id});
+	}
+	// remove sensitive commands
 }
 
 /**
@@ -164,11 +189,20 @@ CommandManager.prototype.parseCommand = function(user, client, target, command) 
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
  * @param {String} command The command string
+ * @param {Boolean} out Used to force the message to target or params[0]
+ * @param {ObjectID} id The object id of the command so we can remove it if we need to
  * @return void
  */
-CommandManager.prototype.msg = function(user, client, target, params) {
+CommandManager.prototype.msg = function(user, client, target, params, out, id) {
+	var out = out || false;
+
 	if (params.length == 0) {
 		return false;
+	}
+
+	if (!out) {
+		var target = params[0];
+		params.shift();
 	}
 
 	ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
@@ -178,6 +212,11 @@ CommandManager.prototype.msg = function(user, client, target, params) {
 	// bit of hackery here but we also send it to _parseLine so it comes right
 	// back through and looks like it's came from someone else - it's actually 99.9% more cleaner than the
 	// last buggy implementation so I'm very happy with this, don't fuck about it with it.
+
+	if (target.toLowerCase() === 'nickserv' && (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login')) {
+		application.Commands.sync.remove({_id: id});
+	}
+	// remove sensitive commands
 }
 
 /**

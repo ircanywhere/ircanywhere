@@ -623,7 +623,7 @@ UserManager.prototype.parse = function(file, replace) {
 	var template = fs.readFileSync(file).toString();
 
 	for (var key in replace) {
-		template.replace('{{' + key + '}}', replace[key]);
+		template = template.replace('{{' + key + '}}', replace[key]);
 	}
 
 	return template;

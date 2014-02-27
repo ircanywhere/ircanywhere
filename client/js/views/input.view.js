@@ -12,7 +12,7 @@ App.InputView = Ember.View.extend({
 	},
 
 	willDestroyElement: function() {
-		Ember.$(document).off('keydown', this.documentKeyDown);
+		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
 	},
 
 	documentKeyDown: function(e) {
@@ -31,9 +31,11 @@ App.InputView = Ember.View.extend({
 			this.get('controller').send('tabComplete');
 			e.preventDefault();
 		} else if (keyCode === key.up) {
-			this.get('controller').send('toggleUp').send('resetTabCompletion');
+			this.get('controller').send('toggleUp');
+			this.get('controller').send('resetTabCompletion');
 		} else if (keyCode === key.down) {
-			this.get('controller').send('toggleDown').send('resetTabCompletion');
+			this.get('controller').send('toggleDown');
+			this.get('controller').send('resetTabCompletion');
 		} else {
 			this.get('controller').send('resetTabCompletion');
 		}

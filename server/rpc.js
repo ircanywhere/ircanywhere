@@ -42,7 +42,7 @@ RPCHandler.prototype.init = function() {
 	application.ee.on(['networks', '*'], self.handleNetworksAll);
 	application.ee.on(['tabs', '*'], self.handleTabsAll);
 	application.ee.on(['events', 'insert'], self.handleEventsInsert);
-	application.ee.on(['commands', 'insert'], self.handleCommandsInsert);
+	application.ee.on(['commands', '*'], self.handleCommandsAll);
 	application.ee.on(['channelUsers', '*'], self.handleChannelUsersAll);
 	// handle changes to our collections individually this time
 }
@@ -158,21 +158,27 @@ RPCHandler.prototype.handleEventsInsert = function(doc) {
 }
 
 /**
- * Handles any inserts to the commands collection
+ * Handles all operations on the commands collection
  *
- * @method handleCommandsInsert
+ * @method handleCommandsAll
  * @param {Object} doc A valid MongoDB document with an _id
  * @return void
  */
-RPCHandler.prototype.handleCommandsInsert = function(doc) {
-	if (!doc) {
+RPCHandler.prototype.handleCommandsAll = function(doc) {
+	var eventName = this.event[1];
+	
+	if (!doc || doc.backlog) {
 		return false;
 	}
 
 	var socket = Users[doc.user];
 
-	if (socket && !doc.backlog) {
-		socket.send('newBacklog', doc);
+	if (socket) {
+		if (eventName === 'insert') {
+			socket.send('newBacklog', doc);
+		} else if (eventName === 'delete') {
+			socket.send('removeBacklog', doc);
+		}
 	}
 }
 

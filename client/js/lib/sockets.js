@@ -127,6 +127,9 @@ Ember.Socket = Ember.Object.extend({
 			case 'newBacklog':
 				self._store('commands', [data]);
 				break;
+			case 'removeBacklog':
+				self._delete('commands', data);
+				break;
 			case 'newChannelUser':
 				self._store('channelUsers', [data]);
 				break;

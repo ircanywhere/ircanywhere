@@ -184,6 +184,10 @@ Application.prototype.setupOplog = function() {
 				break;
 			case 'u':
 				self.mongo.collection(col).findOne(item.o2, function(err, doc) {
+					if (err || !doc) {
+						return false;
+					}
+					
 					if (col === 'channelUsers') {
 						self.channelUserDocs[doc._id] = doc;
 					}
