@@ -56,6 +56,7 @@ CommandManager.prototype.init = function() {
 	this.createAlias('/quit', '/disconnect');
 	this.createAlias('/query', '/q');
 	this.createAlias('/reconnect', '/connect');
+	this.createAlias('/nickserv', '/ns');
 	// setup aliases
 }
 

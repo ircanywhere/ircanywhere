@@ -187,10 +187,10 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 	}
 
 	var escapedRestriction = helper.escape(restriction).replace('\\*', '(.*)');
-	networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
-	server = helper.trimInput(server);
-	name = helper.trimInput(name);
-	nick = helper.trimInput(nick);
+		networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
+		server = helper.trimInput(server);
+		name = helper.trimInput(name);
+		nick = helper.trimInput(nick);
 
 	if (server === '' || nick === '' || name === '') {
 		output.errors.push({error: 'The fields, server, nick and name are all required'});
@@ -222,7 +222,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 	}
 	// any errors?
 
-	this.addNetwork(user, {
+	var network = {
 		server: server,
 		secure: (secure == 'true') ? true : false,
 		port: port,
@@ -230,10 +230,11 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		password: password,
 		nick: nick,
 		realname: name
-	}, this.flags.closed);
-	// add network
+	};
 
+	this.addNetwork(user, network, this.flags.closed);
 	this.connectNetwork(network);
+	// add network
 
 	return output;
 }
