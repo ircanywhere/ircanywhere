@@ -46,8 +46,6 @@ App.InputController = Ember.ObjectController.extend({
 				return false;
 			}
 
-			console.log(input, lastWord);
-
 			if (this.tabCompletionNicks.length === 0) {
 				this.set('originalInputValue', this.get('inputValue'));
 			}

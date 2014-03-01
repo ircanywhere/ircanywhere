@@ -113,8 +113,6 @@ App.MessagesController = Ember.ArrayController.extend({
 			tab.set('preBacklogId', top);
 			// record the scroll position by remembering what the top id was
 
-			console.log(contentLength, filteredLength, query);
-
 			if (contentLength > filteredLength) {
 				tab.set('messageLimit', contentLength);
 				this.updated();
