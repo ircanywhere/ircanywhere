@@ -1,0 +1,42 @@
+.topbar .topic-wrap {
+	width: 85%;
+	float: left;
+}
+
+.topbar ul#options-menu {
+	float: right;
+}
+
+.tab .messages {
+	width: auto;
+	height: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 172px;
+	bottom: 0;
+}
+
+.tab .userlist {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+}
+
+.backlog .row {
+	padding: 3px;
+}
+
+.channel-input input {
+	width: 85%;
+}
+
+.userlist ul li a span.prefix {
+	padding: 4px 6px 6px 0;
+}
+
+.userlist ul li a span.name {
+	height: auto;
+	padding: 2px 6px 0 0;
+}
