@@ -79,9 +79,9 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 		}
 		// this shouldn't occur but if it does just bail
 
-		if (capabilities.types.c.indexOf(mode) >= 0 && modeType == 'minus') {
+		if (capabilities.types && capabilities.types.c && capabilities.types.c.indexOf(mode) >= 0 && modeType == 'minus') {
 			modes[modeType] += mode;
-		} else if (capabilities.param.indexOf(mode) >= 0) {
+		} else if (capabilities.param && capabilities.param.indexOf(mode) >= 0) {
 			params.push((modeType == 'plus' ? '+' + mode : '-' + mode));
 		} else {
 			modes[modeType] += mode;
