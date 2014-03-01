@@ -18,8 +18,7 @@ div.container {
 	z-index: 6000;
 	font-size: 13px;
 	background: @topbar-bg;
-	display: -webkit-flex;
-	display: flex;
+	.flex;
 	.padding-margin;
 
 	&.main {
@@ -37,6 +36,10 @@ div.container {
 		height: 3px;
 		margin-top: 5px;
 		background: -webkit-linear-gradient(left, rgba(163,173,36,1) 0%,rgba(163,173,36,1) 20%,rgba(69,148,204,1) 20%,rgba(69,148,204,1) 40%,rgba(196,38,46,1) 40%,rgba(196,38,46,1) 60%,rgba(217,112,156,1) 60%,rgba(217,112,156,1) 80%,rgba(255,161,0,1) 80%) 0 0 no-repeat;
+		background: -moz-linear-gradient(left, rgba(163,173,36,1) 0%,rgba(163,173,36,1) 20%,rgba(69,148,204,1) 20%,rgba(69,148,204,1) 40%,rgba(196,38,46,1) 40%,rgba(196,38,46,1) 60%,rgba(217,112,156,1) 60%,rgba(217,112,156,1) 80%,rgba(255,161,0,1) 80%) 0 0 no-repeat;
+		background: -ms-linear-gradient(left, rgba(163,173,36,1) 0%,rgba(163,173,36,1) 20%,rgba(69,148,204,1) 20%,rgba(69,148,204,1) 40%,rgba(196,38,46,1) 40%,rgba(196,38,46,1) 60%,rgba(217,112,156,1) 60%,rgba(217,112,156,1) 80%,rgba(255,161,0,1) 80%) 0 0 no-repeat;
+		background: -moz-linear-gradient(left, rgba(163,173,36,1) 0%,rgba(163,173,36,1) 20%,rgba(69,148,204,1) 20%,rgba(69,148,204,1) 40%,rgba(196,38,46,1) 40%,rgba(196,38,46,1) 60%,rgba(217,112,156,1) 60%,rgba(217,112,156,1) 80%,rgba(255,161,0,1) 80%) 0 0 no-repeat;
+		
 		.snap-notop;
 		.box-shadow(0px 2px 2px rgba(0, 0, 0, 0.2));
 	}
@@ -55,7 +58,7 @@ div.container {
 		color: @topbar-link;
 		display: inline;
 		line-height: 150%;
-		flex: 1;
+		.setflex(1);
 
 		.chan-title,
 		.chan-modes {
@@ -499,7 +502,7 @@ div.sidebar {
 		}
 
 		.modal-body {
-			display: flex;
+			.flex;
 
 			.full-set {
 				padding: 18px;
@@ -511,10 +514,10 @@ div.sidebar {
 			}
 
 			.right-set {
-				flex: 1;
 				padding: 20px;
 				padding-left: 0;
 				border-left: 1px solid @login-box-border;
+				.setflex(1);
 			}
 
 			p.large {
@@ -563,7 +566,7 @@ div.sidebar {
 					padding: 5px;
 					font-size: 14px;
 					font-weight: bold;
-					display: flex;
+					.flex;
 
 					span.command {
 						display: inline-block;

@@ -293,21 +293,21 @@ body {
 	.alert-message.info:hover { color: @white; }
 
 	.btn.danger, .alert-message.danger, .btn.error, .alert-message.error {
-		.gradient(top, #EE5F5B, #C43C35);
+		.gradient(#C43C35, top, #EE5F5B, #C43C35);
 		border-color: #C43C35 #C43C35 #882A25;
 		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 		font-weight: bold;
 	}
 
 	.btn.success, .alert-message.success {
-		.gradient(top, #62C462, #57A957);
+		.gradient(#57A957, top, #62C462, #57A957);
 		border-color: #57A957 #57A957 #3D773D;
 		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 		font-weight: bold;
 	}
 
 	.btn.info, .alert-message.info {
-		.gradient(top, #5BC0DE, #339BB9);
+		.gradient(#339BB9, top, #5BC0DE, #339BB9);
 		border-color: #339BB9 #339BB9 #22697D;
 		text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 		font-weight: bold;
@@ -317,7 +317,7 @@ body {
 		.border-radius(1px);
 		.box-shadow(~"inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)");
 		.transition(0.1s linear all);
-		.gradient(@white, @white 25%, #E6E6E6);
+		.gradient(#E6E6E6, @white, @white 25%, #E6E6E6);
 		background-repeat: no-repeat;
 		color: #333;
 		border: 1px solid #CCCCCC;
@@ -343,7 +343,7 @@ body {
 		}
 
 		&.primary {
-			.gradient(top, #049CDB, #0064CD);
+			.gradient(#0064CD, top, #049CDB, #0064CD);
 			border-color: #0064CD #0064CD #003F81;
 			color: @white;
 			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);

@@ -4,8 +4,7 @@
 	padding: 0;
 	border-top: 2px solid #D9D9D9;
 	background: @white;
-	display: flex;
-	display: -webkit-flex;
+	.flex;
 	.snap-notop;
 
 	.nick-button {
@@ -18,7 +17,6 @@
 	}
 
 	input {
-		flex: 1;
 		border: 1px solid #0069D6;
 		color: #000000;
 		display: inline-block;
@@ -31,5 +29,6 @@
 		background: #ffffff;
 		text-align: left;
 		resize: none;
+		.setflex(1);
 	}
 }

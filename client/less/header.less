@@ -56,13 +56,13 @@
 	margin: @size;
 }
 
-.gradient (@start, @first, @second) {
-	background-color: @second;
-	background-image: linear-gradient(@start, @first, @second);
-	background-image: -moz-linear-gradient(@start, @first, @second);
-	background-image: -ms-linear-gradient(@start, @first, @second);
-	background-image: -o-linear-gradient(@start, @first, @second);
-	background-image: -webkit-linear-gradient(@start, @first, @second);
+.gradient (@first, @rest...) {
+	background-color: @first;
+	background-image: linear-gradient(@rest);
+	background-image: -moz-linear-gradient(@rest);
+	background-image: -ms-linear-gradient(@rest);
+	background-image: -o-linear-gradient(@rest);
+	background-image: -webkit-linear-gradient(@rest);
 	background-repeat: repeat-x;
 }
 
@@ -79,6 +79,22 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
+}
+
+.flex () {
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+}
+
+.setflex (@a) {
+	-webkit-box-flex: @a;
+	-moz-box-flex: @a;
+	-webkit-flex: @a;
+	-ms-flex: @a;
+	flex: @a;
 }
 
 // Mixins

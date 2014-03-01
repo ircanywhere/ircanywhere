@@ -24,8 +24,7 @@
 	.row:extend(.clear) {
 		margin: 0;
 		position: relative;
-		display: -webkit-flex;
-		display: flex;
+		.flex;
 
 		&.hide {
 			display: none!important;
@@ -43,8 +42,7 @@
 			line-height: 155%;
 
 			&.column {
-				-webkit-flex: 1;
-				flex: 1;
+				.setflex(1);
 			}
 
 			&.time {
