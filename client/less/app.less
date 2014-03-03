@@ -299,6 +299,12 @@ div.sidebar {
 	}
 
 	.items {
+		overflow-x: auto;
+		position: absolute;
+		.snap;
+		bottom: 71px;
+		top: 61px;
+
 		ul {
 			.padding-margin(0px);
 			list-style-type: none;
@@ -607,6 +613,15 @@ div.sidebar {
 	background-clip: padding-box;
 	border: 3px solid #fff;
 	border-radius: 6px;
+}
+
+div.items::-webkit-scrollbar-thumb {
+	border: 3px solid #1b1e25;
+}
+
+div.items::-webkit-scrollbar-track-piece {
+	background: #1b1e25;
+	border: 3px solid #1b1e25;
 }
 
 // scrollbar styles
