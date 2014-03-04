@@ -619,10 +619,16 @@ RPCHandler.prototype.handleInsertTab = function(socket, data) {
 
 	var nid = new mongo.ObjectID(data.network),
 		ircClient = Clients[nid];
+		data.target = decodeURIComponent(data.target);
 
 	if (ircClient && ircClient.internal.userId.toString() === user._id.toString()) {
 		var type = (helper.isChannel(ircClient, data.target)) ? 'channel' : 'query';
-		networkManager.addTab(ircClient, data.target, type, data.selected);
+
+		if (type === 'channel') {
+			ircFactory.send(ircClient._id, 'join', [data.target]);
+		} else {
+			networkManager.addTab(ircClient, data.target, type, data.selected);
+		}
 	}
 	// we're allowed to continue, use network manager to add the tab
 }
