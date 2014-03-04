@@ -27,3 +27,7 @@
 .backlog .row {
 	padding: 3px;
 }
+
+.channel-input .nick-button {
+	padding: 9px 14px 9px 0;
+}
