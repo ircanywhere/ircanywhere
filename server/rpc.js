@@ -523,7 +523,10 @@ RPCHandler.prototype.handleSelectTab = function(socket, data) {
 			return;
 		}
 
-		exists = _.find(value.internal.tabs, {'url': url});
+		if (_.find(value.internal.tabs, {'url': url})) {
+			exists = true;
+			return false;
+		}
 	});
 
 	if (!exists) {
