@@ -15,12 +15,16 @@ App.SidebaritemView = Ember.View.extend({
 			tab.set('selected', false);
 		}
 
-		if (tab.type !== 'network') {
+		if (tab.get('type') !== 'network') {
 			classes.push('child');
 		}
 
+		if (tab.get('unread') > 0) {
+			classes.push('unread');
+		}
+
 		return classes.join(' ');
-	}.property('controller.parentController.user.selectedTab').cacheable(),
+	}.property('controller.parentController.user.selectedTab', 'controller.content.selected', 'controller.content.unread').cacheable(),
 	
 	getClass: function() {
 		var classNames = [''],
@@ -39,6 +43,10 @@ App.SidebaritemView = Ember.View.extend({
 
 		return classNames.join(' ');
 	}.property('controller.content').cacheable(),
+
+	isPrivmsg: function() {
+		return (this.get('controller.content.type') === 'query');
+	}.property('controller.content.type').cacheable(),
 
 	url: function() {
 		var split = this.get('controller.content.url').split('/');

@@ -126,7 +126,8 @@ App.MessagesController = Ember.ArrayController.extend({
 			var self = this,
 				tab = this.get('socket.tabs').findBy('_id', id),
 				events = this.get('content').filterProperty('unread', true),
-				counter = 0;
+				highlightCounter = 0,
+				counter = 0,
 				docs = [];
 
 			if (!tab) {
@@ -145,12 +146,14 @@ App.MessagesController = Ember.ArrayController.extend({
 					var topOffset = el[0].offsetTop;
 
 					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
-						// XXX - Handle highlights
-
 						item.set('unread', false);
 						if (self.readDocs.indexOf(item._id) === -1) {
 							self.readDocs.push(item._id);
 							counter++;
+
+							if (item.extra.highlight) {
+								highlightCounter++;
+							}
 						}
 					}
 				}
@@ -159,7 +162,11 @@ App.MessagesController = Ember.ArrayController.extend({
 			var unread = tab.get('unread') - counter;
 				unread = (unread <= 0) ? 0 : unread;
 				tab.set('unread', unread);
-			// update the icon
+
+			var highlights = tab.get('highlights') - highlightCounter;
+				highlights = (highlights <= 0) ? 0 : highlights;
+				tab.set('highlights', highlights);
+			// update the icon(s)
 			
 			if (this.get('timeout')) {
 				return false;

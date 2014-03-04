@@ -1,7 +1,12 @@
 <a {{bind-attr href=view.url title=title}}>
 	<span {{bind-attr class=":link view.getClass"}}>
-		{{#if highlights}}<span class="alert highlight" {{action "markAsRead" _id bubbles=false}}>{{highlights}}</span>{{/if}}
-		{{#if unread}}<span class="alert unread" {{action "markAsRead" _id bubbles=false}}>{{unread}}</span>{{/if}}
+		{{#if view.isPrivmsg}}
+			{{#if unread}}
+				<span class="alert highlight" {{action "markAsRead" _id bubbles=false}}>{{unread}}</span>
+			{{/if}}
+		{{else}}
+			{{#if highlights}}<span class="alert highlight" {{action "markAsRead" _id bubbles=false}}>{{highlights}}</span>{{/if}}
+		{{/if}}
 		{{view.title}}
 	</span>
 </a>

@@ -373,7 +373,16 @@ div.sidebar {
 				}
 			}
 
-			.child:not(.selected) {
+			.unread {
+				width: 210px;
+				z-index: 7000;
+
+				a {
+					border-left: 5px solid #225FA3;
+				}
+			}
+
+			.child:not(.selected,.unread) {
 				span.link {
 					padding-left: 6px;
 				}
