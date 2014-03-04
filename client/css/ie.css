@@ -27,16 +27,3 @@
 .backlog .row {
 	padding: 3px;
 }
-
-.channel-input input {
-	width: 85%;
-}
-
-.userlist ul li a span.prefix {
-	padding: 4px 6px 6px 0;
-}
-
-.userlist ul li a span.name {
-	height: auto;
-	padding: 2px 6px 0 0;
-}

@@ -1,2 +1,10 @@
-<label for="chat" class="nick-button">{{nick}}</label>
-{{input class="command-field" type="text" tabindex="1" valueBinding="inputValue" value=""}}
+<tr>
+	<td>
+		<label for="chat" class="nick-button">{{nick}}</label>
+	</td>
+	<td>
+		<form class="input-area">
+			{{textarea class="command-field" type="text" tabindex="1" valueBinding="inputValue" value=""}}
+		</form>
+	</td>
+</tr>

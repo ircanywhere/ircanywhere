@@ -2,33 +2,56 @@
 
 .channel-input {
 	padding: 0;
+	margin: 0;
 	border-top: 2px solid #D9D9D9;
 	background: @white;
-	.flex;
+	width: 100%;
 	.snap-notop;
+
+	td:first-child {
+		width: 100px;
+	}
+
+	td:last-child {
+		padding-right: 6px;
+	}
 
 	.nick-button {
 		width: auto;
 		margin: 0;
-		padding: 10px 14px 10px 91px;
+		padding: 9px 14px 9px 91px;
 		float: left;
 		font-size: 13px;
 		font-weight: bold;
 	}
 
-	input {
+	form.input-area {
+		padding: 0 4px;
+		margin: 0;
 		border: 1px solid #0069D6;
-		color: #000000;
+		color: #000;
+		background: #fff;
+		.border-radius(3px);
+	}
+
+	textarea {
+		outline: 0;
+		border: 0;
+		margin: 0;
 		display: inline-block;
 		font-size: 13px;
 		min-height: 18px;
 		line-height: 18px;
-		margin: 6px;
-		padding: 4px;
-		outline: none;
-		background: #ffffff;
+		padding: 4px 0;
 		text-align: left;
 		resize: none;
-		.setflex(1);	
+		width: 100%;
+		.box-shadow;
+	}
+
+	textarea:focus {
+		outline: 0;
+		border: 0;
+		.box-shadow;
 	}
 }

@@ -42,17 +42,16 @@
 
 			a {
 				text-decoration: none;
-				padding: 6px;
 				font-weight: bold;
 				color: inherit;
-				.flex;
+				display: block;
 
 				span {
 					&.prefix {
 						width: 18px;
 						display: inline-block;
 						text-align: center;
-						.setflex(1);
+						padding: 6px 0 6px 6px;
 
 						&.op { color: darkRed; }
 						&.halfop { color: darkOrange; }
@@ -60,11 +59,9 @@
 					}
 
 					&.name {
-						display: inline-block;
-						width: 85%;
 						overflow: hidden;
 						text-overflow: ellipsis;
-						height: 15px;
+						padding: 6px;
 					}
 				}
 			}
