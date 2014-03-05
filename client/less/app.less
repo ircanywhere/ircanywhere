@@ -13,13 +13,17 @@ div.container {
 }
 
 .topbar {
-	display: inline-block;
 	width: 100%;
 	z-index: 6000;
 	font-size: 13px;
 	background: @topbar-bg;
-	.flex;
+	border-spacing: 0;
+	border-collapse: separate;
 	.padding-margin;
+
+	td {
+		padding: 0;
+	}
 
 	&.main {
 		position: fixed;
@@ -48,16 +52,12 @@ div.container {
 	}
 
 	.topic-wrap {
-		display: inline-block;
-		padding: 9px;
+		padding: 7px 9px;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
-		height: 15px;
+		height: 20px;
 		color: @topbar-link;
-		display: inline;
-		line-height: 150%;
-		.setflex(1);
+		line-height: 170%;
 
 		.chan-title,
 		.chan-modes {
@@ -113,7 +113,6 @@ div.container {
 
 	#options-menu {
 		z-index: 6020;
-		width: 160px;
 		list-style-type: none;
 		text-align: right;
 		.padding-margin;

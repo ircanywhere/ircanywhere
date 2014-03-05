@@ -545,6 +545,10 @@ CommandManager.prototype.close = function(user, client, target, params) {
 	var tab = application.Tabs.sync.findOne({target: target, network: client._id});
 	// get the tab in question
 
+	if (!tab) {
+		return false;
+	}
+
 	if (tab.type === 'channel') {
 		if (tab.active) {
 			ircFactory.send(client._id, 'part', [target]);

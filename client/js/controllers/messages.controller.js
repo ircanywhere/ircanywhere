@@ -58,11 +58,16 @@ App.MessagesController = Ember.ArrayController.extend({
 	}),
 
 	filtered: function() {
-		var tab = this.get('socket.tabs').findBy('selected', true),
-			events = this.get('content'),
+		var tab = this.get('socket.tabs').findBy('selected', true);
+
+		if (!tab) {
+			return Ember.A();
+		}
+
+		var events = this.get('content'),
 			limit = (tab) ? tab.get('messageLimit', 50) : 50,
 			slice = events.length - limit;
-			slice = (slice < 0 || tab.requestedBacklog) ? 0 : slice;
+			slice = (slice < 0 || tab.get('requestedBacklog')) ? 0 : slice;
 
 		var proxy = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 			content: events,

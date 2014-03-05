@@ -1,6 +1,7 @@
 App.TitlebarView = Ember.View.extend({
 	templateName: 'titlebar',
-	classNames: 'topbar clear',
+	tagName: 'table',
+	classNames: 'topbar',
 
 	didInsertElement: function() {
 		Ember.$(document).on('click', this.documentClick.bind(this));
