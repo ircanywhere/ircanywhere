@@ -67,10 +67,12 @@
 		 * -- number
 		 * -- usage: Network limit for users, minimum is 0, maximum is 10, at the moment */
 
-		"networkRestriction": "*.freenode.org",
-		/* -- string
+		"networkRestriction": [
+			"*.freenode.org"
+		],
+		/* -- array
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
-					 disabled by omitting completely, or setting to empty or * */
+					 disabled by omitting completely, or setting to ["*"] */
 
 		"userNamePrefix": "ia"
 		/* -- required
@@ -100,7 +102,7 @@
 		 * -- usage: Whether to use ssl for the default irc client, can be omitted
 					 defaults to false if so */
 
-		"password": null,
+		"password": "",
 		/* -- string
 		 * -- usage: If the server requires a password, enter it here. Set to null to emit it
 					 or remove it completely */

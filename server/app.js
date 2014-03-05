@@ -83,8 +83,17 @@ Application.prototype.init = function() {
 	this.setupWinston();
 	// setup winston first
 
-	validate(this.config, schema);
+	var validation = validate(this.config, schema);
+	if (validation.length > 0) {
+		console.log(new Date().toJSON(), '-', util.inspect(validation, {colors: true}));
+		throw new Error('Invalid config settings, please amend.');
+	}
 	// attempt to validate our config file
+
+	if (!this.config.clientSettings.networkRestriction) {
+		this.config.clientSettings.networkRestriction = ['*'];
+	}
+	// amend any settings
 
 	this.database = {
 		mongo: this.config.mongo.split(/\//i),

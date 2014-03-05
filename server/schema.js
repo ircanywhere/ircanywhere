@@ -19,10 +19,6 @@ exports.schema = {
 		type: 'boolean',
 		required: true,
 	},
-	'reverseDns': {
-		type: 'string',
-		required: true
-	},
 	'enableRegistrations': {
 		type: 'boolean',
 		required: true
@@ -62,7 +58,7 @@ exports.schema = {
 		required: true
 	},
 	'clientSettings.networkRestriction': {
-		type: 'string',
+		type: 'array',
 		required: false
 	},
 	'clientSettings.userNamePrefix': {
@@ -101,7 +97,7 @@ exports.schema = {
 	},
 	'defaultNetwork.channels.$.channel': {
 		type: 'string',
-		required: true,
+		required: false,
 		regEx: /([#&][^\x07\x2C\s]{0,200})/
 	},
 	'defaultNetwork.channels.$.password': {

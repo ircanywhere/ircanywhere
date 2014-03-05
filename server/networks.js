@@ -175,7 +175,8 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		nick = req.param('nick', ''),
 		name = req.param('name', ''),
 		networkCount = 0,
-		restriction = (application.config.clientSettings.networkRestriction) ? application.config.clientSettings.networkRestriction : '*',
+		restriction = application.config.clientSettings.networkRestriction,
+		escapedRestrictions = [],
 		user = userManager.isAuthenticated(req.headers.cookie),
 		output = {failed: false, errors: []};
 	// get our parameters
@@ -186,8 +187,13 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		return output;
 	}
 
-	var escapedRestriction = helper.escape(restriction).replace('\\*', '(.*)');
-		networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
+	restriction.forEach(function(item) {
+		var regex = helper.escape(item).replace('\\*', '(.*)');
+		escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+	});
+	// create an array of restrictions
+
+	var networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
 		server = helper.trimInput(server);
 		name = helper.trimInput(name);
 		nick = helper.trimInput(nick);
@@ -212,8 +218,12 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
 	}
 
-	if (!server.match(new RegExp('(' + escapedRestriction + ')', 'i'))) {
-		output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
+	for (var itemI in escapedRestrictions) {
+		var item = escapedRestrictions[itemI];
+		if (!server.match(item)) {
+			output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
+			break;
+		}
 	}
 
 	if (output.errors.length > 0) {
