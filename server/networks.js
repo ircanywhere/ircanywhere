@@ -76,7 +76,12 @@ NetworkManager.prototype.init = function() {
 		}
 		// error
 
-		Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+		var client = Clients[doc.network.toString()];
+		if (!client || !client.internal) {
+			return;
+		}
+
+		client.internal.tabs[doc.target] = doc;
 	});
 
 	application.ee.on(['networks', 'insert'], function(doc) {
@@ -332,11 +337,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	// empty, bolt it
 
 	var callback = function(err, doc) {
-		if (client.internal.tabs && client.internal.tabs[obj.target]) {
-			application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: active}}, {safe: false});
-		} else {
-			application.Tabs.insert(obj, {safe: false});
-		}
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: obj}, {safe: false, upsert: true});
 		// insert to db, or update old record
 	};
 
