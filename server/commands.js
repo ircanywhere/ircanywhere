@@ -206,6 +206,8 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 		params.shift();
 	}
 
+	console.log([target, params.join(' ')]);
+
 	ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
 	ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + params.join(' ')]);
 	// nope this is a message, lets just send it straight out because if the target

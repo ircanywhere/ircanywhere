@@ -9,25 +9,28 @@ App.InputView = Ember.View.extend({
 		// it's not entirely ember-ish binding events manually but it's
 		// difficult to do this without doing so
 		
-		this.$('input').focus();
+		this.$('textarea').on('keydown', this.onKeyDown.bind(this));
+		this.$('textarea').focus();
 	},
 
 	willDestroyElement: function() {
 		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		this.$('textarea').off('keydown', this.onKeyDown.bind(this));
 	},
 
 	documentKeyDown: function(e) {
-		if (!$('input').is(':focus')) {
-			this.$('input').focus();
+		if (!$('textarea').is(':focus')) {
+			this.$('textarea').focus();
 		}
 	},
 
-	keyDown: function(e) {
+	onKeyDown: function(e) {
 		var keyCode = e.keyCode || e.which,
 			key = {enter: 13, tab: 9, up: 38, down: 40};
 
 		if (keyCode === key.enter) {
 			this.get('controller').send('sendCommand');
+			e.preventDefault();
 		} else if (keyCode === key.tab) {
 			this.get('controller').send('tabComplete');
 			e.preventDefault();
