@@ -19,7 +19,7 @@ App.InputView = Ember.View.extend({
 	},
 
 	documentKeyDown: function(e) {
-		if (!$('textarea').is(':focus')) {
+		if (!Ember.$('input, textarea').is(':focus')) {
 			this.$('textarea').focus();
 		}
 	},

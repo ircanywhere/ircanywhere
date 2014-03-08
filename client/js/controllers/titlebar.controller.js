@@ -10,7 +10,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 	actions: {
 		setTopic: function() {
-			Ember.$('input.command-field:visible').val('/topic ').focus();
+			Ember.$('textarea.command-field:visible').select().val('/topic ');
 		},
 
 		toggleUsers: function() {

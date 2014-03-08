@@ -204,7 +204,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		nick = helper.trimInput(nick);
 
 	if (server === '' || nick === '' || name === '') {
-		output.errors.push({error: 'The fields, server, nick and name are all required'});
+		output.errors.push({error: 'The fields server, nick and name are all required'});
 	}
 
 	if (!helper.isValidName(name)) {
