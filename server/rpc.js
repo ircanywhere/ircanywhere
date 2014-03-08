@@ -353,7 +353,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		// construct some queries
 
 		if (tab.type === 'query') {
-			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tab.target}, {'message.nickname': new RegExp(tab.target, 'i'), target: netIds[tab.network].nick}]};
+			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tab.target}, {'message.nickname': new RegExp('(' + helper.escape(tab.target) + ')', 'i'), target: netIds[tab.network].nick}]};
 		} else if (tab.type === 'network') {
 			var query = {network: netIds[tab.network].name, target: '*', user: user._id}
 		} else {
