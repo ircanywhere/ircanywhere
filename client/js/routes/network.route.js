@@ -23,11 +23,11 @@ App.NetworkRoute = AppRoute.extend({
 				parts = transition.providedModelsArray;
 
 			if (parts.length === 0) {
-				var url = (!params.tab) ? params.url : params.url + '/' + decodeURIComponent(params.tab).toLowerCase();
+				var url = (!params.tab) ? params.url : params.url + '/' + exports.Helpers.decodeChannel(params.tab).toLowerCase();
 			} else if (parts.length === 1) {
 				var url = parts[0];
 			} else {
-				var url = parts[0] + '/' + decodeURIComponent(parts[1]).toLowerCase();
+				var url = parts[0] + '/' + exports.Helpers.decodeChannel(parts[1]).toLowerCase();
 			}
 			// attempt to construct a url from resolves models or parameters
 

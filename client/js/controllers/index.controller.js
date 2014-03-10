@@ -15,7 +15,7 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 			if (tab.get('type') === 'network') {
 				this.transitionToRoute('network', url[0]);
 			} else {
-				this.transitionToRoute('tab', url[0], encodeURIComponent(url[1]));
+				this.transitionToRoute('tab', url[0], exports.Helpers.encodeChannel(url[1]));
 			}
 			// move the route to the selected tab
 
