@@ -147,7 +147,8 @@ RPCHandler.prototype.handleEventsAll = function(doc) {
 		return false;
 	}
 
-	var socket = Users[doc.user];
+	var eventName = this.event[1],
+		socket = Users[doc.user];
 
 	doc = _.omit(doc, 'user');
 	// alter the document

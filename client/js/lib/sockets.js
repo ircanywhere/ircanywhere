@@ -3,6 +3,7 @@ Ember.Socket = Ember.Object.extend({
 	done: false,
 	authed: null,
 	open: false,
+	attempts: 1,
 
 	emitter: Ember.Emitter.create(),
 
@@ -24,12 +25,26 @@ Ember.Socket = Ember.Object.extend({
 		// connect
 
 		socket.onclose = function() {
-			if (self.authed) {
-				Ember.run.later(self._flushData.bind(self), 1000);
+			if (!self.authed) {
+				return false;
 			}
+
+			Ember.run.later(self._flushData.bind(self), 1000);
+			// show the popup
+
+			var time = self._generateInterval(self.attempts);
+			// generate a time
+			
+			Ember.run.later(function() {
+				self.incrementProperty('attempts');
+
+				self.connect();
+			}, time);
+			// attempt to reconnect, but back off
 		}
 
 		socket.onopen = function() {
+			self.set('attempts', 1);
 			self._setup();
 		}
 
@@ -39,6 +54,16 @@ Ember.Socket = Ember.Object.extend({
 		// bind events
 
 		this.set('socket', socket);
+	},
+
+	_generateInterval: function(k) {
+		var maxInterval = (Math.pow(2, k) - 1) * 1000;
+
+		if (maxInterval > 30 * 1000) {
+			maxInterval = 30 * 1000;
+		}
+
+		return Math.random() * maxInterval; 
 	},
 
 	_flushData: function() {

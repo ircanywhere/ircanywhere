@@ -12,9 +12,6 @@ App.DisconnectedController = Ember.ObjectController.extend({
 				this.send('openModal', 'disconnected');
 				// open the modal
 			}
-
-			Ember.run.later(this.reconnect.bind(this), 5000);
-			// attempt to reconnect
 		},
 
 		closeIfOpen: function() {
