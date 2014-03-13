@@ -124,6 +124,9 @@ Ember.Socket = Ember.Object.extend({
 			case 'newEvent':
 				self._store('events', [data]);
 				break;
+			case 'updateEvent':
+				self._update('events', data._id, data);
+				break;
 			case 'newBacklog':
 				self._store('commands', [data]);
 				break;

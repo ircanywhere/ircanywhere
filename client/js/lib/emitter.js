@@ -86,5 +86,9 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 	new_events: function(object, backlog) {
 		this.trigger(object.type, object, backlog);
 		// we can just trigger all our types directly like this
+	},
+
+	update_events: function(object, backlog) {
+		this.trigger(object.type, object, backlog);
 	}
 });

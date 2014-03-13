@@ -236,6 +236,7 @@ IRCHandler.prototype.join = function(client, message) {
 	if (message.nickname === client.nick) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
+		ircFactory.send(client._id, 'names', [message.channel]);
 	} else {
 		channelManager.insertUsers(client._id, client.name, message.channel, [user]);
 	}

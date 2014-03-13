@@ -41,7 +41,7 @@ RPCHandler.prototype.init = function() {
 	application.ee.on(['users', 'update'], self.handleUsersUpdate);
 	application.ee.on(['networks', '*'], self.handleNetworksAll);
 	application.ee.on(['tabs', '*'], self.handleTabsAll);
-	application.ee.on(['events', 'insert'], self.handleEventsInsert);
+	application.ee.on(['events', '*'], self.handleEventsAll);
 	application.ee.on(['commands', '*'], self.handleCommandsAll);
 	application.ee.on(['channelUsers', '*'], self.handleChannelUsersAll);
 	// handle changes to our collections individually this time
@@ -136,13 +136,13 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 }
 
 /**
- * Handles any inserts to the events collection
+ * Handles any changes to the events collection
  *
- * @method handleEventsInsert
+ * @method handleEventsAll
  * @param {Object} doc A valid MongoDB document with an _id
  * @return void
  */
-RPCHandler.prototype.handleEventsInsert = function(doc) {
+RPCHandler.prototype.handleEventsAll = function(doc) {
 	if (!doc) {
 		return false;
 	}
@@ -153,7 +153,11 @@ RPCHandler.prototype.handleEventsInsert = function(doc) {
 	// alter the document
 
 	if (socket) {
-		socket.send('newEvent', doc);
+		if (eventName === 'insert') {
+			socket.send('newEvent', doc);
+		} else if (eventName === 'update') {
+			socket.send('updateEvent', doc);
+		}
 	}
 }
 

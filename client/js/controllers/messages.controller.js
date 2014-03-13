@@ -152,6 +152,7 @@ App.MessagesController = Ember.ArrayController.extend({
 
 					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
 						item.set('unread', false);
+						
 						if (self.readDocs.indexOf(item._id) === -1) {
 							self.readDocs.push(item._id);
 							counter++;
