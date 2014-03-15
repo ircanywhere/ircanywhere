@@ -102,6 +102,12 @@ Ember.Socket = Ember.Object.extend({
 			event = incoming.event,
 			data = incoming.data;
 
+		var userInsertCheck = function(col, u) {
+			return col.find(function(key, i) {
+				return (u.nickname == i.nickname && u.network == i.network && u.channel == i.channel);
+			});
+		};
+
 		switch (event) {
 			case 'authenticate':
 				self.set('authed', data);
@@ -118,7 +124,7 @@ Ember.Socket = Ember.Object.extend({
 				});
 				break;
 			case 'channelUsers':
-				self._store('channelUsers', data);
+				self._store('channelUsers', data, false, userInsertCheck);
 				self.emitter.trigger('updated');
 				break;
 			case 'events':
@@ -159,7 +165,7 @@ Ember.Socket = Ember.Object.extend({
 				self._delete('commands', data);
 				break;
 			case 'newChannelUser':
-				self._store('channelUsers', [data]);
+				self._store('channelUsers', [data], false, userInsertCheck);
 				break;
 			case 'updateChannelUser':
 				self._update('channelUsers', data._id, data);
@@ -173,15 +179,20 @@ Ember.Socket = Ember.Object.extend({
 		}
 	},
 
-	_store: function(collection, payload, noEvent) {
+	_store: function(collection, payload, noEvent, fn) {
 		var self = this,
 			noEvent = noEvent || false,
+			fn = fn || false,
 			col = self.get(collection);
 		
 		for (var k = 0, len = payload.length; k < len; k++) {
 			var i = payload[k],
 				exists = col.findBy('_id', i._id);
 			
+			if (!exists && fn) {
+				exists = fn(col, i);
+			}
+
 			if (exists) {
 				exists.setProperties(i);
 			} else {

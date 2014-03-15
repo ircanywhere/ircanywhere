@@ -316,10 +316,18 @@ CommandManager.prototype.join = function(user, client, target, params) {
  */
 CommandManager.prototype.part = function(user, client, target, params) {
 	if (params.length !== 0 && helper.isChannel(client, params[0])) {
+		var channel = params[0];
 		ircFactory.send(client._id, 'part', params);
 	} else {
+		var channel = target;
 		ircFactory.send(client._id, 'part', [target].concat(params));
 	}
+
+	var index = _.findIndex(client.channels, {channel: channel.toLowerCase()});
+	if (index > -1) {
+		application.Networks.sync.update({_id: client._id}, {$pull: {channels: client.channels[index]}});
+	}
+	// does the index exist? lets remove it if so
 }
 
 /**
@@ -556,6 +564,12 @@ CommandManager.prototype.close = function(user, client, target, params) {
 
 		networkManager.removeTab(client, target);
 		// determine what to do with it, if it's a channel /part and remove tab
+
+		var index = _.findIndex(client.channels, {channel: target.toLowerCase()});
+		if (index > -1) {
+			application.Networks.sync.update({_id: client._id}, {$pull: {channels: client.channels[index]}});
+		}
+		// does the index in client.channels exist? lets remove it if so
 	} else if (tab.type === 'query') {
 		networkManager.removeTab(client, target);
 		// if its a query just remove tab
