@@ -15,8 +15,6 @@ Ember.Socket = Ember.Object.extend({
 		this.set('events', Ember.A());
 		this.set('commands', Ember.A());
 		// setup the collections
-
-		this.connect();
 	},
 
 	connect: function() {
@@ -37,7 +35,6 @@ Ember.Socket = Ember.Object.extend({
 			
 			Ember.run.later(function() {
 				self.incrementProperty('attempts');
-
 				self.connect();
 			}, time);
 			// attempt to reconnect, but back off

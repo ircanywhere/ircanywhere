@@ -93,7 +93,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
-		var userRecords = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname}, {timeout: false}).sync.toArray();
+		var userRecords = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname}).sync.toArray();
 		// find the channel, we gotta construct a query
 
 		userRecords.forEach(function(user) {

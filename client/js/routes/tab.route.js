@@ -1,4 +1,8 @@
 App.TabRoute = AppRoute.extend({
+	init: function() {
+		this.controllerFor('index').determinePath();
+	},
+	
 	setupController: function(controller, model) {
 		controller.set('model', model);
 	},

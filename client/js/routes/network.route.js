@@ -5,6 +5,10 @@ App.Router.map(function() {
 });
 
 App.NetworkRoute = AppRoute.extend({
+	init: function() {
+		this.controllerFor('index').determinePath();
+	},
+
 	setupController: function(controller, model) {
 		controller.set('model', model);
 	},

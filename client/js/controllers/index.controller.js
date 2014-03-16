@@ -25,6 +25,12 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	}.observes('socket.users.@each.selectedTab'),
 	
 	determinePath: function() {
+		if (this.socket.authed === null) {
+			this.socket.connect();
+		}
+	},
+
+	isAuthed: function() {
 		if (this.socket.authed === false) {
 			this.transitionToRoute('login');
 		}

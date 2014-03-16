@@ -415,7 +415,7 @@ UserManager.prototype.forgotPassword = function(req, res) {
 	application.Users.sync.update({email: email}, {$set: {resetToken: resetToken}});
 	// set the reset token
 
-	var link = application.config.url + '/reset/' + token,
+	var link = application.config.url + '/#/reset/' + token,
 		message = {
 			text: this.parse('./private/emails/reset.txt', {name: user.name, link: link}),
 			from: application.config.email.from,
