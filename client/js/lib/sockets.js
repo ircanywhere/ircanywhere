@@ -22,6 +22,8 @@ Ember.Socket = Ember.Object.extend({
 			socket = new SockJS('/websocket');
 		// connect
 
+		this.set('authed', false);
+
 		socket.onclose = function() {
 			if (!self.authed) {
 				return false;

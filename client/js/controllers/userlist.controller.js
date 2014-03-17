@@ -55,11 +55,36 @@ App.UserlistController = Ember.ArrayController.extend({
 		return sorted;
 	}.property('channelUsers').cacheable(),
 
+	onPart: function(object, backlog) {
+		this._onRemove(object, backlog);
+	},
+
+	onQuit: function(object, backlog) {
+		this._onRemove(object, backlog);
+	},
+
 	ready: function() {
 		this.set('channelUsers', this.socket.channelUsers);
 	},
 	
 	updated: function() {
 		this.set('channelUsers', this.socket.channelUsers);
+	},
+
+	_onRemove: function(object, backlog) {
+		if (!backlog && object.get('extra.self') === true) {
+			var network = object.get('network'),
+				channel = object.get('message.channel'),
+				users = this.channelUsers;
+
+			if (users) {
+				var objects = users.filter(function(i) {
+					return (network == i.network && channel == i.channel);
+				});
+
+				users.removeObjects(objects);
+			}
+		}
+		// only target our parts / quits
 	}
 });
