@@ -93,19 +93,22 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
-		var userRecords = application.ChannelUsers.sync.find({network: client.name, nickname: message.nickname}).sync.toArray();
-		// find the channel, we gotta construct a query
-
-		userRecords.forEach(function(user) {
-			if (!user) {
+		application.ChannelUsers.find({network: client.name, nickname: message.nickname}).toArray(function(err, userRecords) {
+			if (err || !userRecords) {
 				return;
 			}
-			
-			var cloned = _.clone(message);
-			cloned.channel = user.channel;
-			self._insert(client, cloned, type, user);
-			// we're in here because the user either changing their nick
-			// or quitting, exists in this channel, lets add it to the event
+
+			userRecords.forEach(function(user) {
+				if (!user) {
+					return;
+				}
+				
+				var cloned = _.clone(message);
+				cloned.channel = user.channel;
+				self._insert(client, cloned, type, user);
+				// we're in here because the user either changing their nick
+				// or quitting, exists in this channel, lets add it to the event
+			});
 		});
 
 		_.each(client.internal.tabs, function(value, key) {
