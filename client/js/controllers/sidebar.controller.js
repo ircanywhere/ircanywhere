@@ -1,4 +1,4 @@
-App.SidebarController = Ember.ArrayController.extend({
+App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	statusChanged: function() {
 		Ember.$.each(Ember.View.views, function() {
 			if (this.get('templateName') === 'sidebar') {
@@ -83,5 +83,19 @@ App.SidebarController = Ember.ArrayController.extend({
 
 	onRemovedTab: function(object) {
 		window.history.back();
+	},
+
+	actions: {
+		onClick: function(url) {
+			var tabUrl = exports.Helpers.decodeChannel(url.substr(4)),
+				tab = this.get('socket.tabs').findBy('url', tabUrl);
+
+			if (this.needsPermission() && tab && tab.get('highlights') > 0) {
+				this.requestPermission();
+			}
+			// are there any pending unread highlights? if so ask for notification permission
+
+			window.location.href = url;
+		}
 	}
 });

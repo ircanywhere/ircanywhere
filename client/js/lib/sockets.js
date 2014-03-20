@@ -14,6 +14,7 @@ Ember.Socket = Ember.Object.extend({
 		this.set('channelUsers', Ember.A());
 		this.set('events', Ember.A());
 		this.set('commands', Ember.A());
+		this.set('highlights', Ember.A());
 		// setup the collections
 	},
 
@@ -73,6 +74,7 @@ Ember.Socket = Ember.Object.extend({
 		this.set('channelUsers', Ember.A());
 		this.set('events', Ember.A());
 		this.set('commands', Ember.A());
+		this.set('highlights', Ember.A());
 		// empty some collections
 
 		App.__container__.lookup('controller:disconnected').send('openIfClosed');

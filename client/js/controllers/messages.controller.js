@@ -1,7 +1,8 @@
-App.MessagesController = Ember.ArrayController.extend({
+App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	needs: ['index'],
 	events: [],
 	readDocs: [],
+	unreadNotifications: [],
 
 	content: Ember.arrayComputed('events', 'controllers.index.tabId', {
 		initialize: function(array, changeMeta, instanceMeta) {
@@ -161,6 +162,10 @@ App.MessagesController = Ember.ArrayController.extend({
 								highlightCounter++;
 							}
 						}
+						// do all our housekeeping, mark the message as read etc
+
+						self.get('socket.emitter').trigger('eventVisible', item._id, item);
+						// emit an event for any listeners looking for a specific event to be read
 					}
 				}
 			});
@@ -208,5 +213,68 @@ App.MessagesController = Ember.ArrayController.extend({
 		}
 
 		tab.set('loading', false);
+	},
+
+	newTabMessage: function(object, backlog) {
+		var self = this;
+
+		if (App.get('isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
+			return false;
+		}
+
+		var title = object.get('message.nickname') + ' - ' + object.target,
+			Notify = this.notify(title, {
+				body: object.get('message.message'),
+				tag: object.network + '/' + object.target,
+				id: object._id,
+				timeout: 5,
+				onClose: function(obj) {
+					console.log(obj);
+					self.unreadNotifications.removeObject(obj);
+				}
+			});
+
+		this.unreadNotifications.pushObject(Notify);
+	},
+
+	onHighlightBurst: function(object, backlog) {
+		this.newTabMessage(object, backlog);
+	},
+
+	onNotice: function(object, backlog) {
+		if (!backlog) {
+			this.newTabMessage(object, backlog);
+		}
+	},
+
+	onAction: function(object, backlog) {
+		if (!backlog) {
+			this.newTabMessage(object, backlog);
+		}
+	},
+
+	onPrivmsg: function(object, backlog) {
+		if (!backlog) {
+			this.newTabMessage(object, backlog);
+		}
+	},
+
+	onEventVisible: function(id, item) {
+		if (!item.get('extra.highlight')) {
+			return false;
+		}
+		// we're not bothered about non-highlights
+
+		var self = this,
+			tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
+
+		this.unreadNotifications.forEach(function(item) {
+			if (!(App.get('isActive') && item.tag === tab.networkName + '/' + tab.title)) {
+				return false;
+			}
+			// tab or window isnt active
+
+			item.close();
+		});
 	}
 });

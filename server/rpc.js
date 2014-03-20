@@ -336,6 +336,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
 		netIds = {},
 		items = [],
+		totalHighlights = [],
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []};
 
@@ -367,12 +368,13 @@ RPCHandler.prototype.handleConnect = function(socket) {
 
 		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).sync.toArray(),
 			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
-			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.count();
+			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.toArray();
 		// get some information about the unread items/highlights
 
 		tab.unread = unreadItems;
-		tab.highlights = unreadHighlights;
+		tab.highlights = unreadHighlights.length;
 		items = _.union(items, eventResults);
+		totalHighlights = _.union(totalHighlights, unreadHighlights);
 		// combine the results
 	});
 	// loop tabs
@@ -393,6 +395,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		channelUsers: users,
 		events: items,
 		commands: commands,
+		highlights: totalHighlights,
 		burstend: true
 	});
 	// send the info

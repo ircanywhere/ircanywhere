@@ -372,12 +372,17 @@ div.sidebar {
 				}
 			}
 
-			.unread {
+			.unread:not(.selected) {
 				width: 210px;
 				z-index: 7000;
 
 				a {
-					border-left: 5px solid #225FA3;
+					background: #202E4F;
+				}
+
+				a:hover {
+					background: #202E4F!important;
+					color: @white;
 				}
 			}
 

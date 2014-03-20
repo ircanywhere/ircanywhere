@@ -32,7 +32,9 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 		removeTab: 'onRemovedTab',
 		newNetwork: 'onNewNetwork',
 		updateNetwork: 'onUpdatedNetwork',
-		removeNetwork: 'onRemovedNetwork'
+		removeNetwork: 'onRemovedNetwork',
+		burstHighlight: 'onHighlightBurst',
+		eventVisible: 'onEventVisible'
 	},
 
 	setup: function(container, controllers) {
@@ -90,5 +92,9 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 
 	update_events: function(object, backlog) {
 		this.trigger(object.type, object, backlog);
+	},
+
+	new_highlights: function(object, backlog) {
+		this.trigger('burstHighlight', object, backlog);
 	}
 });

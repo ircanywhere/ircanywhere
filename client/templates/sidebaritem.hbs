@@ -1,4 +1,4 @@
-<a {{bind-attr href=view.url title=title}}>
+<a {{bind-attr href=view.url title=title}} {{action 'onClick' view.url}}>
 	<span {{bind-attr class=":link view.getClass"}}>
 		{{#if view.isPrivmsg}}
 			{{#if unread}}

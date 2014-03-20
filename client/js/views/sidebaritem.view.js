@@ -59,5 +59,5 @@ App.SidebaritemView = Ember.View.extend({
 			title = this.get('controller.title');
 
 		return (!active) ? '(' + title + ')' : title;
-	}.property('controller.content.title', 'controller.content.active').cacheable(),
+	}.property('controller.content.title', 'controller.content.active').cacheable()
 });
