@@ -353,7 +353,6 @@ IRCHandler.prototype.who = function(client, message) {
 	}
 
 	var users = [],
-		socket = Users[client.internal.userId.toString()],
 		prefixes = _.invert(client.internal.capabilities.modes.prefixmodes);
 
 	networkManager.addTab(client, message.channel, 'channel');
@@ -384,9 +383,7 @@ IRCHandler.prototype.who = function(client, message) {
 
 	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 
-	if (socket) {
-		socket.send('channelUsers', inserts);
-	}
+	rpcHandler.push(client.internal.userId, 'channelUsers', inserts);
 	// burst emit these instead of letting the oplog tailer handle it, it's too heavy
 }
 

@@ -48,6 +48,27 @@ RPCHandler.prototype.init = function() {
 }
 
 /**
+ * Pushes the data and command out to any sockets associated to that uid
+ *
+ * @method push
+ * @param {String} uid A valid user id converted from an object ID
+ * @param {String} command The command to send
+ * @param {String} data The json data to send
+ * @return void
+ */
+RPCHandler.prototype.push = function(uid, command, data) {
+	if (typeof uid === 'object') {
+		uid = uid.toString();
+	}
+
+	var socket = Users[uid];
+
+	if (socket) {
+		socket.send(command, data);
+	}
+}
+
+/**
  * Handles any update changes to the users collection and sends changes to clients
  *
  * @method handleUsersUpdate
@@ -59,15 +80,11 @@ RPCHandler.prototype.handleUsersUpdate = function(doc) {
 		return false;
 	}
 	
-	var socket = Users[doc._id];
-
 	delete doc.lastSeen;
 	doc = _.omit(doc, 'salt', 'password', 'tokens');
 	// alter the document
 
-	if (socket) {
-		socket.send('updateUser', doc);
-	}
+	rpcHandler.push(doc._id, 'updateUser', doc);
 }
 
 /**
@@ -82,17 +99,14 @@ RPCHandler.prototype.handleNetworksAll = function(doc) {
 		return false;
 	}
 
-	var eventName = this.event[1],
-		socket = Users[doc.internal.userId];
+	var eventName = this.event[1];
 
-	if (socket) {
-		if (eventName === 'insert') {
-			socket.send('addNetwork', doc);
-		} else if (eventName === 'update') {
-			socket.send('updateNetwork', doc);
-		} else if (eventName === 'delete') {
-			socket.send('removeNetwork', doc);
-		}
+	if (eventName === 'insert') {
+		rpcHandler.push(doc.internal.userId, 'addNetwork', doc);
+	} else if (eventName === 'update') {
+		rpcHandler.push(doc.internal.userId, 'updateNetwork', doc);
+	} else if (eventName === 'delete') {
+		rpcHandler.push(doc.internal.userId, 'removeNetwork', doc);
 	}
 }
 
@@ -109,29 +123,27 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 	}
 
 	var eventName = this.event[1],
-		socket = false;
+		uid = false;
 
 	if (eventName === 'delete') {
 		_.each(Clients, function(value, key) {
 			var tab = _.find(value.internal.tabs, {'_id': doc});
 			if (tab) {
-				socket = Users[value.internal.userId];
+				uid = value.internal.userId;
 				delete Clients[key].internal.tabs[tab.target];
 			}
 		});
 		// find out which user this tab belongs to?
 	} else {
-		socket = Users[doc.user];
+		uid = doc.user;
 	}
 
-	if (socket) {
-		if (eventName === 'insert') {
-			socket.send('addTab', doc);
-		} else if (eventName === 'update') {
-			socket.send('updateTab', doc);
-		} else if (eventName === 'delete') {
-			socket.send('removeTab', doc);
-		}
+	if (eventName === 'insert') {
+		rpcHandler.push(uid, 'addTab', doc);
+	} else if (eventName === 'update') {
+		rpcHandler.push(uid, 'updateTab', doc);
+	} else if (eventName === 'delete') {
+		rpcHandler.push(uid, 'removeTab', doc);
 	}
 }
 
@@ -147,18 +159,15 @@ RPCHandler.prototype.handleEventsAll = function(doc) {
 		return false;
 	}
 
-	var eventName = this.event[1],
-		socket = Users[doc.user];
+	var eventName = this.event[1];
 
 	doc = _.omit(doc, 'user');
 	// alter the document
 
-	if (socket) {
-		if (eventName === 'insert') {
-			socket.send('newEvent', doc);
-		} else if (eventName === 'update') {
-			socket.send('updateEvent', doc);
-		}
+	if (eventName === 'insert') {
+		rpcHandler.push(doc.user, 'newEvent', doc);
+	} else if (eventName === 'update') {
+		rpcHandler.push(doc.user, 'updateEvent', doc);
 	}
 }
 
@@ -170,20 +179,16 @@ RPCHandler.prototype.handleEventsAll = function(doc) {
  * @return void
  */
 RPCHandler.prototype.handleCommandsAll = function(doc) {
-	var eventName = this.event[1];
-	
 	if (!doc || doc.backlog) {
 		return false;
 	}
 
-	var socket = Users[doc.user];
+	var eventName = this.event[1];
 
-	if (socket) {
-		if (eventName === 'insert') {
-			socket.send('newBacklog', doc);
-		} else if (eventName === 'delete') {
-			socket.send('removeBacklog', doc);
-		}
+	if (eventName === 'insert') {
+		rpcHandler.push(doc.user, 'newBacklog', doc);
+	} else if (eventName === 'delete') {
+		rpcHandler.push(doc.user, 'removeBacklog', doc);
 	}
 }
 
@@ -202,12 +207,12 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 
 	var query = (ext) ? {'networkName': ext.network, 'target': ext.channel} : {'networkName': doc.network, 'target': doc.channel},
 		eventName = this.event[1],
-		socket = false;
+		uid = false;
 
 	_.each(Clients, function(value, key) {
 		var tab = _.find(value.internal.tabs, query);
 		if (tab) {
-			socket = Users[tab.user];
+			uid = tab.user;
 		}
 	});
 	// find the tab that this change is for
@@ -215,14 +220,12 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 	doc = _.omit(doc, 'username', 'hostname', '_burst');
 	// alter the document
 
-	if (socket) {
-		if (eventName === 'insert') {
-			socket.send('newChannelUser', doc);
-		} else if (eventName === 'update') {
-			socket.send('updateChannelUser', doc);
-		} else if (eventName === 'delete') {
-			socket.send('deleteChannelUser', doc);
-		}
+	if (eventName === 'insert') {
+		rpcHandler.push(uid, 'newChannelUser', doc);
+	} else if (eventName === 'update') {
+		rpcHandler.push(uid, 'updateChannelUser', doc);
+	} else if (eventName === 'delete') {
+		rpcHandler.push(uid, 'deleteChannelUser', doc);
 	}
 }
 
