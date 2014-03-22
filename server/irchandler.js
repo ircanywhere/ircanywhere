@@ -612,6 +612,70 @@ IRCHandler.prototype.unknown = function(client, message) {
 	}
 }
 
+/**
+ * Handles an incoming banlist event
+ *
+ * @method banlist
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.banlist = function(client, message) {
+	if (!message.channel || !message.banlist) {
+		return false;
+	}
+
+	rpcHandler.push(client.internal.userId, 'banList', {channel: message.channel, items: message.banlist});
+}
+
+/**
+ * Handles an incoming invitelist event
+ *
+ * @method invitelist
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.invitelist = function(client, message) {
+	if (!message.channel || !message.invitelist) {
+		return false;
+	}
+
+	rpcHandler.push(client.internal.userId, 'inviteList', {channel: message.channel, items: message.invitelist});
+}
+
+/**
+ * Handles an incoming exceptlist event
+ *
+ * @method exceptlist
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.exceptlist = function(client, message) {
+	if (!message.channel || !message.exceptlist) {
+		return false;
+	}
+
+	rpcHandler.push(client.internal.userId, 'exceptList', {channel: message.channel, items: message.exceptlist});
+}
+
+/**
+ * Handles an incoming quietlist event
+ *
+ * @method quietlist
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.quietlist = function(client, message) {
+	if (!message.channel || !message.quietlist) {
+		return false;
+	}
+
+	rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist});
+}
+
 /* XXX - Events TODO
  	
  	away 		-  maybe this should alter the network status?

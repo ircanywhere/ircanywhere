@@ -1,4 +1,4 @@
 <div data-type="mode" {{bind-attr class=classNames data-id=content._id}}>
 	<span class="time">{{time content.message.time}}</span>
-	<span class="column event">{{#if content.extra.self}}&ndash;  You have set the mode {{content.message.mode}}{{else}}&ndash;  {{#if content.message.nickname}}{{userLink false null}} sets mode {{content.message.mode}}{{else}}{{/if}}The server set the mode {{content.message.mode}}{{/if}}</span>
+	<span class="column event">{{#if content.extra.self}}&ndash;  You have set the mode {{content.message.mode}}{{else}}&ndash;  {{#if content.message.nickname}}{{userLink false null}} sets mode {{content.message.mode}}{{else}}The server set the mode {{content.message.mode}}{{/if}}{{/if}}</span>
 </div>
