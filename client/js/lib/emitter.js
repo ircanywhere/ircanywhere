@@ -34,7 +34,11 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 		updateNetwork: 'onUpdatedNetwork',
 		removeNetwork: 'onRemovedNetwork',
 		burstHighlight: 'onHighlightBurst',
-		eventVisible: 'onEventVisible'
+		eventVisible: 'onEventVisible',
+		banList: 'onBanList',
+		inviteList: 'onInviteList',
+		exceptList: 'onExceptList',
+		quietList: 'onQuietList'
 	},
 
 	setup: function(container, controllers) {
@@ -96,5 +100,21 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 
 	new_highlights: function(object, backlog) {
 		this.trigger('burstHighlight', object, backlog);
+	},
+
+	new_banList: function(object, backlog) {
+		this.trigger('banList', object, backlog);
+	},
+
+	new_inviteList: function(object, backlog) {
+		this.trigger('inviteList', object, backlog);
+	},
+
+	new_exceptList: function(object, backlog) {
+		this.trigger('exceptList', object, backlog);
+	},
+
+	new_quietList: function(object, backlog) {
+		this.trigger('quietList', object, backlog);
 	}
 });

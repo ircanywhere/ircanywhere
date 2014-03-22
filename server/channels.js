@@ -106,7 +106,11 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 	}
 	// send the update out
 
-	return application.ChannelUsers.sync.insert(finalArray);
+	if (finalArray.length > 0) {
+		return application.ChannelUsers.sync.insert(finalArray);
+	} else {
+		return [];
+	}
 }
 
 /**
@@ -125,11 +129,14 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
 	// basically we check if channel is an array, if it is we're being told to
 	// just remove the user from the entire network (on quits etc)
 
+	if (users.length === 0) {
+		return false;
+	}
+
 	if (_.isArray(channel)) {
 		application.ChannelUsers.sync.remove({network: network, nickname: {$in: users}});
 	} else {
 		application.ChannelUsers.sync.remove({network: network, channel: channel, nickname: {$in: users}});
-		// update
 	}
 	// send the update out
 }

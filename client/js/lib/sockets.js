@@ -176,6 +176,18 @@ Ember.Socket = Ember.Object.extend({
 			case 'deleteChannelUser':
 				self._delete('channelUsers', data);
 				break;
+			case 'banList':
+				self.emitter.determineEvent('banList', 'new', data, false);
+				break;
+			case 'inviteList':
+				self.emitter.determineEvent('inviteList', 'new', data, false);
+				break;
+			case 'exceptList':
+				self.emitter.determineEvent('exceptList', 'new', data, false);
+				break;
+			case 'quietList':
+				self.emitter.determineEvent('quietList', 'new', data, false);
+				break;
 			default:
 				console.warn('Recieved unknown RPC event:', event, data);
 				break;
