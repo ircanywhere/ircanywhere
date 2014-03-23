@@ -159,15 +159,16 @@ RPCHandler.prototype.handleEventsAll = function(doc) {
 		return false;
 	}
 
-	var eventName = this.event[1];
-
+	var eventName = this.event[1],
+		uid = doc.user;
+	
 	doc = _.omit(doc, 'user');
 	// alter the document
 
 	if (eventName === 'insert') {
-		rpcHandler.push(doc.user, 'newEvent', doc);
+		rpcHandler.push(uid, 'newEvent', doc);
 	} else if (eventName === 'update') {
-		rpcHandler.push(doc.user, 'updateEvent', doc);
+		rpcHandler.push(uid, 'updateEvent', doc);
 	}
 }
 

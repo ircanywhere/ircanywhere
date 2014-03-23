@@ -1,4 +1,5 @@
 App.IndexController = Ember.ObjectController.extend(App.Visibility, {
+	needs: ['infolist'],
 	tabId: null,
 
 	init: function() {
@@ -38,5 +39,10 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 
 	ready: function() {
 		this.tabChanged();
+	},
+
+	onBanList: function(data) {
+		this.send('openModal', 'infolist');
+		this.controllerFor('infolist').populateData(data);
 	}
 });

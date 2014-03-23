@@ -625,7 +625,7 @@ IRCHandler.prototype.banlist = function(client, message) {
 		return false;
 	}
 
-	rpcHandler.push(client.internal.userId, 'banList', {channel: message.channel, items: message.banlist});
+	rpcHandler.push(client.internal.userId, 'banList', {channel: message.channel, items: message.banlist, type: 'banList'});
 }
 
 /**
@@ -641,7 +641,7 @@ IRCHandler.prototype.invitelist = function(client, message) {
 		return false;
 	}
 
-	rpcHandler.push(client.internal.userId, 'inviteList', {channel: message.channel, items: message.invitelist});
+	rpcHandler.push(client.internal.userId, 'inviteList', {channel: message.channel, items: message.invitelist, type: 'inviteList'});
 }
 
 /**
@@ -657,7 +657,7 @@ IRCHandler.prototype.exceptlist = function(client, message) {
 		return false;
 	}
 
-	rpcHandler.push(client.internal.userId, 'exceptList', {channel: message.channel, items: message.exceptlist});
+	rpcHandler.push(client.internal.userId, 'exceptList', {channel: message.channel, items: message.exceptlist, type: 'exceptList'});
 }
 
 /**
@@ -673,7 +673,7 @@ IRCHandler.prototype.quietlist = function(client, message) {
 		return false;
 	}
 
-	rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist});
+	rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist, type: 'quietList'});
 }
 
 /* XXX - Events TODO
