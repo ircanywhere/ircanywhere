@@ -207,7 +207,7 @@ Ember.Socket = Ember.Object.extend({
 			if (!exists && fn) {
 				exists = fn(col, i);
 			}
-
+			
 			if (exists) {
 				exists.setProperties(i);
 			} else {

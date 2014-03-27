@@ -1,0 +1,25 @@
+{{#modal-dialog action="close"}}
+	<div class="modal-header">
+		<h3>{{title}}</h3>
+	</div>
+	<div class="modal-body">
+		<table width="100%" cellpadding="0" cellspacing="0" class="infolist">
+			<thead>
+				<tr>
+					<td>Hostname</td>
+					<td>Set by</td>
+					<td>Date</td>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each content}}
+					<tr>
+						<td>{{hostname}}</td>
+						<td>{{setby}}</td>
+						<td>{{date}}</td>
+					</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+{{/modal-dialog}}

@@ -11,26 +11,7 @@ Ember.Handlebars.helper('lookup', function(component, context, options) {
 });
 
 Ember.Handlebars.helper('time', function(context, options) {
-	var time = new Date(context),
-		ap = 'AM',
-		now = new Date(time),
-		hour = now.getHours(),
-		minute = now.getMinutes();
-		minute = (minute < 10) ? '0' + minute : minute;
-
-	if (hour > 11) {
-		ap = 'PM';
-	}
-
-	if (hour > 12) {
-		hour = hour - 12;
-	}
-
-	if (hour == 0) {
-		hour = 12;
-	}
-	
-	return hour + ':' + minute + ' ' + ap;
+	return new Date(context).format('g:i A');
 });
 
 Ember.Handlebars.registerBoundHelper('ircParse', function(text, networkId, options) {

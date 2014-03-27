@@ -170,11 +170,11 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				}
 			});
 
-			var unread = tab.get('unread') - counter;
+			var unread = tab.get('unread', 0) - counter;
 				unread = (unread <= 0) ? 0 : unread;
 				tab.set('unread', unread);
 
-			var highlights = tab.get('highlights') - highlightCounter;
+			var highlights = tab.get('highlights', 0) - highlightCounter;
 				highlights = (highlights <= 0) ? 0 : highlights;
 				tab.set('highlights', highlights);
 			// update the icon(s)

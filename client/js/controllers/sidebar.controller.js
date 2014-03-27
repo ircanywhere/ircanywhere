@@ -78,6 +78,14 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 			var query = {network: object.networkName, target: object.target};
 		}
 
+		if (!object.get('highlights')) {
+			object.set('highlights', 0);
+		}
+
+		if (!object.get('unread')) {
+			object.set('unread', 0);
+		}
+
 		object.set('query', query);
 	},
 
