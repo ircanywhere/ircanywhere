@@ -206,13 +206,9 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 		params.shift();
 	}
 
-	ircFactory.send(client._id, 'privmsg', [target, params.join(' ')]);
-	ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + params.join(' ')]);
-	// nope this is a message, lets just send it straight out because if the target
-	// is empty then it won't have been accepted into the collection
-	// bit of hackery here but we also send it to _parseLine so it comes right
-	// back through and looks like it's came from someone else - it's actually 99.9% more cleaner than the
-	// last buggy implementation so I'm very happy with this, don't fuck about it with it.
+	ircFactory.send(client._id, 'privmsg', [target, params.join(' '), true]);
+	// append with true to get it pushed back down to us, irc-factory handles this now, because we
+	// do parsing on the privmsg there, and splitting etc, no point duplicating the code
 
 	if (target.toLowerCase() === 'nickserv' && (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login')) {
 		application.Commands.sync.remove({_id: id});
@@ -235,9 +231,8 @@ CommandManager.prototype.notice = function(user, client, target, params) {
 		return false;
 	}
 
-	ircFactory.send(client._id, 'notice', [target, params.join(' ')]);
-	ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' NOTICE ' + target + ' :' + params.join(' ')]);
-	// same as above, we don't get a reciept for notices so we push it back through our buffer
+	ircFactory.send(client._id, 'notice', [target, params.join(' '), true]);
+	// again append with true
 }
 
 /**
@@ -255,9 +250,8 @@ CommandManager.prototype.me = function(user, client, target, params) {
 		return false;
 	}
 
-	ircFactory.send(client._id, 'me', [target, params.join(' ')]);
-	ircFactory.send(client._id, '_parseLine', [':' + client.nick + '!' + client.user + '@' + client.hostname + ' PRIVMSG ' + target + ' :' + String.fromCharCode(1) + 'ACTION ' + params.join(' ') + String.fromCharCode(1)]);
-	// same as above, we don't get a reciept for /me so we push it back through our buffer
+	ircFactory.send(client._id, 'me', [target, params.join(' '), true]);
+	// append with true
 }
 
 /**
@@ -506,7 +500,7 @@ CommandManager.prototype.ctcp = function(user, client, target, params) {
 		type = params[1];
 
 	if (user && type) {
-		ircFactory.send(client._id, 'privmsg', [targ, String.fromCharCode(1) + type.toUpperCase() + String.fromCharCode(1)]);
+		ircFactory.send(client._id, 'privmsg', [targ, '\x01' + type.toUpperCase() + '\x01', true]);
 	}
 }
 
