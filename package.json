@@ -6,7 +6,8 @@
   "homepage": "https://ircanywhere.com",
   "main": "./server/ircanywhere",
   "scripts": {
-    "start": "node ./server/ircanywhere start"
+    "start": "node ./server/ircanywhere start",
+    "test": "./node_modules/lab/bin/lab -clr console"
   },
   "contributors": [
     {
@@ -31,6 +32,7 @@
     "hooks": "0.3.2",
     "irc-factory": "~1.7.0",
     "jsonminify": "0.2.2",
+    "lab": "^3.0.0",
     "lodash": "~2.4.1",
     "mongodb": "^1.4.5",
     "simple-schema": "1.1.0",
