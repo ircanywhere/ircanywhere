@@ -388,7 +388,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			commands = [];
 	} else {
 		var users = application.ChannelUsers.sync.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).sync.toArray(),
-			commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sync.toArray();
+			commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).sync.toArray();
 	}
 	// get channel users and commands
 
@@ -398,7 +398,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		tabs: tabs,
 		channelUsers: users,
 		events: items,
-		commands: commands,
+		commands: commands.reverse(),
 		highlights: totalHighlights,
 		burstend: true
 	});

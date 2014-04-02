@@ -21,15 +21,20 @@ App.InputController = Ember.ObjectController.extend({
 		},
 		
 		sendCommand: function() {
-			var tab = this.get('socket.tabs').findBy('selected', true);
+			var tab = this.get('socket.tabs').findBy('selected', true),
+				commandObject = {
+					command: this.get('inputValue'),
+					network: tab.networkName,
+					target: tab.target
+				};
 
-			this.socket.send('sendCommand', {
-				command: this.get('inputValue'),
-				network: tab.networkName,
-				target: tab.target
-			});
-			// unlike the last codebase, we don't need to piss about with inserting
-			// into a buffer or anything, the commands collection does this for us.
+			this.socket.send('sendCommand', commandObject);
+			// unlike the last codebase
+
+			commandObject.timestamp = +new Date();
+			this.get('socket.commands').pushObject(commandObject);
+			// we push it into the buffer manually, saves us getting the data sent back down
+			// through the pipe which is a waste of bandwidth
 
 			this.set('inputValue', '');
 			// reset the input
