@@ -193,7 +193,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 	}
 
 	restriction.forEach(function(item) {
-		var regex = helper.escape(item).replace('\\*', '(.*)');
+		var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
 		escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
 	});
 	// create an array of restrictions
@@ -225,7 +225,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 
 	for (var itemI in escapedRestrictions) {
 		var item = escapedRestrictions[itemI];
-		if (!server.match(item)) {
+		if (!item.test(server)) {
 			output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
 			break;
 		}
