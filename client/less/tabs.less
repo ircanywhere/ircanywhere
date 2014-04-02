@@ -139,10 +139,26 @@
 	font-size: 12px;
 
 	thead {
-		td {
+		th {
 			background: @light-gray;
 			padding: 8px 15px;
 			font-weight: bold;
+			text-align: left;
+			background-repeat: no-repeat;
+			background-position: center right;
+			cursor: pointer;
+
+			&.icon-sort-up {
+				background-image: url('data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7')
+			}
+
+			&.icon-sort-down {
+				background-image: url('data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7')
+			}
+
+			&.icon-sort {
+				background-image: url('data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==')
+			}
 		}
 	}
 

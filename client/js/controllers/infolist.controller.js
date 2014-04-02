@@ -1,6 +1,9 @@
-App.InfolistController = Ember.ObjectController.extend({
+App.InfolistController = Ember.ArrayController.extend({
 	title: '',
 	items: [],
+
+	sortProperties: ['timestamp'],
+	sortAscending: false,
 
 	populateData: function(data) {
 		if (!data.channel || !data.items || !data.type) {

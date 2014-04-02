@@ -6,13 +6,13 @@
 		<table width="100%" cellpadding="0" cellspacing="0" class="infolist">
 			<thead>
 				<tr>
-					<td>Hostname</td>
-					<td>Set by</td>
-					<td>Date</td>
+					{{view App.SortingTableHeader text="Hostname" property="hostname"}}
+					{{view App.SortingTableHeader text="Set by" property="setby"}}
+					{{view App.SortingTableHeader text="Date" property="timestamp"}}
 				</tr>
 			</thead>
 			<tbody>
-				{{#each content}}
+				{{#each controller}}
 					<tr>
 						<td>{{hostname}}</td>
 						<td>{{setby}}</td>
