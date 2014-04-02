@@ -323,7 +323,7 @@ Ember.Parser = Ember.Object.extend({
 		// parse http links and www. urls (http://jmrware.com/articles/2010/linkifyurl/linkify.html)
 
 		text = text.replace(/(^|[ ]+)(#\S+)/ig, function(input, match, match2) {
-			var route = '#/t/' + network.url + '/' + exports.Helpers.encodeChannel(match2);
+			var route = '#/t/' + network.url + '/' + Helpers.encodeChannel(match2);
 			return (match == ' ') ? ' <a href="' + route + '" rel="channel-link">' + match2 + '</a>' : '<a href="' + route + '" rel="channel-link">' + match2 + '</a>';
 		});
 		// parse channel into link

@@ -13,7 +13,7 @@ App.TabRoute = AppRoute.extend({
 			network = this.modelFor('network');
 
 		return new Ember.RSVP.Promise(function(resolve, reject) {
-			var result = index.socket.find('tabs', {network: network.get('_id'), target: exports.Helpers.decodeChannel(params.tab).toLowerCase()});
+			var result = index.socket.find('tabs', {network: network.get('_id'), target: Helpers.decodeChannel(params.tab).toLowerCase()});
 			if (result.length) {
 				resolve(result[0]);
 			} else {
@@ -36,11 +36,11 @@ App.TabRoute = AppRoute.extend({
 				parts = transition.providedModelsArray;
 
 			if (parts.length === 0) {
-				var url = (!params.tab) ? params.url : params.url + '/' + exports.Helpers.decodeChannel(params.tab).toLowerCase();
+				var url = (!params.tab) ? params.url : params.url + '/' + Helpers.decodeChannel(params.tab).toLowerCase();
 			} else if (parts.length === 1) {
 				var url = parts[0];
 			} else {
-				var url = parts[0] + '/' + exports.Helpers.decodeChannel(parts[1]).toLowerCase();
+				var url = parts[0] + '/' + Helpers.decodeChannel(parts[1]).toLowerCase();
 			}
 			// attempt to construct a url from resolves models or parameters
 

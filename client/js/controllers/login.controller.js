@@ -17,7 +17,7 @@ App.LoginController = Ember.ObjectController.extend({
 				password = this.get('password');
 			// retrieve input fields
 
-			email = exports.Helpers.trimInput(email);
+			email = Helpers.trimInput(email);
 			// validation
 
 			Ember.$.post('/api/login', {email: email, password: password}, function(data) {
@@ -33,7 +33,7 @@ App.LoginController = Ember.ObjectController.extend({
 			var self = this,
 				email = this.get('resetEmail');
 
-			email = exports.Helpers.trimInput(email);
+			email = Helpers.trimInput(email);
 			// validation
 
 			Ember.$.post('/api/forgot', {email: email}, function(data) {
