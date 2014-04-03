@@ -43,7 +43,7 @@ function ChannelManager() {
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
 	var chan = application.Tabs.sync.findOne({network: network, title: channel});
-
+	
 	if (!chan) {
 		var chan = _.clone(this.channel);
 			chan.network = network;
@@ -81,7 +81,7 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 		u._burst = burst;
 		find.push(u.nickname);
 
-		if (u.nickname == Clients[key].nick) {
+		if (u.nickname === Clients[key].nick) {
 			application.Networks.sync.update({_id: key}, {$set: {hostname: u.hostname}});
 		}
 		// update hostname
