@@ -21,7 +21,8 @@
     "gulp-concat-css": "^0.1.4",
     "gulp-less": "~1.2.3",
     "gulp-uglifyjs": "~0.2.0",
-    "gulp-clean": "~0.2.0"
+    "gulp-clean": "~0.2.0",
+    "lab": "^3.0.0"
   },
   "dependencies": {
     "daemonize2": "~0.4.2",
