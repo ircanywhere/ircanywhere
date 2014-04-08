@@ -676,6 +676,24 @@ IRCHandler.prototype.quietlist = function(client, message) {
 	rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist, type: 'quietList'});
 }
 
+/**
+ * Handles an incoming list event
+ *
+ * @method list
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.list = function(client, message) {
+	if (!message.list) {
+		return false;
+	}
+
+	console.log(message.list);
+	client.internal._listBlock = false;
+	//rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist, type: 'quietList'});
+}
+
 /* XXX - Events TODO
  	
  	away 		-  maybe this should alter the network status?

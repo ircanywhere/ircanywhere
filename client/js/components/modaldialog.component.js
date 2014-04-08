@@ -1,4 +1,6 @@
 App.ModalDialogComponent = Ember.Component.extend({
+	className: '',
+
 	didInsertElement: function() {
 		var overlay = this.$('.overlay'),
 			self = this;

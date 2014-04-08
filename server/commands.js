@@ -620,7 +620,7 @@ CommandManager.prototype.quit = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.reconnect = function(user, client, target, params) {
-	if (client.internal.connected || client.internal.connecting) {
+	if (helper.exists(client, 'internal.connected') || helper.exists(client, 'internal.connecting')) {
 		ircFactory.send(client._id, 'reconnect', []);
 	} else {
 		networkManager.connectNetwork(client);
@@ -629,6 +629,32 @@ CommandManager.prototype.reconnect = function(user, client, target, params) {
 
 	networkManager.changeStatus(client._id, networkManager.flags.connecting);
 	// mark as connecting and mark the tab as active again
+}
+
+/**
+ * '/list' command
+ *
+ * @method list
+ * @param {Object} user A valid user object
+ * @param {Object} client A valid client object
+ * @param {String} target Target to send command to, usually a channel or username
+ * @param {String} command The command string
+ * @return void
+ */
+CommandManager.prototype.list = function(user, client, target, params) {
+	if (helper.exists(client, 'internal._listBlock')) {
+		return;
+	}
+
+	client.internal._listBlock = true;
+	// block them from pushing this command out again until it's freed
+
+	var search = params[0] || '*',
+		page = params[1] || 1,
+		limit = 20;
+	// pull out params
+
+	ircFactory.send(client._id, 'list', [search, page, limit]);
 }
 
 /**
@@ -651,12 +677,14 @@ CommandManager.prototype.raw = function(user, client, target, params) {
 
 	if (_.indexOf(blacklist, command) === -1) {
 		ircFactory.send(client._id, 'raw', params);
+	} else if (command === 'LIST') {
+		this.list(user, client, target, params);
 	}
 	// XXX: here we do a little cheat and intercept their command
-	// 		theres a few blacklisted commands at the moment (LIST, WHO)
+	// 		theres a blacklisted command at the moment (WHO)
 	// 		we don't really ever need to do request a who list from the server
 	// 		for a channel if we know we're in the channel because we have it stored in
-	// 		a database.. And we want to avoid accepting LISTs for large networks full stop
+	// 		a database..
 }
 
 exports.CommandManager = _.extend(CommandManager, hooks);
