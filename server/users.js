@@ -198,7 +198,7 @@ UserManager.prototype.isAuthenticated = function(data) {
 		var unset = {};
 			unset['tokens.' + cookies.token] = 1;
 		
-		application.Users.sync.update(query, {$unset: unset});
+		application.Users.update(query, {$unset: unset}, {safe: false});
 		// token is expired, remove it
 
 		return false;
@@ -355,7 +355,7 @@ UserManager.prototype.userLogin = function(req, res) {
 				ip: req.ip
 			};
 
-		application.Users.sync.update({email: email}, {$set: {tokens: tokens, newUser: false}});
+		application.Users.update({email: email}, {$set: {tokens: tokens, newUser: false}}, {safe: false});
 		res.cookie('token', token, {expires: expire});
 		// set a login key and a cookie
 
@@ -380,7 +380,7 @@ UserManager.prototype.userLogout = function(req, res) {
 	if (!user) {
 		return false;
 	} else {
-		application.Users.sync.update({_id: user._id}, {$set: {tokens: {}}});
+		application.Users.update({_id: user._id}, {$set: {tokens: {}}}, {safe: false});
 		return true;
 	}
 }
@@ -412,7 +412,7 @@ UserManager.prototype.forgotPassword = function(req, res) {
 		ip: req.ip
 	};
 
-	application.Users.sync.update({email: email}, {$set: {resetToken: resetToken}});
+	application.Users.update({email: email}, {$set: {resetToken: resetToken}}, {safe: false});
 	// set the reset token
 
 	var link = application.config.url + '/#/reset/' + token,
@@ -503,7 +503,7 @@ UserManager.prototype.updateSettings = function(req, res) {
 	}
 	// any errors?
 
-	application.Users.sync.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}});
+	application.Users.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}}, {safe: false});
 	// update the settings
 
 	output.successMessage = 'Your settings successfully have been updated.';
@@ -561,7 +561,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
 	} else {
 		var hash = crypto.createHmac('sha256', user.salt).update(password).digest('hex');
 
-		application.Users.sync.update({_id: user._id}, {$unset: {resetToken: 1}, $set: {password: hash}});
+		application.Users.update({_id: user._id}, {$unset: {resetToken: 1}, $set: {password: hash}}, {safe: false});
 		// set the password && unset any reset tokens
 
 		output.successMessage = 'Your password has been reset, you may now login';

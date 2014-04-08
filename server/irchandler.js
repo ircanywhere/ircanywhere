@@ -684,12 +684,6 @@ IRCHandler.prototype.quietlist = function(client, message) {
  	whois		- /--
  	links 		-/
  	list 		-| These need to be moved over from events
- 	banlist 	-| and sent straight down the websocket pipe
- 	invitelist 	-| to be parsed into a model window or something
- 	exceptlist 	-| because we dont want to store this info
- 	quietlist 	-\
- 	invitelist	- \--
-
  */
 
 exports.IRCHandler = _.extend(IRCHandler, hooks);

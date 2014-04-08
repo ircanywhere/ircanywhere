@@ -74,7 +74,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 				}
 			};
 
-		application.Events.sync.insert(output, {safe: false});
+		application.Events.insert(output, {safe: false});
 		// get the prefix, construct an output and insert it
 	});
 }

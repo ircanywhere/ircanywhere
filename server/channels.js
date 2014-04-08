@@ -198,7 +198,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 	var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 	// we need to attempt to update the record now with the new info
 
-	application.Tabs.sync.update({network: key, title: channel}, {$set: {modes: modes}});
+	application.Tabs.update({network: key, title: channel}, {$set: {modes: modes}}, {safe: false});
 	// update the record
 
 	users.forEach(function(u) {
@@ -211,7 +211,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 		u.sort = prefix.sort;
 		u.prefix = prefix.prefix;
 		
-		application.ChannelUsers.sync.update({network: network, channel: channel, nickname: u.nickname}, u);
+		application.ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u, {safe: false});
 	});
 	// update users now
 }
@@ -236,7 +236,7 @@ ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	};
 	// updat the topic record
 
-	application.Tabs.sync.update({network: key, title: channel}, {$set: {topic: topic}});
+	application.Tabs.update({network: key, title: channel}, {$set: {topic: topic}}, {safe: false});
 	// update the record
 }
 

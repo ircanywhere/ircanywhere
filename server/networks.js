@@ -363,9 +363,9 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
  */
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
-		application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}});
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}}, {safe: false});
 	} else {
-		application.Tabs.sync.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true});
+		application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
 	}
 	// update the activation flag
 }
