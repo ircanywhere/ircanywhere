@@ -134,9 +134,9 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
 	}
 
 	if (_.isArray(channel)) {
-		application.ChannelUsers.sync.remove({network: network, nickname: {$in: users}});
+		application.ChannelUsers.remove({network: network, nickname: {$in: users}}, {safe: false});
 	} else {
-		application.ChannelUsers.sync.remove({network: network, channel: channel, nickname: {$in: users}});
+		application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}}, {safe: false});
 	}
 	// send the update out
 }

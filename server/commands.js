@@ -177,7 +177,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 	ircFactory.send(client._id, 'raw', ['nickserv'].concat(params));
 
 	if (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login') {
-		application.Commands.sync.remove({_id: id});
+		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands
 }
@@ -211,7 +211,7 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 	// do parsing on the privmsg there, and splitting etc, no point duplicating the code
 
 	if (target.toLowerCase() === 'nickserv' && (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login')) {
-		application.Commands.sync.remove({_id: id});
+		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands
 }
@@ -294,7 +294,7 @@ CommandManager.prototype.join = function(user, client, target, params) {
 	// attempt to figure out if we've got an autojoin record set - just defining a
 	// tab isn't enough for us
 
-	application.Networks.sync.update({_id: client._id}, {$set: {channels: client.channels}});
+	application.Networks.update({_id: client._id}, {$set: {channels: client.channels}}, {safe: false});
 	// we'll also store it in our reconnect settings
 }
 
@@ -319,7 +319,7 @@ CommandManager.prototype.part = function(user, client, target, params) {
 
 	var index = _.findIndex(client.channels, {channel: channel.toLowerCase()});
 	if (index > -1) {
-		application.Networks.sync.update({_id: client._id}, {$pull: {channels: client.channels[index]}});
+		application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
 	}
 	// does the index exist? lets remove it if so
 }
@@ -560,8 +560,9 @@ CommandManager.prototype.close = function(user, client, target, params) {
 		// determine what to do with it, if it's a channel /part and remove tab
 
 		var index = _.findIndex(client.channels, {channel: target.toLowerCase()});
+		
 		if (index > -1) {
-			application.Networks.sync.update({_id: client._id}, {$pull: {channels: client.channels[index]}});
+			application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
 		}
 		// does the index in client.channels exist? lets remove it if so
 	} else if (tab.type === 'query') {
