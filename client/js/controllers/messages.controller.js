@@ -76,8 +76,6 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			sortAscending: true
 		});
 
-		throw new Error('testing source maps');
-
 		return proxy.slice(slice);
 	}.property('content.@each', 'socket.tabs.@each.selected', 'socket.tabs.@each.messageLimit'),
 
