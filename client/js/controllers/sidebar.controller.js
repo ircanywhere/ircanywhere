@@ -95,7 +95,7 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 
 	actions: {
 		onClick: function(url) {
-			var tabUrl = exports.Helpers.decodeChannel(url.substr(4)),
+			var tabUrl = Helpers.decodeChannel(url.substr(4)),
 				tab = this.get('socket.tabs').findBy('url', tabUrl);
 
 			if (this.needsPermission() && tab && tab.get('highlights') > 0) {

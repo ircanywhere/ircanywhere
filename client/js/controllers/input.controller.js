@@ -57,7 +57,7 @@ App.InputController = Ember.ObjectController.extend({
 
 			this.tabCompletionNicks = [];
 			users.forEach(function(user) {
-				var regex = new RegExp('^' + exports.Helpers.escape(lastWord) + '(.*)', 'i');
+				var regex = new RegExp('^' + Helpers.escape(lastWord) + '(.*)', 'i');
 
 				if (user.nickname.match(regex)) {
 					self.tabCompletionNicks.push(user.nickname);
