@@ -46,7 +46,9 @@ App.NetworkController = Ember.ObjectController.extend({
 
 		if (first) {
 			var firstElement = tabElement.find('[data-id=' + first._id + ']')[0];
-			tabElement[0].scrollTop = firstElement.offsetTop - firstElement.offsetHeight;
+			if (firstElement) {
+				tabElement[0].scrollTop = firstElement.offsetTop - firstElement.offsetHeight;
+			}
 		} else {
 			tabElement[0].scrollTop = 0;
 		}
