@@ -53,6 +53,11 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	}.observes('controller.content.@each'),
 
 	scrolled: function() {
+		if (this.$() === undefined) {
+			return false;
+		}
+		// we've not rendered the view yet so just bail
+		
 		var self = this,
 			parent = this.$(),
 			container = this.$('.inside-backlog'),

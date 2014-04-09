@@ -68,6 +68,31 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	},
 
 	onNewTab: function(object) {
+		this._updateQuery(object);
+
+		if (!object.get('highlights')) {
+			object.set('highlights', 0);
+		}
+
+		if (!object.get('unread')) {
+			object.set('unread', 0);
+		}
+
+		if (this.get('socket._empty') === true) {
+			window.location.hash = '#/t/' + object.url;
+			this.socket.set('_empty', false);
+		}
+	},
+
+	onUpdatedTab: function(object) {
+		this._updateQuery(object);
+	},
+
+	onRemovedTab: function(object) {
+		window.history.back();
+	},
+
+	_updateQuery: function(object) {
 		var network = this.get('socket.networks').findBy('_id', object.get('network'));
 
 		if (object.type === 'network') {
@@ -78,19 +103,7 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 			var query = {network: object.networkName, target: object.target};
 		}
 
-		if (!object.get('highlights')) {
-			object.set('highlights', 0);
-		}
-
-		if (!object.get('unread')) {
-			object.set('unread', 0);
-		}
-
 		object.set('query', query);
-	},
-
-	onRemovedTab: function(object) {
-		window.history.back();
 	},
 
 	actions: {

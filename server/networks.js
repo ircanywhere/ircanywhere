@@ -223,12 +223,16 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
 	}
 
+	var restricted = true;
 	for (var itemI in escapedRestrictions) {
 		var item = escapedRestrictions[itemI];
-		if (!item.test(server)) {
-			output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
-			break;
+		if (item.test(server)) {
+			restricted = false;
 		}
+	}
+
+	if (restricted) {
+		output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
 	}
 
 	if (output.errors.length > 0) {

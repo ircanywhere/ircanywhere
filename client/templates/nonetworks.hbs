@@ -1,0 +1,12 @@
+{{render "sidebar"}}
+<div class="container clear">
+	{{render "titlebar"}}
+	<div class="content-holder" id="content">
+		<div id="no-networks">
+			<h3>Hello there!</h3>
+			<p>You are seeing this page because you are not connected to any networks, perhaps you are new?</p>
+			<p>Well, if thats the case then consider <a href="#" {{action "openModal" "addnetwork"}}>adding a network</a>.</p>
+			<p>If you are not sure why you are here then you may have been disconnected from your networks for an unknown reason.</p>
+		</div>
+	</div>
+</div>

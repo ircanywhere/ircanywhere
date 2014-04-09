@@ -70,7 +70,7 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 	},
 
 	update_tabs: function(object, backlog) {
-		this.trigger('updatedTab', object, backlog);
+		this.trigger('updateTab', object, backlog);
 	},
 
 	delete_tabs: function(object, backlog) {

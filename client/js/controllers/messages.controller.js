@@ -26,8 +26,8 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			if (!tab) {
 				return accum;
 			}
-				
-			if (item.network === tab.networkName &&
+
+			if ((item.network === tab.networkName || item.network === network.name) &&
 				((tab.type === 'network' && item.target === '*') ||
 				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {
@@ -46,7 +46,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				return accum;
 			}
 				
-			if (item.network === tab.networkName &&
+			if ((item.network === tab.networkName || item.network === network.name) &&
 				((tab.type === 'network' && item.target === '*') ||
 				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {

@@ -23,17 +23,24 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 			this.set('tabId', tab.get('_id'));
 			// change the tab id
 		}
-	}.observes('socket.users.@each.selectedTab'),
+	}.observes('socket.users.@each.selectedTab', 'socket.tabs.length'),
 	
 	determinePath: function() {
 		if (this.socket.authed === null) {
 			this.socket.connect();
+		} else if (this.socket.authed === false) {
+			this.transitionToRoute('login');
 		}
 	},
 
 	isAuthed: function() {
 		if (this.socket.authed === false) {
 			this.transitionToRoute('login');
+		} else {
+			if (this.get('socket.networks.length') === 0 || this.get('socket.tabs.length') === 0) {
+				this.socket.set('_empty', true);
+				this.transitionToRoute('nonetworks');
+			}
 		}
 	}.observes('socket.authed'),
 
