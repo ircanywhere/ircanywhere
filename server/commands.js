@@ -170,7 +170,7 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
  * @return void
  */
 CommandManager.prototype.nickserv = function(user, client, target, params, out, id) {
-	if (params.length == 0) {
+	if (params.length === 0) {
 		return false;
 	}
 
@@ -197,7 +197,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 	var out = out || false;
 
-	if (params.length == 0) {
+	if (params.length === 0 || target === undefined) {
 		return false;
 	}
 
@@ -205,6 +205,11 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 		var target = params[0];
 		params.shift();
 	}
+
+	if (params.length === 0) {
+		return false;
+	}
+	// check again
 
 	ircFactory.send(client._id, 'privmsg', [target, params.join(' '), true]);
 	// append with true to get it pushed back down to us, irc-factory handles this now, because we
@@ -227,7 +232,7 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
  * @return void
  */
 CommandManager.prototype.notice = function(user, client, target, params) {
-	if (params.length == 0) {
+	if (params.length === 0) {
 		return false;
 	}
 
@@ -246,7 +251,7 @@ CommandManager.prototype.notice = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.me = function(user, client, target, params) {
-	if (params.length == 0) {
+	if (params.length === 0) {
 		return false;
 	}
 
@@ -355,7 +360,7 @@ CommandManager.prototype.cycle = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.topic = function(user, client, target, params) {
-	if (params.length == 0) {
+	if (params.length === 0) {
 		return false;
 	}
 

@@ -69,7 +69,7 @@ IRCFactory.prototype.init = function() {
 
 	this.events.on('message', function(message) {
 		fibrous.run(function() {
-			if (message.event == 'synchronize') {
+			if (message.event === 'synchronize') {
 				var networks = networkManager.getClients(),
 					keys = _.keys(networks),
 					difference = _.difference(keys, message.keys);
@@ -84,6 +84,8 @@ IRCFactory.prototype.init = function() {
 				// the clients we're going to actually attempt to boot up
 
 				application.logger.log('info', 'factory synchronize', helper.cleanObjectIds(message));
+			} else if (message.event === 'uncaughtException') {
+				application.logger.log('error', JSON.parse(message.message));
 			} else {
 				self.handleEvent(message.event, message.message);
 			}
