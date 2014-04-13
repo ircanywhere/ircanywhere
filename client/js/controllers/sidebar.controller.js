@@ -39,8 +39,6 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 
 	incrementCounters: function(network, tab, object, backlog) {
 		if (tab && network && (!object.read || object.unread)) {
-			object.set('unread', true).set('read', true);
-
 			if (backlog) {
 				return false;
 			}

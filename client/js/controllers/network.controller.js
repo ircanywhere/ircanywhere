@@ -28,7 +28,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		// some how this has happened, but lets be safe and not continue anyway
 
 		var query = Ember.copy(tab.query),
-			events = this.get('controllers.messages.content').filterProperty('unread', true);
+			events = this.get('controllers.messages.content').filterProperty('read', false);
 		// get the events for the specific tab
 
 		query.read = false;
@@ -41,7 +41,7 @@ App.NetworkController = Ember.ObjectController.extend({
 	},
 
 	gotoUnread: function(id) {
-		var first = this.get('controllers.messages.content').filterProperty('unread', true).objectAt(0),
+		var first = this.get('controllers.messages.content').filterProperty('read', false).objectAt(0),
 			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
 
 		if (first) {

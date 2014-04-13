@@ -131,7 +131,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		detectUnread: function(id, top, bottom, container) {
 			var self = this,
 				tab = this.get('socket.tabs').findBy('_id', id),
-				events = this.get('content').filterProperty('unread', true),
+				events = this.get('filtered').filterProperty('read', false),
 				highlightCounter = 0,
 				counter = 0,
 				docs = [];
@@ -141,18 +141,14 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 
 			events.forEach(function(item) {
-				var el = container.find('div.row[data-id=' + item._id + ']'),
+				var el = $('div.row[data-id=' + item._id + ']'),
 					type = el.attr('data-type');
 
-				if (type !== 'privmsg' && type !== 'action' && type !== 'notice') {
-					return;
-				}
-
-				if (el.get(0)) {
+				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
 					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
-						item.set('unread', false);
+						item.set('read', true);
 						
 						if (self.readDocs.indexOf(item._id) === -1) {
 							self.readDocs.push(item._id);
@@ -229,7 +225,6 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				id: object._id,
 				timeout: 5,
 				onClose: function(obj) {
-					console.log(obj);
 					self.unreadNotifications.removeObject(obj);
 				}
 			});
