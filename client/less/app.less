@@ -4,6 +4,10 @@ div.main-view:extend(.clear), body > div {
 	height: 100%;
 }
 
+div.main-view .narrow {
+	left: 0
+}
+
 div.container {
 	height: 100%;
 	float: left;
@@ -271,6 +275,10 @@ div.sidebar {
 	font-size: 12px;
 	background: @side-background;
 	.padding-margin;
+
+	&.narrow {
+		left: -210px;
+	}
 
 	.header {
 		background: @side-head-bg;

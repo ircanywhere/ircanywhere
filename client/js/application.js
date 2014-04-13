@@ -6,6 +6,7 @@ App = Ember.Application.create({
 	timeout: null,
 	timein: null,
 	isActive: true,
+	isDesktop: true,
 	// global variables
 	
 	Parser: Ember.Parser.create(),

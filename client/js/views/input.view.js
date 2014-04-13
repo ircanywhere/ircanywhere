@@ -31,6 +31,10 @@ App.InputView = Ember.View.extend({
 		if (keyCode === key.enter) {
 			this.get('controller').send('sendCommand');
 			e.preventDefault();
+
+			if (!App.get('isDesktop')) {
+				document.activeElement.blur();
+			}
 		} else if (keyCode === key.tab) {
 			this.get('controller').send('tabComplete');
 			e.preventDefault();

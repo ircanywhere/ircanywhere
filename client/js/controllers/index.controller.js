@@ -33,14 +33,16 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 		}
 	},
 
+	waitTillReady: function() {
+		if (this.get('socket.networks.length') === 0 || this.get('socket.tabs.length') === 0) {
+			this.socket.set('_empty', true);
+			this.transitionToRoute('nonetworks');
+		}
+	}.observes('socket.done'),
+
 	isAuthed: function() {
 		if (this.socket.authed === false) {
 			this.transitionToRoute('login');
-		} else {
-			if (this.get('socket.networks.length') === 0 || this.get('socket.tabs.length') === 0) {
-				this.socket.set('_empty', true);
-				this.transitionToRoute('nonetworks');
-			}
 		}
 	}.observes('socket.authed'),
 

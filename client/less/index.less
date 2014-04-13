@@ -113,7 +113,8 @@ body {
 
 	button, input[type="button"], input[type="reset"], input[type="submit"] {
 		cursor: pointer;
-		webkit-appearance: button;
+		-webkit-appearance: none;
+		-moz-appearance: none;
 		height: auto;
 		width: auto;
 	}
@@ -136,7 +137,7 @@ body {
 		line-height: initial;
 		moz-box-shadow: none;
 		padding: initial;
-		webkit-box-shadow: none;
+		-webkit-box-shadow: none;
 	}
 
 	select, input[type="file"] {
@@ -331,6 +332,7 @@ body {
 		cursor: pointer;
 		display: inline-block;
 		text-decoration: none;
+
 
 		&:hover {
 			background-position: 0 -15px;
