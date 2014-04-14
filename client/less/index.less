@@ -745,3 +745,16 @@ span.tooltip, span.tt-tooltip {
 		font-weight: bold;
 	}
 }
+
+div#breakpoints {
+	height: 0;
+	
+	&.breakpoint-small,
+	&.breakpoint-medium {
+		display: none;
+	}
+
+	&.breakpoint-large {
+		display: block;
+	}
+}

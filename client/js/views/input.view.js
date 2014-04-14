@@ -32,7 +32,7 @@ App.InputView = Ember.View.extend({
 			this.get('controller').send('sendCommand');
 			e.preventDefault();
 
-			if (!App.get('isDesktop')) {
+			if (App.get('size') !== 'large') {
 				document.activeElement.blur();
 			}
 		} else if (keyCode === key.tab) {

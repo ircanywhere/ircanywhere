@@ -87,13 +87,40 @@
 
 	div.container {
 		left: 0;
+
+		.messages {
+			right: 0;
+
+			.row .time {
+				padding: 4px 0;
+			}
+
+			.row a[rel=user-link] {
+				margin-right: 5px;
+			}
+		}
+	}
+
+	div.userlist {
+		display: none!important;
 	}
 
 	div.sidebar {
 		left: -210px;
 	}
 
-	.channel-input, .userlist {
+	.channel-input {
 		display: none!important;
+	}
+
+	div#breakpoints {
+		&.breakpoint-small {
+			display: block;
+		}
+
+		&.breakpoint-medium,
+		&.breakpoint-large {
+			display: none;
+		}
 	}
 }

@@ -13,9 +13,14 @@
 		<link rel="stylesheet" type="text/css" href="/build/ircanywhere.css" />
 	</head>
 	<body>
-	<script type="text/x-handlebars">
-		{{outlet}}
-		{{outlet 'modal'}}
-	</script>
+		<script type="text/x-handlebars">
+			{{outlet}}
+			{{outlet 'modal'}}
+		</script>
+		<div id="breakpoints">
+			<div class="breakpoint-small" data-size="small"></div>
+			<div class="breakpoint-medium" data-size="medium"></div>
+			<div class="breakpoint-large" data-size="large"></div>
+		</div>
 	</body>
 </html>

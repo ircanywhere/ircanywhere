@@ -3,11 +3,11 @@ App.ApplicationView = Ember.View.extend({
 		var self = this,
 			doc = this.$();
 
-		if (doc.outerWidth() <= 1024) {
-			App.set('isDesktop', false);
-		} else {
-			App.set('isDesktop', true);
+		function getSize() {
+			App.set('size', Ember.$('#breakpoints div:visible').first().data('size'));
 		}
+
+		Ember.$(window).resize(getSize());
 
 		doc.swipe({
 			swipeRight: function(event, direction, distance, duration, fingerCount) {
@@ -20,13 +20,5 @@ App.ApplicationView = Ember.View.extend({
 				Ember.$('.sidebar').addClass('mobile');*/
 			}
 		});
-	},
-
-	determineOS: function() {
-		/*if (App.get('isDesktop')) {
-			this.$().removeClass('mobile');
-		} else {
-			this.$().addClass('mobile');
-		}*/
-	}.observes('App.isDesktop')
+	}
 });
