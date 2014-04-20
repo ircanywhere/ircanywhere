@@ -23,7 +23,7 @@ App.NetworkRoute = AppRoute.extend({
 	},
 
 	renderTemplate: function() {
-		this.updateTitle(this.get('context.name') + ' - ' + App.get('defaultTitle'));
+		this.controller.onUnreadChange();
 		this.render();
 	},
 
@@ -58,7 +58,7 @@ App.NetworkRoute = AppRoute.extend({
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
 
-			this.updateTitle(tab.get('target') + ' - ' + App.get('defaultTitle'));
+			this.controller.onUnreadChange();
 		},
 
 		markAsRead: function(id) {

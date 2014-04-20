@@ -1,5 +1,4 @@
 App.InfolistController = Ember.ArrayController.extend({
-	title: '',
 	items: [],
 
 	sortProperties: ['timestamp'],

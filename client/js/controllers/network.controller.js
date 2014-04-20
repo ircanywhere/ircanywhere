@@ -60,6 +60,37 @@ App.NetworkController = Ember.ObjectController.extend({
 		// XXX
 	},
 
+	onUnreadChange: function() {
+		var tabs = this.get('socket.tabs'),
+			selectedTab = tabs.findBy('_id', this.get('controllers.index.tabId')),
+			title = [selectedTab.get('target'), '-', App.get('defaultTitle')],
+			unread = 0,
+			highlights = 0,
+			route = App.__container__.cache.dict['route:network'];
+		// this will probably make Ember people mad but it works and I dunno how to get to the router from here
+		// maybe the update title function shouldn't be in the router? huh?.. idk
+
+		tabs.forEach(function(tab) {
+			unread += tab.unread;
+			highlights += tab.highlights;
+		});
+
+		
+		if (unread > 0) {
+			title.unshift('*');
+		} else if (title[0] === '*') {
+			title.shift();
+		}
+
+		if (highlights > 0) {
+			title.unshift('(' + highlights + ')');
+		} else if (title[0][0] === '(') {
+			title.shift();
+		}
+
+		route.updateTitle(title.join(' '));
+	}.observes('socket.tabs.@each.unread', 'socket.tabs.@each.highlights'),
+
 	ready: function() {
 		this.tabChanged();
 	}

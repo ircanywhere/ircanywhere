@@ -27,7 +27,7 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	renderTemplate: function() {
-		this.updateTitle(this.get('context.target') + ' - ' + App.get('defaultTitle'));
+		this.controller.onUnreadChange();
 		this.render();
 	},
 
@@ -62,7 +62,7 @@ App.TabRoute = AppRoute.extend({
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
 
-			this.updateTitle(tab.get('target') + ' - ' + App.get('defaultTitle'));
+			this.controller.onUnreadChange();
 		},
 
 		error: function(error, transition) {

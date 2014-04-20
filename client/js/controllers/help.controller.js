@@ -1,5 +1,4 @@
 App.HelpController = Ember.ObjectController.extend({
-	title: 'Help',
 	helpItems: [],
 
 	init: function() {
