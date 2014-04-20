@@ -27,7 +27,7 @@ App.TabRoute = AppRoute.extend({
 	},
 
 	renderTemplate: function() {
-		this.controller.onUnreadChange();
+		this.controllerFor('network').onUnreadChange();
 		this.render();
 	},
 
@@ -62,7 +62,7 @@ App.TabRoute = AppRoute.extend({
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
 
-			this.controller.onUnreadChange();
+			this.controllerFor('network').onUnreadChange();
 		},
 
 		error: function(error, transition) {

@@ -1,4 +1,5 @@
 App.AddnetworkController = Ember.ObjectController.extend({
+	title: 'Add A Network',
 	user: {},
 
 	server: '',

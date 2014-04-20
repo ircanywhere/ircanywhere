@@ -63,7 +63,7 @@ App.NetworkController = Ember.ObjectController.extend({
 	onUnreadChange: function() {
 		var tabs = this.get('socket.tabs'),
 			selectedTab = tabs.findBy('_id', this.get('controllers.index.tabId')),
-			title = [selectedTab.get('target'), '-', App.get('defaultTitle')],
+			title = (selectedTab) ? [selectedTab.get('title'), '-', App.get('defaultTitle')] : [App.get('defaultTitle')],
 			unread = 0,
 			highlights = 0,
 			route = App.__container__.cache.dict['route:network'];

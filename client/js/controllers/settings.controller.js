@@ -1,4 +1,5 @@
 App.SettingsController = Ember.ObjectController.extend({
+	title: 'Settings - Account Settings',
 	active: 'settings',
 	user: {},
 

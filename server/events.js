@@ -56,8 +56,17 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
 		var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
-			target = (force) ? '*' : target;
+			target = (force) ? '*' : target.toLowerCase();
 		// anything else goes in '*' so it's forwarded to the server log
+
+		if (message.channel) {
+			message.channel = message.channel.toLowerCase();
+		}
+
+		if (message.target) {
+			message.target = message.target.toLowerCase();
+		}
+		// housekeeping for #ChannelNames
 
 		var prefixObject = eventManager.getPrefix(client, user),
 			output = {
@@ -125,7 +134,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 		}
 		// we can also push it into the * backlog if it's us
 	} else if (type == 'privmsg' || type == 'action') {
-		var tab = client.internal.tabs[message.target];
+		var tab = client.internal.tabs[message.target.toLowerCase()];
 
 		if (!tab && message.nickname !== client.nick) {
 			networkManager.addTab(client, message.nickname, 'query', false);

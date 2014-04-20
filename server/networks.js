@@ -341,7 +341,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	// empty, bolt it
 
 	var callback = function(err, doc) {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: obj}, {safe: false, upsert: true});
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: obj}, {safe: false, upsert: true});
 		// insert to db, or update old record
 	};
 
