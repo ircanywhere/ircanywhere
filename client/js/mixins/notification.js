@@ -1,7 +1,9 @@
 App.Notification = Ember.Mixin.create({
 	notification: null,
+	audioNotification: null,
 
 	init: function() {
+		this.set('audioNotification', Ember.$('audio#audio-notification').get(0));
 		this.set('notification', window.Notification);
 	},
 
@@ -51,6 +53,11 @@ App.Notification = Ember.Mixin.create({
 		Notify.addEventListener('close', this.onClose.bind(Notify), false);
 		Notify.addEventListener('click', this.onClick.bind(Notify), false);
 		// add event listeners if they exist so we can handle things like clicks..
+
+		if (typeof this.audioNotification.play === 'function') {
+			this.audioNotification.play();
+		}
+		// play a sound!
 
 		return Notify;
 	},

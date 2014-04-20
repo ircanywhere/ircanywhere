@@ -26,8 +26,9 @@ App.TabRoute = AppRoute.extend({
 		// and it keeps things organised and conformed
 	},
 
-	title: function(controller, model) {
-		return model.get('target') + ' - ' + App.get('defaultTitle');
+	renderTemplate: function() {
+		this.updateTitle(this.get('context.target') + ' - ' + App.get('defaultTitle'));
+		this.render();
 	},
 
 	actions: {
@@ -60,6 +61,8 @@ App.TabRoute = AppRoute.extend({
 			index.set('tabId', tab._id);
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
+
+			this.updateTitle(tab.get('target') + ' - ' + App.get('defaultTitle'));
 		},
 
 		error: function(error, transition) {

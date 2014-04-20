@@ -3,7 +3,9 @@ App.Router.map(function() {
 });
 
 App.SignupRoute = AppRoute.extend({
-	title: function(controller, model) {
-		return controller.get('title');
+	title: 'Signup - IRCAnywhere',
+	
+	activate: function() {
+		this.updateTitle(this.title);
 	}
 });

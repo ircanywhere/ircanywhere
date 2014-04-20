@@ -1,6 +1,4 @@
 App.ResetController = Ember.ObjectController.extend({
-	title: 'Reset Password - IRCAnywhere',
-	
 	errors: false,
 	success: false,
 

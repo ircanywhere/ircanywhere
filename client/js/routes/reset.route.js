@@ -3,7 +3,9 @@ App.Router.map(function() {
 });
 
 App.ResetRoute = AppRoute.extend({
-	title: function(controller, model) {
-		return controller.get('title');
+	title: 'Reset Password - IRCAnywhere',
+
+	activate: function() {
+		this.updateTitle(this.title);
 	}
 });

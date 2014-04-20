@@ -5,8 +5,13 @@ App.Router.map(function() {
 });
 
 App.NetworkRoute = AppRoute.extend({
+	tabs: [],
+
 	init: function() {
-		this.controllerFor('index').determinePath();
+		var index = this.controllerFor('index');
+
+		this.set('tabs', index.get('socket.tabs'));
+		index.determinePath();
 	},
 
 	setupController: function(controller, model) {
@@ -17,8 +22,9 @@ App.NetworkRoute = AppRoute.extend({
 		return this.controllerFor('index').socket.findButWait('networks', {url: params.url}, true);
 	},
 
-	title: function(controller, model) {
-		return model.get('name') + ' - ' + App.get('defaultTitle');
+	renderTemplate: function() {
+		this.updateTitle(this.get('context.name') + ' - ' + App.get('defaultTitle'));
+		this.render();
 	},
 
 	actions: {
@@ -51,6 +57,8 @@ App.NetworkRoute = AppRoute.extend({
 			index.set('tabId', tab._id);
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
+
+			this.updateTitle(tab.get('target') + ' - ' + App.get('defaultTitle'));
 		},
 
 		markAsRead: function(id) {

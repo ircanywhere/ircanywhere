@@ -1,5 +1,4 @@
 App.LoginController = Ember.ObjectController.extend({
-	title: 'IRCAnywhere',
 	errors: false,
 
 	resetErrors: false,

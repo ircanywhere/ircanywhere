@@ -3,7 +3,7 @@ App.Router.map(function() {
 });
 
 App.LoginRoute = AppRoute.extend({
-	title: function(controller, model) {
-		return controller.get('title');
+	activate: function() {
+		this.updateTitle();
 	}
 });

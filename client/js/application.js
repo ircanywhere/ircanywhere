@@ -3,6 +3,7 @@ App = Ember.Application.create({
 	// ember settings
 	
 	defaultTitle: 'IRCAnywhere',
+	title: 'IRCAnywhere',
 	timeout: null,
 	timein: null,
 	isActive: true,

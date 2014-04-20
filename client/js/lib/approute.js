@@ -1,8 +1,11 @@
 AppRoute = Ember.Route.extend({
-	renderTemplate: function(controller, model) {
-		this.render();
-
-		var pageTitle = this.title ? this.title(controller, model) : null;
-		document.title = pageTitle ? pageTitle : App.get('defaultTitle');
+	updateTitle: function(title) {
+		if (title) {
+			document.title = title;
+			App.set('title', title);
+		} else {
+			document.title = App.defaultTitle;
+			App.set('title', App.defaultTitle);
+		}
 	}
 });
