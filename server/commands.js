@@ -660,6 +660,7 @@ CommandManager.prototype.list = function(user, client, target, params) {
 	// pull out params
 
 	ircFactory.send(client._id, 'list', [search, page, limit]);
+	rpcHandler.push(client.internal.userId, 'openList', {search: search, page: page, network: client.name});
 }
 
 /**

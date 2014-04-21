@@ -23,6 +23,10 @@ Ember.Socket = Ember.Object.extend({
 			socket = new SockJS('/websocket');
 		// connect
 
+		if (this.get('authed') === null) {
+			this.set('authed', false);
+		}
+
 		socket.onclose = function() {
 			if (!self.authed) {
 				return false;
@@ -183,6 +187,12 @@ Ember.Socket = Ember.Object.extend({
 				break;
 			case 'quietList':
 				self.emitter.determineEvent('quietList', 'new', data, false);
+				break;
+			case 'openList':
+				self.emitter.determineEvent('openList', 'new', data, false);
+				break;
+			case 'list':
+				self.emitter.determineEvent('list', 'new', data, false);
 				break;
 			default:
 				console.warn('Recieved unknown RPC event:', event, data);

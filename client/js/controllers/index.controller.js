@@ -53,5 +53,30 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	onBanList: function(data) {
 		this.send('openModal', 'infolist');
 		this.controllerFor('infolist').populateData(data);
+	},
+
+	onInviteList: function(data) {
+		this.send('openModal', 'infolist');
+		this.controllerFor('infolist').populateData(data);
+	},
+
+	onExceptList: function(data) {
+		this.send('openModal', 'infolist');
+		this.controllerFor('infolist').populateData(data);
+	},
+
+	onQuietList: function(data) {
+		this.send('openModal', 'infolist');
+		this.controllerFor('infolist').populateData(data);
+	},
+
+	onOpenList: function(data) {
+		this.send('openModal', 'list');
+		this.controllerFor('list').prePopulateData(data);
+	},
+
+	onList: function(data) {
+		this.send('openModal', 'list');
+		this.controllerFor('list').populateData(data);
 	}
 });

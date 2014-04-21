@@ -685,13 +685,14 @@ IRCHandler.prototype.quietlist = function(client, message) {
  * @return void
  */
 IRCHandler.prototype.list = function(client, message) {
-	if (!message.list) {
+	if (!message.list || !message.search || !message.page || !message.limit) {
 		return false;
 	}
 
-	console.log(message.list);
 	client.internal._listBlock = false;
-	//rpcHandler.push(client.internal.userId, 'quietList', {channel: message.channel, items: message.quietlist, type: 'quietList'});
+	// mark list block as false now we have the response
+	
+	rpcHandler.push(client.internal.userId, 'list', {search: message.search, page: message.page, limit: message.limit, channels: message.list, network: client.name});
 }
 
 /* XXX - Events TODO

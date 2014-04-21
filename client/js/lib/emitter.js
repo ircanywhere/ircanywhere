@@ -38,7 +38,9 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 		banList: 'onBanList',
 		inviteList: 'onInviteList',
 		exceptList: 'onExceptList',
-		quietList: 'onQuietList'
+		quietList: 'onQuietList',
+		openList: 'onOpenList',
+		list: 'onList'
 	},
 
 	setup: function(container, controllers) {
@@ -115,5 +117,13 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 
 	new_quietList: function(object, backlog) {
 		this.trigger('quietList', object, backlog);
+	},
+
+	new_openList: function(object, backlog) {
+		this.trigger('openList', object, backlog);
+	},
+
+	new_list: function(object, backlog) {
+		this.trigger('list', object, backlog);
 	}
 });
