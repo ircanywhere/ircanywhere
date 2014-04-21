@@ -9,16 +9,18 @@ App.ApplicationView = Ember.View.extend({
 
 		Ember.$(window).resize(getSize());
 
-		doc.swipe({
-			swipeRight: function(event, direction, distance, duration, fingerCount) {
+		doc.touchwipe({
+			wipeLeft: function() {
+				/*Ember.$('.container').addClass('mobile');
+				Ember.$('.sidebar').addClass('mobile');*/
+			},
+			wipeRight: function() {
 				/*Ember.$('.container').removeClass('mobile');
 				Ember.$('.sidebar').removeClass('mobile');*/
 			},
-
-			swipeLeft: function(event, direction, distance, duration, fingerCount) {
-				/*Ember.$('.container').addClass('mobile');
-				Ember.$('.sidebar').addClass('mobile');*/
-			}
+			min_move_x: 20,
+			min_move_y: 20,
+			preventDefaultEvents: true
 		});
 	}
 });
