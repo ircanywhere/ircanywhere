@@ -86,10 +86,12 @@ WebSocket.prototype.onMessage = function(raw) {
  * @return void
  */
 WebSocket.prototype.onClose = function() {
+	var uSockets = Users[this._user._id];
 	this._socket.removeAllListeners();
 
-	if (this._user) {
-		delete Users[this._user._id];	
+	if (this._user && uSockets) {
+		var socket = _.find(uSockets, {id: this._socket.id});
+		delete uSockets[socket];
 	}
 	
 	delete Sockets[this._socket.id];

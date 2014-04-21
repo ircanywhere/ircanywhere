@@ -61,10 +61,14 @@ RPCHandler.prototype.push = function(uid, command, data) {
 		uid = uid.toString();
 	}
 
-	var socket = Users[uid];
+	var sockets = Users[uid];
 
-	if (socket) {
-		socket.send(command, data);
+	if (sockets) {
+		sockets.forEach(function(s) {
+			if (s.socket) {
+				s.socket.send(command, data);
+			}
+		})
 	}
 }
 
@@ -317,7 +321,12 @@ RPCHandler.prototype.handleAuth = function(socket, data) {
 		socket.send('authenticate', false, true);
 	} else {
 		socket._user = user;
-		Users[user._id] = socket;
+		
+		if (!Users[user._id]) {
+			Users[user._id] = [{id: socket.id, socket: socket}];
+		} else {
+			Users[user._id].push({id: socket.id, socket: socket});
+		}
 
 		socket.send('authenticate', true, false);
 

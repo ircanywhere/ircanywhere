@@ -88,7 +88,9 @@ App.NetworkController = Ember.ObjectController.extend({
 			title.shift();
 		}
 
-		route.updateTitle(title.join(' '));
+		if (route) {
+			route.updateTitle(title.join(' '));
+		}
 	}.observes('socket.tabs.@each.unread', 'socket.tabs.@each.highlights'),
 
 	ready: function() {
