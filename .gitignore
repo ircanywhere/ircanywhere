@@ -1,6 +1,7 @@
 private/node.json
 private/certs/*
 client/build/*
+build
 node_modules
 logs
 *.sublime*
