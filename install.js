@@ -45,11 +45,11 @@ function installNpmDeps() {
 function mongoDbSetup() {
 	console.log(COLOUR.blue, 'Checking for MongoDB installation...');
 
-	var child = cp.exec('whereis mangod', function(error, stdout, stderr) {
+	var child = cp.exec('whereis mongod', function(error, stdout, stderr) {
 		var global = true,
 			local = fs.existsSync('./build/mongodb/bin/mongod');
 
-		if (stdout === 'mangod:\n') {
+		if (stdout === 'mongod:\n') {
 			global = false;
 		}
 		// it's not in the $PATH
