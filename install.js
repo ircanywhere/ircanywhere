@@ -61,33 +61,33 @@ function mongoDbSetup() {
 
 		if (global) {
 			var path = stdout.split(' ')[1];
-		} else if (local) {
+		} else {
 			var path = './build/mongodb/bin/mongod';
 		}
 		// get the proper path
 
 		console.log(COLOUR.green, 'Found MongoDB at ' + path + '!');
 
-		isMongoRunning(local, path);
+		isMongoRunning(global, path);
 	});
 	// we need to check if mongodb is setup properly
 }
 
-function isMongoRunning(local, path) {
+function isMongoRunning(isGlobal, path) {
 	var mongo = require('mongodb').MongoClient,
 		opts = {},
-		dbPath = (local) ? './build/mongodb/db' : '/data/db',
-		logFile = (local) ? './build/mongodb/mongodb.log' : '/var/log/mongodb.log';
+		dbPath = (!isGlobal) ? './build/mongodb/db' : '/data/db',
+		logFile = (!isGlobal) ? './build/mongodb/mongodb.log' : '/var/log/mongodb.log';
 
-	if (local && !fs.existsSync('./build/mongodb/db')) {
+	if (isGlobal && !fs.existsSync('./build/mongodb/db')) {
 		fs.mkdirSync('./build/mongodb/db');
 	}
 	// make a data dir if it doesnt exist
 
-	if (local) {
-		opts = {stdio: [0, 1]};
-	} else {
+	if (isGlobal) {
 		opts = {uid: 0, stdio: [0, 1]};
+	} else {
+		opts = {stdio: [0, 1]};
 	}
 
 	mongo.connect('mongodb://127.0.0.1:27017', function(err, db) {
@@ -106,11 +106,12 @@ function isMongoRunning(local, path) {
 					if (code === 0) {
 						console.log(LINE);
 						setTimeout(function() {
-							isMongoRunning(local, path);
-						}, 1000);
+							isMongoRunning(isGlobal, path);
+						}, 2500);
 					} else if (code === 100) {
 						console.log(LINE);
 						console.log(COLOUR.red, 'Startup failed, will try a repair.');
+						console.log(LINE);
 						repairMongoDb(dbPath, logFile, path);
 					} else if (code === 1) {
 						console.log(LINE);
@@ -158,8 +159,8 @@ function isMongoRunning(local, path) {
 					console.log(LINE);
 					console.log(COLOUR.green, 'Repair was successful!');
 					setTimeout(function() {
-						isMongoRunning(local, path);
-					}, 1000);
+						isMongoRunning(isGlobal, path);
+					}, 2500);
 				} else if (code === 1) {
 					console.log(LINE);
 					console.log(COLOUR.red, 'Repair failed. Needs manual intervention.');
