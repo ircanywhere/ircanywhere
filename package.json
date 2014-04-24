@@ -1,60 +1,60 @@
 {
-	"name": "ircanywhere",
-	"description": "IRCAnywhere web bnc system",
-	"version": "0.2.0-alpha",
-	"author": "Ricki Hastings <ricki@ircanywhere.com> (https://ircanywhere.com)",
-	"homepage": "https://ircanywhere.com",
-	"main": "./server/ircanywhere",
-	"scripts": {
-		"start": "node ./server/ircanywhere start"
-	},
-	"contributors": [
-		{
-			"name": "Ricki Hastings",
-			"email": "ricki@ircanywhere.com"
-		}
-	],
-	"devDependencies": {
-		"grunt": "~0.4.2",
-		"grunt-ember-templates": "0.4.18",
-		"grunt-contrib-concat": "0.3.0",
-		"grunt-contrib-less": "0.9.0",
-		"grunt-contrib-uglify": "~0.3.0",
-		"grunt-contrib-watch": "0.5.3"
-	},
-	"dependencies": {
-		"daemonize2": "~0.4.2",
-		"emailjs": "0.3.6",
-		"express": "~3.4.0",
-		"eventemitter2": "~0.4.13",
-		"fibrous": "~0.3.3",
-		"hooks": "0.3.2",
-		"irc-factory": "~1.5.0",
-		"jsonminify": "0.2.2",
-		"lodash": "~2.4.1",
-		"mongodb": "~1.3.23",
-		"simple-schema": "1.1.0",
-		"sockjs": "~0.3.8",
-		"winston": "~0.7.2"
-	},
-	"keywords": [
-		"irc",
-		"web",
-		"client",
-		"bnc"
-	],
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/ircanywhere/ircanywhere"
-	},
-	"bugs": {
-		"mail": "support@ircanywhere.com",
-		"url": "http://github.com/ircanywhere/ircanywhere/issues"
-	},
-	"licenses": [
-		{
-			"type": "GNU",
-			"url": "http://github.com/ircanywhere/ircanywhere/raw/master/LICENSE"
-		}
-	]
+  "name": "ircanywhere",
+  "description": "IRCAnywhere web bnc system",
+  "version": "0.2.0-alpha",
+  "author": "Ricki Hastings <ricki@ircanywhere.com> (https://ircanywhere.com)",
+  "homepage": "https://ircanywhere.com",
+  "main": "./server/ircanywhere",
+  "scripts": {
+    "start": "node ./server/ircanywhere start"
+  },
+  "contributors": [
+    {
+      "name": "Ricki Hastings",
+      "email": "ricki@ircanywhere.com"
+    }
+  ],
+  "devDependencies": {
+    "gulp": "~3.6.1",
+    "gulp-ember-handlebars": "~0.6.0",
+    "gulp-concat-css": "^0.1.4",
+    "gulp-less": "~1.2.3",
+    "gulp-uglifyjs": "~0.2.0",
+    "gulp-watch": "~0.6.2"
+  },
+  "dependencies": {
+    "daemonize2": "~0.4.2",
+    "emailjs": "0.3.6",
+    "express": "~3.4.0",
+    "eventemitter2": "~0.4.13",
+    "fibrous": "~0.3.3",
+    "hooks": "0.3.2",
+    "irc-factory": "~1.5.0",
+    "jsonminify": "0.2.2",
+    "lodash": "~2.4.1",
+    "mongodb": "~1.3.23",
+    "simple-schema": "1.1.0",
+    "sockjs": "~0.3.8",
+    "winston": "~0.7.2"
+  },
+  "keywords": [
+    "irc",
+    "web",
+    "client",
+    "bnc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/ircanywhere/ircanywhere"
+  },
+  "bugs": {
+    "mail": "support@ircanywhere.com",
+    "url": "http://github.com/ircanywhere/ircanywhere/issues"
+  },
+  "licenses": [
+    {
+      "type": "GNU",
+      "url": "http://github.com/ircanywhere/ircanywhere/raw/master/LICENSE"
+    }
+  ]
 }
