@@ -59,9 +59,9 @@ function mongoDbSetup() {
 		}
 		// its nowhere :<
 
-		if (!local) {
+		if (global) {
 			var path = stdout.split(' ')[1];
-		} else {
+		} else if (local) {
 			var path = './build/mongodb/bin/mongod';
 		}
 		// get the proper path
