@@ -78,7 +78,7 @@ I use a program called `https://github.com/visionmedia/mon`_ to keep the process
 
 ``$ mon -d "node . run" -p ircanywhere.pid -l logs/mon.log``
 
-If you're running in a production environment it would be better to run this behind a nginx proxy or similar. In the future there will be instructions on how to do this and the possibility to serve the css/js files via nginx. I'll also be implementing a way to sticky session via nginx when the system is clustered.
+If you're running in a production environment it would be better to run this behind a nginx proxy or similar. You can see install instructions at `reverse proxies`_ section.
 
 Updating
 ~~~~~~~~
