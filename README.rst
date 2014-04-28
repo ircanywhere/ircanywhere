@@ -101,3 +101,4 @@ Any bugs (preferably) should be reported via the issues page on this repository,
 .. _http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-node-js-and-npm: http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-node-js-and-npm
 .. _https://github.com/visionmedia/mon: https://github.com/visionmedia/mon
 .. _https://github.com/ircanywhere/ircanywhere/issues: https://github.com/ircanywhere/ircanywhere/issues
+.. _`reverse proxies`: http://ircanywhere.readthedocs.org/en/latest/reverse_proxies.html
