@@ -340,7 +340,7 @@ CommandManager.prototype.part = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.cycle = function(user, client, target, params) {
-	if (helper.isChannel(client, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client, params[0])) {
 		ircFactory.send(client._id, 'part', params);
 		ircFactory.send(client._id, 'join', params);
 	} else {
