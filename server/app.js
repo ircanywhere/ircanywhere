@@ -40,6 +40,8 @@ var _ = require('lodash'),
  * @return void
  */
 function Application() {
+	var self = this;
+
 	this.ee = new events.EventEmitter2({
 		wildcard: true,
 		delimiter: '.',
@@ -47,8 +49,13 @@ function Application() {
 	});
 	// setup our event emitter
 
-	fibrous.run(this.init.bind(this), this.handleError.bind(this));
-	// initiate the module
+	var d = require('domain').create();
+	
+	d.on('error', self.handleError.bind(self));
+	d.run(function() {
+		fibrous.run(self.init.bind(self), self.handleError.bind(self));
+		// initiate the module
+	});
 
 	process.title = 'ircanywhere';
 	// set process title
@@ -282,12 +289,18 @@ Application.prototype.setupWinston = function() {
  * @method handleError
  * @return void
  */
-Application.prototype.handleError = function(err) {
-	if (err) {
-		this.logger.log('error', err.stack, function() {
-			process.exit(0);
-		});
+Application.prototype.handleError = function(err, exit) {
+	var exit = (exit === undefined) ? true : exit;
+
+	if (!err) {
+		return;
 	}
+
+	this.logger.log('error', err.stack, function() {
+		if (exit) {
+			process.exit(0);
+		}
+	});
 }
 
 /**
@@ -378,20 +391,19 @@ Application.prototype.setupServer = function() {
 	app.enable('trust proxy');
 	// express settings
 
-	var winstonStream = {
-		write: function(message, encoding) {
-			//self.logger.log('info', message.slice(0, -1));
-		}
+	var error = function(err, req, res, next) {
+		self.handleError(err, false);
+		res.send(500, 'An error has occured');
 	};
-	// enable web server logging; pipe those log messages through winston
+	// error handling
 
-	app.use(express.logger({stream: winstonStream}));
 	app.use(express.compress());
 	app.use(express.static('client', {maxAge: 86400000}));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());
 	app.use(express.urlencoded());
-	app.use(fibrous.middleware);
+	app.use(app.router);
+	app.use(error);
 	// setup middleware
 
 	app.get(/^\/(?!api\/(.*)).*$/, function(req, res) {

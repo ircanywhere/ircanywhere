@@ -1,4 +1,6 @@
 App.LoginController = Ember.ObjectController.extend({
+	needs: ['index'],
+
 	errors: false,
 
 	resetErrors: false,
@@ -75,5 +77,11 @@ App.LoginController = Ember.ObjectController.extend({
 			this.set('resetErrors', data.errors[0].error);
 		}
 		// set the errors
-	}
+	},
+
+	isAuthed: function() {
+		if (this.socket.authed) {
+			this.get('controllers.index').determinePath();
+		}
+	}.observes('socket.authed')
 });

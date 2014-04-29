@@ -54,52 +54,66 @@ UserManager.prototype.init = function() {
 	// setup email server
 
 	application.app.post('/api/register', function(req, res) {
-		var response = self.registerUser(req, res);
+		fibrous.run(function() {
+			var response = self.registerUser(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 
 	application.app.post('/api/login', function(req, res) {
-		var response = self.userLogin(req, res);
+		fibrous.run(function() {
+			var response = self.userLogin(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 
 	application.app.get('/api/logout', function(req, res) {
-		var response = self.userLogout(req, res);
+		fibrous.run(function() {
+			var response = self.userLogout(req, res);
 
-		res.redirect(307, application.config.url);
-		res.end();
+			res.redirect(307, application.config.url);
+			res.end();
+		}, application.handleError.bind(application));
 	});
 
 	application.app.post('/api/forgot', function(req, res) {
-		var response = self.forgotPassword(req, res);
+		fibrous.run(function() {
+			var response = self.forgotPassword(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 
 	application.app.post('/api/reset', function(req, res) {
-		var response = self.resetPassword(req, res);
+		fibrous.run(function() {
+			var response = self.resetPassword(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 
 	application.app.post('/api/settings/updatesettings', function(req, res) {
-		var response = self.updateSettings(req, res);
+		fibrous.run(function() {
+			var response = self.updateSettings(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 
 	application.app.post('/api/settings/changepassword', function(req, res) {
-		var response = self.changePassword(req, res);
+		fibrous.run(function() {
+			var response = self.changePassword(req, res);
 
-		res.header('Content-Type', 'application/json');
-		res.end(JSON.stringify(response));
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		}, application.handleError.bind(application));
 	});
 	// setup routes
 }

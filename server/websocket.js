@@ -86,12 +86,14 @@ WebSocket.prototype.onMessage = function(raw) {
  * @return void
  */
 WebSocket.prototype.onClose = function() {
-	var uSockets = Users[this._user._id];
 	this._socket.removeAllListeners();
 
-	if (this._user && uSockets) {
-		var socket = _.find(uSockets, {id: this._socket.id});
-		delete uSockets[socket];
+	if (this._user) {
+		var uSockets = Users[this._user._id];
+
+		if (uSockets) {
+			delete uSockets[_.find(uSockets, {id: this._socket.id})];
+		}
 	}
 	
 	delete Sockets[this._socket.id];
@@ -134,15 +136,17 @@ WebSocket.prototype.sendBurst = function(data) {
 		path = '/api/burst/' +  helper.generateSalt(25);
 
 	application.app.get(path, function(req, res) {
-		var user = userManager.isAuthenticated(req.headers.cookie);
+		fibrous.run(function() {
+			var user = userManager.isAuthenticated(req.headers.cookie);
 
-		if (user._id.toString() === self._user._id.toString()) {
-			res.header('Content-Type', 'application/json');
-			res.end(JSON.stringify(data));
-		} else {
-			res.header('Content-Type', 'application/json');
-			res.end(JSON.stringify({'error': 'unauthenticated'}));
-		}
+			if (user._id.toString() === self._user._id.toString()) {
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify(data));
+			} else {
+				res.header('Content-Type', 'application/json');
+				res.end(JSON.stringify({'error': 'unauthenticated'}));
+			}
+		}, application.handleError.bind(application));
 	});
 	// generate a temporary route
 
