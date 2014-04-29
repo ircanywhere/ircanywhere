@@ -23,7 +23,7 @@ function CommandManager() {
 	var self = this;
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self));
+		fibrous.run(self.init.bind(self), application.handleError.bind(application));
 	});
 }
 
@@ -47,7 +47,7 @@ CommandManager.prototype.init = function() {
 
 			self.parseCommand(user, client, doc.target, doc.command, doc._id);
 			// success
-		});
+		}, application.handleError.bind(application));
 	});
 
 	this.createAlias('/join', '/j');
@@ -549,7 +549,8 @@ CommandManager.prototype.unaway = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.close = function(user, client, target, params) {
-	var tab = application.Tabs.sync.findOne({target: target, network: client._id});
+	var tlower = target.toLowerCase(),
+		tab = application.Tabs.sync.findOne({target: tlower, network: client._id});
 	// get the tab in question
 
 	if (!tab) {
@@ -564,7 +565,7 @@ CommandManager.prototype.close = function(user, client, target, params) {
 		networkManager.removeTab(client, target);
 		// determine what to do with it, if it's a channel /part and remove tab
 
-		var index = _.findIndex(client.channels, {channel: target.toLowerCase()});
+		var index = _.findIndex(client.channels, {channel: tlower});
 		
 		if (index > -1) {
 			application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});

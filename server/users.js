@@ -31,7 +31,7 @@ function UserManager() {
 	// set our inactivity timeout function to run every hour
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self));
+		fibrous.run(self.init.bind(self), application.handleError.bind(application));
 	});
 }
 		

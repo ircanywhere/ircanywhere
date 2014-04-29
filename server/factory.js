@@ -40,7 +40,7 @@ function IRCFactory() {
 	this.api = new factory();
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self));
+		fibrous.run(self.init.bind(self), application.handleError.bind(application));
 	});
 }
 
@@ -89,7 +89,7 @@ IRCFactory.prototype.init = function() {
 			} else {
 				self.handleEvent(message.event, message.message);
 			}
-		});
+		}, application.handleError.bind(application));
 	});
 }
 
@@ -123,7 +123,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 	if (_.isFunction(ircHandler[e]) && object !== false) {
 		fibrous.run(function() {
 			ircHandler[e].call(ircHandler, client, object);
-		});
+		}, application.handleError.bind(application));
 	} else {
 		application.logger.log('warn', 'Unhandled event in IRCFactory.handleEvent()', {key: key, event: e, data: object});
 	}

@@ -42,7 +42,7 @@ function ChannelManager() {
  * @return {Object} A channel object straight out of the database.
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
-	var chan = application.Tabs.sync.findOne({network: network, title: channel});
+	var chan = application.Tabs.sync.findOne({network: network, target: channel});
 
 	if (!chan) {
 		var chan = _.clone(this.channel);
@@ -198,7 +198,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 	var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 	// we need to attempt to update the record now with the new info
 
-	application.Tabs.update({network: key, title: channel}, {$set: {modes: modes}}, {safe: false});
+	application.Tabs.update({network: key, target: channel}, {$set: {modes: modes}}, {safe: false});
 	// update the record
 
 	users.forEach(function(u) {
@@ -236,7 +236,7 @@ ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	};
 	// updat the topic record
 
-	application.Tabs.update({network: key, title: channel}, {$set: {topic: topic}}, {safe: false});
+	application.Tabs.update({network: key, target: channel}, {$set: {topic: topic}}, {safe: false});
 	// update the record
 }
 

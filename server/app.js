@@ -47,7 +47,7 @@ function Application() {
 	});
 	// setup our event emitter
 
-	fibrous.run(this.init.bind(this));
+	fibrous.run(this.init.bind(this), this.handleError.bind(this));
 	// initiate the module
 
 	process.title = 'ircanywhere';
@@ -273,11 +273,21 @@ Application.prototype.setupWinston = function() {
 		]
 	});
 
-	process.on('uncaughtException', function(err) {
-		self.logger.log('error', err.stack, function() {
+	process.on('uncaughtException', self.handleError.bind(self));
+}
+
+/**
+ * This should be called as the second argument for fibrous.run()
+ *
+ * @method handleError
+ * @return void
+ */
+Application.prototype.handleError = function(err) {
+	if (err) {
+		this.logger.log('error', err.stack, function() {
 			process.exit(0);
 		});
-	});
+	}
 }
 
 /**
@@ -335,7 +345,7 @@ Application.prototype.setupNode = function() {
 					throw err;
 				}
 			});
-		});
+		}, self.handleError.bind(self));
 	});
 }
 

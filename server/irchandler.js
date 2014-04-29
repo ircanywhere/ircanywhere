@@ -78,9 +78,9 @@ IRCHandler.prototype.registered = function(client, message) {
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-	application.Tabs.sync.update({title: client.name, network: client._id}, {$set: {
+	application.Tabs.sync.update({target: client.name.toLowerCase(), network: client._id}, {$set: {
 		title: message.capabilities.network.name,
-		target: message.capabilities.network.name,
+		target: message.capabilities.network.name.toLowerCase(),
 		active: true
 	}}, {multi: true});
 	// update the tab

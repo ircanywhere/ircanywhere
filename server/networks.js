@@ -24,7 +24,7 @@ function NetworkManager() {
 	var self = this;
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self));
+		fibrous.run(self.init.bind(self), application.handleError.bind(application));
 	});
 	// run this.init when we get the go ahead
 }
@@ -329,19 +329,19 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 			url: (type === 'network') ? client.url : client.url + '/' + target.toLowerCase(),
 			network: client._id,
 			networkName: client.name,
-			target: target.toLowerCase(),
-			title: target,
+			target: target.toLowerCase().trim(),
+			title: target.trim(),
 			type: type,
 			active: active
 		};
 
-	if (obj.target.trim() == '') {
+	if (obj.target == '') {
 		return false;
 	}
 	// empty, bolt it
 
 	var callback = function(err, doc) {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: obj}, {safe: false, upsert: true});
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: obj.target}, {$set: obj}, {safe: false, upsert: true});
 		// insert to db, or update old record
 	};
 
@@ -367,7 +367,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
  */
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: target}, {$set: {active: activate}}, {safe: false});
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: {active: activate}}, {safe: false});
 	} else {
 		application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
 	}
@@ -388,7 +388,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
 	// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
 	
 	if (target) {
-		application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target});
+		application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target.toLowerCase()});
 	} else {
 		application.Tabs.remove({user: client.internal.userId, network: client._id}, function(err, doc) {
 			application.Networks.remove({_id: client._id}, {safe: false});

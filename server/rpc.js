@@ -24,7 +24,7 @@ function RPCHandler() {
 	var self = this;
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self));
+		fibrous.run(self.init.bind(self), application.handleError.bind(application));
 	});
 }
 
@@ -256,49 +256,49 @@ RPCHandler.prototype.onSocketOpen = function(socket) {
 	webSocket.on('authenticate', function(data) {
 		fibrous.run(function() {
 			self.handleAuth(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('sendCommand', function(data) {
 		fibrous.run(function() {
 			self.handleCommand(webSocket, data, false);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('execCommand', function(data) {
 		fibrous.run(function() {
 			self.handleCommand(webSocket, data, true);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('readEvents', function(data) {
 		fibrous.run(function() {
 			self.handleReadEvents(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('selectTab', function(data) {
 		fibrous.run(function() {
 			self.handleSelectTab(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('updateTab', function(data) {
 		fibrous.run(function() {
 			self.handleUpdateTab(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('insertTab', function(data) {
 		fibrous.run(function() {
 			self.handleInsertTab(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	webSocket.on('getEvents', function(data) {
 		fibrous.run(function() {
 			self.handleGetEvents(webSocket, data);
-		});
+		}, application.handleError.bind(application));
 	});
 
 	Sockets[socket.id] = webSocket;
@@ -367,16 +367,18 @@ RPCHandler.prototype.handleConnect = function(socket) {
 	});
 
 	tabs.forEach(function(tab, index) {
-		usersQuery.$or.push({network: netIds[tab.network].name, channel: tab.target});
-		commandsQuery.$or.push({network: tab.network, target: tab.target});
+		var tlower = tab.target.toLowerCase();
+
+		usersQuery.$or.push({network: netIds[tab.network].name, channel: tlower});
+		commandsQuery.$or.push({network: tab.network, target: tlower});
 		// construct some queries
 
 		if (tab.type === 'query') {
-			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tab.target}, {'message.nickname': new RegExp('(' + helper.escape(tab.target) + ')', 'i'), target: netIds[tab.network].nick}]};
+			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
 		} else if (tab.type === 'network') {
 			var query = {network: netIds[tab.network].name, target: '*', user: user._id}
 		} else {
-			var query = {network: netIds[tab.network].name, target: tab.target, user: user._id}
+			var query = {network: netIds[tab.network].name, target: tlower, user: user._id}
 		}
 
 		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).sync.toArray(),

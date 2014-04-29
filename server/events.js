@@ -45,9 +45,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 			user = user || false,
 			network = (client.name) ? client.name : client.server,
 			ours = (message.nickname === client.nick),
-			channel = (message.channel && !message.target) ? message.channel : message.target,
-			user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
-		// get a channel user object if we've not got one
+			channel = (message.channel && !message.target) ? message.channel : message.target;
 
 		if (!message.channel && !message.target) {
 			var channel = null;
@@ -55,6 +53,9 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 		
+		var user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
+		// get a channel user object if we've not got one
+
 		var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
 			target = (force) ? '*' : target.toLowerCase();
 		// anything else goes in '*' so it's forwarded to the server log
@@ -85,7 +86,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 
 		application.Events.insert(output, {safe: false});
 		// get the prefix, construct an output and insert it
-	});
+	}, application.handleError.bind(application));
 }
 
 /**
