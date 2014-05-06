@@ -57,7 +57,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		// get a channel user object if we've not got one
 
 		var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
-			target = (force) ? '*' : target.toLowerCase();
+			target = (force || !target) ? '*' : target.toLowerCase();
 		// anything else goes in '*' so it's forwarded to the server log
 
 		if (message.channel) {
