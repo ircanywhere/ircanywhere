@@ -114,7 +114,7 @@ function isMongoRunning(isGlobal, path) {
 		dbPath = (!isGlobal) ? './build/mongodb/db' : '/data/db',
 		logFile = (!isGlobal) ? './build/mongodb/mongodb.log' : '/var/log/mongodb.log';
 
-	if (isGlobal && !fs.existsSync(dbPath)) {
+	if (!fs.existsSync(dbPath)) {
 		try {
 			mkdirRecursive(dbPath);
 		} catch (e) {
@@ -333,6 +333,11 @@ function runGulp() {
 	var child = cp.exec('gulp', function(error, stdout, stderr) {
 		if (stderr) {
 			throw stderr;
+		}
+
+		if (error && error.code === 8) {
+			console.log(LINE);
+			console.log(COLOUR.red, 'Permission error, try running as sudo.');
 		}
 
 		console.log(COLOUR.green, 'Compiled client-side files!');
