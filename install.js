@@ -45,32 +45,67 @@ function installNpmDeps() {
 function mongoDbSetup() {
 	console.log(COLOUR.blue, 'Checking for MongoDB installation...');
 
-	var child = cp.exec('whereis mongod', function(error, stdout, stderr) {
-		var global = true,
-			local = fs.existsSync('./build/mongodb/bin/mongod');
+    var local = fs.existsSync('./build/mongodb/bin/mongod'),
+        global = false,
+        path;
 
-		if (stdout === 'mongod:\n') {
-			global = false;
-		}
-		// it's not in the $PATH
+    cp.exec('whereis mongod', function(error, stdout, stderr) {
+        if (!stdout || stdout === 'mongod:\n') {
+            cp.exec('which mongod', function(error, stdout, stderr) {
+                if (!stdout) {
+                    done();
+                    return;
+                }
+                // it's not in the $PATH
 
-		if (!global && !local) {
-			return installMongoDb();
-		}
-		// its nowhere :<
+                path = stdout.trim();
+                global = true;
+                done();
+            });
+            return;
+        }
+        // whereis can't find it
 
-		if (global) {
-			var path = stdout.split(' ')[1];
-		} else {
-			var path = './build/mongodb/bin/mongod';
-		}
-		// get the proper path
+        path = stdout.split(' ')[1].trim() || stdout.split(' ')[0].trim();
+        // OSX does not use a label on output, linux does
 
-		console.log(COLOUR.green, 'Found MongoDB at ' + path + '!');
+        global = true;
+        done();
+    });
 
-		isMongoRunning(global, path);
-	});
-	// we need to check if mongodb is setup properly
+    function done() {
+        if (!global && local) {
+            path = './build/mongodb/bin/mongod';
+        }
+
+        if (!global && !local) {
+            return installMongoDb();
+        }
+        // its nowhere :<
+
+        console.log(COLOUR.green, 'Found MongoDB at ' + path + '!');
+
+        isMongoRunning(global, path);
+        // we need to check if mongodb is setup properly
+    }
+}
+
+function mkdirRecursive(dirPath) {
+    try {
+        fs.mkdirSync(dirPath);
+    } catch(e) {
+        if (e.errno !== 34) {
+            throw e;
+        }
+
+        var parent = dirPath.substr(0, dirPath.lastIndexOf('/'));
+
+        // Recurse into parents
+        mkdirRecursive(parent);
+
+        //then create the directory
+        mkdirRecursive(dirPath);
+    }
 }
 
 function isMongoRunning(isGlobal, path) {
@@ -79,8 +114,15 @@ function isMongoRunning(isGlobal, path) {
 		dbPath = (!isGlobal) ? './build/mongodb/db' : '/data/db',
 		logFile = (!isGlobal) ? './build/mongodb/mongodb.log' : '/var/log/mongodb.log';
 
-	if (isGlobal && !fs.existsSync('./build/mongodb/db')) {
-		fs.mkdirSync('./build/mongodb/db');
+	if (isGlobal && !fs.existsSync(dbPath)) {
+        try {
+            mkdirRecursive(dbPath);
+        } catch (e) {
+            console.log(LINE);
+            console.log(COLOUR.red, 'Failed to create database path at', dbPath);
+            console.log(COLOUR.red, 'Try creating folder manually or running as sudo');
+            process.exit(1);
+        }
 	}
 	// make a data dir if it doesnt exist
 
@@ -215,7 +257,7 @@ function installMongoDb() {
 		}
 
 		var child = cp.exec('getconf LONG_BIT', function(error, stdout, stderr) {
-			if (stdout === '64') {
+			if (stdout.trim() === '64') {
 				downloadMongo(true);
 			} else {
 				downloadMongo(false);
@@ -271,7 +313,7 @@ function installMongoDb() {
 				console.log(COLOUR.blue, 'such as /usr/local/bin.');
 				console.log(COLOUR.blue, ' ');
 				console.log(COLOUR.blue, 'MongoDB will be automatically started with oplog tailing enabled, although for production use');
-				console.log(COLOUR.blue, 'this will haveto be done manually which will require reading the documentation at');
+				console.log(COLOUR.blue, 'this will have to be done manually which will require reading the documentation at');
 				console.log(COLOUR.blue, 'http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-mongodb.');
 				console.log(COLOUR.blue, '----');
 
