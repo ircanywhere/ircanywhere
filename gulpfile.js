@@ -68,5 +68,5 @@ gulp.task('js:watch', function() {
 	gulp.watch(['lib/*.js', 'client/js/**/*.js'], ['js']);
 });
 
-gulp.task('default', ['clean', 'css', 'templates', 'js', 'dependencies']);
+gulp.task('default', ['css', 'templates', 'js', 'dependencies']);
 gulp.task('watch', ['css:watch', 'templates:watch', 'js:watch']);

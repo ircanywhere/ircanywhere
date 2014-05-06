@@ -174,7 +174,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 		return false;
 	}
 
-	ircFactory.send(client._id, 'raw', ['nickserv'].concat(params));
+	ircFactory.send(client._id, 'raw', ['NICKSERV'].concat(params));
 
 	if (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login') {
 		application.Commands.remove({_id: id}, {safe: false});
@@ -662,6 +662,24 @@ CommandManager.prototype.list = function(user, client, target, params) {
 
 	ircFactory.send(client._id, 'list', [search, page, limit]);
 	rpcHandler.push(client.internal.userId, 'openList', {search: search, page: page, network: client.name});
+}
+
+/**
+ * '/whois' command
+ *
+ * @method whois
+ * @param {Object} user A valid user object
+ * @param {Object} client A valid client object
+ * @param {String} target Target to send command to, usually a channel or username
+ * @param {String} command The command string
+ * @return void
+ */
+CommandManager.prototype.whois = function(user, client, target, params) {
+	if (params.length < 0) {
+		return;
+	}
+	
+	ircFactory.send(client._id, 'raw', ['WHOIS'].concat(params));
 }
 
 /**

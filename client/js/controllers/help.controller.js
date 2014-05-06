@@ -21,6 +21,14 @@ App.HelpController = Ember.ObjectController.extend({
 				'desc': 'Disconnect from the current server'
 			},
 			{
+				'command': '/list <strong>pattern</strong> [page]',
+				'desc': 'Searches the channel list with the pattern eg *php* or * for all',
+			},
+			{
+				'command': '/whois <strong>nickname</strong>',
+				'desc': 'Performs a whois command on the specified nickname',
+			},
+			{
 				'command': '/quit <strong>message</strong>',
 				'desc': '&rarr; <strong>/disconnect</strong>'
 			},

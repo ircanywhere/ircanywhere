@@ -1,0 +1,17 @@
+{{#modal-dialog action="close" className="thin"}}
+	<div class="modal-header">
+		<h3>{{title}}</h3>
+	</div>
+	<div class="modal-body">
+		<table width="100%" cellpadding="0" cellspacing="0" class="whois">
+			<tbody>
+				{{#each item as controller}}
+					<tr>
+						<td class="key">{{item.key}}</td>
+						<td class="value">{{ircParse item.value id}}</td>
+					</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+{{/modal-dialog}}

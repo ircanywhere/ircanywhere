@@ -40,7 +40,8 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 		exceptList: 'onExceptList',
 		quietList: 'onQuietList',
 		openList: 'onOpenList',
-		list: 'onList'
+		list: 'onList',
+		whois: 'onWhois'
 	},
 
 	setup: function(container, controllers) {
@@ -125,5 +126,9 @@ Ember.Emitter = Ember.Object.extend(Ember.Evented, {
 
 	new_list: function(object, backlog) {
 		this.trigger('list', object, backlog);
+	},
+
+	new_whois: function(object, backlog) {
+		this.trigger('whois', object, backlog);
 	}
 });

@@ -695,14 +695,29 @@ IRCHandler.prototype.list = function(client, message) {
 	rpcHandler.push(client.internal.userId, 'list', {search: message.search, page: message.page, limit: message.limit, channels: message.list, network: client.name});
 }
 
+/**
+ * Handles an incoming whois event
+ *
+ * @method whois
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.whois = function(client, message) {
+	if (!message.nickname || !message.username || !message.hostname || !message.realname) {
+		return false;
+	}
+
+	message.network = client._id;
+	rpcHandler.push(client.internal.userId, 'whois', message);
+}
+
 /* XXX - Events TODO
  	
  	away 		-  maybe this should alter the network status?
  	unaway		-  ^
  	names 		-  kinda done, need to determine whether they've ran /names or not and show it as a model maybe
- 	whois		- /--
- 	links 		-/
- 	list 		-| These need to be moved over from events
+ 	links 		-  still needs to be implemented, although the basis in irc-factory is there
  */
 
 exports.IRCHandler = _.extend(IRCHandler, hooks);

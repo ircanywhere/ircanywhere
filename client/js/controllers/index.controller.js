@@ -78,5 +78,10 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	onList: function(data) {
 		this.send('openModal', 'list');
 		this.controllerFor('list').populateData(data);
+	},
+
+	onWhois: function(data) {
+		this.send('openModal', 'whois');
+		this.controllerFor('whois').populateData(data);
 	}
 });

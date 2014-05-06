@@ -194,6 +194,9 @@ Ember.Socket = Ember.Object.extend({
 			case 'list':
 				self.emitter.determineEvent('list', 'new', data, false);
 				break;
+			case 'whois':
+				self.emitter.determineEvent('whois', 'new', data, false);
+				break;
 			default:
 				console.warn('Recieved unknown RPC event:', event, data);
 				break;
