@@ -3,7 +3,12 @@ var gulp = require('gulp'),
 	concatCss = require('gulp-concat-css'),
 	handlebars = require('gulp-ember-handlebars'),
 	uglify = require('gulp-uglifyjs'),
-	watch = require('gulp-watch');
+	clean = require('gulp-clean');
+
+gulp.task('clean', function() {
+	gulp.src('./client/build', {read: false})
+		.pipe(clean({force: true}));
+});
 
 gulp.task('css', function() {
 	gulp.src('./client/less/**/*.less')
@@ -52,34 +57,16 @@ gulp.task('dependencies', function() {
 });
 
 gulp.task('css:watch', function() {
-	watch({
-		glob: './client/less/**/*.less',
-		emit: 'one',
-		emitOnGlob: false
-	}, function(files) {
-		gulp.start('css');
-	});
+	gulp.watch('./client/less/**/*.less', ['css']);
 });
 
 gulp.task('templates:watch', function() {
-	watch({
-		glob: './client/templates/**/*.hbs',
-		emit: 'one',
-		emitOnGlob: false
-	}, function() {
-		gulp.start('templates');
-	});
+	gulp.watch('./client/templates/**/*.hbs', ['templates']);
 });
 
 gulp.task('js:watch', function() {
-	watch({
-		glob: ['lib/*.js', 'client/js/**/*.js'],
-		emit: 'one',
-		emitOnGlob: false
-	}, function() {
-		gulp.start('js');
-	});
+	gulp.watch(['lib/*.js', 'client/js/**/*.js'], ['js']);
 });
 
-gulp.task('default', ['css', 'templates', 'js', 'dependencies']);
+gulp.task('default', ['clean', 'css', 'templates', 'js', 'dependencies']);
 gulp.task('watch', ['css:watch', 'templates:watch', 'js:watch']);
