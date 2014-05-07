@@ -151,7 +151,7 @@ IRCFactory.prototype.create = function(network) {
 
 	this.rpc.emit('createClient', key, network);
 	application.logger.log('info', 'creating irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
-},
+}
 
 /**
  * Sends the command to destroy a client with the given key. If the client doesn't exist
@@ -166,7 +166,7 @@ IRCFactory.prototype.destroy = function(key) {
 	// log it before we destroy it below
 
 	this.rpc.emit('destroyClient', key.toString());
-},
+}
 
 /**
  * Calls an RPC command on the irc-factory client, usually used to send

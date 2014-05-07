@@ -1,4 +1,5 @@
 var Application = require('./app').Application,
+	IdentdServer = require('./identd').IdentdServer,
 	ModeParser = require('./modeparser').ModeParser,
 	UserManager = require('./users').UserManager,
 	ChannelManager = require('./channels').ChannelManager,
@@ -17,6 +18,9 @@ Users = {};
 
 application = new Application();
 // inject the config so we can mimic it in tests if needed
+
+identdServer = new IdentdServer();
+// setup the identd singleton
 
 userManager = new UserManager();
 // user manager
