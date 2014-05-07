@@ -114,7 +114,7 @@ function isMongoRunning(isGlobal, path) {
 		dbPath = (!isGlobal) ? './build/mongodb/db' : '/data/db',
 		logFile = (!isGlobal) ? './build/mongodb/mongodb.log' : '/var/log/mongodb.log';
 
-	if (isGlobal && !fs.existsSync(dbPath)) {
+	if (!fs.existsSync(dbPath)) {
 		try {
 			mkdirRecursive(dbPath);
 		} catch (e) {
@@ -251,11 +251,6 @@ function installMongoDb() {
 	// prompt the user with a y/n to see if they want us to install mongodb locally
 
 	function installPrompt() {
-		if (os.platform() !== 'linux') {
-			console.log(COLOUR.red, 'I can\'t currently install MongoDB for you on non linux platforms, you will need to do this yourself.');
-			process.exit(0);
-		}
-
 		var child = cp.exec('getconf LONG_BIT', function(error, stdout, stderr) {
 			if (stdout.trim() === '64') {
 				downloadMongo(true);
@@ -267,57 +262,80 @@ function installMongoDb() {
 	}
 
 	function downloadMongo(x64) {
-		var filename;
+		var filename,
+			prefix,
+			version = "-2.4.10",
+			platformFolder;
 
-		if (x64) {
-			filename = 'mongodb-linux-x86_64-2.6.0';
+		if (os.platform() === 'linux') {
+			if (x64) {
+				prefix = 'mongodb-linux-x86_64';
+			} else {
+				prefix = 'mongodb-linux-i686';
+			}
+			platformFolder = 'linux/';
+		} else if (os.platform() === 'darwin') {
+			prefix = 'mongodb-osx-x86_64';
+			platformFolder = 'osx/';
+			x64 = true;
 		} else {
-			filename = 'mongodb-linux-i686-2.6.0';
+			console.log(LINE);
+			console.log(COLOUR.red, 'Can\'t install MongoDB for platform ' + os.platform());
+			console.log(COLOUR.red, 'Please check http://docs.mongodb.org/manual/installation/ for installation instructions.');
+			process.exit(0);
 		}
-		
+
+		filename = prefix + version;
+
 		if (!fs.existsSync('./build')) {
 			fs.mkdirSync('./build');
 		}
 		// make a tmp build dir
 
 		if (fs.existsSync('./build/' + filename + '.tgz')) {
-			untarAndInstall(x64, filename);
+			untarAndInstall(filename);
 			// is mongodb already downloaded?
 		} else {
 			console.log(COLOUR.blue, 'Downloading ' + ((x64) ? '64' : '32' ) + 'bit version of MongoDB...');
 			console.log(LINE);
 
-			spawnProcess('wget', ['http://fastdl.mongodb.org/linux/' + filename + '.tgz', '--directory-prefix=./build'], {stdio: 'inherit'}, {
+			spawnProcess('wget', ['http://fastdl.mongodb.org/' + platformFolder + filename + '.tgz', '--directory-prefix=./build'], {stdio: 'inherit'}, {
 				close: function(code) {
 					if (code === 0) {
 						console.log(LINE);
-						untarAndInstall(x64, filename);
+						untarAndInstall(filename);
 					}
 				}
 			});
 		}
 	}
 
-	function untarAndInstall(x64, filename) {
+	function untarAndInstall(filename) {
 		console.log(COLOUR.blue, 'Untarring build/' + filename + '.tgz...');
 		
-		spawnProcess('tar', ['-xzf', 'build/' + filename + '.tgz', '-C', './build', '--transform', 's/' + filename + '/mongodb/'], {stdio: 'inherit'}, {
+		spawnProcess('tar', ['-xzf', 'build/' + filename + '.tgz', '-C', './build'], {stdio: 'inherit'}, {
 			close: function(code) {
 				if (code !== 0) {
 					return false;
 				}
 
-				console.log(COLOUR.green, 'MongoDB is now locally installed at ./build/mongodb');
-				console.log(COLOUR.blue, '----');
-				console.log(COLOUR.blue, 'For production use it\'s recommended you move the files from ./build/mongodb/bin to a location in your $PATH');
-				console.log(COLOUR.blue, 'such as /usr/local/bin.');
-				console.log(COLOUR.blue, ' ');
-				console.log(COLOUR.blue, 'MongoDB will be automatically started with oplog tailing enabled, although for production use');
-				console.log(COLOUR.blue, 'this will have to be done manually which will require reading the documentation at');
-				console.log(COLOUR.blue, 'http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-mongodb.');
-				console.log(COLOUR.blue, '----');
+				cp.exec('mv ./build/' + filename + ' ./build/mongodb', function(error, stdout, stderr) {
+					if (stderr) {
+						throw stderr;
+					}
 
-				isMongoRunning(true, './build/mongodb/bin/mongod');
+					console.log(COLOUR.green, 'MongoDB is now locally installed at ./build/mongodb');
+					console.log(COLOUR.blue, '----');
+					console.log(COLOUR.blue, 'For production use it\'s recommended you move the files from ./build/mongodb/bin to a location in your $PATH');
+					console.log(COLOUR.blue, 'such as /usr/local/bin.');
+					console.log(COLOUR.blue, ' ');
+					console.log(COLOUR.blue, 'MongoDB will be automatically started with oplog tailing enabled, although for production use');
+					console.log(COLOUR.blue, 'this will have to be done manually which will require reading the documentation at');
+					console.log(COLOUR.blue, 'http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-mongodb.');
+					console.log(COLOUR.blue, '----');
+
+					isMongoRunning(true, './build/mongodb/bin/mongod');
+				});
 			}
 		});
 	}
@@ -333,6 +351,11 @@ function runGulp() {
 	var child = cp.exec('gulp', function(error, stdout, stderr) {
 		if (stderr) {
 			throw stderr;
+		}
+
+		if (error && error.code === 8) {
+			console.log(LINE);
+			console.log(COLOUR.red, 'Permission error, try running as sudo.');
 		}
 
 		console.log(COLOUR.green, 'Compiled client-side files!');
