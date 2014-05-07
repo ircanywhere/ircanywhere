@@ -27,6 +27,8 @@
 @unread-bg: #3B3F4A;
 @message-bar-bg: #7AC1C4;
 
+@panel-transition-duration: 250ms;
+
 // Variable definitions
 
 .border-radius (@value: 5px) {
@@ -43,12 +45,28 @@
 	box-shadow: @value;
 }
 
+.transition(@transition, @duration, @timingFunction: ease-in-out ) when (@transition = transform) {
+	-webkit-transition: -webkit-transform @duration @timingFunction;
+	-moz-transition: -moz-transform @duration @timingFunction;
+	-ms-transition: -ms-transform @duration @timingFunction;
+	-o-transition: -o-transform @duration @timingFunction;
+	transition: transform @duration @timingFunction;
+}
+
 .transition (@value: none) {
 	-webkit-transition: @value;
 	-moz-transition: @value;
 	-ms-transition: @value;
 	-o-transition: @value;
 	transition: @value;
+}
+
+.transform(@value){
+	-webkit-transform: @value;
+	-moz-transform: @value;
+	-ms-transform: @value;
+	-o-transform: @value;
+	transform: @value;
 }
 
 .padding-margin (@size: 0px) {
@@ -100,4 +118,8 @@
 	flex: @a;
 }
 
+.iphoneTouchScroll () {
+	-webkit-overflow-scrolling: touch;
+	-webkit-backface-visibility: hidden;
+}
 // Mixins

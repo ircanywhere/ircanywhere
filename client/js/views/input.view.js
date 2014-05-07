@@ -10,7 +10,6 @@ App.InputView = Ember.View.extend({
 		// difficult to do this without doing so
 		
 		this.$('textarea').on('keydown', this.onKeyDown.bind(this));
-		this.$('textarea').focus();
 	},
 
 	willDestroyElement: function() {
