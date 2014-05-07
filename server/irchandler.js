@@ -50,7 +50,30 @@ IRCHandler.prototype._formatRaw = function(raw) {
 	});
 
 	return output;
-};
+}
+
+/**
+ * Handles the opened event from `irc-factory` which just tells us what localPort and any other
+ * information relating to the client so we can make sure the identd server is working.
+ *
+ * @method opened
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.opened = function(client, message) {
+	if (!application.config.identd.enable) {
+		return;
+	}
+	// not enabled, don't fill the cache if it isn't needed
+
+	if (!message.username || !message.port || !message.localPort) {
+		return;
+	}
+	// we need to make sure we've got all our required items
+
+	IdentdCache[message.localPort] = message;
+}
 
 /**
  * Handles the registered event, this will only ever be called when an IRC connection has been

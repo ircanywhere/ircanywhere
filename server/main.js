@@ -14,6 +14,7 @@ var Application = require('./app').Application,
 Sockets = {};
 Clients = {};
 Users = {};
+IdentdCache = {};
 // global object holders
 
 application = new Application();
