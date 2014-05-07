@@ -15,7 +15,7 @@ var _ = require('lodash'),
  * This is the IdentdServer object which creates an integrated identd server and can be turned
  * off via the configuration, this is a singleton and should never be instantiated more than once.
  *
- * The configuration option `identd` and `identdPort` will control whether this runs and what port
+ * The configuration option `identd.enable` and `identd.port` will control whether this runs and what port
  * it runs on, the default port is 113 but you can bind it to whatever you like and use iptables
  * to forward to 113, without doing that IRCAnywhere will need elevated permissions to bind.
  *

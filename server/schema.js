@@ -27,6 +27,20 @@ exports.schema = {
 		type: 'boolean',
 		required: true
 	},
+	'identd': {
+		type: 'object',
+		required: true
+	},
+	'identd.enable': {
+		type: 'boolean',
+		required: true
+	},
+	'identd.port': {
+		type: 'number',
+		min: 1,
+		max: 65535,
+		required: false
+	},
 	'email': {
 		type: 'object',
 		required: true

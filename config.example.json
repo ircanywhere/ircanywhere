@@ -37,6 +37,20 @@
 				 online when the main application closes. It'll also probably speed things up. It's recommended 
 				 to only ever set this to false when developing */
 
+	"identd": {
+		"enable": true,
+		/* -- required
+		 * -- boolean 
+		 * -- usage: Whether to enable the integrated identd server or not. This is recommended to ensure that
+		 			 server owners can validate your users, and often it increases i:line limits on some networks */
+
+		"port": 113
+		/* -- number 
+		 * -- usage: The port to run the identd server on, 113 is the ident service port, however you can run it on
+					 any port you wish, you would need to forward 113 to this port. If you omit it or leave it as 113 
+					 IRCAnywhere will need elevated permissions to bind */
+	},
+
 	"email": {
 		"siteName": "IRCAnywhere",
 		/* -- string 
