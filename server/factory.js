@@ -74,13 +74,13 @@ IRCFactory.prototype.init = function() {
 					keys = _.keys(networks),
 					difference = _.difference(keys, message.keys);
 
-				for (var key in message.keys) {
+				_.each(message.keys, function(key) {
 					networkManager.changeStatus({_id: key}, networkManager.flags.connected);
-				}
+				});
 				
-				for (var key in difference) {
-					networkManager.connectNetwork(networks[difference[key]]);
-				}
+				_.each(difference, function(net) {
+					networkManager.connectNetwork(networks[net]);
+				});
 				// the clients we're going to actually attempt to boot up
 
 				application.logger.log('info', 'factory synchronize', helper.cleanObjectIds(message));

@@ -591,9 +591,8 @@ UserManager.prototype.onUserLogin = function(me, force) {
 	var networks = application.Networks.sync.find({'internal.userId': userId}).sync.toArray();
 	// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
-	for (var netId in networks) {
-		var network = networks[netId],
-			reconnect = false;
+	_.each(networks, function(network) {
+		var nreconnect = false;
 
 		if (network.internal.status !== networkManager.flags.disconnected && force) {
 			reconnect = true;
@@ -602,7 +601,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 		if (reconnect) {
 			networkManager.connectNetwork(network);
 		}
-	}
+	});
 	// loop through our networks and connect them if need be
 
 	application.logger.log('info', 'user logged in', {userId: userId.toString()});
@@ -622,9 +621,9 @@ UserManager.prototype.onUserLogin = function(me, force) {
 UserManager.prototype.parse = function(file, replace) {
 	var template = fs.readFileSync(file).toString();
 
-	for (var key in replace) {
-		template = template.replace('{{' + key + '}}', replace[key]);
-	}
+	_.each(replace, function(rep, key) {
+		template = template.replace('{{' + key + '}}', rep);
+	});
 
 	return template;
 }

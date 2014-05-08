@@ -501,22 +501,22 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 	// update it to a proper mongo id
 
 	if ('$in' in query) {
-		for (var i in query.$in) {
-			query.$in[i] = new mongo.ObjectID(query.$in[i]);
-		}
+		_.each(query.$in, function(q, i) {
+			query.$in[i] = new mongo.ObjectID(q);
+		});
 
 		query = {_id: query};
 	}
 
 	if ('$or' in query) {
-		for (var i in query.$or) {
-			var subQuery = query.$or[i];
+		_.each(query.$or, function(q, i) {
+			var subQuery = q;
 
 			if ('_id' in subQuery) {
 				subQuery._id = new mongo.ObjectID(subQuery._id);
 				query.$or[i] = subQuery;
 			}
-		}
+		});
 	}
 	// convert _id to proper mongo IDs
 	
@@ -679,13 +679,13 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	// reset back to 50
 
 	if (query._id) {
-		for (var op in query._id) {
+		_.each(query._id, function(_id, op) {
 			var _id = query._id[op];
 			
 			if (_id) {
 				query._id[op] = new mongo.ObjectID(_id);
 			}
-		}
+		});
 	}
 	// convert _id to proper mongo IDs
 

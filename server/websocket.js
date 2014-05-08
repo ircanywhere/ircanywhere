@@ -152,12 +152,12 @@ WebSocket.prototype.sendBurst = function(data) {
 	// compile a load of data to send to the frontend
 
 	setTimeout(function() {
-		for (var index in application.app.routes.get) {
-			if (application.app.routes.get[index].path === path) {
+		_.each(application.app.routes.get, function(route, index) {
+			if (route.path === path) {
 				application.app.routes.get.splice(index, 1);
-				break;
+				return false;
 			}
-		}
+		});
 	}, 10000);
 	// trash the route
 }

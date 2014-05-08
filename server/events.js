@@ -206,8 +206,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 	});
 	// sort modes in q, a, o, h, v order
 
-	for (var i in sorted) {
-		var mode = sorted[i];
+	_.each(sorted, function(mode) {
 		switch (mode) {
 			case 'q':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 1};
@@ -225,7 +224,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 5};
 				break;
 		}
-	}
+	});
 	// loop through the modes in a normal for loop so we can return
 
 	return {prefix: '', sort: 6};

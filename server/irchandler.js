@@ -128,15 +128,14 @@ IRCHandler.prototype.registered = function(client, message) {
 	// XXX - send our connect commands, things that the user defines
 	// 		 nickserv identify or something
 
-	for (var key in client.channels) {
-		var channel = client.channels[key],
-			chan = channel.channel,
+	_.each(client.channels, function(channel, key) {
+		var chan = channel.channel,
 			password = channel.password || '';
 
 		ircFactory.send(client._id, 'join', [chan, password]);
 		ircFactory.send(client._id, 'mode', [chan]);
 		// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
-	}
+	});
 	// find our channels to automatically join from the network setup
 
 	setTimeout(function() {
@@ -381,9 +380,8 @@ IRCHandler.prototype.who = function(client, message) {
 	networkManager.addTab(client, message.channel, 'channel');
 	// we'll update our internal channels cause we might be reconnecting after inactivity
 
-	for (var uid in message.who) {
-		var u = message.who[uid],
-			split = u.prefix.split('@'),
+	_.each(message.who, function(u) {
+		var split = u.prefix.split('@'),
 			mode = u.mode.replace(/[a-z0-9]/i, ''),
 			user = {};
 
@@ -404,7 +402,7 @@ IRCHandler.prototype.who = function(client, message) {
 		// set the current most highest ranking prefix
 
 		users.push(user);
-	}
+	});
 
 	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
 
@@ -434,9 +432,9 @@ IRCHandler.prototype.names = function(client, message) {
 		keys.push(u.nickname);
 	});
 
-	for (var user in message.names) {
-		users.push(message.names[user].replace(regex, ''));
-	}
+	_.each(message.names, function(user) {
+		users.push(user.replace(regex, ''));
+	});
 	// strip prefixes
 
 	keys.sort();

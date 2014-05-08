@@ -223,9 +223,9 @@ Application.prototype.setupOplog = function() {
 				}, 5000);
 				break;
 			case 'c':
-				for (var cmd in item.o) {
-					self.ee.emit([item.o[cmd], cmd]);
-				}
+				_.each(item.o, function(cmdObject, cmd) {
+					self.ee.emit([cmdObject, cmd]);
+				});
 			default:
 				break;
 		}

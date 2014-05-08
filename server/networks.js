@@ -224,12 +224,11 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 	}
 
 	var restricted = true;
-	for (var itemI in escapedRestrictions) {
-		var item = escapedRestrictions[itemI];
+	_.each(escapedRestrictions, function(item) {
 		if (item.test(server)) {
 			restricted = false;
 		}
-	}
+	});
 
 	if (restricted) {
 		output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
