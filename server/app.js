@@ -397,13 +397,17 @@ Application.prototype.setupServer = function() {
 	};
 	// error handling
 
+
 	app.use(express.compress());
 	app.use(express.static('client', {maxAge: 86400000}));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());
 	app.use(express.urlencoded());
+	app.use(fibrous.middleware);
 	app.use(app.router);
 	app.use(error);
+
+	
 	// setup middleware
 
 	app.get(/^\/(?!api\/(.*)).*$/, function(req, res) {
