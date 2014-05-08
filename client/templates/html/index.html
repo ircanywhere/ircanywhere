@@ -4,7 +4,8 @@
 		<title>IRCAnywhere</title>
 		
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
 
 		<script src="/build/dependencies.js"></script>
 		<script src="/build/templates.js"></script>
@@ -17,11 +18,6 @@
 			{{outlet}}
 			{{outlet 'modal'}}
 		</script>
-		<div id="breakpoints">
-			<div class="breakpoint-small" data-size="small"></div>
-			<div class="breakpoint-medium" data-size="medium"></div>
-			<div class="breakpoint-large" data-size="large"></div>
-		</div>
 		<audio id="audio-notification" src="/sounds/notification.mp3" preload="auto"></audio>
 	</body>
 </html>

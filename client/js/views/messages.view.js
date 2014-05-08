@@ -7,9 +7,17 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
 	}.property('controller.target.content.selectedTab.unread').cacheable(),
 
+	animateScrollTo: function (scrollTo) {
+		this.$().animate({
+			scrollTop: scrollTo
+		}, 250);
+		// Animate scroll to work around iPhone bug on setting scroll
+		// position on touch scrollable elements.
+	},
+
 	didInsertElement: function() {
 		Ember.run.later(this, function() {
-			this.$().context.scrollTop = this.$().context.scrollHeight;
+			this.animateScrollTo(this.$().context.scrollHeight);
 			this.set('scrollPosition', this.$().context.scrollHeight);
 		}, 100);
 		// scroll to bottom on render
@@ -41,7 +49,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		if (offset === last.height() || pos === height) {
 			Ember.run.later(this, function() {
 				if (this.$() !== undefined) {
-					this.$().context.scrollTop = this.$().context.scrollHeight;
+					this.animateScrollTo(this.$().context.scrollHeight);
 					this.set('scrollPosition', this.$().context.scrollHeight);
 				}
 			}, 100);
@@ -71,5 +79,5 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		self.set('scrollPosition', scrollBottom);
 		// reset the scroll position
-	}.observes('App.isActive'),
+	}.observes('App.isActive')
 });

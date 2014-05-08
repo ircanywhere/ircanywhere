@@ -1,6 +1,16 @@
-@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+@import "header.less";
+
+@media only screen and (max-device-width: 480px) {
 	html, body, body > div {
-		width: 100%!important;
+		width: 100% !important;
+	}
+
+	body {
+		-webkit-text-size-adjust: none;
+
+		label {
+			width: auto;
+		}
 	}
 
 	.topbar {
@@ -102,25 +112,28 @@
 	}
 
 	div.userlist {
-		display: none!important;
+		.transform(translateX(100%));
+		.transition(transform, @panel-transition-duration);
+		.iphoneTouchScroll;
+		z-index: 6030;
+
+		&.mobile {
+			.transform(translateX(0));
+		}
 	}
 
 	div.sidebar {
-		left: -210px;
+		.transform(translateX(-100%));
+		.transition(transform, @panel-transition-duration);
+		.iphoneTouchScroll;
+		z-index: 6030;
+
+		&.mobile {
+			.transform(translateX(0));
+		}
 	}
 
-	.channel-input {
-		display: none!important;
-	}
-
-	div#breakpoints {
-		&.breakpoint-small {
-			display: block;
-		}
-
-		&.breakpoint-medium,
-		&.breakpoint-large {
-			display: none;
-		}
+	.backlog {
+		.iphoneTouchScroll;
 	}
 }

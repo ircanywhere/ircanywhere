@@ -1,26 +1,23 @@
 App.ApplicationView = Ember.View.extend({
 	didInsertElement: function() {
-		var self = this,
-			doc = this.$();
-
-		function getSize() {
-			App.set('size', Ember.$('#breakpoints div:visible').first().data('size'));
-		}
-
-		Ember.$(window).resize(getSize());
+		var doc = this.$();
 
 		doc.touchwipe({
 			wipeLeft: function() {
-				/*Ember.$('.container').addClass('mobile');
-				Ember.$('.sidebar').addClass('mobile');*/
+				if (Ember.$('.sidebar').hasClass('mobile')) {
+					Ember.$('.sidebar').removeClass('mobile');
+				} else {
+					Ember.$('.userlist').addClass('mobile');
+				}
 			},
 			wipeRight: function() {
-				/*Ember.$('.container').removeClass('mobile');
-				Ember.$('.sidebar').removeClass('mobile');*/
+				if (Ember.$('.userlist').hasClass('mobile')) {
+					Ember.$('.userlist').removeClass('mobile');
+				} else {
+					Ember.$('.sidebar').addClass('mobile');
+				}
 			},
-			min_move_x: 20,
-			min_move_y: 20,
-			preventDefaultEvents: true
+			preventDefaultEvents: false
 		});
 	}
 });
