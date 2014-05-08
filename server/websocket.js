@@ -136,17 +136,15 @@ WebSocket.prototype.sendBurst = function(data) {
 		path = '/api/burst/' +  helper.generateSalt(25);
 
 	application.app.get(path, function(req, res) {
-		fibrous.run(function() {
-			var user = userManager.isAuthenticated(req.headers.cookie);
+		var user = userManager.isAuthenticated(req.headers.cookie);
 
-			if (user._id.toString() === self._user._id.toString()) {
-				res.header('Content-Type', 'application/json');
-				res.end(JSON.stringify(data));
-			} else {
-				res.header('Content-Type', 'application/json');
-				res.end(JSON.stringify({'error': 'unauthenticated'}));
-			}
-		}, application.handleError.bind(application));
+		if (user._id.toString() === self._user._id.toString()) {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(data));
+		} else {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify({'error': 'unauthenticated'}));
+		}
 	});
 	// generate a temporary route
 

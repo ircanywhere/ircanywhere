@@ -130,12 +130,10 @@ NetworkManager.prototype.init = function() {
 	// - the delete is handled in sockets.js after we've propogated it
 
 	application.app.post('/api/addnetwork', function(req, res) {
-		fibrous.run(function() {
-			var response = self.addNetworkApi(req, res);
+		var response = self.addNetworkApi(req, res);
 
-			res.header('Content-Type', 'application/json');
-			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		res.header('Content-Type', 'application/json');
+		res.end(JSON.stringify(response));
 	});
 }
 
