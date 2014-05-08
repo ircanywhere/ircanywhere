@@ -397,6 +397,8 @@ IRCHandler.prototype.who = function(client, message) {
 			user.modes[prefix] = prefixes[prefix];
 		}
 		// set the modes
+		// normal for loop here cause we're just iterating a string, other cases I would use
+		// _.each()
 
 		user.prefix = eventManager.getPrefix(client, user).prefix;
 		// set the current most highest ranking prefix
