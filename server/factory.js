@@ -102,7 +102,7 @@ IRCFactory.prototype.init = function() {
  * 		target: '#ircanywhere-test',
  * 		message: '#ircanywhere-test WORD UP BROSEPTH',
  * 		time: '2014-01-22T18:20:57.323Z',
- * 		raw: ':ricki-!ia1@84.19.104.162 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
+ * 		raw: ':ricki-!ia1@127.0.0.1 PRIVMSG #ircanywhere-test :#ircanywhere-test here is a test' }
  *
  * More advanced docs can be found at https://github.com/ircanywhere/irc-factory/wiki/Events
  *
