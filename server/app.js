@@ -404,7 +404,6 @@ Application.prototype.setupServer = function() {
 	app.use(express.urlencoded());
 	app.use(app.router);
 	app.use(error);
-	
 	// setup middleware
 
 	app.get(/^\/(?!api\/(.*)).*$/, function(req, res) {

@@ -63,12 +63,8 @@ UserManager.prototype.init = function() {
 	});
 
 	application.app.post('/api/login', function(req, res) {
-		fibrous.run(function() {
-			var response = self.userLogin(req, res);
-
-			res.header('Content-Type', 'application/json');
-			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		res.header('Content-Type', 'application/json');
+		self.userLogin(req, res);
 	});
 
 	application.app.get('/api/logout', function(req, res) {
@@ -335,49 +331,51 @@ UserManager.prototype.registerUser = function(req, res) {
  * @return {Object} An output object for the API call
  */
 UserManager.prototype.userLogin = function(req, res) {
-	var email = req.param('email', ''),
+	var self = this,
+		email = req.param('email', ''),
 		password = req.param('password', ''),
 		token = helper.generateSalt(25),
 		expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
-		output = {failed: false, successMessage: '', errors: []},
-		user = application.Users.sync.findOne({email: email});
+		output = {failed: false, successMessage: '', errors: []};
 
-	if (!user) {
-		output.failed = true;
-		output.errors.push({error: 'User not found'});
-		return output;
-	}
+	application.Users.findOne({email: email}, function(err, user) {
+		if (err || !user) {
+			output.failed = true;
+			output.errors.push({error: 'User not found'});
+			return res.end(JSON.stringify(output));
+		}
 
-	var salt = user.salt,
-		hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+		var salt = user.salt,
+			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
-	if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
-		output.successMessage = 'Login successful';
-		return output;
-	}
+		if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
+			output.successMessage = 'Login successful';
+			return res.end(JSON.stringify(output));
+		}
 
-	if (hash != user.password) {
-		output.failed = true;
-		output.errors.push({error: 'Password incorrect'});
-	} else {
-		output.successMessage = 'Login successful';
-		// set the output
+		if (hash != user.password) {
+			output.failed = true;
+			output.errors.push({error: 'Password incorrect'});
+		} else {
+			output.successMessage = 'Login successful';
+			// set the output
 
-		var tokens = user.tokens;
-			tokens[token] = {
-				time: expire,
-				ip: req.ip
-			};
+			var tokens = user.tokens;
+				tokens[token] = {
+					time: expire,
+					ip: req.ip
+				};
 
-		application.Users.update({email: email}, {$set: {tokens: tokens, newUser: false}}, {safe: false});
-		res.cookie('token', token, {expires: expire});
-		// set a login key and a cookie
+			application.Users.update({email: email}, {$set: {tokens: tokens, newUser: false}}, {safe: false});
+			res.cookie('token', token, {expires: expire});
+			// set a login key and a cookie
 
-		this.onUserLogin(user, user.newUser);
-	}
-	// check if password matches
+			self.onUserLogin(user, user.newUser);
+		}
+		// check if password matches
 
-	return output;
+		return res.end(JSON.stringify(output));
+	});
 }
 
 /**
@@ -602,10 +600,11 @@ UserManager.prototype.onUserLogin = function(me, force) {
 		return;
 	}
 
-	var networks = application.Networks.sync.find({'internal.userId': userId}).sync.toArray();
-	// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
-
-	_.each(networks, function(network) {
+	application.Networks.find({'internal.userId': userId}).each(function(err, network) {
+		if (err || !network) {
+			return;
+		}
+		
 		var reconnect = false;
 
 		if (network.internal.status !== networkManager.flags.disconnected && force) {
@@ -616,7 +615,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 			networkManager.connectNetwork(network);
 		}
 	});
-	// loop through our networks and connect them if need be
+	// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
 	application.logger.log('info', 'user logged in', {userId: userId.toString()});
 	// log this event
