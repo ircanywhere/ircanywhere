@@ -592,7 +592,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 	// find user's networks (use fetch cause we're going to manually push to it if no networks exist)
 
 	_.each(networks, function(network) {
-		var nreconnect = false;
+		var reconnect = false;
 
 		if (network.internal.status !== networkManager.flags.disconnected && force) {
 			reconnect = true;
