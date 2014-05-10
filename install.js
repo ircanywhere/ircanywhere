@@ -305,6 +305,22 @@ function installMongoDb() {
 						console.log(LINE);
 						untarAndInstall(filename);
 					}
+				},
+				error: function() {
+					// failed with wget, try curl
+					spawnProcess('curl', ['http://fastdl.mongodb.org/' + platformFolder + filename + '.tgz', '-o', './build/' + filename + '.tgz'], {stdio: 'inherit'}, {
+						close: function(code) {
+							if (code === 0) {
+								console.log(LINE);
+								untarAndInstall(filename);
+							}
+						},
+						error: function() {
+							console.log(LINE);
+							console.log(COLOUR.red, 'Failed to download MongoDB. Please install curl or wget and try again.');
+							console.log(COLOUR.red, 'To manually install MongoDB, check http://docs.mongodb.org/manual/installation/');
+						}
+					});
 				}
 			});
 		}
@@ -334,7 +350,7 @@ function installMongoDb() {
 					console.log(COLOUR.blue, 'http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-mongodb.');
 					console.log(COLOUR.blue, '----');
 
-					isMongoRunning(true, './build/mongodb/bin/mongod');
+					isMongoRunning(false, './build/mongodb/bin/mongod');
 				});
 			}
 		});
@@ -359,8 +375,54 @@ function runGulp() {
 		}
 
 		console.log(COLOUR.green, 'Compiled client-side files!');
-		done();
+		checkConfig();
 	});
+}
+
+function checkConfig() {
+	var configExists = fs.existsSync('./config.json');
+
+	if (configExists) {
+		console.log(COLOUR.green, 'Found config file');
+		done();
+	} else {
+		console.log(COLOUR.yellow, 'Config file not found.');
+		console.log(COLOUR.yellow, 'Please don\'t use the default config on production.');
+		var rl = readline.createInterface(process.stdin, process.stdout),
+			q = COLOUR.q + ' Generate default config file? (yes/no) [yes]:',
+			install = false;
+
+		rl.setPrompt(q, q.length - 26);
+		rl.prompt(true);
+
+		rl.on('line', function(line) {
+			line = line.toLowerCase().trim();
+
+			if (line === 'yes' || line === 'y' || line === '') {
+				install = true;
+				rl.close();
+			} else if (line === 'no' || line === 'n') {
+				install = false;
+				rl.close();
+			} else {
+				rl.prompt(true);
+			}
+		}).on('close', function() {
+			if (install) {
+				cp.exec('cp config.example.json config.json', function(error, stdout, stderr) {
+					if (stderr) {
+						throw stderr;
+					}
+
+					console.log(COLOUR.green, 'Default config created as config.json');
+					done();
+				});
+			} else {
+				done();
+			}
+		});
+		// prompt the user with a y/n to see if they want us to copy the example config json over.
+	}
 }
 
 function done() {
