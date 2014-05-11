@@ -14,7 +14,6 @@ var _ = require('lodash'),
 	os = require('os'),
 	fs = require('fs'),
 	util = require('util'),
-	raw = fs.readFileSync('./config.json').toString(),
 	schema = require('./schema').schema,
 	path = require('path'),
 	jsonminify = require('jsonminify'),
@@ -67,11 +66,6 @@ function Application() {
 Application.prototype.verbose = (process.env.VERBOSE && process.env.VERBOSE == 'true') ? true : false;
 
 /**
- * @member {Object} config A copy of the parsed config object
- */
-Application.prototype.config = JSON.parse(jsonminify(raw));
-
-/**
  * @member {Object} packagejson A copy of the project's package.json object
  */
 Application.prototype.packagejson = JSON.parse(fs.readFileSync('./package.json').toString());
@@ -89,6 +83,16 @@ Application.prototype.init = function() {
 
 	this.setupWinston();
 	// setup winston first
+
+	if (!fs.existsSync('./config.json')) {
+		throw new Error('Configuration file config.json not found.');
+	}
+	// Fail and exit if config file not found
+
+	var rawConfig = fs.readFileSync('./config.json').toString();
+
+	this.config = JSON.parse(jsonminify(rawConfig));
+	// A copy of the parsed config object
 
 	var validation = validate(this.config, schema);
 	if (validation.length > 0) {
