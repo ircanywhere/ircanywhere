@@ -142,14 +142,14 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
 		if (_.isFunction(this[execute])) {
 			this[execute].call(this, user, client, target, params, false, id);
 		} else {
-			this['raw'](user, client, target, [execute].concat(params));
+			this.raw(user, client, target, [execute].concat(params));
 		}
 		// is this a command? if it's prefixed with one / then yes
 	} else {
 		command = (command.charAt(1) === '/') ? command.substr(1) : command;
 		// strip one of the /'s off if it has two at the start
 
-		this['msg'](user, client, target, command.split(' '), true);
+		this.msg(user, client, target, command.split(' '), true);
 		// just split it to follow standards with other commands, it'll be rejoined before sent out
 	}
 
@@ -189,20 +189,20 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @param {Boolean} out Used to force the message to target or params[0]
  * @param {ObjectID} id The object id of the command so we can remove it if we need to
  * @return void
  */
 CommandManager.prototype.msg = function(user, client, target, params, out, id) {
-	var out = out || false;
+	out = !!out;
 
 	if (params.length === 0 || target === undefined) {
 		return false;
 	}
 
 	if (!out) {
-		var target = params[0];
+		target = params[0];
 		params.shift();
 	}
 
