@@ -246,6 +246,52 @@ EventManager.prototype.getPrefix = function(client, user) {
 	return {prefix: '', sort: 6};
 }
 
+/**
+ * Gets an event from the database by its type.
+ *
+ * @param {String} type Event type
+ * @param {String} networkName Event network
+ * @param {String} userId Id of the user
+ * @returns {promise}
+ */
+EventManager.prototype.getEventByType = function (type, networkName, userId) {
+	var deferred = Q.defer();
+
+	application.Events.findOne({type: type, network: networkName, user: userId}, function(err, event) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(event);
+	});
+
+	return deferred.promise;
+};
+
+/**
+ * Gets the message playback for an IRC server user since he was last seen.
+ *
+ * @param {String} networkName Network to get playback from
+ * @param {String} userId Id of the user
+ * @param {String} lastSeen JSON formatted string with the last seen Date
+ * @returns {promise}
+ */
+EventManager.prototype.getUserPlayback = function (networkName, userId, lastSeen) {
+	var deferred = Q.defer();
+
+	application.Events.find({'message.time': {$gt: lastSeen}, type: 'privmsg', network: networkName, user: userId},
+		function(err, events) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(events);
+	});
+
+	return deferred.promise;
+};
 
 EventManager.prototype = _.extend(EventManager.prototype, hooks);
 

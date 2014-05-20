@@ -405,7 +405,44 @@ UserManager.prototype.userLogin = function(req, res) {
 	});
 
 	return deferred.promise;
-}
+};
+
+/**
+ * Handles login of IRC server user
+ *
+ * @param {String} email User email
+ * @param {String} password User password
+ * @returns {promise}
+ */
+UserManager.prototype.loginServerUser = function(email, password) {
+	var self = this,
+		deferred = Q.defer();
+
+	application.Users.findOne({email: email}, function(err, user) {
+		if (err || !user) {
+			deferred.reject(new Error('User not found'));
+			return;
+		}
+
+		var salt = user.salt,
+			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+
+		if (hash != user.password) {
+			deferred.reject(new Error('Password incorrect'));
+			return;
+		}
+		// check if password matches
+
+		application.Users.update({email: email}, {$set: {newUser: false}}, {safe: false});
+		// set newUser
+
+		self.onUserLogin(user, user.newUser);
+
+		deferred.resolve(user);
+	});
+
+	return deferred.promise;
+};
 
 /**
  * Handles the call to /api/logout which is self explanatory.
@@ -735,6 +772,18 @@ UserManager.prototype.parse = function(file, replace) {
 
 	return template;
 }
+
+/**
+ * Update lastSeen entry of user.
+ *
+ * @param {String} userId Id of the user
+ * @param {Date} [lastSeen] New lastSeen value
+ */
+UserManager.prototype.updateLastSeen = function (userId, lastSeen) {
+	var timestamp = lastSeen || new Date();
+
+	application.Users.update({_id: userId}, {$set: {lastSeen: timestamp}}, {safe: false});
+};
 
 UserManager.prototype = _.extend(UserManager.prototype, hooks);
 

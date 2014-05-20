@@ -40,7 +40,8 @@
     "simple-schema": "1.1.0",
     "sockjs": "~0.3.8",
     "winston": "~0.7.2",
-    "q": "^1.0.1"
+    "irc-message": "1.0.0",
+    "q": "~1.0.1"
   },
   "keywords": [
     "irc",

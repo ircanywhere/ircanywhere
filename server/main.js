@@ -7,6 +7,7 @@ var Application = require('./app').Application,
 	NetworkManager = require('./networks').NetworkManager,
 	IRCHandler = require('./irchandler').IRCHandler,
 	IRCFactory = require('./factory').IRCFactory,
+	IRCServer = require('./server').IRCServer,
 	CommandManager = require('./commands').CommandManager,
 	RPCHandler = require('./rpc').RPCHandler,
 	ModuleManager = require('./module').ModuleManager,
@@ -50,6 +51,9 @@ commandManager = new CommandManager();
 
 rpcHandler = new RPCHandler();
 // websocket engine
+
+ircServer = new IRCServer();
+// setup irc server
 
 moduleManager = new ModuleManager();
 // module manager
