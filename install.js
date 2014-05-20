@@ -184,6 +184,7 @@ function isMongoRunning(isGlobal, path) {
 			} else {
 				console.log(err, result);
 				console.log(COLOUR.red, 'rs.initiate() failed. Needs manual intervention.');
+				process.exit(1);
 			}
 		});
 	}

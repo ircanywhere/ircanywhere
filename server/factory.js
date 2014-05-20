@@ -63,8 +63,9 @@ IRCFactory.prototype.options = {
 IRCFactory.prototype.init = function() {
 	var self = this,
 		interfaces = this.api.connect(_.extend(this.options, {fork: application.config.forkProcess}));
-		this.events = interfaces.events,
-		this.rpc = interfaces.rpc;
+
+	this.events = interfaces.events;
+	this.rpc = interfaces.rpc;
 	// connect to our uplinks
 
 	this.events.on('message', function(message) {

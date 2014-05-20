@@ -383,7 +383,7 @@ Application.prototype.setupServer = function() {
 		var https = require('https'),
 			options = {
 				key: fs.readFileSync('./private/certs/key.pem'),
-				cert: fs.readFileSync('./private/certs/cert.pem'),
+				cert: fs.readFileSync('./private/certs/cert.pem')
 			},
 			server = https.createServer(options, app);
 	} else {
