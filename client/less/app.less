@@ -121,13 +121,17 @@ div.container {
 		z-index: 6020;
 		list-style-type: none;
 		text-align: right;
+		position: absolute;
+		top: 0;
+		right: 0;
+		background: @topbar-bg;
 		.padding-margin;
 
 		> li {
 			display: inline-block;
 			position: relative;
 			line-height: 11px;
-			margin: 6px 6px 6px 0;
+			margin: 6px 6px 0 6px;
 
 			a {
 				display: block;

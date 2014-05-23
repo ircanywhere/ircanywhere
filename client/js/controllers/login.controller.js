@@ -2,6 +2,7 @@ App.LoginController = Ember.ObjectController.extend({
 	needs: ['index'],
 
 	errors: false,
+	success: false,
 
 	resetErrors: false,
 	resetSent: false,
@@ -52,9 +53,12 @@ App.LoginController = Ember.ObjectController.extend({
 	loginSuccess: function(data) {
 		this.socket.connect();
 		this.set('errors', false);
+		this.set('success', false);
 	},
 
 	loginFail: function(data) {
+		this.set('success', false);
+
 		if (!data) {
 			this.set('errors', 'An error has occured');
 		} else {

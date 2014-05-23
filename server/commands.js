@@ -385,7 +385,7 @@ CommandManager.prototype.topic = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.mode = function(user, client, target, params) {
-	if (helper.isChannel(client, params[0])) {
+	if (params.length !== 0 && helper.isChannel(client, params[0])) {
 		ircFactory.send(client._id, 'mode', params);
 	} else {
 		ircFactory.send(client._id, 'mode', [target].concat(params));
