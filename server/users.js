@@ -69,9 +69,9 @@ UserManager.prototype.init = function() {
 
 	application.app.get('/api/logout', function(req, res) {
 		fibrous.run(function() {
-			var response = self.userLogout(req, res);
+			self.userLogout(req, res);
 
-			res.redirect(307, application.config.url);
+			res.redirect(307, "/");
 			res.end();
 		}, application.handleError.bind(application));
 	});
