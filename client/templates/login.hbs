@@ -14,7 +14,11 @@
 						<div {{bind-attr class="errors:show:hide"}}>
 							<div class="alert-message block-message error">{{errors}}</div>
 						</div>
-						
+
+						<div {{bind-attr class="success:show:hide"}}>
+							<div class="alert-message block-message success"><p>{{success}}</p></div>
+						</div>
+
 						<div class="field">
 							{{view App.InputBlur class="login-input" value=email valueBinding="model.email" default="Email Address"}}
 						</div>

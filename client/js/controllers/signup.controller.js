@@ -1,6 +1,7 @@
 App.SignupController = Ember.ObjectController.extend({
+	needs: ['login'],
+
 	errors: false,
-	success: false,
 
 	name: '',
 	nickname: '',
@@ -22,12 +23,11 @@ App.SignupController = Ember.ObjectController.extend({
 
 	signupSuccess: function(data) {
 		this.set('errors', false);
-		this.set('success', data.successMessage);
+		this.get('controllers.login').set('success', data.successMessage);
+		this.transitionToRoute('login');
 	},
 
 	signupFail: function(data) {
-		this.set('success', false);
-
 		if (!data) {
 			this.set('errors', [{error: 'An error has occured, contact your system administrator'}]);
 		} else {
