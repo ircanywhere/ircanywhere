@@ -23,10 +23,6 @@ Ember.Socket = Ember.Object.extend({
 			socket = new SockJS('/websocket');
 		// connect
 
-		if (this.get('authed') === null) {
-			this.set('authed', false);
-		}
-
 		socket.onclose = function() {
 			if (!self.authed) {
 				return false;
@@ -93,8 +89,12 @@ Ember.Socket = Ember.Object.extend({
 		});
 		// alter the done variable when we're actually done
 
-		this._send('authenticate', document.cookie);
-		// authenticate
+		if (document.cookie) {
+			this._send('authenticate', document.cookie);
+			// authenticate
+		} else {
+			self.set('authed', false);
+		}
 
 		App.__container__.lookup('controller:disconnected').send('closeIfOpen');
 		// close if a modal window is open
