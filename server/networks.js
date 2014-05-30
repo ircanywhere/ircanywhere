@@ -216,6 +216,51 @@ NetworkManager.prototype.getClients = function(keys) {
 }
 
 /**
+ * Gets a list of networks for a user.
+ *
+ * @method getClientsForUSer
+ * @param {String} userId Id of the user
+ * @return {promise} A promise that will resolve to the clients for the given user
+ */
+NetworkManager.prototype.getClientsForUser = function(userId) {
+	var deferred = Q.defer();
+
+	application.Networks.find({'internal.userId': userId}).toArray(function (err, networksArray) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(networksArray);
+	});
+
+	return deferred.promise;
+};
+
+/**
+ * Gets a list of active channels for a user.
+ *
+ * @method getActiveChannelsForUser
+ * @param {String} userId Id of the user
+ * @param {String} networkId Id of the network
+ * @return {promise} A promise that will resolve to the active channels for the given user
+ */
+NetworkManager.prototype.getActiveChannelsForUser = function(userId, networkId) {
+	var deferred = Q.defer();
+
+	application.Tabs.find({user: userId, network: networkId, active: true, type: 'channel'}).toArray(function (err, tabsArray) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(tabsArray);
+	});
+
+	return deferred.promise;
+};
+
+/**
  * Handles the add network api call, basically handling authentication
  * validating the parameters and input, and on success passes the information
  * to `addNetwork()` which handles everything else

@@ -141,39 +141,33 @@ ServerSession.prototype.user = function(message) {
 			return Q.reject(error);
 		})
 		.then(function(user) {
-			var deferred = Q.defer();
+			self.user = user;
+			self.email = email;
 
-			fibrous.run(function() {
-				var networks = networkManager.getClients(),
-					keys = Object.keys(networks);
-
-				if (keys.length === 1) {
-					self.network = networks[keys[0]];
-					// if only one network, choose it
-				} else
-				{
-					self.network = _.find(networks, {name: network});
-					if (!self.network) {
-						deferred.reject(new Error('Network ' + network + ' not found.'));
-						return;
-					}
+			return networkManager.getClientsForUser(user._id);
+		})
+		.then(function(networks) {
+			if (networks.length === 1) {
+				self.network = networks[0];
+				// if only one network, choose it
+			} else {
+				self.network = _.find(networks, {name: network});
+				if (!self.network) {
+					return Q.reject(new Error('Network ' + network + ' not found.'));
 				}
+			}
 
-				self.user = user;
-				self.email = email;
-				self.setup();
-				self.sendWelcome()
-					.then(deferred.resolve);
-			}, application.handleError.bind(application));
-			// Fibrous needed for networkManager.getClients
-
-			return deferred.promise
+			self.setup();
+			return self.sendWelcome()
 				.fail(function(error){
 					application.handleError(error, false);
 					self.disconnectUser();
 
 					return Q.reject(error);
 				});
+		})
+		.then(function () {
+			return self.sendJoins();
 		})
 		.then(function () {
 			self.sendPlayback();
@@ -284,6 +278,28 @@ ServerSession.prototype.sendWelcome = function () {
 		.fail(function (error) {
 			application.logger.log('error', 'error registering client to IRC server');
 			application.handleError(error, false);
+		});
+};
+
+/**
+ * Sends to client a join message for each active channel tab.
+ *
+ * @return {promise}
+ */
+ServerSession.prototype.sendJoins = function () {
+	var self = this;
+
+	return networkManager.getActiveChannelsForUser(self.user._id, self.network._id)
+		.then(function (tabs) {
+			_.each(tabs, function (tab) {
+
+				// TODO: may need to store names event after joining a channel
+				// or generate one from channelUsers.
+				self.sendRaw(':' + self.user.profile.nickname +  ' JOIN :' + tab.target);
+				ircFactory.send(self.network._id.toString(), 'raw', ['NAMES ' + tab.target]);
+			});
+
+			return Q.resolve();
 		});
 };
 

@@ -247,7 +247,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 }
 
 /**
- * Gets an event from the database by its type.
+ * Gets the most recent event from the database by its type.
  *
  * @param {String} type Event type
  * @param {String} networkName Event network
@@ -257,7 +257,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 EventManager.prototype.getEventByType = function (type, networkName, userId) {
 	var deferred = Q.defer();
 
-	application.Events.findOne({type: type, network: networkName, user: userId}, function(err, event) {
+	application.Events.find({type: type, network: networkName, user: userId}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
 		if (err) {
 			deferred.reject(err);
 			return;

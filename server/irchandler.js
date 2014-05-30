@@ -451,7 +451,7 @@ IRCHandler.prototype.names = function(client, message) {
 		keys.sort();
 		users.sort();
 
-		if (!_.isEqual(keys, users)) {
+		if (!_.isEqual(keys, users) && message.channel !== '*') {
 			ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
 		}
 		// different lists.. lets do a /WHO
