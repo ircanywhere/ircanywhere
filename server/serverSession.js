@@ -23,6 +23,8 @@ function ServerSession(socket) {
 	this.id = Math.floor(Math.random() * 1e10).toString(10);
 	// Random id for this session
 
+	application.logger.log('info', 'New client connection. id=', this.id);
+
 	this.welcomed = false;
 
 	this.init();
@@ -65,6 +67,8 @@ ServerSession.prototype.init = function() {
 	});
 
 	this.socket.on('close', function() {
+		application.logger.log('info', 'Client disconnected. id=', self.id);
+
 		process.nextTick(function () {
 			self.socket.removeAllListeners();
 			delete self.socket;
@@ -180,12 +184,15 @@ ServerSession.prototype.user = function(message) {
  * @return void
  */
 ServerSession.prototype.setup = function() {
-	var callback = this.handleEvent.bind(this);
+	var eventsCallback = this.handleEvent.bind(this),
+		ircMessageCallback = this.handleIrcMessage.bind(this);
 
-	application.ee.on(['events', 'insert'], callback);
+	application.ee.on(['events', 'insert'], eventsCallback);
+	ircFactory.events.on('message', ircMessageCallback);
 
 	this.socket.on('close', function() {
-		application.ee.removeListener(['events', 'insert'], callback);
+		application.ee.removeListener(['events', 'insert'], eventsCallback);
+		ircFactory.events.removeListener('message', ircMessageCallback);
 	}.bind(this));
 };
 
@@ -212,8 +219,34 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Is in the ignore list
 
+	if (event.type === 'privmsg') {
+		userManager.updateLastSeen(this.user._id);
+	}
+
 	this.sendRaw(event.message.raw);
 	// Sent to client
+};
+
+/**
+ * Forwards messages that are not stored in the events collection in the database.
+ *
+ * @param ircMessage
+ */
+ServerSession.prototype.handleIrcMessage = function (ircMessage) {
+	var fwdMessages = ['names', 'who'],
+		clientKey = ircMessage.event[0].toString(),
+		command = ircMessage.event[1],
+		message = ircMessage.message;
+
+	if (this.network._id.toString() !== clientKey) {
+		return;
+	}
+	// Check if it's the right network.
+
+	if (_.contains(fwdMessages, command)) {
+		this.sendRaw(message.raw);
+		// Sent to client
+	}
 };
 
 /**
@@ -418,6 +451,9 @@ ServerSession.prototype.onClientMessage = function(message, command) {
  * @param {String} rawMessage
  */
 ServerSession.prototype.sendRaw = function(rawMessage) {
+	if (_.isArray(rawMessage)) {
+		rawMessage = rawMessage.join("\r\n");
+	}
 	this.socket.write(rawMessage + "\r\n");
 };
 
