@@ -134,6 +134,12 @@ ServerSession.prototype.user = function(message) {
 		email = params[0],
 		network = params[1];
 
+	if (!self.password) {
+		application.logger.log('warn', 'Unable to log in user', email, 'password not specified.');
+		self.disconnectUser();
+		return;
+	}
+
 	userManager.loginServerUser(email, self.password)
 		.fail(function(error){
 			// TODO send a 464 ERR_PASSWDMISMATCH
