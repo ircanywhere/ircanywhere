@@ -239,7 +239,7 @@ ServerSession.prototype.handleEvent =  function(event) {
  * @param ircMessage
  */
 ServerSession.prototype.handleIrcMessage = function (ircMessage) {
-	var fwdMessages = ['names', 'who'],
+	var fwdMessages = ['names', 'who', 'topic'],
 		clientKey = ircMessage.event[0].toString(),
 		command = ircMessage.event[1],
 		message = ircMessage.message;
@@ -330,15 +330,26 @@ ServerSession.prototype.sendJoins = function () {
 
 	return networkManager.getActiveChannelsForUser(self.user._id, self.network._id)
 		.then(function (tabs) {
-			_.each(tabs, function (tab) {
+			return Q.all(tabs.map(function (tab) {
+				var deferred = Q.defer();
 
-				// TODO: may need to store names event after joining a channel
-				// or generate one from channelUsers.
-				self.sendRaw(':' + self.user.profile.nickname +  ' JOIN :' + tab.target);
-				ircFactory.send(self.network._id.toString(), 'raw', ['NAMES ' + tab.target]);
-			});
+				application.Events.find({type: 'join', network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+					if (err) {
+						deferred.reject(err);
+						return;
+					}
 
-			return Q.resolve();
+					self.sendRaw(event.message.raw);
+
+					// TODO: names command is throttled, may need to store names event after joining a channel
+					// or generate one from channelUsers.
+					ircFactory.send(self.network._id.toString(), 'raw', ['NAMES ' + tab.target]);
+
+					deferred.resolve();
+				});
+
+				return deferred.promise;
+			}));
 		});
 };
 
@@ -460,6 +471,7 @@ ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {
 		rawMessage = rawMessage.join("\r\n");
 	}
+
 	this.socket.write(rawMessage + "\r\n");
 };
 
