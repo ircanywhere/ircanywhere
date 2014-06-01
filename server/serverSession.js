@@ -88,15 +88,15 @@ ServerSession.prototype.pass = function(message) {
 };
 
 /**
- * Handles NICK message from client. If message arrives before welcome, just store nickname. Otherwise
- * process it.
+ * Handles NICK message from client. If message arrives before welcome, just store nickname temporarily to use
+ * on the welcome message. Otherwise forward it.
  *
  * @param {Object} message Received message
  */
 ServerSession.prototype.nick = function(message) {
 	if (!this.welcomed) {
-		this.nickname = message.params[0];
-		// first nick, just store it locally.
+		this.clientNick = message.params[0];
+		// first nick, just store it locally for the welcome msg.
 	} else {
 		this.onClientMessage(message, 'nick')
 	}
@@ -264,11 +264,11 @@ ServerSession.prototype.handleIrcMessage = function (ircMessage) {
 ServerSession.prototype.sendWelcome = function () {
 	var self = this;
 
-	function sendWelcomeMessagesForNick(rawMessages) {
+	function sendWelcomeMessagesForClientNick(rawMessages) {
 		function setNick(rawMessage) {
 			var message = new IrcMessage(rawMessage);
 
-			message.params[0] = self.nickname;
+			message.params[0] = self.clientNick;
 
 			return message.toString();
 		}
@@ -285,31 +285,33 @@ ServerSession.prototype.sendWelcome = function () {
 	return eventManager.getEventByType('registered', self.network.name, self.user._id)
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForNick(event.message.raw);
+				sendWelcomeMessagesForClientNick(event.message.raw);
 			}
 
 			return eventManager.getEventByType('lusers', self.network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForNick(event.message.raw);
+				sendWelcomeMessagesForClientNick(event.message.raw);
 			}
 
-			self.sendRaw(':' + self.nickname + ' NICK :' + self.user.profile.nickname);
-			self.nickname = self.user.profile.nickname;
+			if (self.clientNick !== self.network.nick) {
+				self.sendRaw(':' + self.clientNick + ' NICK :' + self.network.nick);
+			}
+			// Change nick on client to what we have on the network.
 
 			return eventManager.getEventByType('motd', self.network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForNick(event.message.raw);
+				self.sendRaw(event.message.raw);
 			}
 
 			return eventManager.getEventByType('usermode', self.network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForNick(event.message.raw);
+				self.sendRaw(event.message.raw);
 			}
 
 			self.welcomed = true;
@@ -412,7 +414,7 @@ ServerSession.prototype.privmsg = function(message) {
 		timestamp = new Date(),
 		hostname = (hostmask && hostmask.hostname) || 'none',
 		data = {
-			nickname: this.nickname,
+			nickname: this.network.nick,
 			username: this.user.ident,
 			hostname: hostname,
 			target: message.params[0],
@@ -442,7 +444,7 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 		var hostmask = message.parseHostmaskFromPrefix(),
 			hostname = (hostmask && hostmask.hostname) || 'none',
 			data = {
-				nickname: this.nickname,
+				nickname: this.network.nick,
 				username: this.user.ident,
 				hostname: hostname,
 				target: '*', // TODO: Does this work for all messages?
