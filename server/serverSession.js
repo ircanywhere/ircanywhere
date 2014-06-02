@@ -336,17 +336,16 @@ ServerSession.prototype.sendJoins = function () {
 			return Q.all(tabs.map(function (tab) {
 				var deferred = Q.defer();
 
-				application.Events.find({type: 'join', network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
-					if (err) {
+				application.Events.find({type: 'join', 'message.self': true, network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+					if (err || !event) {
 						deferred.reject(err);
 						return;
 					}
 
 					self.sendRaw(event.message.raw);
 
-					// TODO: names command is throttled, may need to store names event after joining a channel
-					// or generate one from channelUsers.
 					ircFactory.send(self.network._id.toString(), 'raw', ['NAMES ' + tab.target]);
+					// TODO: names command is throttled, may need to generate one from channelUsers.
 
 					deferred.resolve();
 				});
