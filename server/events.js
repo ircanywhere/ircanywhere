@@ -252,7 +252,7 @@ EventManager.prototype.getPrefix = function(client, user) {
  * @param {String} type Event type
  * @param {String} networkName Event network
  * @param {String} userId Id of the user
- * @returns {promise}
+ * @returns {promise} Promise that resolves to event.
  */
 EventManager.prototype.getEventByType = function (type, networkName, userId) {
 	var deferred = Q.defer();
@@ -275,13 +275,13 @@ EventManager.prototype.getEventByType = function (type, networkName, userId) {
  * @param {String} networkName Network to get playback from
  * @param {String} userId Id of the user
  * @param {String} lastSeen JSON formatted string with the last seen Date
- * @returns {promise}
+ * @returns {promise} Promise that resolves to array of playback events.
  */
 EventManager.prototype.getUserPlayback = function (networkName, userId, lastSeen) {
 	var deferred = Q.defer();
 
-	application.Events.find({'message.time': {$gt: lastSeen}, type: 'privmsg', network: networkName, user: userId},
-		function(err, events) {
+	application.Events.find({'message.time': {$gt: lastSeen}, type: 'privmsg', network: networkName, user: userId})
+		.sort({"message.time": 1}).toArray(function(err, events) {
 		if (err) {
 			deferred.reject(err);
 			return;

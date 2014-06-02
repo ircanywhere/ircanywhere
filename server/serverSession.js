@@ -367,47 +367,50 @@ ServerSession.prototype.sendPlayback = function () {
 
 	eventManager.getUserPlayback(self.network.name, self.user._id, self.user.lastSeen.toJSON())
 		.then(function (events) {
-			var deferred = Q.defer();
+			var lastDate = {},
+				now = moment().zone(self.user.timezoneOffset || new Date().getTimezoneOffset());
 
-			events.each(function (err, event) {
-				if (err || !event) {
-					deferred.reject(err);
-					return;
-				}
-
+			events.forEach(function (event) {
 				var message = new IrcMessage(event.message.raw),
 					timestamp = moment(event.message.time),
 					channel = message.params[0],
-					timestampString;
-
-				if (self.user.timezoneOffset) {
-					timestamp.zone(self.user.timezoneOffset);
-				}
-				// Correct timezone if information available.
-
-				timestampString = timestamp.format('h:ma');
-				if (timestamp.isBefore(moment(), 'day')) {
-					timestampString += ' ' + timestamp.fromNow();
-				}
-				// If playback is older then yesterday, display day information. Example: [3:15pm 2 days ago]
-
-				// TODO: would be nicer to add a message with date whenever day changes between playback msgs
-
-				message.params[1] = '[' + timestampString + '] ' +
-					message.params[1];
-				// Prepend timestamp
+					daysAgo,
+					daysAgoString;
 
 				if (!channelsSent[channel]) {
 					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :Playback Start...');
 					channelsSent[channel] = true;
 				}
 
-				self.sendRaw(message.toString());
+				if (self.user.timezoneOffset) {
+					timestamp.zone(self.user.timezoneOffset);
+				}
+				// Correct timezone if information available.
 
-				deferred.resolve();
+				if ((!lastDate[channel] && timestamp.isBefore(now, 'day')) || timestamp.isAfter(lastDate[channel], 'day')) {
+					lastDate[channel] = timestamp;
+					daysAgo = now.startOf('day').diff(timestamp.startOf('day'), 'days');
+
+					if (daysAgo === 0) {
+						daysAgoString = 'today';
+					} else if (daysAgo === 1) {
+						daysAgoString = 'yesterday';
+					} else {
+						daysAgoString = daysAgo + ' days ago';
+					}
+
+					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :' + daysAgoString);
+				}
+				// Display message with date when playback messages changes dates.
+
+				message.params[1] = '[' + timestamp.format('h:ma') + '] ' +
+					message.params[1];
+				// Prepend timestamp
+
+				self.sendRaw(message.toString());
 			});
 
-			return deferred.promise;
+			return Q.resolve();
 		})
 		.then(function () {
 			_.each(_.keys(channelsSent), function (channel) {
@@ -415,6 +418,11 @@ ServerSession.prototype.sendPlayback = function () {
 			});
 
 			userManager.updateLastSeen(self.user._id);
+		})
+		.fail(function (error) {
+			application.logger.log('warn', 'Ignoring playback error.');
+			application.handleError(error, false);
+			return Q.resolve();
 		});
 };
 
