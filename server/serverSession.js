@@ -105,11 +105,10 @@ ServerSession.prototype.nick = function(message) {
 
 /**
  * Handles QUIT message from client. Disconnects the user.
- *
- * @param {Object} message Received message
  */
-ServerSession.prototype.quit = function(message) {
-	this.disconnectUser()
+ServerSession.prototype.quit = function() {
+	this.sendRaw("ERROR :Quitting");
+	this.disconnectUser();
 };
 
 /**
@@ -461,6 +460,11 @@ ServerSession.prototype.privmsg = function(message) {
  * @param {String} command Messages command
  */
 ServerSession.prototype.onClientMessage = function(message, command) {
+	if (!this.network) {
+		return;
+	}
+	// Not ready to take requests yet.
+
 	if (ircHandler[command]) {
 		var hostmask = message.parseHostmaskFromPrefix(),
 			hostname = (hostmask && hostmask.hostname) || 'none',
