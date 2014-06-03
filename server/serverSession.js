@@ -366,24 +366,24 @@ ServerSession.prototype.sendPlayback = function () {
 	eventManager.getUserPlayback(self.network.name, self.user._id, self.user.lastSeen.toJSON())
 		.then(function (events) {
 			var lastDate = {},
-				now = moment().zone(self.user.timezoneOffset || new Date().getTimezoneOffset());
+				timezoneOffset = parseInt(self.user.timezoneOffset, 10) || new Date().getTimezoneOffset(),
+				now = moment().zone(timezoneOffset);
 
 			events.forEach(function (event) {
 				var message = new IrcMessage(event.message.raw),
-					timestamp = moment(event.message.time),
+					timestamp = moment(event.message.time).zone(timezoneOffset),
 					channel = message.params[0],
 					daysAgo,
-					daysAgoString;
+					daysAgoString,
+					timestampStr;
 
 				if (!channelsSent[channel]) {
 					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :Playback Start...');
 					channelsSent[channel] = true;
 				}
 
-				if (self.user.timezoneOffset) {
-					timestamp.zone(self.user.timezoneOffset);
-				}
-				// Correct timezone if information available.
+				timestampStr = timestamp.format('h:mma');
+				// Get the formatted string before startOf() changes the timestamp.
 
 				if ((!lastDate[channel] && timestamp.isBefore(now, 'day')) || timestamp.isAfter(lastDate[channel], 'day')) {
 					lastDate[channel] = timestamp;
@@ -401,7 +401,7 @@ ServerSession.prototype.sendPlayback = function () {
 				}
 				// Display message with date when playback messages changes dates.
 
-				message.params[1] = '[' + timestamp.format('h:ma') + '] ' +
+				message.params[1] = '[' + timestampStr + '] ' +
 					message.params[1];
 				// Prepend timestamp
 
