@@ -265,7 +265,7 @@ function installMongoDb() {
 	function downloadMongo(x64) {
 		var filename,
 			prefix,
-			version = "-2.4.10",
+			version = "-2.6.1",
 			platformFolder;
 
 		if (os.platform() === 'linux') {
