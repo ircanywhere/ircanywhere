@@ -262,7 +262,6 @@ IRCHandler.prototype.join = function(client, message) {
 		ircFactory.send(client._id, 'mode', [message.channel]);
 		ircFactory.send(client._id, 'names', [message.channel]);
 		insertEvent();
-		message.self = true;
 	} else {
 		channelManager.insertUsers(client._id, client.name, message.channel, [user])
 			.then(insertEvent);

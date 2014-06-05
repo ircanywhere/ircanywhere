@@ -335,7 +335,7 @@ ServerSession.prototype.sendJoins = function () {
 			return Q.all(tabs.map(function (tab) {
 				var deferred = Q.defer();
 
-				application.Events.find({type: 'join', 'message.self': true, network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+				application.Events.find({type: 'join', 'extra.self': true, network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
 						deferred.reject(err);
 						return;
