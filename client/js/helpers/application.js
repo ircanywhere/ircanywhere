@@ -42,7 +42,8 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
 		prefixClass = '',
-		url = this.get('controllers.network.model').url;
+		url = this.get('controllers.network.model').url,
+		nickHash = Helpers.hashCode(nickname);
 
 	if (!nickname) {
 		return '';
@@ -58,6 +59,9 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 		prefixClass = ' op';
 	}
 	// setup a different colour for different prefixes
+
+	prefixClass += ' nameColor_' + ((Math.abs(nickHash) % 78) + 1);
+	// pick one of the 78 colors in nameColors.less for the vertical band, based on user nick
 
 	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
