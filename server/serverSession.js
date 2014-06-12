@@ -225,6 +225,11 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Is in the ignore list
 
+	if (!event.user.equals(this.user._id)) {
+		return;
+	}
+	// not for me
+
 	if (event.type === 'privmsg') {
 		userManager.updateLastSeen(this.user._id);
 	}
