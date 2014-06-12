@@ -377,21 +377,28 @@ ServerSession.prototype.sendPlayback = function () {
 			events.forEach(function (event) {
 				var message = new IrcMessage(event.message.raw),
 					timestamp = moment(event.message.time).zone(timezoneOffset),
-					channel = message.params[0],
+					target = message.params[0],
 					daysAgo,
 					daysAgoString,
-					timestampStr;
+					timestampStr,
+					sender = target === self.network.nick ? message.prefix : "***!ircanywhere@ircanywhere.com",
+					key = target === self.network.nick ? event.message.nickname : target;
 
-				if (!channelsSent[channel]) {
-					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :Playback Start...');
-					channelsSent[channel] = true;
+				if (!channelsSent[key]) {
+					self.sendRaw(':' + sender + ' PRIVMSG ' + target + ' :Playback Start...');
+					channelsSent[key] = {
+						sender: sender,
+						target: target
+					};
 				}
 
 				timestampStr = timestamp.format('h:mma');
 				// Get the formatted string before startOf() changes the timestamp.
 
-				if ((!lastDate[channel] && timestamp.isBefore(now, 'day')) || timestamp.isAfter(lastDate[channel], 'day')) {
-					lastDate[channel] = timestamp;
+				if ((!lastDate[target] && timestamp.isBefore(now, 'day')) ||
+					(lastDate[target] && timestamp.isAfter(lastDate[target], 'day'))) {
+
+					lastDate[target] = timestamp;
 					daysAgo = now.startOf('day').diff(timestamp.startOf('day'), 'days');
 
 					if (daysAgo === 0) {
@@ -402,7 +409,7 @@ ServerSession.prototype.sendPlayback = function () {
 						daysAgoString = daysAgo + ' days ago';
 					}
 
-					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :' + daysAgoString);
+					self.sendRaw(':' + sender + ' PRIVMSG ' + target + ' :' + daysAgoString);
 				}
 				// Display message with date when playback messages changes dates.
 
@@ -416,8 +423,8 @@ ServerSession.prototype.sendPlayback = function () {
 			return Q.resolve();
 		})
 		.then(function () {
-			_.each(_.keys(channelsSent), function (channel) {
-				self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :Playback End.');
+			_.each(channelsSent, function (channel) {
+				self.sendRaw(':' + channel.sender + ' PRIVMSG ' + channel.target + ' :Playback End.');
 			});
 
 			userManager.updateLastSeen(self.user._id);

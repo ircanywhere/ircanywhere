@@ -427,7 +427,7 @@ UserManager.prototype.loginServerUser = function(email, password) {
 
 	application.Users.findOne({email: email}, function(err, user) {
 		if (err || !user) {
-			deferred.reject(new Error('User not found'));
+			deferred.reject(new Error('User not found ' + err));
 			return;
 		}
 
