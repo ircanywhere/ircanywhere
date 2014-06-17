@@ -47,10 +47,11 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		user = user || false,
 		network = (client.name) ? client.name : client.server,
 		ours = (message.nickname === client.nick),
-		channel = (message.channel && !message.target) ? message.channel : message.target;
+		channel = (message.channel && !message.target) ? message.channel : message.target,
+		read = ours || client.clientConnected;
 
 	if (!message.channel && !message.target) {
-		var channel = null;
+		channel = null;
 	}
 	// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 	// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
@@ -90,9 +91,9 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 					network: network,
 					target: target,
 					message: message,
-					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
+					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? read : true,
 					extra: {
-						self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
+						self: (client.nick === message.nickname || client.nick === message.kicked),
 						highlight: eventManager.determineHighlight(client, message, type, ours),
 						prefix: prefixObject.prefix
 					}
@@ -274,13 +275,12 @@ EventManager.prototype.getEventByType = function (type, networkName, userId) {
  *
  * @param {String} networkName Network to get playback from
  * @param {String} userId Id of the user
- * @param {String} lastSeen JSON formatted string with the last seen Date
  * @returns {promise} Promise that resolves to array of playback events.
  */
-EventManager.prototype.getUserPlayback = function (networkName, userId, lastSeen) {
+EventManager.prototype.getUserPlayback = function (networkName, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({'message.time': {$gt: lastSeen}, type: 'privmsg', network: networkName, user: userId})
+	application.Events.find({read: false, network: networkName, user: userId})
 		.sort({"message.time": 1}).toArray(function(err, events) {
 		if (err) {
 			deferred.reject(err);
@@ -288,6 +288,15 @@ EventManager.prototype.getUserPlayback = function (networkName, userId, lastSeen
 		}
 
 		deferred.resolve(events);
+
+		application.Events.update({read: false, network: networkName, user: userId},
+			{$set: {read: true}}, {multi: true},
+			function (err) {
+				if (err) {
+					application.handleError(new Error(err));
+				}
+			});
+		// Mark all as read
 	});
 
 	return deferred.promise;

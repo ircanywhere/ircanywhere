@@ -70,6 +70,10 @@ ServerSession.prototype.init = function() {
 	this.socket.on('close', function() {
 		application.logger.log('info', 'Client disconnected. id=', self.id);
 
+		if (self.network) {
+			application.Networks.update({_id: self.network._id}, {$set: {clientConnected: false}}, {safe: false});
+		}
+
 		process.nextTick(function () {
 			self.socket.removeAllListeners();
 			delete self.socket;
@@ -195,6 +199,8 @@ ServerSession.prototype.setup = function() {
 
 	application.ee.on(['events', 'insert'], eventsCallback);
 	ircFactory.events.on('message', ircMessageCallback);
+
+	application.Networks.update({_id: this.network._id}, {$set: {clientConnected: true}}, {safe: false});
 
 	this.socket.on('close', function() {
 		application.ee.removeListener(['events', 'insert'], eventsCallback);
@@ -368,7 +374,7 @@ ServerSession.prototype.sendPlayback = function () {
 	var self = this,
 		channelsSent = {};
 
-	eventManager.getUserPlayback(self.network.name, self.user._id, self.user.lastSeen.toJSON())
+	eventManager.getUserPlayback(self.network.name, self.user._id)
 		.then(function (events) {
 			var lastDate = {},
 				timezoneOffset = parseInt(self.user.timezoneOffset, 10) || new Date().getTimezoneOffset(),
