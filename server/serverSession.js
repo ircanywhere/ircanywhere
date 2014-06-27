@@ -419,9 +419,19 @@ ServerSession.prototype.sendPlayback = function () {
 				}
 				// Display message with date when playback messages changes dates.
 
-				message.params[1] = '[' + timestampStr + '] ' +
-					message.params[1];
-				// Prepend timestamp
+				var origMessage = message.params[1];
+
+				if (event.type === 'action' && origMessage.indexOf('ACTION') !== -1) {
+					var index = origMessage.indexOf('ACTION') + 7;
+
+					origMessage = origMessage.slice(0, index) + '[' + timestampStr + '] ' +
+						origMessage.slice(index);
+					// Add timestamp after ACTION
+				} else {
+					origMessage = '[' + timestampStr + '] ' + origMessage;
+					// Prepend timestamp
+				}
+				message.params[1] = origMessage;
 
 				self.sendRaw(message.toString());
 			});
