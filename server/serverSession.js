@@ -7,7 +7,7 @@
  * @author Rodrigo Silveira
  */
 
-var IrcMessage = require('irc-message'),
+var IrcMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
 	moment = require('moment'),
 	Q = require('q');
