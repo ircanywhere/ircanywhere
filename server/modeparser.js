@@ -162,11 +162,15 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 	// handle minus modes
 
 	_.each(modeArray.params, function(param, parami) {
+		if (!param) {
+			return true;
+		}
+
 		if (param.plus) {
 			var plusSplit = param.plus.split('');
 			
 			_.each(plusSplit, function(pm, pmi) {
-				if (prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
+				if (!pm || prefixModes.indexOf(pm) >= 0 || capabilities.types.a.indexOf(pm) >= 0) {
 					return true;
 				}
 				// ignore these modes, handled elsewhere
@@ -194,7 +198,7 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 			var minusSplit = param.minus.split('');
 
 			_.each(minusSplit, function(mm, mmi) {
-				if (prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
+				if (!mm || prefixModes.indexOf(mm) >= 0 || capabilities.types.a.indexOf(mm) >= 0) {
 					return true;
 				}
 				// ignore these modes, handled elsewhere
@@ -235,6 +239,10 @@ ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 		changedUsers = [];
 
 	_.each(modeArray.params, function(param, pi) {
+		if (!param) {
+			return true;
+		}
+		
 		if (_.has(users, pi)) {
 			var user = users[pi];
 		
