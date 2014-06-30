@@ -23,7 +23,7 @@ function CommandManager() {
 	var self = this;
 
 	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
+		self.init();
 	});
 }
 
@@ -40,14 +40,16 @@ CommandManager.prototype.init = function() {
 	var self = this;
 
 	application.ee.on(['commands', 'insert'], function(doc) {
-		fibrous.run(function() {
-			var user = application.Users.sync.findOne({_id: doc.user}),
-				client = Clients[doc.network.toString()];
-			// get some variables
+		application.Users.findOne({_id: doc.user}, function(err, user) {
+			if (err || !user) {
+				return;
+			}
+
+			var client = Clients[doc.network.toString()];
 
 			self.parseCommand(user, client, doc.target, doc.command, doc._id);
 			// success
-		}, application.handleError.bind(application));
+		});
 	});
 
 	this.createAlias('/join', '/j');
@@ -73,19 +75,20 @@ CommandManager.prototype.init = function() {
  */
 CommandManager.prototype._ban = function(client, channel, nickname, ban) {
 	var nickname = params[0],
-		mode = (ban) ? '+b' : '-b',
-		user = application.ChannelUsers.sync.findOne({
-			network: client.name,
-			channel: new RegExp('^' + channel + '$', 'i'),
-			nickname: new RegExp('^' + nickname + '$', 'i')
-		});
+		mode = (ban) ? '+b' : '-b';
 
-	if (user === undefined) {
-		return false;
-	} else {
+	application.ChannelUsers.findOne({
+		network: client.name,
+		channel: new RegExp('^' + channel + '$', 'i'),
+		nickname: new RegExp('^' + nickname + '$', 'i')
+	}, function(err, user) {
+		if (err || !user) {
+			return false;
+		}
+		// cant find a user
+
 		ircFactory.send(client._id, 'mode', [channel, mode, '*@' + user.hostname]);
-	}
-	// cant find a user
+	});
 }
 
 /**
@@ -549,39 +552,40 @@ CommandManager.prototype.unaway = function(user, client, target, params) {
  * @return void
  */
 CommandManager.prototype.close = function(user, client, target, params) {
-	var tlower = target.toLowerCase(),
-		tab = application.Tabs.sync.findOne({target: tlower, network: client._id});
+	var tlower = target.toLowerCase();
+
+	application.Tabs.sync.findOne({target: tlower, network: client._id}, function(err, tab) {
+		if (err || !tab) {
+			return false;
+		}
+
+		if (tab.type === 'channel') {
+			if (tab.active) {
+				ircFactory.send(client._id, 'part', [target]);
+			}
+
+			networkManager.removeTab(client, target);
+			// determine what to do with it, if it's a channel /part and remove tab
+
+			var index = _.findIndex(client.channels, {channel: tlower});
+
+			if (index > -1) {
+				application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
+			}
+			// does the index in client.channels exist? lets remove it if so
+		} else if (tab.type === 'query') {
+			networkManager.removeTab(client, target);
+			// if its a query just remove tab
+		} else if (tab.type === 'network') {
+			if (tab.active) {
+				ircFactory.destroy(client._id);
+			}
+
+			networkManager.removeTab(client);
+			// if it's a network /quit and remove tab(s)
+		}
+	});
 	// get the tab in question
-
-	if (!tab) {
-		return false;
-	}
-
-	if (tab.type === 'channel') {
-		if (tab.active) {
-			ircFactory.send(client._id, 'part', [target]);
-		}
-
-		networkManager.removeTab(client, target);
-		// determine what to do with it, if it's a channel /part and remove tab
-
-		var index = _.findIndex(client.channels, {channel: tlower});
-		
-		if (index > -1) {
-			application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
-		}
-		// does the index in client.channels exist? lets remove it if so
-	} else if (tab.type === 'query') {
-		networkManager.removeTab(client, target);
-		// if its a query just remove tab
-	} else if (tab.type === 'network') {
-		if (tab.active) {
-			ircFactory.destroy(client._id);
-		}
-
-		networkManager.removeTab(client);
-		// if it's a network /quit and remove tab(s)
-	}
 }
 
 /**

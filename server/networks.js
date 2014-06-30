@@ -416,7 +416,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
 	// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
 	
 	if (target) {
-		application.Tabs.sync.remove({user: client.internal.userId, network: client._id, target: target.toLowerCase()});
+		application.Tabs.remove({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {safe: false});
 	} else {
 		application.Tabs.remove({user: client.internal.userId, network: client._id}, function(err, doc) {
 			application.Networks.remove({_id: client._id}, {safe: false});
