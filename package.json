@@ -29,7 +29,7 @@
     "express": "~3.4.0",
     "fibrous": "~0.3.3",
     "hooks": "0.3.2",
-    "irc-factory": "~1.7.0",
+    "irc-factory": "~1.8.1",
     "jsonminify": "0.2.2",
     "lodash": "~2.4.1",
     "mongodb": "^1.4.5",
