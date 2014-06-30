@@ -11,7 +11,8 @@ var _ = require('lodash'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers,
 	WebSocket = require('./websocket').WebSocket,
-	mongo = require('mongodb');
+	mongo = require('mongodb'),
+	Q = require('q');
 
 /**
  * Singleton class to handle the inbound and outbound RPC calls on the websocket lines
@@ -315,24 +316,28 @@ RPCHandler.prototype.onSocketOpen = function(socket) {
  * @return void
  */
 RPCHandler.prototype.handleAuth = function(socket, data) {
-	var user = userManager.isAuthenticated(data);
+	var self = this;
 	
-	if (!user) {
-		socket.send('authenticate', false, true);
-	} else {
-		socket._user = user;
-		
-		if (!Users[user._id]) {
-			Users[user._id] = [{id: socket.id, socket: socket}];
-		} else {
-			Users[user._id].push({id: socket.id, socket: socket});
-		}
+	userManager.isAuthenticated(data)
+		.fail(function(err) {
+			socket.send('authenticate', false, true);
+		})
+		.then(function(user) {
+			socket._user = user;
 
-		socket.send('authenticate', true, false);
+			if (!Users[user._id]) {
+				Users[user._id] = [{id: socket.id, socket: socket}];
+			} else {
+				Users[user._id].push({id: socket.id, socket: socket});
+			}
 
-		this.handleConnect(socket);
-		// handle sending out data on connect
-	}
+			socket.send('authenticate', true, false);
+
+			fibrous.run(function() {
+				self.handleConnect(socket);
+			});
+			// handle sending out data on connect
+		});
 }
 
 /**

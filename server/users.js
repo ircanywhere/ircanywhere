@@ -12,7 +12,8 @@ var _ = require('lodash'),
 	fs = require('fs'),
 	hooks = require('hooks'),
 	emails = require('emailjs'),
-	helper = require('../lib/helpers').Helpers;
+	helper = require('../lib/helpers').Helpers,
+	Q = require('q');
 
 /**
  * Responsible for handling user related actions ie registering, logging in, forgot passwords etc.
@@ -54,62 +55,52 @@ UserManager.prototype.init = function() {
 	// setup email server
 
 	application.app.post('/api/register', function(req, res) {
-		fibrous.run(function() {
-			var response = self.registerUser(req, res);
-
+		self.registerUser(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 
 	application.app.post('/api/login', function(req, res) {
-		res.header('Content-Type', 'application/json');
-		self.userLogin(req, res);
+		self.userLogin(req, res).then(function(response) {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		});
 	});
 
 	application.app.get('/api/logout', function(req, res) {
-		fibrous.run(function() {
-			self.userLogout(req, res);
-
+		self.userLogout(req, res).then(function() {
 			res.redirect(307, "/");
 			res.end();
-		}, application.handleError.bind(application));
+		});
 	});
 
 	application.app.post('/api/forgot', function(req, res) {
-		fibrous.run(function() {
-			var response = self.forgotPassword(req, res);
-
+		self.forgotPassword(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 
 	application.app.post('/api/reset', function(req, res) {
-		fibrous.run(function() {
-			var response = self.resetPassword(req, res);
-
+		self.resetPassword(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 
 	application.app.post('/api/settings/updatesettings', function(req, res) {
-		fibrous.run(function() {
-			var response = self.updateSettings(req, res);
-
+		self.updateSettings(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 
 	application.app.post('/api/settings/changepassword', function(req, res) {
-		fibrous.run(function() {
-			var response = self.changePassword(req, res);
-
+		self.changePassword(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 	// setup routes
 }
@@ -180,10 +171,11 @@ UserManager.prototype.timeOutInactive = function() {
  *
  * @method isAuthenticated
  * @param {Object} data A valid data object from sock.js
- * @return {Object}
+ * @return {promise}
  */
 UserManager.prototype.isAuthenticated = function(data) {
-	var parsed = (data) ? data.split('; ') : [],
+	var deferred = Q.defer(),
+		parsed = (data) ? data.split('; ') : [],
 		cookies = {};
 
 	parsed.forEach(function(cookie) {
@@ -193,29 +185,34 @@ UserManager.prototype.isAuthenticated = function(data) {
 	// get our cookies
 
 	if (!cookies.token) {
-		return false;
+		deferred.reject();
+		return deferred.promise;
 	}
 
 	var query = {};
 		query['tokens.' + cookies.token] = {$exists: true};
-	var user = application.Users.sync.findOne(query);
 
-	if (!user) {
-		return false;
-	}
+	application.Users.findOne(query, function(err, user) {
+		if (err || !user) {
+			deferred.reject(err);
+			return;
+		}
 
-	if (new Date() > user.tokens[cookies.token].time) {
-		var unset = {};
-			unset['tokens.' + cookies.token] = 1;
-		
-		application.Users.update(query, {$unset: unset}, {safe: false});
-		// token is expired, remove it
+		if (new Date() > user.tokens[cookies.token].time) {
+			var unset = {};
+				unset['tokens.' + cookies.token] = 1;
 
-		return false;
-	} else {
-		return user;
-	}
-	// validate the cookie and return user or false
+			application.Users.update(query, {$unset: unset}, {safe: false});
+			// token is expired, remove it
+
+			deferred.reject();
+		} else {
+			deferred.resolve(user);
+		}
+	});
+
+	return deferred.promise;
+	// validate the cookie and return promise
 }
 
 /**
@@ -226,10 +223,12 @@ UserManager.prototype.isAuthenticated = function(data) {
  * @method registerUser
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.registerUser = function(req, res) {
-	var name = req.param('name', ''),
+	var self = this,
+		deferred = Q.defer(),
+		name = req.param('name', ''),
 		nickname = req.param('nickname', ''),
 		email = req.param('email', ''),
 		password = req.param('password', ''),
@@ -270,56 +269,81 @@ UserManager.prototype.registerUser = function(req, res) {
 
 	if (output.errors.length > 0) {
 		output.failed = true;
-		return output;
+
+		deferred.resolve(output);
+		return deferred.promise;
 	}
 	// any errors?
 
-	var userCount = application.Users.sync.find().sync.count() + 1,
-		salt = helper.generateSalt(10),
-		user = {
-			email: email,
-			password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
-			salt: salt,
-			tokens: {},
-			ident: application.config.clientSettings.userNamePrefix + userCount,
-			newUser: true,
-			selectedTab: '',
-			profile: {
-				name: name,
-				nickname: nickname
-			}
-		};
-	// the user record
-
-	var find = application.Users.sync.find({email: email}).sync.toArray();
-	if (find.length > 0) {
+	function errorOccured(msg) {
 		output.failed = true;
-		output.errors.push({error: 'The email you have used is already in use'});
+		output.errors.push({error: msg});
 
-		return output;
-	} else {
-		application.Users.sync.insert(user);
+		deferred.resolve(output);
 	}
-	// it's failed, lets bail
 
-	application.logger.log('info', 'account created', helper.cleanObjectIds(_.cloneDeep(user)));
-	// log this event
+	application.Users.find().count(function(err, userCount) {
+		if (err) {
+			return errorOccured('An error has occured');
+		}
 
-	var message = {
-		text: this.parse('./private/emails/signup.txt', {name: name}),
-		from: application.config.email.from,
-		to: email,
-		subject: 'Welcome to ' + application.config.email.siteName
-	};
-	
-	this.server.send(message);
-	// send a email
+		userCount++;
 
-	networkManager.addNetwork(user, _.clone(application.config.defaultNetwork), networkManager.flags.closed);
-	// create a network for them
+		var salt = helper.generateSalt(10),
+			user = {
+				email: email,
+				password: crypto.createHmac('sha256', salt).update(password).digest('hex'),
+				salt: salt,
+				tokens: {},
+				ident: application.config.clientSettings.userNamePrefix + userCount,
+				newUser: true,
+				selectedTab: '',
+				profile: {
+					name: name,
+					nickname: nickname
+				}
+			};
+		// the user record
 
-	output.successMessage = 'Your account has been successfully created, you may now login';
-	return output;
+		application.Users.find({email: email}).toArray(function(err, find) {
+			if (err || find.length > 0) {
+				return errorOccured((err) ? 'An error has occured' : 'The email you have used is already in use');
+			}
+			// it's failed, lets bail
+
+			application.Users.insert(user, function(err, docs) {
+				if (err) {
+					return errorOccured('An error has occured');
+				}
+
+				if (docs.length == 0) {
+					return errorOccured('Your account was not created, please contact an administrator');
+				}
+
+				application.logger.log('info', 'account created', helper.cleanObjectIds(_.cloneDeep(user)));
+				// log this event
+
+				var message = {
+					text: self.parse('./private/emails/signup.txt', {name: name}),
+					from: application.config.email.from,
+					to: email,
+					subject: 'Welcome to ' + application.config.email.siteName
+				};
+
+				self.server.send(message);
+				// send a email
+
+				networkManager.addNetwork(user, _.clone(application.config.defaultNetwork), networkManager.flags.closed);
+				// create a network for them
+
+				output.successMessage = 'Your account has been successfully created, you may now login';
+
+				deferred.resolve(output);
+			});
+		});
+	});
+
+	return deferred.promise;
 }
 
 /**
@@ -332,6 +356,7 @@ UserManager.prototype.registerUser = function(req, res) {
  */
 UserManager.prototype.userLogin = function(req, res) {
 	var self = this,
+		deferred = Q.defer(),
 		email = req.param('email', ''),
 		password = req.param('password', ''),
 		token = helper.generateSalt(25),
@@ -342,7 +367,9 @@ UserManager.prototype.userLogin = function(req, res) {
 		if (err || !user) {
 			output.failed = true;
 			output.errors.push({error: 'User not found'});
-			return res.end(JSON.stringify(output));
+
+			deferred.resolve(output);
+			return;
 		}
 
 		var salt = user.salt,
@@ -350,7 +377,9 @@ UserManager.prototype.userLogin = function(req, res) {
 
 		if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
 			output.successMessage = 'Login successful';
-			return res.end(JSON.stringify(output));
+
+			deferred.resolve(output);
+			return;
 		}
 
 		if (hash != user.password) {
@@ -374,8 +403,10 @@ UserManager.prototype.userLogin = function(req, res) {
 		}
 		// check if password matches
 
-		return res.end(JSON.stringify(output));
+		deferred.resolve(output);
 	});
+
+	return deferred.promise;
 }
 
 /**
@@ -384,17 +415,22 @@ UserManager.prototype.userLogin = function(req, res) {
  * @method userLogout
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.userLogout = function(req, res) {
-	var user = this.isAuthenticated(req.headers.cookie);
+	var deferred = Q.defer();
 
-	if (!user) {
-		return false;
-	} else {
-		application.Users.update({_id: user._id}, {$set: {tokens: {}}}, {safe: false});
-		return true;
-	}
+	this.isAuthenticated(req.headers.cookie)
+		.fail(function(err) {
+			deferred.resolve(false);
+		})
+		.then(function(user) {
+			application.Users.update({_id: user._id}, {$set: {tokens: {}}}, {safe: false});
+
+			deferred.resolve(true);
+		});
+
+	return deferred.promise;
 }
 
 /**
@@ -403,43 +439,51 @@ UserManager.prototype.userLogout = function(req, res) {
  * @method forgotPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.forgotPassword = function(req, res) {
-	var output = {failed: false, successMessage: '', errors: []},
+	var self = this,
+		deferred = Q.defer(),
+		output = {failed: false, successMessage: '', errors: []},
 		email = req.param('email', ''),
 		token = helper.generateSalt(25),
-		expire = new Date(Date.now() + (24 * 60 * 60 * 1000)),
-		user = application.Users.sync.findOne({email: email});
+		expire = new Date(Date.now() + (24 * 60 * 60 * 1000));
 
-	if (!user) {
-		output.failed = true;
-		output.errors.push({error: 'User not found'});
-		return output;
-	}
+	application.Users.findOne({email: email}, function(err, user) {
+		if (err || !user) {
+			output.failed = true;
+			output.errors.push({error: 'User not found'});
 
-	var resetToken = {
-		token: token,
-		time: expire,
-		ip: req.ip
-	};
+			deferred.resolve(output);
+			return;
+		}
 
-	application.Users.update({email: email}, {$set: {resetToken: resetToken}}, {safe: false});
-	// set the reset token
-
-	var link = application.config.url + '/#/reset/' + token,
-		message = {
-			text: this.parse('./private/emails/reset.txt', {name: user.name, link: link}),
-			from: application.config.email.from,
-			to: email,
-			subject: 'Your new password'
+		var resetToken = {
+			token: token,
+			time: expire,
+			ip: req.ip
 		};
-	
-	this.server.send(message);
-	// send a email
 
-	output.successMessage = 'Instructions on how to reset your password have been sent';
-	return output;
+		application.Users.update({email: email}, {$set: {resetToken: resetToken}}, {safe: false});
+		// set the reset token
+
+		var link = application.config.url + '/#/reset/' + token,
+			message = {
+				text: self.parse('./private/emails/reset.txt', {name: user.name, link: link}),
+				from: application.config.email.from,
+				to: email,
+				subject: 'Your new password'
+			};
+
+		self.server.send(message);
+		// send a email
+
+		output.successMessage = 'Instructions on how to reset your password have been sent';
+
+		deferred.resolve(output);
+	});
+
+	return deferred.promise;
 }
 
 /**
@@ -449,16 +493,32 @@ UserManager.prototype.forgotPassword = function(req, res) {
  * @method resetPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.resetPassword = function(req, res) {
-	var password = req.param('password', ''),
+	var self = this,
+		deferred = Q.defer(),
+		password = req.param('password', ''),
 		confirmPassword = req.param('confirmPassword', ''),
 		token = req.param('token', ''),
 		time = new Date(Date.now()),
-		user = application.Users.sync.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}});
+		output = {};
 
-	return this.updatePassword(user, password, confirmPassword);
+	application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}}, function(err, user) {
+		if (err || !user) {
+			output.failed = true;
+			output.errors.push({error: 'Not authenticated'});
+
+			deferred.resolve(output);
+			return;
+		}
+
+		output = self.updatePassword(user, password, confirmPassword);
+
+		deferred.resolve(output);
+	})
+
+	return deferred.promise;
 }
 
 /**
@@ -468,58 +528,76 @@ UserManager.prototype.resetPassword = function(req, res) {
  * @method updateSettings
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.updateSettings = function(req, res) {
-	var name = req.param('name', ''),
+	var self = this,
+		deferred = Q.defer(),
+		name = req.param('name', ''),
 		nickname = req.param('nickname', ''),
 		email = req.param('email', ''),
-		emailUser = application.Users.sync.findOne({email: email}),
-		user = this.isAuthenticated(req.headers.cookie),
 		output = {failed: false, successMessage: '', errors: []};
 
-	if (!user) {
-		output.failed = true;
-		output.errors.push({error: 'Not authenticated'});
-		return output;
-	}
+	application.Users.findOne({email: email}, function(err, emailUser) {
+		if (err) {
+			output.failed = true;
+			output.errors.push({error: 'An error has occured'});
 
-	name = helper.trimInput(name);
-	nickname = helper.trimInput(nickname);
-	email = helper.trimInput(email);
-	// trim output
+			deferred.resolve(output);
+			return;
+		}
 
-	if (name === '' || nickname === '' || email === '') {
-		output.errors.push({error: 'All fields are required'});
-	}
+		self.isAuthenticated(req.headers.cookie)
+			.fail(function(err) {
+				output.failed = true;
+				output.errors.push({error: 'Not authenticated'});
 
-	if (!helper.isValidName(name)) {
-		output.errors.push({error: 'The name you have entered is too long'});
-	}
+				deferred.resolve(output);
+			})
+			.then(function(user) {
+				name = helper.trimInput(name);
+				nickname = helper.trimInput(nickname);
+				email = helper.trimInput(email);
+				// trim output
 
-	if (!helper.isValidNickname(nickname)) {
-		output.errors.push({error: 'The nickname you have entered is invalid'});
-	}
+				if (name === '' || nickname === '' || email === '') {
+					output.errors.push({error: 'All fields are required'});
+				}
 
-	if (user.email !== email && emailUser) {
-		output.errors.push({error: 'The email address you have entered is already in use'});
-	}
+				if (!helper.isValidName(name)) {
+					output.errors.push({error: 'The name you have entered is too long'});
+				}
 
-	if (!helper.isValidEmail(email)) {
-		output.errors.push({error: 'The email address you have entered is invalid'});
-	}
+				if (!helper.isValidNickname(nickname)) {
+					output.errors.push({error: 'The nickname you have entered is invalid'});
+				}
 
-	if (output.errors.length > 0) {
-		output.failed = true;
-		return output;
-	}
-	// any errors?
+				if (user.email !== email && emailUser) {
+					output.errors.push({error: 'The email address you have entered is already in use'});
+				}
 
-	application.Users.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}}, {safe: false});
-	// update the settings
+				if (!helper.isValidEmail(email)) {
+					output.errors.push({error: 'The email address you have entered is invalid'});
+				}
 
-	output.successMessage = 'Your settings successfully have been updated.';
-	return output;
+				if (output.errors.length > 0) {
+					output.failed = true;
+
+					deferred.resolve(output);
+					return;
+				}
+				// any errors?
+
+				application.Users.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}}, {safe: false});
+				// update the settings
+
+				output.successMessage = 'Your settings successfully have been updated.';
+
+				deferred.resolve(output);
+			});
+	});
+
+	return deferred.promise;
 }
 
 /**
@@ -530,14 +608,29 @@ UserManager.prototype.updateSettings = function(req, res) {
  * @method resetPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
- * @return {Object} An output object for the API call
+ * @return {promise} An output object for the API call
  */
 UserManager.prototype.changePassword = function(req, res) {
-	var password = req.param('password', ''),
+	var self = this,
+		deferred = Q.defer(),
+		password = req.param('password', ''),
 		newPassword = req.param('newPassword', ''),
-		user = this.isAuthenticated(req.headers.cookie);
+		output = {};
 
-	return this.updatePassword(user, newPassword, newPassword, password);
+	this.isAuthenticated(req.headers.cookie)
+		.fail(function(err) {
+			output.failed = true;
+			output.errors.push({error: (password) ? 'Not authenticated' : 'Invalid reset password url'});
+
+			deferred.resolve(output);
+		})
+		.then(function(user) {
+			output = self.updatePassword(user, newPassword, newPassword, password);
+
+			deferred.resolve(output);
+		});
+
+	return deferred.promise;
 }
 
 /**
@@ -545,7 +638,7 @@ UserManager.prototype.changePassword = function(req, res) {
  * define how you select the user, so via a token or direct user object
  * 
  * @method updatePassword
- * @param {Object} user A valid user object from `isAuthenticated`
+ * @param {promise} user A valid promise object from `isAuthenticated`
  * @param {String} password The new password to set
  * @param {String} confirmPassword The same password again
  * @param {String} [currentPassword] The current password
@@ -555,10 +648,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
 	var currentPassword = currentPassword || '',
 		output = {failed: false, successMessage: '', errors: []};
 
-	if (user === null) {
-		output.failed = true;
-		output.errors.push({error: (currentPassword) ? 'Not authenticated' : 'Invalid reset password url'});
-	} else if (currentPassword !== '' && user.password !== crypto.createHmac('sha256', user.salt).update(currentPassword).digest('hex')) {
+	if (currentPassword !== '' && user.password !== crypto.createHmac('sha256', user.salt).update(currentPassword).digest('hex')) {
 		output.failed = true;
 		output.errors.push({error: 'The password you have entered is invalid'});
 	} else if (password === '' || confirmPassword === '') {

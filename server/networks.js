@@ -10,7 +10,8 @@
 var _ = require('lodash'),
 	hooks = require('hooks'),
 	mongo = require('mongodb'),
-	helper = require('../lib/helpers').Helpers;
+	helper = require('../lib/helpers').Helpers,
+	Q = require('q');
 
 /**
  * Responsible for handling everything related to networks, such as tracking changes
@@ -130,12 +131,10 @@ NetworkManager.prototype.init = function() {
 	// - the delete is handled in sockets.js after we've propogated it
 
 	application.app.post('/api/addnetwork', function(req, res) {
-		fibrous.run(function() {
-			var response = self.addNetworkApi(req, res);
-
+		self.addNetworkApi(req, res).then(function(response) {
 			res.header('Content-Type', 'application/json');
 			res.end(JSON.stringify(response));
-		}, application.handleError.bind(application));
+		});
 	});
 }
 
@@ -174,7 +173,9 @@ NetworkManager.prototype.getClients = function() {
  * @return {Object} An output object for the API call
  */
 NetworkManager.prototype.addNetworkApi = function(req, res) {
-	var server = req.param('server', ''),
+	var self = this,
+		deferred = Q.defer(),
+		server = req.param('server', ''),
 		secure = req.param('secure', false),
 		port = parseInt(req.param('port', '6667')),
 		sasl = req.param('sasl', false),
@@ -184,79 +185,93 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		networkCount = 0,
 		restriction = application.config.clientSettings.networkRestriction,
 		escapedRestrictions = [],
-		user = userManager.isAuthenticated(req.headers.cookie),
 		output = {failed: false, errors: []};
 	// get our parameters
 
-	if (!user) {
-		output.failed = true;
-		output.errors.push({error: 'Not authenticated'});
-		return output;
-	}
+	userManager.isAuthenticated(req.headers.cookie)
+		.fail(function(err) {
+			output.failed = true;
+			output.errors.push({error: 'Not authenticated'});
 
-	restriction.forEach(function(item) {
-		var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
-		escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
-	});
-	// create an array of restrictions
+			deferred.resolve(output);
+		})
+		.then(function(user) {
+			restriction.forEach(function(item) {
+				var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
+				escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+			});
+			// create an array of restrictions
 
-	var networkCount = application.Networks.sync.find({'internal.userId': user._id}).sync.count();
-		server = helper.trimInput(server);
-		name = helper.trimInput(name);
-		nick = helper.trimInput(nick);
+			application.Networks.find({'internal.userId': user._id}).count(function(err, networkCount) {
+				server = helper.trimInput(server);
+				name = helper.trimInput(name);
+				nick = helper.trimInput(nick);
 
-	if (server === '' || nick === '' || name === '') {
-		output.errors.push({error: 'The fields server, nick and name are all required'});
-	}
+				if (server === '' || nick === '' || name === '') {
+					output.errors.push({error: 'The fields server, nick and name are all required'});
+				}
 
-	if (!helper.isValidName(name)) {
-		output.errors.push({error: 'The name you have entered is too long'});
-	}
+				if (!helper.isValidName(name)) {
+					output.errors.push({error: 'The name you have entered is too long'});
+				}
 
-	if (!helper.isValidNickname(nick)) {
-		output.errors.push({error: 'The nickname you have entered is invalid'});
-	}
+				if (!helper.isValidNickname(nick)) {
+					output.errors.push({error: 'The nickname you have entered is invalid'});
+				}
 
-	if (port < 0 || port > 65535) {
-		output.errors.push({error: 'The port you have entered is invalid'});
-	}
+				if (port < 0 || port > 65535) {
+					output.errors.push({error: 'The port you have entered is invalid'});
+				}
 
-	if (networkCount >= application.config.clientSettings.networkLimit) {
-		output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
-	}
+				if (networkCount >= application.config.clientSettings.networkLimit) {
+					output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
+				}
 
-	var restricted = true;
-	_.each(escapedRestrictions, function(item) {
-		if (item.test(server)) {
-			restricted = false;
-		}
-	});
+				var restricted = true;
+				_.each(escapedRestrictions, function(item) {
+					if (item.test(server)) {
+						restricted = false;
+					}
+				});
 
-	if (restricted) {
-		output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
-	}
+				if (restricted) {
+					output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
+				}
 
-	if (output.errors.length > 0) {
-		output.failed = true;
-		return output;
-	}
-	// any errors?
+				if (output.errors.length > 0) {
+					output.failed = true;
 
-	var network = {
-		server: server,
-		secure: (secure == 'true') ? true : false,
-		port: port,
-		sasl: (sasl == 'true') ? true : false,
-		password: password,
-		nick: nick,
-		realname: name
-	};
+					deferred.resolve(output);
+					return;
+				}
+				// any errors?
 
-	this.addNetwork(user, network, this.flags.closed);
-	this.connectNetwork(network);
-	// add network
+				var network = {
+					server: server,
+					secure: (secure == 'true') ? true : false,
+					port: port,
+					sasl: (sasl == 'true') ? true : false,
+					password: password,
+					nick: nick,
+					realname: name
+				};
 
-	return output;
+				self.addNetwork(user, network, self.flags.closed)
+					.fail(function() {
+						output.failed = true;
+						output.errors.push({error: 'An error has occured'});
+						deferred.resolve(output);
+					})
+					.then(function() {
+						self.connectNetwork(network);
+					// add network
+
+					deferred.resolve(output);
+				});
+			});
+		});
+
+	return deferred.promise;
 }
 
 /**
@@ -267,7 +282,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
  * @param {Object} user A valid user object from the `users` collection
  * @param {Object} network A valid network object to insert
  * @param {String} status A valid network status
- * @return {Object} The network inserted or null if not
+ * @return {promise} A promise to determine whether the insert worked or not
  */
 NetworkManager.prototype.addNetwork = function(user, network, status) {
 	if (!(status in this.flags)) {
@@ -301,12 +316,24 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 	// the client but they wont be able to edit it, it also wont be able to be enforced
 	// by the config settings or network settings, it's overwritten every time.
 
-	var doc = application.Networks.sync.insert(network)[0];
-	
-	this.addTab(doc, doc.name, 'network', true, false);
-	// add the tab
+	var self = this,
+		deferred = Q.defer();
 
-	return doc;
+	application.Networks.insert(network, function(err, docs) {
+		if (err || docs.length == 0) {
+			deferred.reject();
+			return;
+		}
+
+		var doc = docs[0];
+
+		self.addTab(doc, doc.name, 'network', true, false);
+		// add the tab
+
+		deferred.resolve(doc);
+	});
+
+	return deferred.promise;
 	// insert the network. Just doing this will propogate the change directly due to our observe driver
 }
 
