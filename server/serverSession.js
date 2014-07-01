@@ -10,6 +10,7 @@
 var IrcMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
 	moment = require('moment'),
+	helper = require('../lib/helpers').Helpers,
 	Q = require('q');
 
 /**
@@ -70,8 +71,8 @@ ServerSession.prototype.init = function() {
 	this.socket.on('close', function() {
 		application.logger.log('info', 'Client disconnected. id=', self.id);
 
-		if (self.network) {
-			application.Networks.update({_id: self.network._id}, {$set: {clientConnected: false}}, {safe: false});
+		if (self.networkId) {
+			application.Networks.update({_id: self.networkId}, {$set: {clientConnected: false}}, {safe: false});
 		}
 
 		process.nextTick(function () {
@@ -136,7 +137,7 @@ ServerSession.prototype.user = function(message) {
 	var self = this,
 		params = message.params[0].split('/'),
 		email = params[0],
-		network = params[1];
+		networkName = params[1];
 
 	if (!self.password) {
 		application.logger.log('warn', 'Unable to log in user', email, 'password not specified.');
@@ -162,13 +163,16 @@ ServerSession.prototype.user = function(message) {
 		})
 		.then(function(networks) {
 			if (networks.length === 1) {
-				self.network = networks[0];
+				self.networkId = networks[0]._id;
 				// if only one network, choose it
 			} else {
-				self.network = _.find(networks, {name: network});
-				if (!self.network) {
-					return Q.reject(new Error('Network ' + network + ' not found.'));
+				var network = _.find(networks, {name: networkName});
+
+				if (!network) {
+					return Q.reject(new Error('Network ' + networkName + ' not found.'));
 				}
+
+				self.networkId = network._id;
 			}
 
 			self.setup();
@@ -200,7 +204,7 @@ ServerSession.prototype.setup = function() {
 	application.ee.on(['events', 'insert'], eventsCallback);
 	ircFactory.events.on('message', ircMessageCallback);
 
-	application.Networks.update({_id: this.network._id}, {$set: {clientConnected: true}}, {safe: false});
+	application.Networks.update({_id: this.networkId}, {$set: {clientConnected: true}}, {safe: false});
 
 	this.socket.on('close', function() {
 		application.ee.removeListener(['events', 'insert'], eventsCallback);
@@ -214,14 +218,15 @@ ServerSession.prototype.setup = function() {
  * @param {Object} event Event to handle
  */
 ServerSession.prototype.handleEvent =  function(event) {
-	var ignore = ['registered', 'lusers', 'motd'];
+	var ignore = ['registered', 'lusers', 'motd'],
+		network = Clients[this.networkId.toString()];
 
 	if (event.message.clientId === this.id) {
 		return;
 	}
 	// Don't duplicate events.
 
-	if (event.network !== this.network.name) {
+	if (event.network !== network.name) {
 		return;
 	}
 	// Check network
@@ -255,7 +260,7 @@ ServerSession.prototype.handleIrcMessage = function (ircMessage) {
 		command = ircMessage.event[1],
 		message = ircMessage.message;
 
-	if (this.network._id.toString() !== clientKey) {
+	if (this.networkId.toString() !== clientKey) {
 		return;
 	}
 	// Check if it's the right network.
@@ -273,13 +278,17 @@ ServerSession.prototype.handleIrcMessage = function (ircMessage) {
  * @return {promise}
  */
 ServerSession.prototype.sendWelcome = function () {
-	var self = this;
+	var self = this,
+		network = Clients[this.networkId.toString()];
 
-	function sendWelcomeMessagesForClientNick(rawMessages) {
+	// Change nick on messages and send them.
+	function _sendWelcomeMessageToNick(rawMessages, nick) {
+		nick = nick || network.nick;
+
 		function setNick(rawMessage) {
 			var message = new IrcMessage(rawMessage);
 
-			message.params[0] = self.clientNick;
+			message.params[0] = nick;
 
 			return message.toString();
 		}
@@ -293,36 +302,41 @@ ServerSession.prototype.sendWelcome = function () {
 		}
 	}
 
-	return eventManager.getEventByType('registered', self.network.name, self.user._id)
+	return eventManager.getEventByType('registered', network.name, self.user._id)
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForClientNick(event.message.raw);
+				_sendWelcomeMessageToNick(event.message.raw, self.clientNick);
 			}
 
-			return eventManager.getEventByType('lusers', self.network.name, self.user._id);
+			return eventManager.getEventByType('lusers', network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				sendWelcomeMessagesForClientNick(event.message.raw);
+				_sendWelcomeMessageToNick(event.message.raw, self.clientNick);
 			}
 
-			if (self.clientNick !== self.network.nick) {
-				self.sendRaw(':' + self.clientNick + ' NICK :' + self.network.nick);
+			if (self.clientNick !== network.nick) {
+				self.sendRaw(':' + self.clientNick + ' NICK :' + network.nick);
 			}
 			// Change nick on client to what we have on the network.
 
-			return eventManager.getEventByType('motd', self.network.name, self.user._id);
+			return eventManager.getEventByType('motd', network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				self.sendRaw(event.message.raw);
+				_sendWelcomeMessageToNick(event.message.raw);
 			}
 
-			return eventManager.getEventByType('usermode', self.network.name, self.user._id);
+			return eventManager.getEventByType('usermode', network.name, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
-				self.sendRaw(event.message.raw);
+				var message = IrcMessage(event.message.raw);
+
+				message.prefix = network.nick;
+				message.params[0] = network.nick;
+
+				self.sendRaw(message.toString());
 			}
 
 			self.welcomed = true;
@@ -339,23 +353,36 @@ ServerSession.prototype.sendWelcome = function () {
  * @return {promise}
  */
 ServerSession.prototype.sendJoins = function () {
-	var self = this;
+	var self = this,
+		network = Clients[this.networkId.toString()];
 
-	return networkManager.getActiveChannelsForUser(self.user._id, self.network._id)
+	return networkManager.getActiveChannelsForUser(self.user._id, self.networkId)
 		.then(function (tabs) {
 			return Q.all(tabs.map(function (tab) {
 				var deferred = Q.defer();
 
-				application.Events.find({type: 'join', 'extra.self': true, network: self.network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+				application.Events.find({type: 'join', 'extra.self': true, network: network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
 						deferred.reject(err);
 						return;
 					}
 
-					self.sendRaw(event.message.raw);
+					var message = IrcMessage(event.message.raw),
+						hostmask = message.parseHostmaskFromPrefix();
 
-					ircFactory.send(self.network._id.toString(), 'raw', ['NAMES ' + tab.target]);
-					// TODO: names command is throttled, may need to generate one from channelUsers.
+					message.prefix = network.nick;
+
+					if (hostmask.username) {
+						message.prefix += '!' + hostmask.username;
+					}
+
+					if (hostmask.hostname) {
+						message.prefix += '@' + hostmask.hostname;
+					}
+
+					self.sendRaw(message.toString());
+
+					ircFactory.send(self.networkId.toString(), 'raw', ['NAMES ' + tab.target]);
 
 					deferred.resolve();
 				});
@@ -372,9 +399,10 @@ ServerSession.prototype.sendJoins = function () {
  */
 ServerSession.prototype.sendPlayback = function () {
 	var self = this,
-		channelsSent = {};
+		channelsSent = {},
+		network = Clients[this.networkId.toString()];
 
-	eventManager.getUserPlayback(self.network.name, self.user._id)
+	eventManager.getUserPlayback(network.name, self.user._id)
 		.then(function (events) {
 			var lastDate = {},
 				timezoneOffset = parseInt(self.user.timezoneOffset, 10) || new Date().getTimezoneOffset(),
@@ -387,8 +415,9 @@ ServerSession.prototype.sendPlayback = function () {
 					daysAgo,
 					daysAgoString,
 					timestampStr,
-					sender = target === self.network.nick ? message.prefix : "***!ircanywhere@ircanywhere.com",
-					key = target === self.network.nick ? event.message.nickname : target;
+					isChannel = helper.isChannelString(target),
+					sender = isChannel ? "***!ircanywhere@ircanywhere.com" : message.prefix,
+					key = isChannel ? target : event.message.nickname;
 
 				if (!channelsSent[key]) {
 					self.sendRaw(':' + sender + ' PRIVMSG ' + target + ' :Playback Start...');
@@ -431,6 +460,11 @@ ServerSession.prototype.sendPlayback = function () {
 					origMessage = '[' + timestampStr + '] ' + origMessage;
 					// Prepend timestamp
 				}
+
+				if (!isChannel) {
+					message.params[0] = network.nick;
+				}
+
 				message.params[1] = origMessage;
 
 				self.sendRaw(message.toString());
@@ -461,8 +495,9 @@ ServerSession.prototype.privmsg = function(message) {
 	var hostmask = message.parseHostmaskFromPrefix(),
 		timestamp = new Date(),
 		hostname = (hostmask && hostmask.hostname) || 'none',
+		network = Clients[this.networkId.toString()],
 		data = {
-			nickname: this.network.nick,
+			nickname: network.nick,
 			username: this.user.ident,
 			hostname: hostname,
 			target: message.params[0],
@@ -472,10 +507,10 @@ ServerSession.prototype.privmsg = function(message) {
 			clientId: this.id
 		};
 
-	ircHandler.privmsg(Clients[this.network._id.toString()], data);
+	ircHandler.privmsg(Clients[this.networkId.toString()], data);
 	// inset in the db
 
-	ircFactory.send(this.network._id.toString(), 'raw', [message.toString()]);
+	ircFactory.send(this.networkId.toString(), 'raw', [message.toString()]);
 	// send to network
 
 	userManager.updateLastSeen(this.user._id, timestamp);
@@ -488,16 +523,18 @@ ServerSession.prototype.privmsg = function(message) {
  * @param {String} command Messages command
  */
 ServerSession.prototype.onClientMessage = function(message, command) {
-	if (!this.network) {
+	if (!this.networkId) {
 		return;
 	}
 	// Not ready to take requests yet.
+
+	var network = Clients[this.networkId.toString()];
 
 	if (ircHandler[command]) {
 		var hostmask = message.parseHostmaskFromPrefix(),
 			hostname = (hostmask && hostmask.hostname) || 'none',
 			data = {
-				nickname: this.network.nick,
+				nickname: network.nick,
 				username: this.user.ident,
 				hostname: hostname,
 				target: '*', // TODO: Does this work for all messages?
@@ -507,20 +544,18 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 				clientId: this.id
 			};
 
-		ircHandler[command](Clients[this.network._id.toString()], data);
+		ircHandler[command](Clients[this.networkId.toString()], data);
 	}
 	// Check if ircHandler can handle the command
 
-	ircFactory.send(this.network._id.toString(), 'raw', [message.toString()]);
+	ircFactory.send(this.networkId.toString(), 'raw', [message.toString()]);
 	// send to network
-
-	// TODO: Should update lastseen on some messages.
 };
 
 /**
  * Sends a raw message to the client
  *
- * @param {String} rawMessage
+ * @param {String} rawMessage Raw message
  */
 ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {
