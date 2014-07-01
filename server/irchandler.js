@@ -91,27 +91,27 @@ IRCHandler.prototype.registered = function(client, message) {
 	client.internal.capabilities = message.capabilities;
 	// set this immediately so the other stuff works
 
-	application.Networks.sync.update({_id: client._id}, {$set: {
+	application.Networks.update({_id: client._id}, {$set: {
 		'nick': message.nickname,
 		'name': message.capabilities.network.name,
 		'internal.status': networkManager.flags.connected,
 		'internal.capabilities': message.capabilities
-	}});
+	}}, {safe: false});
 	//networkManager.changeStatus({_id: client._id}, networkManager.flags.connected);
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-	application.Tabs.sync.update({target: client.name.toLowerCase(), network: client._id}, {$set: {
+	application.Tabs.update({target: client.name.toLowerCase(), network: client._id}, {$set: {
 		title: message.capabilities.network.name,
 		target: message.capabilities.network.name.toLowerCase(),
 		active: true
-	}}, {multi: true});
+	}}, {multi: true, safe: false});
 	// update the tab
 
-	application.Tabs.sync.update({network: client._id}, {$set: {
+	application.Tabs.update({network: client._id}, {$set: {
 		networkName: message.capabilities.network.name,
 		active: true
-	}}, {multi: true});
+	}}, {multi: true, safe: false});
 	// update any sub tabs
 
 	eventManager.insertEvent(client, {
@@ -119,33 +119,34 @@ IRCHandler.prototype.registered = function(client, message) {
 		time: new Date(new Date(message.time).getTime() - 15).toJSON(),
 		message: this._formatRaw(message.raw),
 		raw: message.raw
-	}, 'registered');
-	// a bit of a hack here we'll spin the timestamp back 15ms to make sure it
-	// comes in order, it's because we've gotta wait till we've recieved all the capab
-	// stuff in irc-factory before we send it out, which can create a race condition
-	// which causes lusers to be sent through first
+	}, 'registered', function() {
+		// a bit of a hack here we'll spin the timestamp back 15ms to make sure it
+		// comes in order, it's because we've gotta wait till we've recieved all the capab
+		// stuff in irc-factory before we send it out, which can create a race condition
+		// which causes lusers to be sent through first
 
-	// XXX - send our connect commands, things that the user defines
-	// 		 nickserv identify or something
+		// XXX - send our connect commands, things that the user defines
+		// 		 nickserv identify or something
 
-	_.each(client.channels, function(channel, key) {
-		var chan = channel.channel,
-			password = channel.password || '';
+		_.each(client.channels, function(channel, key) {
+			var chan = channel.channel,
+				password = channel.password || '';
 
-		ircFactory.send(client._id, 'join', [chan, password]);
-		ircFactory.send(client._id, 'mode', [chan]);
-		// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
+			ircFactory.send(client._id, 'join', [chan, password]);
+			ircFactory.send(client._id, 'mode', [chan]);
+			// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
+		});
+		// find our channels to automatically join from the network setup
+
+		setTimeout(function() {
+			application.Events.update({user: client.internal.userId, network: client.server}, {$set: {
+				network: message.capabilities.network.name,
+			}}, {multi: true, safe: false});
+		}, 5000);
+		// update events later on so when we're totally finished connecting (we can't assume at any point because of half assed ircds
+		// not sending out proper stuff.. we know that we're registered here we just give it 5 seconds for other shit to come in
+		// could be large who lists etc.
 	});
-	// find our channels to automatically join from the network setup
-
-	setTimeout(function() {
-		application.Events.update({user: client.internal.userId, network: client.server}, {$set: {
-			network: message.capabilities.network.name,
-		}}, {multi: true, safe: false});
-	}, 5000);
-	// update events later on so when we're totally finished connecting (we can't assume at any point because of half assed ircds
-	// not sending out proper stuff.. we know that we're registered here we just give it 5 seconds for other shit to come in
-	// could be large who lists etc.
 }
 
 /**
@@ -259,13 +260,17 @@ IRCHandler.prototype.join = function(client, message) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
 		ircFactory.send(client._id, 'names', [message.channel]);
+
+		insertEvent();
 	} else {
-		channelManager.insertUsers(client._id, client.name, message.channel, [user]);
+		channelManager.insertUsers(client._id, client.name, message.channel, [user])
+			.then(insertEvent);
 	}
 	// if it's us joining a channel we'll create a tab for it and request a mode
 
-	eventManager.insertEvent(client, message, 'join');
-	// event
+	function insertEvent() {
+		eventManager.insertEvent(client, message, 'join');
+	}
 }
 
 /**
@@ -281,14 +286,14 @@ IRCHandler.prototype.part = function(client, message) {
 		return false;
 	}
 
-	channelManager.removeUsers(client.name, message.channel, [message.nickname]);
+	eventManager.insertEvent(client, message, 'part', function() {
+		channelManager.removeUsers(client.name, message.channel, [message.nickname]);
 
-	if (message.nickname === client.nick) {
-		networkManager.activeTab(client, message.channel, false);
-	}
-	// we're leaving, mark the tab as inactive
-
-	eventManager.insertEvent(client, message, 'part');
+		if (message.nickname === client.nick) {
+			networkManager.activeTab(client, message.channel, false);
+		}
+		// we're leaving, mark the tab as inactive
+	});
 }
 
 /**
@@ -304,14 +309,14 @@ IRCHandler.prototype.kick = function(client, message) {
 		return false;
 	}
 
-	channelManager.removeUsers(client.name, message.channel, [message.kicked]);
+	eventManager.insertEvent(client, message, 'kick', function() {
+		channelManager.removeUsers(client.name, message.channel, [message.kicked]);
 
-	if (message.kicked === client.nick) {
-		networkManager.activeTab(client, message.channel, false);
-	}
-	// we're leaving, remove the tab
-
-	eventManager.insertEvent(client, message, 'kick');
+		if (message.kicked === client.nick) {
+			networkManager.activeTab(client, message.channel, false);
+		}
+		// we're leaving, remove the tab
+	});
 }
 
 /**
@@ -346,13 +351,13 @@ IRCHandler.prototype.nick = function(client, message) {
 	}
 
 	if (message.nickname === client.nick) {
-		application.Networks.sync.update({_id: client._id}, {$set: {nick: message.newnick}});
+		application.Networks.update({_id: client._id}, {$set: {nick: message.newnick}}, {safe: false});
 	}
 	// update the nickname because its us changing our nick
 
 	if (_.has(client.internal.tabs, message.nickname)) {
 		var mlower = message.nickname.toLowerCase();
-		application.Tabs.sync.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}});
+		application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}}, {safe: false});
 	}
 	// is this a client we're chatting to whos changed their nickname?
 	
@@ -404,10 +409,11 @@ IRCHandler.prototype.who = function(client, message) {
 		users.push(user);
 	});
 
-	var inserts = channelManager.insertUsers(client._id, client.name, message.channel, users, true);
-
-	rpcHandler.push(client.internal.userId, 'channelUsers', inserts);
-	// burst emit these instead of letting the oplog tailer handle it, it's too heavy
+	channelManager.insertUsers(client._id, client.name, message.channel, users, true)
+		.then(function(inserts) {
+			rpcHandler.push(client.internal.userId, 'channelUsers', inserts);
+			// burst emit these instead of letting the oplog tailer handle it, it's too heavy
+		});
 }
 
 /**
@@ -475,8 +481,9 @@ IRCHandler.prototype.mode_change = function(client, message) {
 		return false;
 	}
 
-	channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
-	eventManager.insertEvent(client, message, 'mode');
+	eventManager.insertEvent(client, message, 'mode', function() {
+		channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
+	});
 }
 
 /**
@@ -515,8 +522,9 @@ IRCHandler.prototype.topic_change = function(client, message) {
 	message.hostname = split[2];
 	// reform this object
 
-	channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
-	eventManager.insertEvent(client, message, 'topic');
+	eventManager.insertEvent(client, message, 'topic', function() {
+		channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
+	});
 }
 
 /**

@@ -9,7 +9,8 @@
 
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	helper = require('../lib/helpers').Helpers;
+	helper = require('../lib/helpers').Helpers,
+	Q = require('q');
 
 /**
  * Constructor, does nothing
@@ -38,55 +39,67 @@ function EventManager() {
  * @return void
  */
 EventManager.prototype._insert = function(client, message, type, user, force) {
-	var self = this;
+	var self = this,
+		deferred = Q.defer(),
+		force = force || false,
+		user = user || false,
+		network = (client.name) ? client.name : client.server,
+		ours = (message.nickname === client.nick),
+		channel = (message.channel && !message.target) ? message.channel : message.target;
 
-	fibrous.run(function() {
-		var force = force || false,
-			user = user || false,
-			network = (client.name) ? client.name : client.server,
-			ours = (message.nickname === client.nick),
-			channel = (message.channel && !message.target) ? message.channel : message.target;
+	if (!message.channel && !message.target) {
+		var channel = null;
+	}
+	// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
+	// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
 
-		if (!message.channel && !message.target) {
-			var channel = null;
-		}
-		// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
-		// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
-		
-		var user = user || application.ChannelUsers.sync.findOne({network: client.name, channel: channel, nickname: message.nickname});
-		// get a channel user object if we've not got one
+	if (user) {
+		deferred.resolve(user);
+	} else {
+		application.ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname}, function(err, doc) {
+			if (err || !doc) {
+				deferred.reject();
+			} else {
+				deferred.resolve(doc);
+			}
+		});
+	}
+	// get a channel user object if we've not got one
 
-		var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
-			target = (force || !target) ? '*' : target.toLowerCase();
-		// anything else goes in '*' so it's forwarded to the server log
+	deferred.promise
+		.then(function(user) {
+			var target = (_.indexOf(self.channelEvents, type) > -1 || (type === 'notice' && helper.isChannel(client, channel))) ? channel : '*';
+				target = (force || !target) ? '*' : target.toLowerCase();
+			// anything else goes in '*' so it's forwarded to the server log
 
-		if (message.channel) {
-			message.channel = message.channel.toLowerCase();
-		}
+			if (message.channel) {
+				message.channel = message.channel.toLowerCase();
+			}
 
-		if (message.target) {
-			message.target = message.target.toLowerCase();
-		}
-		// housekeeping for #ChannelNames
+			if (message.target) {
+				message.target = message.target.toLowerCase();
+			}
+			// housekeeping for #ChannelNames
 
-		var prefixObject = eventManager.getPrefix(client, user),
-			output = {
-				type: type,
-				user: client.internal.userId,
-				network: network,
-				target: target,
-				message: message,
-				read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
-				extra: {
-					self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
-					highlight: eventManager.determineHighlight(client, message, type, ours),
-					prefix: prefixObject.prefix
-				}
-			};
+			var prefixObject = eventManager.getPrefix(client, user),
+				output = {
+					type: type,
+					user: client.internal.userId,
+					network: network,
+					target: target,
+					message: message,
+					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
+					extra: {
+						self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
+						highlight: eventManager.determineHighlight(client, message, type, ours),
+						prefix: prefixObject.prefix
+					}
+				};
 
-		application.Events.insert(output, {safe: false});
-		// get the prefix, construct an output and insert it
-	}, application.handleError.bind(application));
+			application.Events.insert(output, {safe: false});
+			// get the prefix, construct an output and insert it
+		});
+	// once we've got a valid user, continue
 }
 
 /**

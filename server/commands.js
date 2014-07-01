@@ -554,7 +554,7 @@ CommandManager.prototype.unaway = function(user, client, target, params) {
 CommandManager.prototype.close = function(user, client, target, params) {
 	var tlower = target.toLowerCase();
 
-	application.Tabs.sync.findOne({target: tlower, network: client._id}, function(err, tab) {
+	application.Tabs.findOne({target: tlower, network: client._id}, function(err, tab) {
 		if (err || !tab) {
 			return false;
 		}

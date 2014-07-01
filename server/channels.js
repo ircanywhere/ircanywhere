@@ -8,7 +8,8 @@
 */
 
 var _ = require('lodash'),
-	hooks = require('hooks');
+	hooks = require('hooks'),
+	Q = require('q');
 
 /**
  * This object is responsible for managing everything related to channel records, such as
@@ -39,18 +40,25 @@ function ChannelManager() {
  * @method getChannel
  * @param {String} network A network string such as 'freenode'
  * @param {String} channel The name of a channel **with** the hash key '#ircanywhere'
- * @return {Object} A channel object straight out of the database.
+ * @return {promise} A promise with a channel object straight out of the database.
  */
 ChannelManager.prototype.getChannel = function(network, channel) {
-	var chan = application.Tabs.sync.findOne({network: network, target: channel});
+	var self = this,
+		deferred = Q.defer();
 
-	if (!chan) {
-		var chan = _.clone(this.channel);
+	application.Tabs.findOne({network: network, target: channel}, function(err, chan) {
+		if (err || !chan) {
+			deferred.reject(err);
+		}
+
+		var chan = _.clone(self.channel);
 			chan.network = network;
 			chan.channel = channel;
-	}
 
-	return chan;
+		deferred.resolve(chan);
+	});
+
+	return deferred.promise;
 }
 
 /**
@@ -63,51 +71,63 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * @param {String} channel The channel name '#ircanywhere'
  * @param {Array[Object]} users An array of valid user objects usually from a who/join output
  * @param {Boolean} [force] Optional boolean whether to overwrite the contents of the channelUsers
- * @return {Array} The final array of the users inserted
+ * @return {promise} A promise containing final array of the users inserted
  */
 ChannelManager.prototype.insertUsers = function(key, network, channel, users, force) {
-	var force = force || false,
+	var deferred = Q.defer(),
+		force = force || false,
 		channel = channel.toLowerCase(),
 		burst = (users.length > 1) ? true : false,
 		find = [],
-		chan = this.getChannel(key, channel),
 		finalArray = [];
 
-	_.each(users, function(u) {
-		u.network = network;
-		u.channel = channel;
-		u._burst = burst;
-		find.push(u.nickname);
+	this.getChannel(key, channel)
+		.then(function(chan) {
+			_.each(users, function(u) {
+				u.network = network;
+				u.channel = channel;
+				u._burst = burst;
+				find.push(u.nickname);
 
-		if (u.nickname == Clients[key].nick) {
-			application.Networks.sync.update({_id: key}, {$set: {hostname: u.hostname}});
-		}
-		// update hostname
-	});
-	// turn this into an array of nicknames
+				if (u.nickname == Clients[key].nick) {
+					application.Networks.update({_id: key}, {$set: {hostname: u.hostname}}, {safe: false});
+				}
+				// update hostname
+			});
+			// turn this into an array of nicknames
 
-	if (force) {
-		application.ChannelUsers.sync.remove({network: network, channel: channel});
-	} else {
-		application.ChannelUsers.sync.remove({network: network, channel: channel, nickname: {$in: find}});
-	}
-	// ok so here we've gotta remove any users in the channel already
-	// and all of them if we're being told to force the update
+			if (force) {
+				application.ChannelUsers.remove({network: network, channel: channel}, {safe: false});
+			} else {
+				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}}, {safe: false});
+			}
+			// ok so here we've gotta remove any users in the channel already
+			// and all of them if we're being told to force the update
 
-	_.each(users, function(u) {
-		var prefix = eventManager.getPrefix(Clients[key], u);
-		u.sort = prefix.sort;
-		u.prefix = prefix.prefix;
-		
-		finalArray.push(u);
-	});
-	// send the update out
+			_.each(users, function(u) {
+				var prefix = eventManager.getPrefix(Clients[key], u);
+				u.sort = prefix.sort;
+				u.prefix = prefix.prefix;
 
-	if (finalArray.length > 0) {
-		return application.ChannelUsers.sync.insert(finalArray);
-	} else {
-		return [];
-	}
+				finalArray.push(u);
+			});
+			// send the update out
+
+			if (finalArray.length === 0) {
+				deferred.resolve([]);
+				return;
+			}
+
+			application.ChannelUsers.insert(finalArray, function(err, users) {
+				if (err || !users) {
+					deferred.resolve([]);
+				} else {
+					deferred.resolve(users);
+				}
+			});
+		});
+
+	return deferred.promise;
 }
 
 /**
@@ -152,15 +172,20 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
 	var update = {};
 
 	_.each(users, function(u) {
-		var s = {network: network, nickname: u},
-			records = application.ChannelUsers.sync.find(s).sync.toArray();
+		var s = {network: network, nickname: u};
 
-		_.each(records, function(user) {
-			var updated = _.extend(user, values);
-				updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
+		application.ChannelUsers.find(s).toArray(function(err, records) {
+			if (err || !records) {
+				return false;
+			}
 
-			application.ChannelUsers.sync.update(s, _.omit(updated, '_id'));
-			// update the record
+			_.each(records, function(user) {
+				var updated = _.extend(user, values);
+					updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
+
+				application.ChannelUsers.update(s, _.omit(updated, '_id'), {safe: false});
+				// update the record
+			});
 		});
 	});
 	// this is hacky as hell I feel but it's getting done this way to
@@ -182,32 +207,39 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  */
 ChannelManager.prototype.updateModes = function(key, capab, network, channel, mode) {
 	var channel = channel.toLowerCase(),
-		chan = this.getChannel(key, channel),
 		us = {};
 
-	var users = application.ChannelUsers.sync.find({network: network, channel: channel}).sync.toArray(),
-		parsedModes = modeParser.sortModes(capab, mode);
-	// we're not arsed about the channel or network here
+	this.getChannel(key, channel)
+		.then(function(chan) {
+			application.ChannelUsers.find({network: network, channel: channel}).toArray(function(err, users) {
+				if (err || !users) {
+					return false;
+				}
 
-	var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
-	// we need to attempt to update the record now with the new info
+				var parsedModes = modeParser.sortModes(capab, mode);
+				// we're not arsed about the channel or network here
 
-	application.Tabs.update({network: key, target: channel}, {$set: {modes: modes}}, {safe: false});
-	// update the record
+				var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
+				// we need to attempt to update the record now with the new info
 
-	_.each(users, function(u) {
-		delete u._id;
-		us[u.nickname] = u;
-	});
+				application.Tabs.update({network: key, target: channel}, {$set: {modes: modes}}, {safe: false});
+				// update the record
 
-	_.each(modeParser.handleParams(capab, us, parsedModes), function(u) {
-		var prefix = eventManager.getPrefix(Clients[key], u);
-		u.sort = prefix.sort;
-		u.prefix = prefix.prefix;
-		
-		application.ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u, {safe: false});
-	});
-	// update users now
+				_.each(users, function(u) {
+					delete u._id;
+					us[u.nickname] = u;
+				});
+
+				_.each(modeParser.handleParams(capab, us, parsedModes), function(u) {
+					var prefix = eventManager.getPrefix(Clients[key], u);
+					u.sort = prefix.sort;
+					u.prefix = prefix.prefix;
+
+					application.ChannelUsers.update({network: network, channel: channel, nickname: u.nickname}, u, {safe: false});
+				});
+				// update users now
+			});
+		});
 }
 
 /**
@@ -222,13 +254,11 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
  */
 ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	var channel = channel.toLowerCase(),
-		chan = this.getChannel(key, channel);
-
-	var topic = {
-		topic: topic,
-		setter: setby || ''
-	};
-	// updat the topic record
+		topic = {
+			topic: topic,
+			setter: setby || ''
+		};
+	// update the topic record
 
 	application.Tabs.update({network: key, target: channel}, {$set: {topic: topic}}, {safe: false});
 	// update the record
