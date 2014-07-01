@@ -39,9 +39,7 @@ function IRCFactory() {
 
 	this.api = new factory();
 
-	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
-	});
+	application.ee.on('ready', self.init.bind(self));
 }
 
 /**
@@ -69,28 +67,28 @@ IRCFactory.prototype.init = function() {
 	// connect to our uplinks
 
 	this.events.on('message', function(message) {
-		fibrous.run(function() {
-			if (message.event === 'synchronize') {
-				var networks = networkManager.getClients(),
-					keys = _.keys(networks),
-					difference = _.difference(keys, message.keys);
+		if (message.event === 'synchronize') {
+			networkManager.getClients()
+				.then(function(networks) {
+					var keys = _.keys(networks),
+						difference = _.difference(keys, message.keys);
 
-				_.each(message.keys, function(key) {
-					networkManager.changeStatus({_id: key}, networkManager.flags.connected);
-				});
-				
-				_.each(difference, function(net) {
-					networkManager.connectNetwork(networks[net]);
-				});
-				// the clients we're going to actually attempt to boot up
+					_.each(message.keys, function(key) {
+						networkManager.changeStatus({_id: key}, networkManager.flags.connected);
+					});
+					
+					_.each(difference, function(net) {
+						networkManager.connectNetwork(networks[net]);
+					});
+					// the clients we're going to actually attempt to boot up
 
-				application.logger.log('info', 'factory synchronize', helper.cleanObjectIds(message));
-			} else if (message.event === 'uncaughtException') {
-				application.logger.log('error', JSON.parse(message.message));
-			} else {
-				self.handleEvent(message.event, message.message);
-			}
-		}, application.handleError.bind(application));
+					application.logger.log('info', 'factory synchronize', helper.cleanObjectIds(message));
+				});
+		} else if (message.event === 'uncaughtException') {
+			application.logger.log('error', JSON.parse(message.message));
+		} else {
+			self.handleEvent(message.event, message.message);
+		}
 	});
 }
 
@@ -122,9 +120,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 	}
 
 	if (_.isFunction(ircHandler[e]) && object !== false) {
-		fibrous.run(function() {
-			ircHandler[e].call(ircHandler, client, object);
-		}, application.handleError.bind(application));
+		ircHandler[e].call(ircHandler, client, object);
 	} else {
 		application.logger.log('warn', 'Unhandled event in IRCFactory.handleEvent()', {key: key, event: e, data: object});
 	}

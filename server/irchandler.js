@@ -429,27 +429,32 @@ IRCHandler.prototype.names = function(client, message) {
 		return false;
 	}
 
-	var channelUsers = application.ChannelUsers.sync.find({network: client.name, channel: message.channel.toLowerCase()}).sync.toArray(),
-		users = [],
-		keys = [],
-		regex = new RegExp('[' + helper.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
+	application.ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}).toArray(function(err, channelUsers) {
+		if (err || !channelUsers) {
+			return false;
+		}
 
-	channelUsers.forEach(function(u) {
-		keys.push(u.nickname);
+		var users = [],
+			keys = [],
+			regex = new RegExp('[' + helper.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
+
+		channelUsers.forEach(function(u) {
+			keys.push(u.nickname);
+		});
+
+		_.each(message.names, function(user) {
+			users.push(user.replace(regex, ''));
+		});
+		// strip prefixes
+
+		keys.sort();
+		users.sort();
+
+		if (!_.isEqual(keys, users)) {
+			ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
+		}
+		// different lists.. lets do a /WHO
 	});
-
-	_.each(message.names, function(user) {
-		users.push(user.replace(regex, ''));
-	});
-	// strip prefixes
-
-	keys.sort();
-	users.sort();
-
-	if (!_.isEqual(keys, users)) {
-		ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
-	}
-	// different lists.. lets do a /WHO
 }
 
 /**

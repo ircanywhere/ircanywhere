@@ -24,9 +24,7 @@ var _ = require('lodash'),
 function NetworkManager() {
 	var self = this;
 
-	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
-	});
+	application.ee.on('ready', self.init.bind(self));
 	// run this.init when we get the go ahead
 }
 
@@ -144,22 +142,31 @@ NetworkManager.prototype.init = function() {
  * also can be modified with hooks to return more information if needed.
  *
  * @method getClients
- * @return {Object} An object containing the clients that should be started up
+ * @return {promise} A promise containing the clients that should be started up
  */
 NetworkManager.prototype.getClients = function() {
 	var self = this,
-		clients = {},
-		networks =  application.Networks.sync.find().sync.toArray();
+		deferred = Q.defer(),
+		clients = {};
 	// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
-	networks.forEach(function(network) {
-		if (network.internal && network.internal.status !== self.flags.disconnected) {
-			clients[network._id] = network;
+	application.Networks.find().toArray(function(err, networks) {
+		if (err || !networks) {
+			deferred.reject();
+			return;
 		}
+
+		networks.forEach(function(network) {
+			if (network.internal && network.internal.status !== self.flags.disconnected) {
+				clients[network._id] = network;
+			}
+		});
+
+		deferred.resolve(clients);
 	});
 	// here we just mark them for connection by passing them into this.reconnect
 
-	return clients;
+	return deferred.promise;
 }
 
 /**

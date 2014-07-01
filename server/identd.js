@@ -26,9 +26,7 @@ var _ = require('lodash'),
 function IdentdServer() {
 	var self = this;
 
-	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
-	});
+	application.ee.on('ready', self.init.bind(self));
 }
 
 /**

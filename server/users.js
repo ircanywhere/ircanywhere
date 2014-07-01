@@ -31,9 +31,7 @@ function UserManager() {
 	this.intervalId = setInterval(this.timeOutInactive.bind(this), ((60 * 60 * 1000) - (secondsPastHour * 1000)));
 	// set our inactivity timeout function to run every hour
 
-	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
-	});
+	application.ee.on('ready', self.init.bind(self));
 }
 		
 /**
