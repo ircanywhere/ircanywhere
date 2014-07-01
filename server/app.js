@@ -51,10 +51,8 @@ function Application() {
 	var d = require('domain').create();
 	
 	d.on('error', self.handleError.bind(self));
-	d.run(function() {
-		fibrous.run(self.init.bind(self), self.handleError.bind(self));
-		// initiate the module
-	});
+	d.run(self.init.bind(self));
+	// initiate the module
 
 	process.title = 'ircanywhere';
 	// set process title
@@ -336,18 +334,22 @@ Application.prototype.setupNode = function() {
 	}
 
 	this.Nodes.findOne(query, function(err, doc) {
-		fibrous.run(function() {
-			if (err) {
-				throw err;
-			}
+		if (err) {
+			throw err;
+		}
 
-			if (!doc) {
-				json = self.Nodes.sync.insert(defaultJson)[0];
-			} else {
-				self.Nodes.sync.update(query, defaultJson);
-				json = _.extend(doc, defaultJson);
-			}
+		if (!doc) {
+			self.Nodes.insert(defaultJson, function(err, docs) {
+				if (!err && docs) {
+					saveNode(docs[0]);
+				}
+			});
+		} else {
+			self.Nodes.update(query, defaultJson, {safe: false});
+			saveNode(_.extend(doc, defaultJson));
+		}
 
+		function saveNode(json) {
 			json._id = json._id.toString();
 			self.nodeId = json._id;
 			data = (data == '') ? {} : JSON.parse(data);
@@ -362,7 +364,7 @@ Application.prototype.setupNode = function() {
 					throw err;
 				}
 			});
-		}, self.handleError.bind(self));
+		}
 	});
 }
 
