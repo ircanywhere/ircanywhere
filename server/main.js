@@ -9,7 +9,6 @@ var Application = require('./app').Application,
 	IRCFactory = require('./factory').IRCFactory,
 	CommandManager = require('./commands').CommandManager,
 	RPCHandler = require('./rpc').RPCHandler;
-	fibrous = require('fibrous');
 
 Sockets = {};
 Clients = {};

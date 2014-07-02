@@ -27,7 +27,6 @@
     "emailjs": "0.3.6",
     "eventemitter2": "~0.4.13",
     "express": "~3.4.0",
-    "fibrous": "~0.3.3",
     "hooks": "0.3.2",
     "irc-factory": "~1.8.1",
     "jsonminify": "0.2.2",

@@ -286,7 +286,7 @@ Application.prototype.setupWinston = function() {
 }
 
 /**
- * This should be called as the second argument for fibrous.run()
+ * Handle things such as domain errors and properly report
  *
  * @method handleError
  * @return void

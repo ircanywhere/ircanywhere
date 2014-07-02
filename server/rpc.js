@@ -24,9 +24,7 @@ var _ = require('lodash'),
 function RPCHandler() {
 	var self = this;
 
-	application.ee.on('ready', function() {
-		fibrous.run(self.init.bind(self), application.handleError.bind(application));
-	});
+	application.ee.on('ready', self.init.bind(self));
 }
 
 /**
@@ -255,51 +253,35 @@ RPCHandler.prototype.onSocketOpen = function(socket) {
 	// websocket constructor handles event binding etc
 
 	webSocket.on('authenticate', function(data) {
-		fibrous.run(function() {
-			self.handleAuth(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleAuth(webSocket, data);
 	});
 
 	webSocket.on('sendCommand', function(data) {
-		fibrous.run(function() {
-			self.handleCommand(webSocket, data, false);
-		}, application.handleError.bind(application));
+		self.handleCommand(webSocket, data, false);
 	});
 
 	webSocket.on('execCommand', function(data) {
-		fibrous.run(function() {
-			self.handleCommand(webSocket, data, true);
-		}, application.handleError.bind(application));
+		self.handleCommand(webSocket, data, true);
 	});
 
 	webSocket.on('readEvents', function(data) {
-		fibrous.run(function() {
-			self.handleReadEvents(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleReadEvents(webSocket, data);
 	});
 
 	webSocket.on('selectTab', function(data) {
-		fibrous.run(function() {
-			self.handleSelectTab(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleSelectTab(webSocket, data);
 	});
 
 	webSocket.on('updateTab', function(data) {
-		fibrous.run(function() {
-			self.handleUpdateTab(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleUpdateTab(webSocket, data);
 	});
 
 	webSocket.on('insertTab', function(data) {
-		fibrous.run(function() {
-			self.handleInsertTab(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleInsertTab(webSocket, data);
 	});
 
 	webSocket.on('getEvents', function(data) {
-		fibrous.run(function() {
-			self.handleGetEvents(webSocket, data);
-		}, application.handleError.bind(application));
+		self.handleGetEvents(webSocket, data);
 	});
 
 	Sockets[socket.id] = webSocket;
@@ -333,9 +315,7 @@ RPCHandler.prototype.handleAuth = function(socket, data) {
 
 			socket.send('authenticate', true, false);
 
-			fibrous.run(function() {
-				self.handleConnect(socket);
-			});
+			self.handleConnect(socket);
 			// handle sending out data on connect
 		});
 }
@@ -349,79 +329,129 @@ RPCHandler.prototype.handleAuth = function(socket, data) {
  * @return void
  */
 RPCHandler.prototype.handleConnect = function(socket) {
-	var user = socket._user,
-		networks = application.Networks.sync.find({'internal.userId': user._id}).sync.toArray(),
-		tabs = application.Tabs.sync.find({user: user._id}).sync.toArray(),
+	var deferred = Q.defer(),
+		user = socket._user,
 		netIds = {},
-		items = [],
-		totalHighlights = [],
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []};
 
-	var tabUrls = _.map(tabs, 'url');
-	if (tabUrls.indexOf(user.selectedTab) === -1 && tabs.length > 0) {
-		user.selectedTab = tabs[0].url;
-	}
-	// determine whether we have a selected tab or not?
-
-	networks.forEach(function(network) {
-		netIds[network._id] = {
-			name: network.name,
-			nick: network.nick.toLowerCase()
-		};
-	});
-
-	tabs.forEach(function(tab, index) {
-		var tlower = tab.target.toLowerCase();
-
-		usersQuery.$or.push({network: netIds[tab.network].name, channel: tlower});
-		commandsQuery.$or.push({network: tab.network, target: tlower});
-		// construct some queries
-
-		if (tab.type === 'query') {
-			var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
-		} else if (tab.type === 'network') {
-			var query = {network: netIds[tab.network].name, target: '*', user: user._id}
-		} else {
-			var query = {network: netIds[tab.network].name, target: tlower, user: user._id}
-		}
-
-		var eventResults = application.Events.sync.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).sync.toArray(),
-			unreadItems = application.Events.sync.find(_.extend({read: false}, query)).sync.count(),
-			unreadHighlights = application.Events.sync.find(_.extend({'extra.highlight': true, read: false}, query)).sync.toArray();
-		// get some information about the unread items/highlights
-
-		tab.unread = unreadItems;
-		tab.highlights = unreadHighlights.length;
-		items = _.union(items, eventResults);
-		totalHighlights = _.union(totalHighlights, unreadHighlights);
-		// combine the results
-	});
-	// loop tabs
-
-	if (tabs.length === 0) {
-		var users = [],
-			commands = [];
-	} else {
-		var users = application.ChannelUsers.sync.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).sync.toArray(),
-			commands = application.Commands.sync.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).sync.toArray();
-	}
-	// get channel users and commands
-
-	socket.sendBurst({
+	var output = {
 		users: [_.omit(user, 'salt', 'password', 'tokens')],
-		networks: networks,
-		tabs: tabs,
-		channelUsers: users,
-		events: items,
-		commands: commands.reverse(),
-		highlights: totalHighlights,
+		networks: [],
+		tabs: [],
+		channelUsers: [],
+		events: [],
+		commands: [],
+		highlights: [],
 		burstend: true
-	});
-	// send the info
+	};
 
-	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
-	// update last seen time
+	application.Networks.find({'internal.userId': user._id}).toArray(function(err, nets) {
+		if (err || !nets) {
+			deferred.reject(err);
+		} else {
+			deferred.resolve(nets);
+		}
+	});
+	// get our networks
+
+	deferred.promise
+		.fail(function(err) {
+			socket.sendBurst(output);
+		})
+		.then(function(nets) {
+			var promise = Q.defer();
+				output.networks = nets;
+
+			output.networks.forEach(function(network) {
+				netIds[network._id] = {
+					name: network.name,
+					nick: network.nick.toLowerCase()
+				};
+			});
+
+			application.Tabs.find({user: user._id}).toArray(function(err, dbTabs) {
+				promise.resolve(dbTabs);
+			})
+
+			return promise.promise;
+			// handle network stuff, get tabs and return another promise
+		})
+		.then(function(dbTabs) {
+			var promise = Q.defer();
+				output.tabs = dbTabs;
+
+			var tabUrls = _.map(output.tabs, 'url');
+			if (tabUrls.indexOf(user.selectedTab) === -1 && output.tabs.length > 0) {
+				user.selectedTab = output.tabs[0].url;
+			}
+			// determine whether we have a selected tab or not?
+
+			output.tabs.forEach(function(tab, index) {
+				var tlower = tab.target.toLowerCase();
+
+				usersQuery.$or.push({network: netIds[tab.network].name, channel: tlower});
+				commandsQuery.$or.push({network: tab.network, target: tlower});
+				// construct some queries
+
+				if (tab.type === 'query') {
+					var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
+				} else if (tab.type === 'network') {
+					var query = {network: netIds[tab.network].name, target: '*', user: user._id}
+				} else {
+					var query = {network: netIds[tab.network].name, target: tlower, user: user._id}
+				}
+
+				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
+					application.Events.find(_.extend({read: false}, query)).count(function(err, dbUnreadItems) {
+						application.Events.find(_.extend({'extra.highlight': true, read: false}, query)).toArray(function(err, dbUnreadHighlights) {
+							
+							output.events = _.union(output.eventResults, dbEventResults);
+							output.highlights = _.union(output.highlights, dbUnreadHighlights);
+
+							tab.unread = dbUnreadItems;
+							tab.highlights = dbUnreadHighlights.length;
+							// combine the results
+
+							if ((index + 1) === output.tabs.length) {
+								promise.resolve();
+								return;
+							}
+						});
+					});
+				});
+				// XXX: I hate doing this, horribly messy. Suggestions on improving?
+			});
+			// loop tabs
+
+			return promise.promise;
+		})
+		.then(function() {
+			if (output.tabs.length === 0) {
+				output.channelUsers = [];
+				output.commands = [];
+				
+				return sendResponse();
+			}
+
+			application.ChannelUsers.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).toArray(function(err, dbUsers) {
+				application.Commands.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).toArray(function(err, dbCommands) {
+					output.channelUsers = dbUsers || [];
+					output.commands = dbCommands || [];
+
+					sendResponse();
+				});
+			});
+			// get channel users and commands
+		});
+
+	function sendResponse() {
+		socket.sendBurst(output);
+		// send output
+
+		application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
+		// update last seen time
+	}
 }
 
 /**
@@ -461,21 +491,21 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		return socket.send('error', {command: command, error: 'invalid document properties, see API docs'});
 	}
 
-	var find = application.Tabs.sync.findOne({networkName: data.network, user: user._id, target: data.target});
+	application.Tabs.findOne({networkName: data.network, user: user._id, target: data.target}, function(err, find) {
+		if (err || !find) {
+			return socket.send('error', {command: command, error: 'not authorised to call this command'});
+		}
+
+		data.user = user._id;
+		data.timestamp = +new Date();
+		data.network = find.network;
+		data.backlog = !exec;
+		// bail if we can't find the tab, if we can re-set the network value
+
+		application.Commands.insert(data, {safe: false});
+		// insert
+	});
 	// try and find a valid tab
-
-	if (!find) {
-		return socket.send('error', {command: command, error: 'not authorised to call this command'});
-	}
-
-	data.user = user._id;
-	data.timestamp = +new Date();
-	data.network = find.network;
-	data.backlog = !exec;
-	// bail if we can't find the tab, if we can re-set the network value
-
-	application.Commands.insert(data, {safe: false});
-	// insert
 }
 
 /**
@@ -694,11 +724,16 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	}
 	// convert _id to proper mongo IDs
 
-	var response = application.Events.sync.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).sync.toArray();
-	// perform the query 
+	var response = application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
+		if (err || !response) {
+			socket.send('events', []);
+		} else {
+			socket.send('events', response);
+		}
 
-	socket.send('events', response);
-	// get the data
+
+	});
+	// perform the query 
 }
 
 exports.RPCHandler = _.extend(RPCHandler, hooks);
