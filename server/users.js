@@ -33,7 +33,7 @@ function UserManager() {
 
 	application.ee.on('ready', self.init.bind(self));
 }
-		
+
 /**
  * Sets up the API routes and anything else needed by the user manager class.
  * Such as timers and the SMTP connection
@@ -45,9 +45,9 @@ UserManager.prototype.init = function() {
 	var self = this,
 		smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
 		this.server = emails.server.connect({
-			user: smtp[2], 
-			password: smtp[4], 
-			host: smtp[6], 
+			user: smtp[2],
+			password: smtp[4],
+			host: smtp[6],
 			ssl: true
 		});
 	// setup email server
@@ -231,6 +231,7 @@ UserManager.prototype.registerUser = function(req, res) {
 		email = req.param('email', ''),
 		password = req.param('password', ''),
 		confirmPassword = req.param('confirmPassword', ''),
+		timezoneOffset = req.param('timezoneOffset', ''),
 		output = {failed: false, successMessage: '', errors: []};
 
 	if (!application.config.enableRegistrations) {
@@ -262,6 +263,11 @@ UserManager.prototype.registerUser = function(req, res) {
 
 		if (password != confirmPassword) {
 			output.errors.push({error: 'The passwords you have entered do not match'});
+		}
+
+		if (!helper.isValidTimezoneOffset(timezoneOffset)) {
+			timezoneOffset = new Date().getTimezoneOffset();
+			// Use server timezone by default.
 		}
 	}
 
@@ -296,6 +302,7 @@ UserManager.prototype.registerUser = function(req, res) {
 				ident: application.config.clientSettings.userNamePrefix + userCount,
 				newUser: true,
 				selectedTab: '',
+				timezoneOffset: timezoneOffset,
 				profile: {
 					name: name,
 					nickname: nickname
@@ -446,7 +453,7 @@ UserManager.prototype.loginServerUser = function(email, password) {
 
 /**
  * Handles the call to /api/logout which is self explanatory.
- * 
+ *
  * @method userLogout
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
@@ -470,7 +477,7 @@ UserManager.prototype.userLogout = function(req, res) {
 
 /**
  * Handles the call to /api/forgot to send a forgot password link
- * 
+ *
  * @method forgotPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
@@ -524,7 +531,7 @@ UserManager.prototype.forgotPassword = function(req, res) {
 /**
  * Handles the call to /api/reset which will be called when the reset password link is visited
  * Checking is done to make sure a token exists in a user record.
- * 
+ *
  * @method resetPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
@@ -646,7 +653,7 @@ UserManager.prototype.updateSettings = function(req, res) {
  * Handles the call to /api/settings/changepassword which is almost identical to resetPassword
  * however it checks for authentication and then changes the password using that user, it doesn't
  * take a token though.
- * 
+ *
  * @method resetPassword
  * @param {Object} req A valid request object from express
  * @param {Object} res A valid response object from express
@@ -678,7 +685,7 @@ UserManager.prototype.changePassword = function(req, res) {
 /**
  * Updates a users password, doesn't bypass any checkings, just doesn't
  * define how you select the user, so via a token or direct user object
- * 
+ *
  * @method updatePassword
  * @param {promise} user A valid promise object from `isAuthenticated`
  * @param {String} password The new password to set
@@ -718,7 +725,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  * An event which is called when a successful login occurs, this logic is kept out of
  * the handler for /api/login because it's specific to a different section of the application
  * which is the networkManager and ircFactory.
- * 
+ *
  * @method onUserLogin
  * @param {Object} me A valid user object
  * @param {Boolean} [force] Whether to force the reconnect of a disconnected client
@@ -726,7 +733,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  */
 UserManager.prototype.onUserLogin = function(me, force) {
 	var force = force || false,
-		userId = me._id; 
+		userId = me._id;
 
 	if (me == null) {
 		return;
@@ -736,7 +743,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 		if (err || !network) {
 			return;
 		}
-		
+
 		var reconnect = false;
 
 		if (network.internal.status !== networkManager.flags.disconnected && force) {

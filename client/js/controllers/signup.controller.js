@@ -8,12 +8,13 @@ App.SignupController = Ember.ObjectController.extend({
 	email: '',
 	password: '',
 	confirmPassword: '',
+	timezoneOffset: new Date().getTimezoneOffset(),
 
 	actions: {
 		signupSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/register', this.getProperties('name', 'nickname', 'email', 'password', 'confirmPassword'), function(data) {
+			Ember.$.post('/api/register', this.getProperties('name', 'nickname', 'email', 'password', 'confirmPassword', 'timezoneOffset'), function(data) {
 				self[(data.failed) ? 'signupFail' : 'signupSuccess'](data);
 			}).fail(function() {
 				self.signupFail(false);

@@ -9,6 +9,7 @@
 
 var IrcMessage = require('irc-message'),
 	_ = require('lodash'),
+	moment = require('moment'),
 	Q = require('q');
 
 /**
@@ -375,13 +376,26 @@ ServerSession.prototype.sendPlayback = function () {
 				}
 
 				var message = new IrcMessage(event.message.raw),
-					timestamp = new Date(event.message.time),
-					channel = message.params[0];
+					timestamp = moment(event.message.time),
+					channel = message.params[0],
+					timestampString;
 
-				message.params[1] = '[' + timestamp.toTimeString() + '] ' +
+				if (self.user.timezoneOffset) {
+					timestamp.zone(self.user.timezoneOffset);
+				}
+				// Correct timezone if information available.
+
+				timestampString = timestamp.format('h:ma');
+				if (timestamp.isBefore(moment(), 'day')) {
+					timestampString += ' ' + timestamp.fromNow();
+				}
+				// If playback is older then yesterday, display day information. Example: [3:15pm 2 days ago]
+
+				// TODO: would be nicer to add a message with date whenever day changes between playback msgs
+
+				message.params[1] = '[' + timestampString + '] ' +
 					message.params[1];
 				// Prepend timestamp
-				// TODO: better format date/time, get user timezone
 
 				if (!channelsSent[channel]) {
 					self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + channel + ' :Playback Start...');
