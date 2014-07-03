@@ -9,7 +9,10 @@ var Application = require('./app').Application,
 	IRCFactory = require('./factory').IRCFactory,
 	CommandManager = require('./commands').CommandManager,
 	RPCHandler = require('./rpc').RPCHandler;
+	RPCHandler = require('./rpc').RPCHandler,
+	ModuleManager = require('./module').ModuleManager;
 
+fibrous = require('fibrous');
 Sockets = {};
 Clients = {};
 Users = {};
@@ -48,3 +51,6 @@ eventManager = new EventManager();
 
 commandManager = new CommandManager();
 // command manager
+
+moduleManager = new ModuleManager();
+// module manager
