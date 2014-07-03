@@ -12,7 +12,6 @@ var Application = require('./app').Application,
 	RPCHandler = require('./rpc').RPCHandler,
 	ModuleManager = require('./module').ModuleManager;
 
-fibrous = require('fibrous');
 Sockets = {};
 Clients = {};
 Users = {};
