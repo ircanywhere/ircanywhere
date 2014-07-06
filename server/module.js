@@ -37,37 +37,33 @@ ModuleManager.prototype.loadModule = function(moduleName) {
 	var self = this,
 		modulePath = 'modules/' + moduleName + '/server';
 
-	application.logger.log('info', 'Loading server module ' + moduleName);
-	self.modules[moduleName] = {
-		name: moduleName,
-		loaded: false,
-		object: null
-	};
-	// create a local object
+	fs.exists(modulePath, function (exists) {
+		if (!exists) {
+			return;
+		}
+		// does not have server module
 
-	loadMod(moduleName, modulePath)
-		.fail(function(e) {
-			return loadMod(moduleName, modulePath + '/main');
-		})
-		.fail(function(e) {
-			application.logger.log('error', 'Failed to load module ' + moduleName);
-			application.handleError(e);
-		});
+		self.modules[moduleName] = {
+			name: moduleName,
+			loaded: false,
+			object: null
+		};
+		// create a local object
 
-	function loadMod(name, path) {
-		var deferred = Q.defer();
+		application.logger.log('info', 'Loading server module ' + moduleName);
 
 		try {
-			self.modules[name].object = require('../' + path);
-			self.modules[name].loaded = true;
-			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
-			deferred.resolve();
-		} catch (e) {
-			deferred.reject(e);
-		}
+			self.modules[moduleName].object = require('../' + modulePath);
+			self.modules[moduleName].loaded = true;
 
-		return deferred.promise;
-	}
+			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
+		} catch (e) {
+			self.modules[moduleName].loaded = false;
+
+			application.logger.log('error', 'Failed to load module ' + moduleName);
+			application.handleError(e);
+		}
+	});
 };
 
 /**
