@@ -8,7 +8,6 @@
 */
 
 var _ = require('lodash'),
-	hooks = require('hooks'),
 	crypto = require('crypto'),
 	util = require('util'),
 	factory = require('irc-factory').Api,

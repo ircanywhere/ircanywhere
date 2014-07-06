@@ -147,4 +147,6 @@ IdentdServer.prototype.parse = function(line) {
 	}
 }
 
+IdentdServer.prototype = _.extend(IdentdServer.prototype, hooks);
+
 exports.IdentdServer = IdentdServer;

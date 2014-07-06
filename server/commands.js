@@ -22,9 +22,7 @@ var _ = require('lodash'),
 function CommandManager() {
 	var self = this;
 
-	application.ee.on('ready', function() {
-		self.init();
-	});
+	application.ee.on('ready', self.init.bind(self));
 }
 
 /**
@@ -716,4 +714,6 @@ CommandManager.prototype.raw = function(user, client, target, params) {
 	// 		a database..
 }
 
-exports.CommandManager = _.extend(CommandManager, hooks);
+CommandManager.prototype = _.extend(CommandManager.prototype, hooks);
+
+exports.CommandManager = CommandManager;

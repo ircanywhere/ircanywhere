@@ -22,8 +22,7 @@ function ModuleManager() {
 	var self = this;
 
 	self.modules = {};
-
-	application.ee.on('ready', self.loadAllModules.bind(self));
+	self.loadAllModules();
 }
 
 /**
@@ -35,6 +34,7 @@ function ModuleManager() {
  */
 ModuleManager.prototype.loadModule = function(moduleName) {
 	var self = this,
+		deferred = Q.defer(),
 		modulePath = 'modules/' + moduleName + '/server';
 
 	fs.exists(modulePath, function (exists) {
@@ -57,13 +57,22 @@ ModuleManager.prototype.loadModule = function(moduleName) {
 			self.modules[moduleName].loaded = true;
 
 			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
+			
+			deferred.resolve(self.modules[moduleName].object);
 		} catch (e) {
 			self.modules[moduleName].loaded = false;
 
 			application.logger.log('error', 'Failed to load module ' + moduleName);
 			application.handleError(e);
+			
+			deferred.reject();
 		}
 	});
+
+	deferred.promise
+		.then(function(module) {
+			self.bindModule(module);
+		});
 };
 
 /**
@@ -99,6 +108,19 @@ ModuleManager.prototype.loadAllModules = function() {
 			application.logger.log('error', 'Failed to load modules');
 			application.handleError(new Error(error));
 		});
+};
+
+/**
+ * Bind events and expose module to core functionality and vice versa
+ *
+ * @method bindModule
+ * @param {Object} module A valid module object returned from require()
+ * @return void
+ */
+ModuleManager.prototype.bindModule = function(module) {
+	if (typeof module.init === 'function') {
+		application.ee.on('ready', module.init.bind(module));
+	}
 };
 
 exports.ModuleManager = ModuleManager;

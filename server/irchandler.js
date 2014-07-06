@@ -756,4 +756,6 @@ IRCHandler.prototype.whois = function(client, message) {
  	links 		-  still needs to be implemented, although the basis in irc-factory is there
  */
 
-exports.IRCHandler = _.extend(IRCHandler, hooks);
+IRCHandler.prototype = _.extend(IRCHandler.prototype, hooks);
+
+exports.IRCHandler = IRCHandler;

@@ -729,4 +729,6 @@ UserManager.prototype.parse = function(file, replace) {
 	return template;
 }
 
-exports.UserManager = _.extend(UserManager, hooks);
+UserManager.prototype = _.extend(UserManager.prototype, hooks);
+
+exports.UserManager = UserManager;

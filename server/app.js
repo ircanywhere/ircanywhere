@@ -429,4 +429,6 @@ Application.prototype.setupServer = function() {
 	// put them in the main namespace
 }
 
-exports.Application = _.extend(Application, hooks);
+Application.prototype = _.extend(Application.prototype, hooks);
+
+exports.Application = Application;

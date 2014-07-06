@@ -20,11 +20,13 @@ var _ = require('lodash'),
  * @return void
  */
 function EventManager() {
-	/**
-	 * @member channelEvents A list of events relating to channels
-	 */
-	this.channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action'];
+	
 }
+
+/**
+ * @member channelEvents A list of events relating to channels
+ */
+IRCHandler.prototype.blacklisted = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action']
 
 /**
  * Inserts an event into a backlog after all the checking has been done
@@ -244,4 +246,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 	return {prefix: '', sort: 6};
 }
 
-exports.EventManager = _.extend(EventManager, hooks);
+
+EventManager.prototype = _.extend(EventManager.prototype, hooks);
+
+exports.EventManager = EventManager;

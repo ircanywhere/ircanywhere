@@ -736,4 +736,6 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	// perform the query 
 }
 
-exports.RPCHandler = _.extend(RPCHandler, hooks);
+RPCHandler.prototype = _.extend(RPCHandler.prototype, hooks);
+
+exports.RPCHandler = RPCHandler;

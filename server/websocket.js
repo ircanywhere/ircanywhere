@@ -167,4 +167,6 @@ WebSocket.prototype.sendBurst = function(data) {
 	// trash the route
 }
 
-exports.WebSocket = _.extend(WebSocket, hooks);
+WebSocket.prototype = _.extend(WebSocket.prototype, hooks);
+
+exports.WebSocket = WebSocket;

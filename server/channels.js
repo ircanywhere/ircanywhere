@@ -264,4 +264,6 @@ ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	// update the record
 }
 
-exports.ChannelManager = _.extend(ChannelManager, hooks);
+ChannelManager.prototype = _.extend(ChannelManager.prototype, hooks);
+
+exports.ChannelManager = ChannelManager;
