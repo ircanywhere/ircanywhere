@@ -14,44 +14,67 @@ var _ = require('lodash'),
 /**
  * Handles loading of modules.
  *
- * @constructor
+ * @class ModuleManager
+ * @method ModuleManager
+ * @return void
  */
 function ModuleManager() {
 	var self = this;
 
-	application.ee.on('ready', function() {
-		self.loadAllModules();
-	});
+	self.modules = {};
+
+	application.ee.on('ready', self.loadAllModules.bind(self));
 }
 
 /**
  * Loads a module by name. The name should be the name of the folder containing the module.
  *
+ * @method loadModule
  * @param {String} moduleName Name of module to load.
+ * @return void
  */
 ModuleManager.prototype.loadModule = function(moduleName) {
-	var modulePath = 'modules/' + moduleName + '/server';
+	var self = this,
+		modulePath = 'modules/' + moduleName + '/server';
 
-	fs.exists(modulePath, function (exists) {
-		if (!exists) {
-			return;
-		}
-		// does not have server module
+	application.logger.log('info', 'Loading server module ' + moduleName);
+	self.modules[moduleName] = {
+		name: moduleName,
+		loaded: false,
+		object: null
+	};
+	// create a local object
 
-		application.logger.log('info', 'Loading server module ' + moduleName);
-
-		try {
-			require('../' + modulePath);
-			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
-		} catch (e) {
+	loadMod(moduleName, modulePath)
+		.fail(function(e) {
+			return loadMod(moduleName, modulePath + '/main');
+		})
+		.fail(function(e) {
 			application.logger.log('error', 'Failed to load module ' + moduleName);
 			application.handleError(e);
+		});
+
+	function loadMod(name, path) {
+		var deferred = Q.defer();
+
+		try {
+			self.modules[name].object = require('../' + path);
+			self.modules[name].loaded = true;
+			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
+			deferred.resolve();
+		} catch (e) {
+			deferred.reject(e);
 		}
-	});
+
+		return deferred.promise;
+	}
 };
 
 /**
  * Loads all modules.
+ *
+ * @method loadAllModules
+ * @return void
  */
 ModuleManager.prototype.loadAllModules = function() {
 	var self = this,
