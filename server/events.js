@@ -26,7 +26,7 @@ function EventManager() {
 /**
  * @member channelEvents A list of events relating to channels
  */
-IRCHandler.prototype.blacklisted = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action']
+EventManager.prototype.blacklisted = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action']
 
 /**
  * Inserts an event into a backlog after all the checking has been done
