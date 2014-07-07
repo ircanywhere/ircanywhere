@@ -59,7 +59,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		deferred.resolve(user);
 	} else {
 		application.ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname}, function(err, doc) {
-			if (err || !doc) {
+			if (err) {
 				deferred.reject();
 			} else {
 				deferred.resolve(doc);
