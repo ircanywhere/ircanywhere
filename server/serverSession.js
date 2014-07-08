@@ -382,7 +382,7 @@ ServerSession.prototype.sendJoins = function () {
 
 					self.sendRaw(message.toString());
 
-					ircFactory.send(self.networkId.toString(), 'raw', ['NAMES ' + tab.target]);
+					ircFactory.send(self.networkId.toString(), 'raw', ['NAMES', tab.target]);
 
 					deferred.resolve();
 				});
@@ -510,7 +510,7 @@ ServerSession.prototype.privmsg = function(message) {
 	ircHandler.privmsg(Clients[this.networkId.toString()], data);
 	// inset in the db
 
-	ircFactory.send(this.networkId.toString(), 'raw', [message.toString()]);
+	ircFactory.send(this.networkId.toString(), 'raw', message.toString());
 	// send to network
 
 	userManager.updateLastSeen(this.user._id, timestamp);
@@ -548,7 +548,7 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 	}
 	// Check if ircHandler can handle the command
 
-	ircFactory.send(this.networkId.toString(), 'raw', [message.toString()]);
+	ircFactory.send(this.networkId.toString(), 'raw', message.toString());
 	// send to network
 };
 
