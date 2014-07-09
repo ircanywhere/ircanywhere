@@ -372,7 +372,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 
 			application.Tabs.find({user: user._id}).toArray(function(err, dbTabs) {
 				promise.resolve(dbTabs);
-			})
+			});
 
 			return promise.promise;
 			// handle network stuff, get tabs and return another promise
@@ -388,25 +388,26 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			// determine whether we have a selected tab or not?
 
 			output.tabs.forEach(function(tab, index) {
-				var tlower = tab.target.toLowerCase();
+				var tlower = tab.target.toLowerCase(),
+					query;
 
 				usersQuery.$or.push({network: netIds[tab.network].name, channel: tlower});
 				commandsQuery.$or.push({network: tab.network, target: tlower});
 				// construct some queries
 
 				if (tab.type === 'query') {
-					var query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
+					query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
 				} else if (tab.type === 'network') {
-					var query = {network: netIds[tab.network].name, target: '*', user: user._id}
+					query = {network: netIds[tab.network].name, target: '*', user: user._id}
 				} else {
-					var query = {network: netIds[tab.network].name, target: tlower, user: user._id}
+					query = {network: netIds[tab.network].name, target: tlower, user: user._id}
 				}
 
 				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
 					application.Events.find(_.extend({read: false}, query)).count(function(err, dbUnreadItems) {
 						application.Events.find(_.extend({'extra.highlight': true, read: false}, query)).toArray(function(err, dbUnreadHighlights) {
 							
-							output.events = _.union(output.eventResults, dbEventResults);
+							output.events = _.union(output.events, dbEventResults);
 							output.highlights = _.union(output.highlights, dbUnreadHighlights);
 
 							tab.unread = dbUnreadItems;
@@ -724,7 +725,7 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	}
 	// convert _id to proper mongo IDs
 
-	var response = application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
+	application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
 		if (err || !response) {
 			socket.send('events', []);
 		} else {
