@@ -10,7 +10,8 @@ var Application = require('./app').Application,
 	CommandManager = require('./commands').CommandManager,
 	RPCHandler = require('./rpc').RPCHandler;
 	RPCHandler = require('./rpc').RPCHandler,
-	ModuleManager = require('./module').ModuleManager;
+	ModuleManager = require('./module').ModuleManager,
+	Module = require('./basemodule').Module;
 
 Sockets = {};
 Clients = {};
@@ -53,3 +54,5 @@ commandManager = new CommandManager();
 
 moduleManager = new ModuleManager();
 // module manager
+
+baseModule = new Module();

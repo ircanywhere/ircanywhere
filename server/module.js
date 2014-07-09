@@ -1,5 +1,5 @@
 /**
- * IRCAnywhere server/modules.js
+ * IRCAnywhere server/module.js
  *
  * @title ModuleManager
  * @copyright (c) 2013-2014 http://ircanywhere.com
