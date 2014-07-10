@@ -114,12 +114,16 @@ Module.prototype.bindFunction = function(key, classObject, split, fn, object) {
 	var hook = split[0],
 		method = split[1];
 
-	if (!classObject[method] || !classObject[hook]) {
+	if (hook !== 'bind' && (!classObject[method] || !classObject[hook])) {
 		application.logger.log('error', 'Failed to bind hook on', key, split);
 		return;
 	}
 
-	classObject[hook](method, fn.bind(object));
+	if (hook === 'bind') {
+		classObject[method] = fn.bind(object, classObject);
+	} else {
+		classObject[hook](method, fn.bind(object));
+	}
 }
 
 exports.Module = Module;

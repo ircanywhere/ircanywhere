@@ -53,10 +53,12 @@ ModuleManager.prototype.loadModule = function(moduleName) {
 		application.logger.log('info', 'Loading server module ' + moduleName);
 
 		try {
-			self.modules[moduleName].object = require('../' + modulePath);
+			var mod = require('../' + modulePath);
+
+			self.modules[moduleName].object = mod;
 			self.modules[moduleName].loaded = true;
 
-			application.logger.log('info', 'Server module ' + moduleName + ' loaded');
+			application.logger.log('info', 'Server module ' + moduleName + ' loaded [' + mod.version + ' by ' + mod.author + ']');
 			
 			deferred.resolve(self.modules[moduleName].object);
 		} catch (e) {

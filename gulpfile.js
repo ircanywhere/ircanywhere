@@ -11,7 +11,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('css', function() {
-	gulp.src('./client/less/**/*.less')
+	gulp.src(['./client/less/**/*.less', './modules/*/client/less/**/*.less'])
 		.pipe(less({
 			paths: ['./client/less']
 		}))
@@ -21,7 +21,7 @@ gulp.task('css', function() {
 });
 
 gulp.task('templates', function() {
-	gulp.src(['./client/templates/**/*.hbs'])
+	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
 		.pipe(handlebars({
 			outputType: 'browser'
 		}))
@@ -35,7 +35,7 @@ gulp.task('templates', function() {
 });
 
 gulp.task('js', function() {
-	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js'])
+	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js', './modules/*/client/js/**/*.js'])
 		.pipe(gulp.dest('./client/build/js'))
 		.pipe(uglify('ircanywhere.js', {
 			outSourceMap: true,
@@ -57,15 +57,15 @@ gulp.task('dependencies', function() {
 });
 
 gulp.task('css:watch', function() {
-	gulp.watch('./client/less/**/*.less', ['css']);
+	gulp.watch(['./client/less/**/*.less', './modules/*/client/less/**/*.less'], ['css']);
 });
 
 gulp.task('templates:watch', function() {
-	gulp.watch('./client/templates/**/*.hbs', ['templates']);
+	gulp.watch(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'], ['templates']);
 });
 
 gulp.task('js:watch', function() {
-	gulp.watch(['lib/*.js', 'client/js/**/*.js'], ['js']);
+	gulp.watch(['lib/*.js', 'client/js/**/*.js', './modules/*/client/js/**/*.js'], ['js']);
 });
 
 gulp.task('default', ['css', 'templates', 'js', 'dependencies']);
