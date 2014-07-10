@@ -120,7 +120,7 @@ Module.prototype.bindFunction = function(key, classObject, split, fn, object) {
 	}
 
 	if (hook === 'bind') {
-		classObject[method] = fn.bind(object, classObject);
+		classObject.__proto__[method] = fn.bind(object, classObject);
 	} else {
 		classObject[hook](method, fn.bind(object));
 	}
