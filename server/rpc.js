@@ -387,6 +387,13 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			}
 			// determine whether we have a selected tab or not?
 
+			if (output.tabs.length === 0) {
+				output.channelUsers = [];
+				output.commands = [];
+
+				return sendResponse();
+			}
+
 			output.tabs.forEach(function(tab, index) {
 				var tlower = tab.target.toLowerCase(),
 					query;
@@ -425,25 +432,17 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			});
 			// loop tabs
 
-			return promise.promise;
-		})
-		.then(function() {
-			if (output.tabs.length === 0) {
-				output.channelUsers = [];
-				output.commands = [];
-				
-				return sendResponse();
-			}
+			return promise.promise.then(function() {
+				application.ChannelUsers.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).toArray(function(err, dbUsers) {
+					application.Commands.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).toArray(function(err, dbCommands) {
+						output.channelUsers = dbUsers || [];
+						output.commands = dbCommands || [];
 
-			application.ChannelUsers.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).toArray(function(err, dbUsers) {
-				application.Commands.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).toArray(function(err, dbCommands) {
-					output.channelUsers = dbUsers || [];
-					output.commands = dbCommands || [];
-
-					sendResponse();
+						sendResponse();
+					});
 				});
+				// get channel users and commands
 			});
-			// get channel users and commands
 		});
 
 	function sendResponse() {
