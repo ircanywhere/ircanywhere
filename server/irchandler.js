@@ -740,7 +740,7 @@ IRCHandler.prototype.list = function(client, message) {
  * @return void
  */
 IRCHandler.prototype.whois = function(client, message) {
-	if (!message.nickname || !message.username || !message.hostname || !message.realname) {
+	if (!message.nickname || !message.username || !message.hostname) {
 		return false;
 	}
 
