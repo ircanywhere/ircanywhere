@@ -183,7 +183,7 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 		return false;
 	}
 
-	if (message.message.match(new RegExp('(' + helper.escape(client.nick) + ')', 'i'))) {
+	if (message.message.match(new RegExp('\\b' + helper.escape(client.nick) + '\\b', 'i'))) {
 		return true;
 	}
 	// does this match our nick?
