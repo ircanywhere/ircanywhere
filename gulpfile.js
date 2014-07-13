@@ -56,6 +56,11 @@ gulp.task('dependencies', function() {
 		.pipe(gulp.dest('./client/build'))
 });
 
+gulp.task('static', function() {
+	gulp.src('./client/static/**')
+		.pipe(gulp.dest('./client/build'));
+});
+
 gulp.task('css:watch', function() {
 	gulp.watch(['./client/less/**/*.less', './modules/*/client/less/**/*.less'], ['css']);
 });
@@ -68,5 +73,9 @@ gulp.task('js:watch', function() {
 	gulp.watch(['lib/*.js', 'client/js/**/*.js', './modules/*/client/js/**/*.js'], ['js']);
 });
 
-gulp.task('default', ['css', 'templates', 'js', 'dependencies']);
-gulp.task('watch', ['css:watch', 'templates:watch', 'js:watch']);
+gulp.task('static:watch', function() {
+	gulp.watch(['client/static/**'], ['static']);
+});
+
+gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
+gulp.task('watch', ['css:watch', 'templates:watch', 'js:watch', 'static:watch']);
