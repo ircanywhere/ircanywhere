@@ -57,6 +57,19 @@
 						</span>
 					</div>
 				</div>
+				{{#if sasl}}
+				<div class="clearfix">
+					<label for="password">SASL Username</label>
+					<div class="input">
+						<div class="field">
+							{{input type="text" id="saslUsername" valueBinding="model.saslUsername" value=saslUsername tabindex="6"}}
+						</div>
+						<span class="tooltip">
+							<a href="#" rel="twipsy" title="The SASL username to connect with">?</a>
+						</span>
+					</div>
+				</div>
+				{{/if}}
 				<div class="clearfix">
 					<label for="nick">Nickname</label>
 					<div class="input">

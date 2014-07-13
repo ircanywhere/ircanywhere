@@ -186,6 +186,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		secure = req.param('secure', false),
 		port = parseInt(req.param('port', '6667')),
 		sasl = req.param('sasl', false),
+		saslUsername = req.param('saslUsername', ''),
 		password = req.param('password', ''),
 		nick = req.param('nick', ''),
 		name = req.param('name', ''),
@@ -258,6 +259,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 					secure: (secure == 'true') ? true : false,
 					port: port,
 					sasl: (sasl == 'true') ? true : false,
+					saslUsername: saslUsername,
 					password: password,
 					nick: nick,
 					realname: name
@@ -302,7 +304,7 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 	network.user = user.ident;
 	network.secure = network.secure || false;
 	network.sasl = network.sasl || false;
-	network.saslUsername = network.saslUsername || undefined;
+	network.saslUsername = (network.saslUsername !== '') ? network.saslUsername : undefined;
 	network.password = network.password || null;
 	network.capab = true;
 	network.url = network.server + ':' + ((network.secure) ? '+' : '') + network.port;

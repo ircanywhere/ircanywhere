@@ -6,6 +6,7 @@ App.AddnetworkController = Ember.ObjectController.extend({
 	secure: false,
 	port: '6667',
 	sasl: false,
+	saslUsername: '',
 	password: '',
 	nick: '',
 	name: '',
@@ -34,7 +35,7 @@ App.AddnetworkController = Ember.ObjectController.extend({
 		networkSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/addnetwork', this.getProperties('server', 'secure', 'port', 'sasl', 'password', 'nick', 'name'), function(data) {
+			Ember.$.post('/api/addnetwork', this.getProperties('server', 'secure', 'port', 'sasl', 'saslUsername', 'password', 'nick', 'name'), function(data) {
 				self[(data.failed) ? 'networkFail' : 'networkSuccess'](data);
 			}).fail(function(err) {
 				self.networkFail(false);
