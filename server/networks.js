@@ -326,18 +326,28 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 	var self = this,
 		deferred = Q.defer();
 
-	application.Networks.insert(network, function(err, docs) {
-		if (err || docs.length == 0) {
-			deferred.reject();
+	application.Networks.find({'internal.userId': new mongo.ObjectID(user._id), url: network.url}).count(function(err, docs) {
+		if (err) {
 			return;
 		}
 
-		var doc = docs[0];
+		if (docs > 0) {
+			network.url = network.url + ':' + docs;
+		}
 
-		self.addTab(doc, doc.name, 'network', true, false);
-		// add the tab
+		application.Networks.insert(network, function(err, docs) {
+			if (err || docs.length == 0) {
+				deferred.reject();
+				return;
+			}
 
-		deferred.resolve(doc);
+			var doc = docs[0];
+
+			self.addTab(doc, doc.name, 'network', true, false);
+			// add the tab
+
+			deferred.resolve(doc);
+		});
 	});
 
 	return deferred.promise;

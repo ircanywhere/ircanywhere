@@ -46,7 +46,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 			this.socket.send('execCommand', {
 				command: (tab.active) ? '/leave' : '/join',
-				network: tab.networkName,
+				network: tab.network,
 				target: tab.target
 			});
 		},
@@ -62,7 +62,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 			this.socket.send('execCommand', {
 				command: (network.internal.status === 'disconnected' || network.internal.status === 'closed' || network.internal.status === 'failed') ? '/reconnect' : '/disconnect',
-				network: tab.networkName,
+				network: tab.network,
 				target: tab.target
 			});
 		},
@@ -76,7 +76,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 			this.socket.send('execCommand', {
 				command: '/close',
-				network: tab.networkName,
+				network: tab.network,
 				target: tab.target
 			});
 		},

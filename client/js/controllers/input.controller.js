@@ -24,7 +24,7 @@ App.InputController = Ember.ObjectController.extend({
 			var tab = this.get('socket.tabs').findBy('selected', true),
 				commandObject = {
 					command: this.get('inputValue'),
-					network: tab.networkName,
+					network: tab.network,
 					target: tab.target
 				};
 

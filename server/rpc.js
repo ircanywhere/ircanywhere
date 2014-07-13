@@ -491,7 +491,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		return socket.send('error', {command: command, error: 'invalid document properties, see API docs'});
 	}
 
-	application.Tabs.findOne({networkName: data.network, user: user._id, target: data.target}, function(err, find) {
+	application.Tabs.findOne({network: new mongo.ObjectID(data.network), user: user._id, target: data.target}, function(err, find) {
 		if (err || !find) {
 			return socket.send('error', {command: command, error: 'not authorised to call this command'});
 		}
