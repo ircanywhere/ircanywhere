@@ -369,6 +369,35 @@ Application.prototype.setupNode = function() {
 }
 
 /**
+ * This function will select a suitable cipher suite and return
+ * a string to be used in createServer
+ *
+ * @method selectCipherSuite
+ * @return void
+ */
+Application.prototype.selectCipherSuite = function() {
+	var suitableSuites = [
+		'ecdhe-rsa-aes128-gcm-sha256',
+		'ecdhe-rsa-aes128-sha',
+		'dhe-rsa-aes128-gcm-sha256',
+		'dhe-rsa-aes128-sha'
+	];
+
+	var cipherString = '',
+		getCiphers = require('tls').getCiphers();
+
+	_.each(suitableSuites, function(cipher) {
+		if (_.indexOf(getCiphers, cipher) > 0) {
+			cipherString += cipher.toUpperCase() + ':';
+		}
+	});
+
+	cipherString += 'HIGH:!MD5:!aNULL:!EDHM';
+
+	return cipherString;
+}
+
+/**
  * This function is responsible for setting up the express webserver we use to serve the static files and
  * the sock.js server which hooks onto it to handle the websockets. None of the routes or rpc callbacks
  * are handled here.
@@ -382,10 +411,13 @@ Application.prototype.setupServer = function() {
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 
 	if (application.config.ssl) {
+		console.log(this.selectCipherSuite());
 		var https = require('https'),
 			options = {
 				key: fs.readFileSync('./private/certs/key.pem'),
-				cert: fs.readFileSync('./private/certs/cert.pem')
+				cert: fs.readFileSync('./private/certs/cert.pem'),
+				ciphers: this.selectCipherSuite(),
+				honorCipherOrder: true
 			},
 			server = https.createServer(options, app);
 	} else {
