@@ -58,7 +58,7 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 			params: (params.length == 0 || params[0] == '') ? {} : params
 		},
 		modeType = null,
-		newParams = [],
+		newParams = {},
 		paramCount = 1;
 		params = [];
 	// set some variables
@@ -87,24 +87,22 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 		}
 	});
 
-	if (modes.params.length) {
-		_.each(modes.params, function(param, num) {
-			var mode = params[num];
-			
-			if (!_.has(newParams, param)) {
-				newParams[param] = {plus: '', minus: ''};
-			}
-			
-			if (_.has(params, num) && mode.charAt(0) === '+') {
-				newParams[param].plus += mode.replace('+', '');
-			} else if (_.has(params, num) && mode.charAt(0) === '-') {
-				newParams[param].minus += mode.replace('-', '');
-			}
-		});
-		// go through each parameter and find the mode that comes with it
+	_.each(modes.params, function(param, num) {
+		var mode = params[num];
 
-		modes.params = newParams;
-	}
+		if (!_.has(newParams, param)) {
+			newParams[param] = {plus: '', minus: ''};
+		}
+
+		if (_.has(params, num) && mode.charAt(0) === '+') {
+			newParams[param].plus += mode.replace('+', '');
+		} else if (_.has(params, num) && mode.charAt(0) === '-') {
+			newParams[param].minus += mode.replace('-', '');
+		}
+	});
+	// go through each parameter and find the mode that comes with it
+
+	modes.params = newParams;
 
 	return modes;
 }
@@ -121,7 +119,7 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),
 		modes = modes || '';
-	
+
 	if (modeArray.plus) {
 		_.each(modeArray.plus.split(), function(mode) {
 			if (modes.indexOf(mode) === -1) {
