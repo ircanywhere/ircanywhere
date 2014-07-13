@@ -412,6 +412,11 @@ Application.prototype.setupServer = function() {
 	app.use(error);
 	// setup middleware
 
+	app.get(/^\/(?!api\/(.*)).*$/, function(req, res) {
+		res.sendfile('./client/static/index.html');
+	});
+	// setup routes
+
 	sockjsServer.on('connection', rpcHandler.onSocketOpen.bind(rpcHandler));
 	// websocket routes
 
