@@ -45,7 +45,6 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		deferred = Q.defer(),
 		force = force || false,
 		user = user || false,
-		network = (client.name) ? client.name : client.server,
 		ours = (message.nickname === client.nick),
 		channel = (message.channel && !message.target) ? message.channel : message.target;
 
@@ -58,7 +57,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 	if (user) {
 		deferred.resolve(user);
 	} else {
-		application.ChannelUsers.findOne({network: client.name, channel: channel, nickname: message.nickname}, function(err, doc) {
+		application.ChannelUsers.findOne({network: client._id, channel: channel, nickname: message.nickname}, function(err, doc) {
 			if (err) {
 				deferred.reject();
 			} else {
@@ -87,7 +86,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 				output = {
 					type: type,
 					user: client.internal.userId,
-					network: network,
+					network: client._id,
 					target: target,
 					message: message,
 					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
@@ -118,7 +117,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
-		application.ChannelUsers.find({network: client.name, nickname: message.nickname}).toArray(function(err, userRecords) {
+		application.ChannelUsers.find({network: client._id, nickname: message.nickname}).toArray(function(err, userRecords) {
 			if (err || !userRecords) {
 				return;
 			}

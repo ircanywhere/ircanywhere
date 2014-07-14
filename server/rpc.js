@@ -398,16 +398,16 @@ RPCHandler.prototype.handleConnect = function(socket) {
 				var tlower = tab.target.toLowerCase(),
 					query;
 
-				usersQuery.$or.push({network: netIds[tab.network].name, channel: tlower});
+				usersQuery.$or.push({network: tab.network, channel: tlower});
 				commandsQuery.$or.push({network: tab.network, target: tlower});
 				// construct some queries
 
 				if (tab.type === 'query') {
-					query = {network: netIds[tab.network].name, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
+					query = {network: tab.network, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
 				} else if (tab.type === 'network') {
-					query = {network: netIds[tab.network].name, target: '*', user: user._id}
+					query = {network: tab.network, target: '*', user: user._id}
 				} else {
-					query = {network: netIds[tab.network].name, target: tlower, user: user._id}
+					query = {network: tab.network, target: tlower, user: user._id}
 				}
 
 				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
