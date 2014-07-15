@@ -6,19 +6,19 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="initial-scale=1, maximum-scale=1">
 		<meta name="apple-mobile-web-app-capable" content="yes">
-		<link rel="shortcut icon" href="/static/favicon.ico" />
+		<link rel="shortcut icon" href="/favicon.ico" />
 
-		<script src="/build/dependencies.js"></script>
-		<script src="/build/templates.js"></script>
-		<script src="/build/ircanywhere.js"></script>
+		<script src="/dependencies.js"></script>
+		<script src="/templates.js"></script>
+		<script src="/ircanywhere.js"></script>
 
-		<link rel="stylesheet" type="text/css" href="/build/ircanywhere.css" />
+		<link rel="stylesheet" type="text/css" href="/ircanywhere.css" />
 	</head>
 	<body>
 		<script type="text/x-handlebars">
 			{{outlet}}
 			{{outlet 'modal'}}
 		</script>
-		<audio id="audio-notification" src="/static/sounds/notification.mp3" preload="auto"></audio>
+		<audio id="audio-notification" src="/sounds/notification.mp3" preload="auto"></audio>
 	</body>
 </html>

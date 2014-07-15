@@ -436,7 +436,7 @@ Application.prototype.setupServer = function() {
 	// error handling
 
 	app.use(express.compress());
-	app.use(express.static('client', {maxAge: 86400000}));
+	app.use(express.static('client/build', {maxAge: 86400000}));
 	app.use(express.cookieParser(this.nodeId));
 	app.use(express.json());
 	app.use(express.urlencoded());
@@ -444,9 +444,9 @@ Application.prototype.setupServer = function() {
 	app.use(error);
 	// setup middleware
 
-	app.get(/^\/(?!api|static|build\/(.*)).*$/, function(req, res) {
-		res.sendfile('./client/static/index.html');
-	});
+	// app.get(/^\/(?!api|static|build\/(.*)).*$/, function(req, res) {
+	// 	res.sendfile('./client/static/index.html');
+	// });
 	// setup routes
 
 	sockjsServer.on('connection', rpcHandler.onSocketOpen.bind(rpcHandler));
