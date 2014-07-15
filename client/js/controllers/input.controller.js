@@ -45,7 +45,7 @@ App.InputController = Ember.ObjectController.extend({
 				input = (this.tabCompletionNicks.length === 0) ? this.get('inputValue').split(/\s+/) : this.get('originalInputValue').split(/\s+/),
 				lastWord = input[input.length - 1],
 				tab = this.get('socket.tabs').findBy('selected', true),
-				users = this.socket.find('channelUsers', {network: tab.networkName, channel: tab.target});
+				users = this.socket.find('channelUsers', {network: tab.network, channel: tab.target});
 
 			if (lastWord.trim() === '') {
 				return false;

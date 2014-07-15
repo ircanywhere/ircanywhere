@@ -26,7 +26,7 @@ App.UserlistController = Ember.ArrayController.extend({
 		addedItem: function(accum, item, changeMeta, instanceMeta) {
 			var tab = instanceMeta.tab;
 
-			if (tab && item.network === tab.networkName && item.channel === tab.target) {
+			if (tab && item.network === tab.network && item.channel === tab.target) {
 				accum.pushObject(item);
 			}
 
@@ -36,7 +36,7 @@ App.UserlistController = Ember.ArrayController.extend({
 		removedItem: function(accum, item, changeMeta, instanceMeta) {
 			var tab = instanceMeta.tab;
 
-			if (tab && item.network === tab.networkName && item.channel === tab.target) {
+			if (tab && item.network === tab.network && item.channel === tab.target) {
 				accum.removeObject(item);
 			}
 

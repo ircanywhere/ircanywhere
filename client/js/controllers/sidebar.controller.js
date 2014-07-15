@@ -23,17 +23,20 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object, backlog) {
 		var self = this;
 
-		this.get('socket.tabs').forEach(function(tab) {
-			var network = self.get('socket.networks').findBy('_id', tab.network);
+		var tab = this.get('socket.tabs').findBy('network', object.network),
+			network = this.get('socket.networks').findBy('_id', object.network);
 
-			if (tab.type === 'channel' && object.target === tab.target) {
-				self.incrementCounters(network, tab, object, backlog);
-			} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
-				self.incrementCounters(network, tab, object, backlog);
-			} else if (tab.type === 'network' && object.target === '*') {
-				self.incrementCounters(network, tab, object, backlog);
-			}
-		});
+		if (!tab || !network) {
+			return;
+		}
+
+		if (tab.type === 'channel' && object.target === tab.target) {
+			self.incrementCounters(network, tab, object, backlog);
+		} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
+			self.incrementCounters(network, tab, object, backlog);
+		} else if (tab.type === 'network' && object.target === '*') {
+			self.incrementCounters(network, tab, object, backlog);
+		}
 		// we need to dig a little deeper to find out the exact tab this message is in
 	},
 
@@ -94,11 +97,11 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		var network = this.get('socket.networks').findBy('_id', object.get('network'));
 
 		if (object.type === 'network') {
-			var query = {network: object.networkName, target: '*'};
+			var query = {network: object.network, target: '*'};
 		} else if (object.type === 'query') {
-			var query = {network: object.networkName, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
+			var query = {network: object.network, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
 		} else if (object.type === 'channel') {
-			var query = {network: object.networkName, target: object.target};
+			var query = {network: object.network, target: object.target};
 		}
 
 		object.set('query', query);
