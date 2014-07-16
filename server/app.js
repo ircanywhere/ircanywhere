@@ -411,7 +411,6 @@ Application.prototype.setupServer = function() {
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 
 	if (application.config.ssl) {
-		console.log(this.selectCipherSuite());
 		var https = require('https'),
 			options = {
 				key: fs.readFileSync('./private/certs/key.pem'),
@@ -443,11 +442,6 @@ Application.prototype.setupServer = function() {
 	app.use(app.router);
 	app.use(error);
 	// setup middleware
-
-	// app.get(/^\/(?!api|static|build\/(.*)).*$/, function(req, res) {
-	// 	res.sendfile('./client/static/index.html');
-	// });
-	// setup routes
 
 	sockjsServer.on('connection', rpcHandler.onSocketOpen.bind(rpcHandler));
 	// websocket routes
