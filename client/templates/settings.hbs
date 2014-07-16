@@ -51,10 +51,23 @@
 							</span>
 						</div>
 					</div>
+
+					<div class="clearfix">
+						<label for="irc-nickname">Autocomplete Char</label>
+						<div class="input">
+							<div class="field">
+								{{input type="text" id="autoCompleteChar" valueBinding="model.autoCompleteChar" value=autoCompleteChar tabindex="4"}}
+							</div>
+							<span class="tooltip">
+								<a href="#" rel="twipsy" title="A character to append after nick autocompletion eg. , : -">?</a>
+							</span>
+						</div>
+					</div>
+
 					<div class="clearfix">
 						<div class="input">
 							<div class="field">
-								{{input type="submit" class="btn primary" value="Update Settings" tabindex="4" action="settingsSubmit"}}
+								{{input type="submit" class="btn primary" value="Update Settings" tabindex="5" action="settingsSubmit"}}
 							</div>
 						</div>
 					</div>

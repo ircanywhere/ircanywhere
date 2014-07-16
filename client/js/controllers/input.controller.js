@@ -11,6 +11,10 @@ App.InputController = Ember.ObjectController.extend({
 		this.set('commandIndex', this.get('socket.commands').length);
 	},
 
+	autoCompleteChar: function() {
+		return this.get('socket.users.0.profile.autoCompleteChar');
+	}.property('socket.users.0.profile.autoCompleteChar'),
+
 	nick: function() {
 		return this.get('controllers.network.model.nick');
 	}.observes('controllers.network.model.nick').property('controllers.network.model.nick').cacheable(),
@@ -74,11 +78,11 @@ App.InputController = Ember.ObjectController.extend({
 				//currentNick = this.tabCompletionNicks[0];
 			}
 			// look for a nick on the index
-
+			
 			if (!currentNick) {
 				this.set('inputValue', this.get('originalInputValue'));
 			} else {
-				input[input.length - 1] = (input.length === 1) ? currentNick + ', ' : currentNick;
+				input[input.length - 1] = (input.length === 1) ? currentNick + this.get('autoCompleteChar') + ' ' : currentNick;
 				this.set('inputValue', input.join(' '));
 			}
 		},

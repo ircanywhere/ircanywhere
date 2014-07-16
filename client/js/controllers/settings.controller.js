@@ -6,6 +6,7 @@ App.SettingsController = Ember.ObjectController.extend({
 	name: '',
 	nickname: '',
 	email: '',
+	autoCompleteChar: '',
 	settingsErrors: [],
 	settingsMessage: '',
 
@@ -20,6 +21,7 @@ App.SettingsController = Ember.ObjectController.extend({
 		this.set('name', user.profile.name);
 		this.set('nickname', user.profile.nickname);
 		this.set('email', user.email);
+		this.set('autoCompleteChar', user.profile.autoCompleteChar);
 		// set some settings
 	}.observes('user'),
 
@@ -59,7 +61,7 @@ App.SettingsController = Ember.ObjectController.extend({
 		settingsSubmit: function() {
 			var self = this;
 			
-			Ember.$.post('/api/settings/updatesettings', this.getProperties('name', 'nickname', 'email'), function(data) {
+			Ember.$.post('/api/settings/updatesettings', this.getProperties('name', 'nickname', 'email', 'autoCompleteChar'), function(data) {
 				self[(data.failed) ? 'settingsFail' : 'settingsSuccess'](data);
 			}).fail(function(err) {
 				self.settingsFail(false);

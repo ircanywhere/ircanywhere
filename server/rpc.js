@@ -335,6 +335,11 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		usersQuery = {$or: []},
 		commandsQuery = {$or: []};
 
+	if (!helper.exists(user, 'profile.autoCompleteChar')) {
+		user.profile.autoCompleteChar = ',';
+	}
+	// add any missing / default items
+
 	var output = {
 		users: [_.omit(user, 'salt', 'password', 'tokens')],
 		networks: [],

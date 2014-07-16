@@ -534,6 +534,7 @@ UserManager.prototype.updateSettings = function(req, res) {
 		name = req.param('name', ''),
 		nickname = req.param('nickname', ''),
 		email = req.param('email', ''),
+		autoCompleteChar = req.param('autoCompleteChar', ''),
 		output = {failed: false, successMessage: '', errors: []};
 
 	application.Users.findOne({email: email}, function(err, emailUser) {
@@ -556,9 +557,10 @@ UserManager.prototype.updateSettings = function(req, res) {
 				name = helper.trimInput(name);
 				nickname = helper.trimInput(nickname);
 				email = helper.trimInput(email);
+				autoCompleteChar = helper.trimInput(autoCompleteChar);
 				// trim output
 
-				if (name === '' || nickname === '' || email === '') {
+				if (name === '' || nickname === '' || email === '' || autoCompleteChar === '') {
 					output.errors.push({error: 'All fields are required'});
 				}
 
@@ -586,7 +588,12 @@ UserManager.prototype.updateSettings = function(req, res) {
 				}
 				// any errors?
 
-				application.Users.update({_id: user._id}, {$set: {'profile.name': name, 'profile.nickname': nickname, email: email}}, {safe: false});
+				application.Users.update({_id: user._id}, {$set: {
+					'profile.name': name,
+					'profile.nickname': nickname,
+					'profile.autoCompleteChar': autoCompleteChar,
+					email: email
+				}}, {safe: false});
 				// update the settings
 
 				output.successMessage = 'Your settings successfully have been updated.';
