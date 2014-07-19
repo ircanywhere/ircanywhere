@@ -89,3 +89,5 @@ App.LoginController = Ember.ObjectController.extend({
 		}
 	}.observes('socket.authed')
 });
+
+App.injectController('login');

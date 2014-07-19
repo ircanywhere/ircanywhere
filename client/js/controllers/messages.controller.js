@@ -273,3 +273,5 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		});
 	}
 });
+
+App.injectController('messages');

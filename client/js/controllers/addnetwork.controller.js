@@ -57,3 +57,5 @@ App.AddnetworkController = Ember.ObjectController.extend({
 		// set the errors
 	},
 });
+
+App.injectController('addnetwork');

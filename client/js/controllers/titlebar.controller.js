@@ -177,3 +177,5 @@ App.TitlebarController = Ember.ObjectController.extend({
 		this.optionsChanged();
 	}
 });
+
+App.injectController('titlebar');

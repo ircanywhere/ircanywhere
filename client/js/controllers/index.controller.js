@@ -85,3 +85,5 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 		this.controllerFor('whois').populateData(data);
 	}
 });
+
+App.injectController('index');

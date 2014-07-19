@@ -97,3 +97,5 @@ App.NetworkController = Ember.ObjectController.extend({
 		this.tabChanged();
 	}
 });
+
+App.injectController('network');

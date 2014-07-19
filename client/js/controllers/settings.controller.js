@@ -111,3 +111,5 @@ App.SettingsController = Ember.ObjectController.extend({
 		// set the errors
 	}
 });
+
+App.injectController('settings');

@@ -88,3 +88,5 @@ App.UserlistController = Ember.ArrayController.extend({
 		// only target our parts / quits
 	}
 });
+
+App.injectController('userlist');

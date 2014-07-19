@@ -106,3 +106,5 @@ App.ListController = Ember.ArrayController.extend({
 		}
 	}
 });
+
+App.injectController('list');

@@ -23,3 +23,5 @@ App.DisconnectedController = Ember.ObjectController.extend({
 		}
 	}
 });
+
+App.injectController('disconnected');

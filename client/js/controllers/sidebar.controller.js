@@ -118,3 +118,5 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		}
 	}
 });
+
+App.injectController('sidebar');

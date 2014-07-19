@@ -117,3 +117,5 @@ App.InputController = Ember.ObjectController.extend({
 		}
 	}
 });
+
+App.injectController('input');

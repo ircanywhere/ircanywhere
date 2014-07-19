@@ -39,3 +39,5 @@ App.InfolistController = Ember.ArrayController.extend({
 		}
 	}
 });
+
+App.injectController('infolist');
