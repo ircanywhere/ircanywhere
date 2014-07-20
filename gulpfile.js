@@ -11,11 +11,10 @@ gulp.task('clean', function() {
 });
 
 gulp.task('css', function() {
-	gulp.src(['./client/less/**/*.less', './modules/*/client/less/**/*.less'])
+	gulp.src(['./client/less/**/*.less', './modules/*/client/less/**/*.less', 'client/ext/*.css'])
 		.pipe(less({
 			paths: ['./client/less']
 		}))
-		.pipe(gulp.dest('./client/build/css'))
 		.pipe(concatCss('ircanywhere.css'))
 		.pipe(gulp.dest('./client/build'));
 });
