@@ -30,7 +30,7 @@
     "eventemitter2": "~0.4.13",
     "express": "~3.4.0",
     "hooks": "0.3.2",
-    "irc-factory": ">= 1.8.6",
+    "irc-factory": "> 1.8.6",
     "jsonminify": "0.2.2",
     "lab": "^3.0.0",
     "lodash": "~2.4.1",
