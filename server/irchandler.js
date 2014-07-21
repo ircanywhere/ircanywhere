@@ -168,7 +168,7 @@ IRCHandler.prototype.closed = function(client, message) {
 	eventManager.insertEvent(client, {
 		time: new Date().toJSON(),
 		message: (message.reconnecting) ? 'Connection closed. Attempting reconnect number ' + message.attempts : 'You have disconnected.',
-	}, 'closed');
+	}, networkManager.flags.closed);
 
 	if (!message.reconnecting) {
 		ircFactory.destroy(client._id);
@@ -194,7 +194,7 @@ IRCHandler.prototype.failed = function(client, message) {
 	eventManager.insertEvent(client, {
 		time: new Date().toJSON(),
 		message: 'Connection closed. Retry attempts exhausted.',
-	}, 'closed');
+	}, networkManager.flags.closed);
 
 	ircFactory.destroy(client._id);
 	// destroy the client

@@ -147,24 +147,48 @@ NetworkManager.prototype.init = function() {
 NetworkManager.prototype.getClients = function() {
 	var self = this,
 		deferred = Q.defer(),
-		clients = {};
+		clients = {},
+		users = [];
 	// get the networks (we just get all here so we can do more specific tests on whether to connect them)
 
-	application.Networks.find().toArray(function(err, networks) {
-		if (err || !networks) {
-			deferred.reject();
+	var d = new Date(),
+		timeoutDate = new Date(),
+		timeout = application.config.clientSettings.activityTimeout,
+		secondsPastHour = (d.getMinutes() * 60) + d.getSeconds();
+
+	if (timeout > 0) {
+		timeoutDate.setHours(timeoutDate.getHours() - timeout);
+	}
+	// alter the date as per configuration
+
+	application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
+		if (err) {
 			return;
 		}
 
-		networks.forEach(function(network) {
-			if (network.internal && network.internal.status !== self.flags.disconnected) {
-				clients[network._id] = network;
+		if (docs) {
+			for (var doc in docs) {
+				users.push(docs[doc]._id.toString());
 			}
-		});
+		}
+		// create an array of timed out users
 
-		deferred.resolve(clients);
+		application.Networks.find().toArray(function(err, networks) {
+			if (err || !networks) {
+				deferred.reject();
+				return;
+			}
+
+			networks.forEach(function(network) {
+				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(users, network.internal.userId.toString()) === -1) {
+					clients[network._id] = network;
+				}
+			});
+
+			deferred.resolve(clients);
+		});
+		// here we just mark them for connection by passing them into this.reconnect
 	});
-	// here we just mark them for connection by passing them into this.reconnect
 
 	return deferred.promise;
 }

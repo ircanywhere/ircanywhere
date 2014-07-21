@@ -132,7 +132,7 @@ UserManager.prototype.timeOutInactive = function() {
 			docs.forEach(function(doc) {
 				var networks = _.filter(Clients, function(client) {
 					return (client.internal.userId.toString() === doc._id.toString() &&
-							(client.internal.status === 'connected' || client.internal.status === 'connecting'));
+							(client.internal.status === networkManager.flags.connected || client.internal.status === networkManager.flags.connecting));
 				});
 				// ok we have our inactive users now lets find their networks
 
