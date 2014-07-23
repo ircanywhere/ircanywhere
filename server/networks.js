@@ -134,6 +134,13 @@ NetworkManager.prototype.init = function() {
 			res.end(JSON.stringify(response));
 		});
 	});
+
+	application.app.post('/api/editnetwork', function(req, res) {
+		self.editNetworkApi(req, res).then(function(response) {
+			res.header('Content-Type', 'application/json');
+			res.end(JSON.stringify(response));
+		});
+	});
 }
 
 /**
@@ -295,8 +302,129 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 						output.errors.push({error: 'An error has occured'});
 						deferred.resolve(output);
 					})
-					.then(function() {
+					.then(function(network) {
 						self.connectNetwork(network);
+					});
+					// add network
+
+					deferred.resolve(output);
+				});
+			});
+		});
+
+	return deferred.promise;
+}
+
+/**
+ * Handles the edit network api call, everything the add network call does
+ * except it takes a network ID as a parameter validates the new data.
+ * On success it passes to `editNetwork()` which handles the rest.
+ *
+ * @method editNetworkApi
+ * @param {Object} req A valid request object from express
+ * @param {Object} res A valid response object from express
+ * @return {Object} An output object for the API call
+ */
+NetworkManager.prototype.editNetworkApi = function(req, res) {
+	var self = this,
+		deferred = Q.defer(),
+		networkId = req.param('id', ''),
+		server = req.param('server', ''),
+		secure = req.param('secure', false),
+		port = parseInt(req.param('port', '6667')),
+		sasl = req.param('sasl', false),
+		saslUsername = req.param('saslUsername', ''),
+		password = req.param('password', ''),
+		nick = req.param('nick', ''),
+		name = req.param('name', ''),
+		restriction = application.config.clientSettings.networkRestriction,
+		escapedRestrictions = [],
+		output = {failed: false, errors: []};
+	// get our parameters
+
+	userManager.isAuthenticated(req.headers.cookie)
+		.fail(function(err) {
+			output.failed = true;
+			output.errors.push({error: 'Not authenticated'});
+
+			deferred.resolve(output);
+		})
+		.then(function(user) {
+			restriction.forEach(function(item) {
+				var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
+				escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+			});
+			// create an array of restrictions
+
+			application.Networks.findOne({_id: new mongo.ObjectID(networkId)}, function(err, doc) {
+				if (err || !doc) {
+					output.errors.push({error: 'An error has occured, please contact your system administrator'});
+					output.failed = true;
+
+					deferred.resolve(output);
+					return;
+				}
+				// does the network exist?
+
+				server = helper.trimInput(server);
+				name = helper.trimInput(name);
+				nick = helper.trimInput(nick);
+
+				if (server === '' || nick === '' || name === '') {
+					output.errors.push({error: 'The fields server, nick and name are all required'});
+				}
+
+				if (!helper.isValidName(name)) {
+					output.errors.push({error: 'The name you have entered is too long'});
+				}
+
+				if (!helper.isValidNickname(nick)) {
+					output.errors.push({error: 'The nickname you have entered is invalid'});
+				}
+
+				if (port < 0 || port > 65535) {
+					output.errors.push({error: 'The port you have entered is invalid'});
+				}
+
+				var restricted = true;
+				_.each(escapedRestrictions, function(item) {
+					if (item.test(server)) {
+						restricted = false;
+					}
+				});
+
+				if (restricted) {
+					output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
+				}
+
+				if (output.errors.length > 0) {
+					output.failed = true;
+
+					deferred.resolve(output);
+					return;
+				}
+				// any errors?
+
+				var network = _.extend(doc, {
+					server: server,
+					secure: (secure == 'true') ? true : false,
+					port: port,
+					sasl: (sasl == 'true') ? true : false,
+					saslUsername: saslUsername,
+					password: password,
+					nick: nick,
+					realname: name
+				});
+
+				self.editNetwork(user, network, self.flags.closed)
+					.fail(function() {
+						output.failed = true;
+						output.errors.push({error: 'An error has occured'});
+						deferred.resolve(output);
+					})
+					.then(function(network) {
+						console.log(network);
+					});
 					// add network
 
 					deferred.resolve(output);
