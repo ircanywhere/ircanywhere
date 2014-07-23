@@ -1,5 +1,6 @@
 <div {{bind-attr id=view.tabId}} class="tab selected">
-	<div {{bind-attr class=":messages view.showUserList:no-right:"}}>
+	{{log view.showUserList}}
+	<div {{bind-attr class=":messages view.showUserList::no-right"}}>
 		{{render "overlaybar" this}}
 		{{#if selectedTab.unread}}
 		<div class="top-message-bar message-bar clear" {{action "gotoUnread" selectedTab._id}}>
