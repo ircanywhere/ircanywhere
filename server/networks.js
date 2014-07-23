@@ -295,8 +295,9 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 						output.errors.push({error: 'An error has occured'});
 						deferred.resolve(output);
 					})
-					.then(function() {
+					.then(function(network) {
 						self.connectNetwork(network);
+					});
 					// add network
 
 					deferred.resolve(output);
