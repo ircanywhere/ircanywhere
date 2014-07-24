@@ -214,7 +214,6 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		password = req.param('password', ''),
 		nick = req.param('nick', ''),
 		name = req.param('name', ''),
-		networkCount = 0,
 		restriction = application.config.clientSettings.networkRestriction,
 		escapedRestrictions = [],
 		output = {failed: false, errors: []};
@@ -297,11 +296,10 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 					})
 					.then(function(network) {
 						self.connectNetwork(network);
-					});
-					// add network
+						// add network
 
-					deferred.resolve(output);
-				});
+						deferred.resolve(output);
+					});
 			});
 		});
 
