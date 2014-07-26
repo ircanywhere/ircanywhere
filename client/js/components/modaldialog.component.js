@@ -2,8 +2,7 @@ App.ModalDialogComponent = Ember.Component.extend({
 	className: '',
 
 	didInsertElement: function() {
-		var overlay = this.$('.overlay'),
-			self = this;
+		var self = this;
 
 		this.$('.overlay').on('click', function(e) {
 			if (e.target.className === 'overlay' && !self.alert) {

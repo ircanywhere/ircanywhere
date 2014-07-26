@@ -3,7 +3,8 @@ var gulp = require('gulp'),
 	concatCss = require('gulp-concat-css'),
 	handlebars = require('gulp-ember-handlebars'),
 	uglify = require('gulp-uglifyjs'),
-	clean = require('gulp-clean');
+	clean = require('gulp-clean'),
+	jshint = require('gulp-jshint');
 
 gulp.task('clean', function() {
 	gulp.src('./client/build', {read: false})
@@ -59,6 +60,20 @@ gulp.task('static', function() {
 	gulp.src('./client/static/**')
 		.pipe(gulp.dest('./client/build'));
 });
+
+gulp.task('client-jshint', function () {
+	gulp.src(['./client/js/**/*.js'])
+		.pipe(jshint('./client/.jshintrc'))
+		.pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('server-jshint', function () {
+	gulp.src(['./server/*.js'])
+		.pipe(jshint('./server/.jshintrc'))
+		.pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('jshint', ['server-jshint', 'client-jshint']);
 
 gulp.task('css:watch', function() {
 	gulp.watch(['./client/less/**/*.less', './modules/*/client/less/**/*.less'], ['css']);

@@ -1,4 +1,4 @@
-Ember.Handlebars.helper('safeString', function(value, options) {
+Ember.Handlebars.helper('safeString', function(value) {
 	return new Ember.Handlebars.SafeString(value);
 });
 
@@ -10,11 +10,11 @@ Ember.Handlebars.helper('lookup', function(component, context, options) {
 	}
 });
 
-Ember.Handlebars.helper('time', function(context, options) {
+Ember.Handlebars.helper('time', function(context) {
 	return new Date(context).format('g:i A');
 });
 
-Ember.Handlebars.registerBoundHelper('ircParse', function(text, networkId, options) {
+Ember.Handlebars.registerBoundHelper('ircParse', function(text, networkId) {
 	var network = this.get('controllers.network.socket.networks').findBy('_id', networkId);
 	return new Ember.Handlebars.SafeString(App.Parser.exec(text, network));
 });
@@ -37,7 +37,7 @@ Ember.Handlebars.registerHelper('group', function(options) {
 	view.appendChild(childView);
 });
 
-Ember.Handlebars.helper('userLink', function(show, user, options) {
+Ember.Handlebars.helper('userLink', function(show, user) {
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
@@ -48,7 +48,7 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 		return '';
 	}
 	
-	if (prefix == '') {
+	if (prefix === '') {
 		prefixClass = '';
 	} else if (prefix == '+') {
 		prefixClass = ' voice';
@@ -59,7 +59,7 @@ Ember.Handlebars.helper('userLink', function(show, user, options) {
 	}
 	// setup a different colour for different prefixes
 
-	var prefixIcon = (prefix == '') ? '&nbsp;' : prefix,
+	var prefixIcon = (prefix === '') ? '&nbsp;' : prefix,
 		prefixSpan = (show) ? '<span class="prefix' + prefixClass + '">' + prefixIcon + '</span>' : '',
 		route = '#/t/' + url + '/' + nickname,
 		html = (user) ? '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '">' + prefixSpan + '<span class="name">' + nickname + '</span></a>' : '<a href="' + route + '" rel="user-link" data-nick="' + nickname + '" data-prefix="' + prefixIcon + '">' + prefixSpan + '<span class="name">' + nickname + '</span><span aria-hidden="true">&gt; </span></a>';
