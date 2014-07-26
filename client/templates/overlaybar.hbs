@@ -1,3 +1,5 @@
 {{#if view.isChannel}}
-	<span class="channel-name">{{content.selectedTab.title}}</span><span class="modes">+{{content.selectedTab.modes}}</span><span class="topic">{{ircParse content.selectedTab.topic.topic content._id}}</span>
+	<div class="inner-overlay-bar">
+		<span class="channel-name">{{content.selectedTab.title}}</span><span class="modes">+{{content.selectedTab.modes}}</span><span class="topic">{{ircParse content.selectedTab.topic.topic content._id}}</span>
+	</div>
 {{/if}}
