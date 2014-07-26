@@ -15,6 +15,8 @@ App.NetworkController = Ember.ObjectController.extend({
 			this.set('content', network);
 			// set content.selectedTab (network) - so we can find the full selected tab object in
 			// the network's object for quick access
+
+			Ember.$('.main-view').removeClass('mobileChannels');
 		}
 		// update this.tab if we have a new selected tab
 	}.observes('controllers.index.tabId', 'socket.tabs.@each.selected'),

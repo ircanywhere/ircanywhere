@@ -64,6 +64,7 @@ div.container {
 		height: 20px;
 		color: @topbar-link;
 		line-height: 170%;
+		white-space: nowrap;
 
 		.chan-title,
 		.chan-modes {
@@ -118,12 +119,22 @@ div.container {
 	}
 
 	#options-menu {
-		z-index: 6020;
+		float: right;
+	}
+
+	#channels {
+		float: left;
+
+		a {
+			&.button {
+				font-size: 15px;
+			}
+		}
+	}
+
+	.button-list {
 		list-style-type: none;
 		text-align: right;
-		position: absolute;
-		top: 0;
-		right: 0;
 		background: @topbar-bg;
 		.padding-margin;
 
@@ -175,6 +186,10 @@ div.container {
 				a.dropdown-toggle:after {
 					border-top: 4px solid @white;
 				}
+			}
+
+			&.show-mobile {
+				display: none;
 			}
 		}
 
@@ -275,7 +290,7 @@ div.container {
 
 div.sidebar {
 	height: 100%;
-	width: 210px;
+	width: @sidebar-width;
 	float: left;
 	position: relative;
 	font-size: 12px;
