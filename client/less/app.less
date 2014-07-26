@@ -706,30 +706,36 @@ div.sidebar {
 
 // modal styles
 
-::-webkit-scrollbar {
+div.backlog::-webkit-scrollbar,
+div.userlist::-webkit-scrollbar,
+div.items::-webkit-scrollbar {
 	width: 14px;
 	height: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+div.backlog::-webkit-scrollbar-thumb,
+div.userlist::-webkit-scrollbar-thumb,
+div.items::-webkit-scrollbar-thumb {
 	background: #bbb;
 	background-clip: padding-box;
 	border: 3px solid #fff;
 	border-radius: 6px;
 }
 
-::-webkit-scrollbar-track-piece {
+div.backlog::-webkit-scrollbar-track-piece,
+div.userlist::-webkit-scrollbar-track-piece,
+div.items::-webkit-scrollbar-track-piece {
 	background: #fff;
 	background-clip: padding-box;
 	border: 3px solid #fff;
 	border-radius: 6px;
 }
 
-div.items::-webkit-scrollbar-thumb {
+div.backlog.items::-webkit-scrollbar-thumb {
 	border: 3px solid #1b1e25;
 }
 
-div.items::-webkit-scrollbar-track-piece {
+div.backlog.items::-webkit-scrollbar-track-piece {
 	background: #1b1e25;
 	border: 3px solid #1b1e25;
 }
