@@ -1,0 +1,7 @@
+{
+	"undef": true,
+	"unused": true,
+	"browser": true,
+	"devel": true,
+	"predef": [ "Ember", "App", "Helpers" ]
+}

@@ -24,8 +24,8 @@ App.LoginController = Ember.ObjectController.extend({
 
 			Ember.$.post('/api/login', {email: email, password: password}, function(data) {
 				self[(data.failed) ? 'loginFail' : 'loginSuccess'](data);
-			}).fail(function(err) {
-				self.loginFail(false)
+			}).fail(function() {
+				self.loginFail(false);
 			});
 			// still stuck using jquery, everything seems to depend on it
 			// oh well.
@@ -40,8 +40,8 @@ App.LoginController = Ember.ObjectController.extend({
 
 			Ember.$.post('/api/forgot', {email: email}, function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
-			}).fail(function(err) {
-				self.resetFail(false)
+			}).fail(function() {
+				self.resetFail(false);
 			});
 		},
 
@@ -50,7 +50,7 @@ App.LoginController = Ember.ObjectController.extend({
 		}
 	},
 
-	loginSuccess: function(data) {
+	loginSuccess: function() {
 		this.socket.connect();
 		this.set('errors', false);
 		this.set('success', false);

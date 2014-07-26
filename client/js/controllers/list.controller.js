@@ -76,7 +76,7 @@ App.ListController = Ember.ArrayController.extend({
 			this.set('loading', true);
 		},
 
-		curPage: function(e) {
+		curPage: function() {
 			return false;
 		},
 

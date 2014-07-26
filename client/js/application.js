@@ -10,10 +10,10 @@ App = Ember.Application.create({
 	size: '',
 	// global variables
 
-	controllers: [],
+	controllers: []
 	// controllers - now empty, we let controllers inject themselves
 });
-	
+
 App.reopen({
 	Parser: Ember.Parser.create(),
 	Socket: Ember.Socket.extend({
