@@ -147,32 +147,36 @@ NetworkManager.prototype.init = function() {
 NetworkManager.prototype.getClients = function() {
 	var self = this,
 		deferred = Q.defer(),
+		timeOutDeferred = Q.defer(),
 		clients = {},
-		users = [];
-	// get the networks (we just get all here so we can do more specific tests on whether to connect them)
-
-	var d = new Date(),
 		timeoutDate = new Date(),
-		timeout = application.config.clientSettings.activityTimeout,
-		secondsPastHour = (d.getMinutes() * 60) + d.getSeconds();
+		timeout = application.config.clientSettings.activityTimeout;
 
 	if (timeout > 0) {
 		timeoutDate.setHours(timeoutDate.getHours() - timeout);
-	}
-	// alter the date as per configuration
+		// alter the timeout date as per configuration
 
-	application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
-		if (err) {
-			return;
-		}
-
-		if (docs) {
-			for (var doc in docs) {
-				users.push(docs[doc]._id.toString());
+		application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
+			if (err) {
+				return;
 			}
-		}
-		// create an array of timed out users
 
+			var users = [];
+
+			if (docs) {
+				for (var doc in docs) {
+					users.push(docs[doc]._id.toString());
+				}
+			}
+			// create an array of timed out users
+
+			timeOutDeferred.resolve(users);
+		});
+	} else {
+		timeOutDeferred.resolve([]);
+	}
+
+	timeOutDeferred.promise.then(function (timedOutUsers) {
 		application.Networks.find().toArray(function(err, networks) {
 			if (err || !networks) {
 				deferred.reject();
@@ -180,7 +184,7 @@ NetworkManager.prototype.getClients = function() {
 			}
 
 			networks.forEach(function(network) {
-				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(users, network.internal.userId.toString()) === -1) {
+				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(timedOutUsers, network.internal.userId.toString()) === -1) {
 					clients[network._id] = network;
 				}
 			});
