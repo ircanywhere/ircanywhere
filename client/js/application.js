@@ -1,3 +1,4 @@
+/*global App:true */
 App = Ember.Application.create({
 	LOG_TRANSITIONS: true,
 	// ember settings

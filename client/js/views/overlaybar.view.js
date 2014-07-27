@@ -6,7 +6,7 @@ App.OverlaybarView = Ember.View.extend({
 		return (this.get('context.selectedTab.type') === 'channel');
 	}.property('context.selectedTab.type').cacheable(),
 
-	mouseEnter: function(e) {
+	mouseEnter: function() {
 		if (this.get('context.selectedTab.type') !== 'channel') {
 			return false;
 		} else if (this.get('context.selectedTab.type.topic', '') === '') {
@@ -22,7 +22,7 @@ App.OverlaybarView = Ember.View.extend({
 		clearTimeout(App.get('timeout'));
 	},
 
-	mouseLeave: function(e) {
+	mouseLeave: function() {
 		App.set('timeout', setTimeout(function() {
 			Ember.$('.overlay-bar').slideUp('fast');
 		}, 500));

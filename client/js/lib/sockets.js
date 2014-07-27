@@ -39,16 +39,16 @@ Ember.Socket = Ember.Object.extend({
 				self.connect();
 			}, time);
 			// attempt to reconnect, but back off
-		}
+		};
 
 		socket.onopen = function() {
 			self.set('attempts', 1);
 			self._setup();
-		}
+		};
 
 		socket.onmessage = function(message) {
 			self._listen(JSON.parse(message.data));
-		}
+		};
 		// bind events
 
 		this.set('socket', socket);
@@ -205,10 +205,11 @@ Ember.Socket = Ember.Object.extend({
 
 	_store: function(collection, payload, noEvent, fn) {
 		var self = this,
-			noEvent = noEvent || false,
-			fn = fn || false,
 			col = self.get(collection);
-		
+
+		noEvent = noEvent || false;
+		fn = fn || false;
+
 		for (var k = 0, len = payload.length; k < len; k++) {
 			var i = payload[k],
 				exists = col.findBy('_id', i._id);
@@ -282,25 +283,26 @@ Ember.Socket = Ember.Object.extend({
 
 	_find: function(many, type, query) {
 		var self = this,
-			collection = this.get(type);
+			collection = this.get(type),
+			collectoinSet;
 		
 		if (!collection) {
 			return false;
 		}
 
 		if (many) {
-			var set = collection.filter(function(obj) {
+			collectoinSet = collection.filter(function(obj) {
 				return self._search(query, obj);
 			});
 		} else {
-			var set = collection.find(function(obj) {
+			collectoinSet = collection.find(function(obj) {
 				return self._search(query, obj);
 			});
 		}
 		// attempt to find
 
-		if (set) {
-			return (many) ? set.toArray() : set;
+		if (collectoinSet) {
+			return (many) ? collectoinSet.toArray() : collectoinSet;
 		} else {
 			return false;
 		}
@@ -321,9 +323,12 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	findButWait: function(type, query, one) {
-		var one = one || false,
-			self = this,
-			_getResults = function(resolve, reject) {
+		var self = this,
+			_getResults;
+
+		one = one || false;
+
+		_getResults = function(resolve, reject) {
 				var results = self._find(true, type, query);
 				
 				if (results) {

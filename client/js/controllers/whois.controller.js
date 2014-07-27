@@ -10,7 +10,7 @@ App.WhoisController = Ember.ArrayController.extend({
 
 	populateData: function(data) {
 		if (!data.nickname || !data.username || !data.hostname) {
-			this.send('closeModel')
+			this.send('closeModel');
 		}
 
 		var items = [];
@@ -27,10 +27,9 @@ App.WhoisController = Ember.ArrayController.extend({
 				case 'hostname':
 				case 'realname':
 					continue;
-					break;
 				case 'nickname':
-					var hostmask = data['username'] + '@' + data['hostname'] + ' (' + data['realname'] + ')';
-					items.push({key: data['nickname'], value: hostmask});
+					var hostmask = data.username + '@' + data.hostname + ' (' + data.realname + ')';
+					items.push({key: data.nickname, value: hostmask});
 					break;
 				case 'idle':
 					var totalSec = parseInt(value),
@@ -45,7 +44,7 @@ App.WhoisController = Ember.ArrayController.extend({
 					items.push({key: 'Logged in as', value: value});
 					break;
 				case 'server':
-					var sinfo = (data['serverinfo']) ? ' ' + data['serverinfo'] : ''; 
+					var sinfo = (data.serverinfo) ? ' ' + data.serverinfo : '';
 					items.push({key: 'Server', value: value + sinfo});
 					break;
 				case 'channels':

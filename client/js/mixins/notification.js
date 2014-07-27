@@ -16,8 +16,7 @@ App.Notification = Ember.Mixin.create({
 			return false;
 		}
 
-		var self = this,
-			options = {
+		var options = {
 				icon: '',
 				body: '',
 				tag: '',
@@ -32,7 +31,7 @@ App.Notification = Ember.Mixin.create({
 		options = Ember.merge(options, o);
 		// extend options with o
 
-		var Notify = new Notification(title, {
+		var Notify = new window.Notification(title, {
 			body: options.body,
 			tag: options.tag,
 			icon: options.icon

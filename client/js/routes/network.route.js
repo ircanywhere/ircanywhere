@@ -30,14 +30,15 @@ App.NetworkRoute = AppRoute.extend({
 	actions: {
 		willTransition: function(transition) {
 			var params = transition.params,
-				parts = transition.providedModelsArray;
+				parts = transition.providedModelsArray,
+				url;
 
 			if (parts.length === 0) {
-				var url = (!params.tab) ? params.url : params.url + '/' + Helpers.decodeChannel(params.tab).toLowerCase();
+				url = (!params.tab) ? params.url : params.url + '/' + Helpers.decodeChannel(params.tab).toLowerCase();
 			} else if (parts.length === 1) {
-				var url = parts[0];
+				url = parts[0];
 			} else {
-				var url = parts[0] + '/' + Helpers.decodeChannel(parts[1]).toLowerCase();
+				url = parts[0] + '/' + Helpers.decodeChannel(parts[1]).toLowerCase();
 			}
 			// attempt to construct a url from resolves models or parameters
 

@@ -1,3 +1,4 @@
+/*global AppRoute:true */
 AppRoute = Ember.Route.extend({
 	updateTitle: function(title) {
 		if (title) {

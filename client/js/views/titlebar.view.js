@@ -25,7 +25,7 @@ App.TitlebarView = Ember.View.extend({
 		}
 	},
 
-	mouseEnter: function(e) {
+	mouseEnter: function() {
 		if (this.get('controller.tab.type') !== 'channel') {
 			return false;
 		} else if (this.get('controller.tab.desc') === '') {
@@ -41,7 +41,7 @@ App.TitlebarView = Ember.View.extend({
 		clearTimeout(App.get('timeout'));
 	},
 
-	mouseLeave: function(e) {
+	mouseLeave: function() {
 		App.set('timeout', setTimeout(function() {
 			Ember.$('.overlay-bar').slideUp('fast');
 		}, 500));
