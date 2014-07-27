@@ -8,7 +8,6 @@ var Application = require('./app').Application,
 	IRCHandler = require('./irchandler').IRCHandler,
 	IRCFactory = require('./factory').IRCFactory,
 	CommandManager = require('./commands').CommandManager,
-	RPCHandler = require('./rpc').RPCHandler;
 	RPCHandler = require('./rpc').RPCHandler,
 	ModuleManager = require('./module').ModuleManager,
 	Module = require('./basemodule').Module;
@@ -25,23 +24,11 @@ application = new Application();
 identdServer = new IdentdServer();
 // setup the identd singleton
 
-userManager = new UserManager();
-// user manager
-
-rpcHandler = new RPCHandler();
-// websocket engine
-
 modeParser = new ModeParser();
 // mode parsing engine, no dependencies, just a parser class
 
-networkManager = new NetworkManager();
-// setup network manager
-
-ircFactory = new IRCFactory();
-// setup irc factory
-
-ircHandler = new IRCHandler();
-// setup irc handler
+userManager = new UserManager();
+// user manager
 
 channelManager = new ChannelManager();
 // channel manager
@@ -49,8 +36,20 @@ channelManager = new ChannelManager();
 eventManager = new EventManager();
 // event manager
 
+networkManager = new NetworkManager();
+// setup network manager
+
+ircHandler = new IRCHandler();
+// setup irc handler
+
+ircFactory = new IRCFactory();
+// setup irc factory
+
 commandManager = new CommandManager();
 // command manager
+
+rpcHandler = new RPCHandler();
+// websocket engine
 
 moduleManager = new ModuleManager();
 // module manager

@@ -425,11 +425,11 @@ NetworkManager.prototype.editNetworkApi = function(req, res) {
 						deferred.resolve(output);
 					})
 					.then(function(network) {
-						//ircFactory.destroy(network._id);
+						ircFactory.destroy(network._id, true);
 		
-						// setTimeout(function() {
-						// 	ircFactory.create(network);
-						// }, 1000);
+						setTimeout(function() {
+							ircFactory.create(network);
+						}, 1000);
 						// wait a second before creating the network, sometimes we create a new client before we destroy it
 						// not sure how or why this happens.. async >:(
 
@@ -524,8 +524,6 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
  * @return {promise} A promise to determine whether the insert worked or not
  */
 NetworkManager.prototype.editNetwork = function(user, network) {
-	delete n;
-
 	var self = this,
 		deferred = Q.defer();
 

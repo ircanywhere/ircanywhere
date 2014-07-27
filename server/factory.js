@@ -155,11 +155,20 @@ IRCFactory.prototype.create = function(network) {
  * 
  * @method destroy
  * @param {ObjectID} key A client key which has the type of a Mongo ObjectID
+ * @param {Boolean} forced Whether we forced a client disconnect or not
  * @return void
  */
-IRCFactory.prototype.destroy = function(key) {
-	application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
-	// log it before we destroy it below
+IRCFactory.prototype.destroy = function(key, forced) {
+	var client = Clients[key];
+
+	if (typeof client.forcedDisconnect === 'undefined') {
+		client.forcedDisconnect = forced;
+	}
+
+	if (client.forcedDisconnect === true) {
+		application.logger.log('info', 'destroying irc client', helper.cleanObjectIds(_.omit(client, 'internal')));
+		// log it before we destroy it below
+	}
 
 	this.rpc.emit('destroyClient', key.toString());
 }

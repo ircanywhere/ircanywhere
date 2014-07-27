@@ -576,7 +576,7 @@ CommandManager.prototype.close = function(user, client, target, params) {
 			// if its a query just remove tab
 		} else if (tab.type === 'network') {
 			if (tab.active) {
-				ircFactory.destroy(client._id);
+				ircFactory.destroy(client._id, true);
 			}
 
 			networkManager.removeTab(client);
@@ -614,7 +614,7 @@ CommandManager.prototype.quit = function(user, client, target, params) {
 	networkManager.changeStatus({_id: client._id}, networkManager.flags.disconnected);
 	// mark as connecting and mark the tab as active again
 
-	ircFactory.destroy(client._id);
+	ircFactory.destroy(client._id, true);
 }
 
 /**
