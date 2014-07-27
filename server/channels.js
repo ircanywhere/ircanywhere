@@ -81,6 +81,30 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 		find = [],
 		finalArray = [];
 
+	function insertUsers() {
+		_.each(users, function(u) {
+			var prefix = eventManager.getPrefix(Clients[key], u);
+			u.sort = prefix.sort;
+			u.prefix = prefix.prefix;
+
+			finalArray.push(u);
+		});
+		// send the update out
+
+		if (finalArray.length === 0) {
+			deferred.resolve([]);
+			return;
+		}
+
+		application.ChannelUsers.insert(finalArray, function(err, users) {
+			if (err || !users) {
+				deferred.resolve([]);
+			} else {
+				deferred.resolve(users);
+			}
+		});
+	}
+
 	this.getChannel(key, channel)
 		.then(function(chan) {
 			_.each(users, function(u) {
@@ -97,34 +121,12 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 			// turn this into an array of nicknames
 
 			if (force) {
-				application.ChannelUsers.remove({network: network, channel: channel}, {safe: false});
+				application.ChannelUsers.remove({network: network, channel: channel}, insertUsers);
 			} else {
-				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}}, {safe: false});
+				application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: find}}, insertUsers);
 			}
 			// ok so here we've gotta remove any users in the channel already
 			// and all of them if we're being told to force the update
-
-			_.each(users, function(u) {
-				var prefix = eventManager.getPrefix(Clients[key], u);
-				u.sort = prefix.sort;
-				u.prefix = prefix.prefix;
-
-				finalArray.push(u);
-			});
-			// send the update out
-
-			if (finalArray.length === 0) {
-				deferred.resolve([]);
-				return;
-			}
-
-			application.ChannelUsers.insert(finalArray, function(err, users) {
-				if (err || !users) {
-					deferred.resolve([]);
-				} else {
-					deferred.resolve(users);
-				}
-			});
 		});
 
 	return deferred.promise;
