@@ -3,5 +3,10 @@
 	"unused": true,
 	"browser": true,
 	"devel": true,
+	"curly": true,
+	"immed": true,
+	"newcap": true,
+	"quotmark": true,
+	"indent": 1,
 	"predef": [ "Ember", "App", "Helpers", "AppRoute", "SockJS" ]
 }
