@@ -42,7 +42,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		// update the records
 	},
 
-	gotoUnread: function(id) {
+	gotoUnread: function() {
 		var first = this.get('controllers.messages.content').filterProperty('read', false).objectAt(0),
 			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
 
@@ -57,7 +57,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		// XXX - Work on this.. A bit iffy
 	},
 
-	gotoHighlight: function(id) {
+	gotoHighlight: function() {
 		console.log('goto first highlight');
 		// XXX
 	},

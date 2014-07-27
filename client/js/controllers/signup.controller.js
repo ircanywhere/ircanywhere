@@ -15,7 +15,7 @@ App.SignupController = Ember.ObjectController.extend({
 			
 			Ember.$.post('/api/register', this.getProperties('name', 'nickname', 'email', 'password', 'confirmPassword'), function(data) {
 				self[(data.failed) ? 'signupFail' : 'signupSuccess'](data);
-			}).fail(function(err) {
+			}).fail(function() {
 				self.signupFail(false);
 			});
 		}

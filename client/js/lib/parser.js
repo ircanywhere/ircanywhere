@@ -48,37 +48,37 @@ Ember.Parser = Ember.Object.extend({
 		ITALIC: ['i'],
 		UNDERLINE: ['u']
 	},
-	
+
 	token_tags: {},
 	token_const: {},
 
 	init: function() {
 		var c = 0,
 			v, open, k;
-		
+
 		for (var i = 0, len = this.tags.length; i < len; i++) {
 			c++;
 			k = this.tags[i];
-			
+
 			this.token_const['OPEN_' + k] = c;
-			
+
 			v = this.tags[k];
 			open = '<wbr><' + v[0];
-			
+
 			if (v[1]) {
 				open += ' class="' + v[1] + '"';
 			}
-			
+
 			open += '>';
 			this.token_tags[c] = open;
-			
+
 			c++;
 			this.token_const['CLOSE_' + k] = c;
 			this.token_tags[c] = '</' + v[0] + '>';
 		}
 		c++;
 
-		this.token_const['CLOSE_COLOR'] = c;
+		this.token_const.CLOSE_COLOR = c;
 		this.token_tags[c] = '</span>';
 	},
 
@@ -92,16 +92,18 @@ Ember.Parser = Ember.Object.extend({
 		}
 
 		for (var i = array.length - 1; i >= 0; i--) {
-			if (array[i] === value) return i;
+			if (array[i] === value) {
+				return i;
+			}
 		}
-		
+
 		return -1;
 	},
 
 	tokenize: function(text) {
 		var list = [],
 			state = [];
-		
+
 		for (var i = 0; i < text.length; i++) {
 			this.parseToken(text[i], list, state);
 		}
@@ -119,7 +121,7 @@ Ember.Parser = Ember.Object.extend({
 		// <code>,<color> - change background, restore default foreground
 		// <code>, - restore default foreground and background
 		// <code><text> - restore default foreground and background
-		
+
 		if (chr === ',' && !colorObj.bg) {
 			colorObj.bg = true;
 			// comma, indicates a background
@@ -145,12 +147,12 @@ Ember.Parser = Ember.Object.extend({
 			}
 			// color code, store it appropriately
 		}
-		else {			
+		else {
 			if (colorObj.bg === true) {
 				delete colorObj.bg;
 			}
 			// background indicated but never specified, clear it
-			
+
 			if (this.isEmptyColor(colorObj)) {
 				this.clearEmptyColor(list, state);
 				list.push(chr);
@@ -165,7 +167,7 @@ Ember.Parser = Ember.Object.extend({
 
 	parseToken: function(chr, list, state) {
 		var token = this.tokens[chr];
-		
+
 		if (chr == this.clear) {
 			this.clearState(list, state);
 		} else if (chr == this.color) {
@@ -179,8 +181,8 @@ Ember.Parser = Ember.Object.extend({
 			this.pushToken(token, list, state);
 		} else {
 			if (list.length) {
-				var prevIdx = list.length-1;
-				
+				var prevIdx = list.length - 1;
+
 				if (typeof list[prevIdx] == 'string') {
 					list[prevIdx] += chr;
 				} else if (typeof list[prevIdx] == 'object') {
@@ -196,7 +198,7 @@ Ember.Parser = Ember.Object.extend({
 
 	pushToken: function(token, list, state) {
 		var lastStateIndex = this.lastIndexOf(token, state);
-		
+
 		if (lastStateIndex !== -1) {
 			state.splice(lastStateIndex, 1);
 			list.push(this.token_const['CLOSE_' + token]);
@@ -273,18 +275,18 @@ Ember.Parser = Ember.Object.extend({
 				classNames.push(this.color_map[colorToken.fg]);
 			}
 		}
-		
-		if (colorToken.bg)
-		{
-			if (colorToken.rgb)
+
+		if (colorToken.bg) {
+			if (colorToken.rgb) {
 				styles.push('background-color:#' + colorToken.bg);
-			else if (this.color_map[colorToken.bg])
+			} else if (this.color_map[colorToken.bg]) {
 				classNames.push('bg-' + this.color_map[colorToken.bg]);
+			}
 		}
 
 		var classAttr = '',
 			styleAttr = '';
-		
+
 		if (classNames.length) {
 			classAttr = ' class="' + classNames.join(' ') + '"';
 		}
@@ -299,15 +301,15 @@ Ember.Parser = Ember.Object.extend({
 	cleanup: function(tokens) {
 		for (var i = tokens.length - 1; i >= 0; i--) {
 			var token = tokens[i];
-			
+
 			if (typeof token == 'number') {
 				continue;
 			}
-			
+
 			if (typeof token == 'string') {
 				break;
 			}
-			
+
 			if (typeof token == 'object') {
 				delete tokens[i];
 			}
@@ -318,8 +320,9 @@ Ember.Parser = Ember.Object.extend({
 	},
 
 	parseLinks: function(text, network) {
-		var regex = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img,
-			text = text.replace(regex, '$1$4$7$10$13<a href="$2$5$8$11$14" target="_blank">$2$5$8$11$14</a>$3$6$9$12');
+		var regex = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%]*)*[a-z0-9\-_~$()*+=\/#[\]@%])/img;
+
+		text = text.replace(regex, '$1$4$7$10$13<a href="$2$5$8$11$14" target="_blank">$2$5$8$11$14</a>$3$6$9$12');
 		// parse http links and www. urls (http://jmrware.com/articles/2010/linkifyurl/linkify.html)
 
 		text = text.replace(/(^|[ ]+)(#\S+)/ig, function(input, match, match2) {
@@ -332,9 +335,9 @@ Ember.Parser = Ember.Object.extend({
 	},
 
 	exec: function(text, network) {
-		if (text == '') {
+		if (text === '') {
 			return text;
-		} else if (text == undefined) {
+		} else if (text === undefined) {
 			return '';
 		}
 

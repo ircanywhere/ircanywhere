@@ -82,7 +82,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	markAsRead: function() {
 		var query = {'$in': []};
 		this.get('readDocs').forEach(function(id) {
-			query['$in'].push(id);
+			query.$in.push(id);
 		});
 		// construct a query from docs
 
@@ -128,20 +128,19 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 		},
 
-		detectUnread: function(id, top, bottom, container) {
+		detectUnread: function(id, top, bottom) {
 			var self = this,
 				tab = this.get('socket.tabs').findBy('_id', id),
 				events = this.get('filtered').filterProperty('read', false),
 				highlightCounter = 0,
-				counter = 0,
-				docs = [];
+				counter = 0;
 
 			if (!tab) {
 				return false;
 			}
 
 			events.forEach(function(item) {
-				var el = $('div.row[data-id=' + item._id + ']'),
+				var el = Ember.$('div.row[data-id=' + item._id + ']'),
 					type = el.attr('data-type');
 
 				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
@@ -211,7 +210,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		tab.set('loading', false);
 	},
 
-	newTabMessage: function(object, backlog) {
+	newTabMessage: function(object) {
 		var self = this;
 
 		if (App.get('isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
@@ -260,8 +259,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		}
 		// we're not bothered about non-highlights
 
-		var self = this,
-			tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
+		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 
 		this.unreadNotifications.forEach(function(item) {
 			if (!(App.get('isActive') && item.tag === tab.networkName + '/' + tab.title)) {

@@ -21,7 +21,7 @@ App.SortingTableHeader = Ember.View.extend({
 		return 'icon-sort';
 	}.property('sortableArray.sortProperties', 'sortableArray.sortAscending'),
 
-	click: function (evt) {
+	click: function () {
 		var sortableArray = this.get('sortableArray'),
 			sortProps = sortableArray.get('sortProperties');
 		

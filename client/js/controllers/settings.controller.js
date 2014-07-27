@@ -63,7 +63,7 @@ App.SettingsController = Ember.ObjectController.extend({
 			
 			Ember.$.post('/api/settings/updatesettings', this.getProperties('name', 'nickname', 'email', 'autoCompleteChar'), function(data) {
 				self[(data.failed) ? 'settingsFail' : 'settingsSuccess'](data);
-			}).fail(function(err) {
+			}).fail(function() {
 				self.settingsFail(false);
 			});
 		},
@@ -73,7 +73,7 @@ App.SettingsController = Ember.ObjectController.extend({
 			
 			Ember.$.post('/api/settings/changepassword', this.getProperties('password', 'newPassword'), function(data) {
 				self[(data.failed) ? 'passwordFail' : 'passwordSuccess'](data);
-			}).fail(function(err) {
+			}).fail(function() {
 				self.passwordFail(false);
 			});
 		}

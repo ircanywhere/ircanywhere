@@ -11,7 +11,7 @@ App.ResetController = Ember.ObjectController.extend({
 			
 			Ember.$.post('/api/reset', this.getProperties('token', 'password', 'confirmPassword'), function(data) {
 				self[(data.failed) ? 'resetFail' : 'resetSuccess'](data);
-			}).fail(function(err) {
+			}).fail(function() {
 				self.resetFail(false);
 			});
 		}

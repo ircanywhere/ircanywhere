@@ -86,19 +86,20 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		this._updateQuery(object);
 	},
 
-	onRemovedTab: function(object) {
+	onRemovedTab: function() {
 		window.history.back();
 	},
 
 	_updateQuery: function(object) {
-		var network = this.get('socket.networks').findBy('_id', object.get('network'));
+		var network = this.get('socket.networks').findBy('_id', object.get('network')),
+			query;
 
 		if (object.type === 'network') {
-			var query = {network: object.networkName, target: '*'};
+			query = {network: object.networkName, target: '*'};
 		} else if (object.type === 'query') {
-			var query = {network: object.networkName, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
+			query = {network: object.networkName, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
 		} else if (object.type === 'channel') {
-			var query = {network: object.networkName, target: object.target};
+			query = {network: object.networkName, target: object.target};
 		}
 
 		object.set('query', query);
