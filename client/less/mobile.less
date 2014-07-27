@@ -1,6 +1,6 @@
 @import "header.less";
 
-@media only screen and (max-device-width: 480px) {
+@media only screen and (max-width: 780px) {
 	html, body, body > div {
 		width: 100% !important;
 	}
@@ -14,8 +14,22 @@
 	}
 
 	.topbar {
+		font-size: 14px;
+
 		#main-menu {
 			width: 100%;
+		}
+
+		.topic-wrap {
+			text-align: center;
+		}
+
+		.button-list {
+			> li {
+				&.show-mobile {
+					display: inline-block;
+				}
+			}
 		}
 	}
 
@@ -112,28 +126,47 @@
 	}
 
 	div.userlist {
-		.transform(translateX(100%));
-		.transition(transform, @panel-transition-duration);
+		.transform(translateX(@userlist-width));
 		.iphoneTouchScroll;
 		z-index: 6030;
-
-		&.mobile {
-			.transform(translateX(0));
-		}
+		display: block !important;
 	}
 
 	div.sidebar {
-		.transform(translateX(-100%));
-		.transition(transform, @panel-transition-duration);
+		.transform(translateX(-@sidebar-width));
 		.iphoneTouchScroll;
 		z-index: 6030;
+	}
 
-		&.mobile {
-			.transform(translateX(0));
+	.main-view {
+		.transition(transform, @panel-transition-duration);
+
+		&.mobileChannels {
+			.transform(translateX(@sidebar-width));
+		}
+	}
+
+	.tab.selected {
+		> div {
+			.transition(transform, @panel-transition-duration);
+		}
+
+		&.mobileSidebar {
+			.messages {
+				.transform(translateX(-@userlist-width));
+			}
+
+			.userlist {
+				.transform(translateX(0));
+			}
 		}
 	}
 
 	.backlog {
 		.iphoneTouchScroll;
+	}
+
+	.hide-mobile {
+		display: none !important;
 	}
 }

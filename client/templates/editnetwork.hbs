@@ -4,7 +4,11 @@
 	</div>
 	<div class="modal-body">
 		<form method="post" {{action "networkSubmit" on="submit"}}>
+			{{input type="hidden" id="networkId" valueBinding="model.networkId" value=networkId}}
 			<div class="full-set">
+				<div class="alert-message block-message warning">
+					Please note that updating a network will force a reconnect using the updated settings.
+				</div>
 				{{#if errors}}
 					<div class="alert-message block-message error">
 						<ul>
@@ -95,7 +99,7 @@
 				<div class="clearfix">
 					<div class="input">
 						<div class="field">
-							{{input type="submit" class="btn primary" value="Add Network" tabindex="8" action="networkSubmit"}}
+							{{input type="submit" class="btn primary" value="Edit Network" tabindex="8" action="networkSubmit"}}
 						</div>
 					</div>
 				</div>

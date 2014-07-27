@@ -64,6 +64,7 @@ div.container {
 		height: 20px;
 		color: @topbar-link;
 		line-height: 170%;
+		white-space: nowrap;
 
 		.chan-title,
 		.chan-modes {
@@ -118,12 +119,22 @@ div.container {
 	}
 
 	#options-menu {
-		z-index: 6020;
+		float: right;
+	}
+
+	#channels {
+		float: left;
+
+		a {
+			&.button {
+				font-size: 15px;
+			}
+		}
+	}
+
+	.button-list {
 		list-style-type: none;
 		text-align: right;
-		position: absolute;
-		top: 0;
-		right: 0;
 		background: @topbar-bg;
 		.padding-margin;
 
@@ -175,6 +186,10 @@ div.container {
 				a.dropdown-toggle:after {
 					border-top: 4px solid @white;
 				}
+			}
+
+			&.show-mobile {
+				display: none;
 			}
 		}
 
@@ -275,7 +290,7 @@ div.container {
 
 div.sidebar {
 	height: 100%;
-	width: 210px;
+	width: @sidebar-width;
 	float: left;
 	position: relative;
 	font-size: 12px;
@@ -706,30 +721,36 @@ div.sidebar {
 
 // modal styles
 
-::-webkit-scrollbar {
+div.backlog::-webkit-scrollbar,
+div.userlist::-webkit-scrollbar,
+div.items::-webkit-scrollbar {
 	width: 14px;
 	height: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+div.backlog::-webkit-scrollbar-thumb,
+div.userlist::-webkit-scrollbar-thumb,
+div.items::-webkit-scrollbar-thumb {
 	background: #bbb;
 	background-clip: padding-box;
 	border: 3px solid #fff;
 	border-radius: 6px;
 }
 
-::-webkit-scrollbar-track-piece {
+div.backlog::-webkit-scrollbar-track-piece,
+div.userlist::-webkit-scrollbar-track-piece,
+div.items::-webkit-scrollbar-track-piece {
 	background: #fff;
 	background-clip: padding-box;
 	border: 3px solid #fff;
 	border-radius: 6px;
 }
 
-div.items::-webkit-scrollbar-thumb {
+div.backlog.items::-webkit-scrollbar-thumb {
 	border: 3px solid #1b1e25;
 }
 
-div.items::-webkit-scrollbar-track-piece {
+div.backlog.items::-webkit-scrollbar-track-piece {
 	background: #1b1e25;
 	border: 3px solid #1b1e25;
 }

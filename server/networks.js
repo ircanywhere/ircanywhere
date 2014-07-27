@@ -154,32 +154,36 @@ NetworkManager.prototype.init = function() {
 NetworkManager.prototype.getClients = function() {
 	var self = this,
 		deferred = Q.defer(),
+		timeOutDeferred = Q.defer(),
 		clients = {},
-		users = [];
-	// get the networks (we just get all here so we can do more specific tests on whether to connect them)
-
-	var d = new Date(),
 		timeoutDate = new Date(),
-		timeout = application.config.clientSettings.activityTimeout,
-		secondsPastHour = (d.getMinutes() * 60) + d.getSeconds();
+		timeout = application.config.clientSettings.activityTimeout;
 
 	if (timeout > 0) {
 		timeoutDate.setHours(timeoutDate.getHours() - timeout);
-	}
-	// alter the date as per configuration
+		// alter the timeout date as per configuration
 
-	application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
-		if (err) {
-			return;
-		}
-
-		if (docs) {
-			for (var doc in docs) {
-				users.push(docs[doc]._id.toString());
+		application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
+			if (err) {
+				return;
 			}
-		}
-		// create an array of timed out users
 
+			var users = [];
+
+			if (docs) {
+				for (var doc in docs) {
+					users.push(docs[doc]._id.toString());
+				}
+			}
+			// create an array of timed out users
+
+			timeOutDeferred.resolve(users);
+		});
+	} else {
+		timeOutDeferred.resolve([]);
+	}
+
+	timeOutDeferred.promise.then(function (timedOutUsers) {
 		application.Networks.find().toArray(function(err, networks) {
 			if (err || !networks) {
 				deferred.reject();
@@ -187,7 +191,7 @@ NetworkManager.prototype.getClients = function() {
 			}
 
 			networks.forEach(function(network) {
-				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(users, network.internal.userId.toString()) === -1) {
+				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(timedOutUsers, network.internal.userId.toString()) === -1) {
 					clients[network._id] = network;
 				}
 			});
@@ -221,7 +225,6 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 		password = req.param('password', ''),
 		nick = req.param('nick', ''),
 		name = req.param('name', ''),
-		networkCount = 0,
 		restriction = application.config.clientSettings.networkRestriction,
 		escapedRestrictions = [],
 		output = {failed: false, errors: []};
@@ -304,11 +307,10 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 					})
 					.then(function(network) {
 						self.connectNetwork(network);
-					});
-					// add network
+						// add network
 
-					deferred.resolve(output);
-				});
+						deferred.resolve(output);
+					});
 			});
 		});
 
@@ -328,7 +330,7 @@ NetworkManager.prototype.addNetworkApi = function(req, res) {
 NetworkManager.prototype.editNetworkApi = function(req, res) {
 	var self = this,
 		deferred = Q.defer(),
-		networkId = req.param('id', ''),
+		networkId = req.param('networkId', ''),
 		server = req.param('server', ''),
 		secure = req.param('secure', false),
 		port = parseInt(req.param('port', '6667')),
@@ -423,12 +425,16 @@ NetworkManager.prototype.editNetworkApi = function(req, res) {
 						deferred.resolve(output);
 					})
 					.then(function(network) {
-						console.log(network);
-					});
-					// add network
+						//ircFactory.destroy(network._id);
+		
+						// setTimeout(function() {
+						// 	ircFactory.create(network);
+						// }, 1000);
+						// wait a second before creating the network, sometimes we create a new client before we destroy it
+						// not sure how or why this happens.. async >:(
 
-					deferred.resolve(output);
-				});
+						deferred.resolve(output);
+					});
 			});
 		});
 
@@ -506,6 +512,34 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 
 	return deferred.promise;
 	// insert the network. Just doing this will propogate the change directly due to our observe driver
+}
+
+/**
+ * Edits an existing network, updating the record in the database. We'll inform
+ * irc-factory that the network information has changed and perform a reconnect.
+ *
+ * @method editNetwork
+ * @param {Object} user A valid user object from the `users` collection
+ * @param {Object} network A valid network object to update
+ * @return {promise} A promise to determine whether the insert worked or not
+ */
+NetworkManager.prototype.editNetwork = function(user, network) {
+	delete n;
+
+	var self = this,
+		deferred = Q.defer();
+
+	application.Networks.update({'_id': new mongo.ObjectID(network._id)}, _.omit(network, '_id'), {multi: false}, function(err) {
+		if (err) {
+			deferred.reject();
+			return;
+		}
+
+		deferred.resolve(network);
+	});
+
+	return deferred.promise;
+	// update the network. Just doing this will propogate the change directly due to our observe driver
 }
 
 /**

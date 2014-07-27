@@ -38,7 +38,7 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		right: 172px;
+		right: @userlist-width;
 		bottom: 0;
 
 		&.no-right {
@@ -48,16 +48,19 @@
 		.overlay-bar {
 			z-index: 20;
 			position: absolute;
-			width: 100%;
 			border-bottom: 1px solid #B8DBFF;
 			background: #F7FEFF;
-			padding: 8px;
+			width: 100%;
 			zoom: 1;
 			filter: alpha(opacity=90);
 			opacity: 0.9;
 			line-height: 150%;
 			font-size: 13px;
 			display: none;
+
+			.inner-overlay-bar {
+				padding: 8px;
+			}
 
 			span.channel-name {
 				font-weight: bold;

@@ -25,6 +25,16 @@ App.TitlebarController = Ember.ObjectController.extend({
 			// update & close the menu
 		},
 
+		toggleMobileChannels: function() {
+			Ember.$('.tab.selected').removeClass('mobileSidebar');
+			Ember.$('.main-view').toggleClass('mobileChannels');
+		},
+
+		toggleMobileSidebar: function() {
+			Ember.$('.tab.selected').toggleClass('mobileSidebar');
+			Ember.$('.main-view').removeClass('mobileChannels');
+		},
+
 		toggleEvents: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true);
 
