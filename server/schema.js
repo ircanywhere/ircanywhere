@@ -13,6 +13,8 @@ exports.schema = {
 	},
 	'port': {
 		type: 'number',
+		min: 1,
+		max: 65535,
 		required: true
 	},
 	'secure': {
@@ -26,6 +28,15 @@ exports.schema = {
 	'forkProcess': {
 		type: 'boolean',
 		required: true
+	},
+	'retryWait': {
+		type: 'number',
+		min: 1,
+		required: false
+	},
+	'retryCount': {
+		type: 'number',
+		required: false
 	},
 	'ircServer': {
 		type: 'object',
