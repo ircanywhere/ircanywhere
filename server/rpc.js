@@ -213,24 +213,24 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 		eventName = this.event[1],
 		uid = false;
 
+	doc = _.omit(doc, 'username', 'hostname', '_burst');
+	// alter the document
+
 	_.each(Clients, function(value, key) {
 		var tab = _.find(value.internal.tabs, query);
 		if (tab) {
 			uid = tab.user;
 		}
+		// find the tab that this change is for
+
+		if (eventName === 'insert') {
+			rpcHandler.push(uid, 'newChannelUser', doc);
+		} else if (eventName === 'update') {
+			rpcHandler.push(uid, 'updateChannelUser', doc);
+		} else if (eventName === 'delete') {
+			rpcHandler.push(uid, 'deleteChannelUser', doc);
+		}
 	});
-	// find the tab that this change is for
-
-	doc = _.omit(doc, 'username', 'hostname', '_burst');
-	// alter the document
-
-	if (eventName === 'insert') {
-		rpcHandler.push(uid, 'newChannelUser', doc);
-	} else if (eventName === 'update') {
-		rpcHandler.push(uid, 'updateChannelUser', doc);
-	} else if (eventName === 'delete') {
-		rpcHandler.push(uid, 'deleteChannelUser', doc);
-	}
 }
 
 /**
