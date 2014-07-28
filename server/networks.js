@@ -111,6 +111,10 @@ NetworkManager.prototype.init = function() {
 
 	application.ee.on(['networks', 'delete'], function(id) {
 		delete Clients[id.toString()];
+
+		application.ChannelUsers.remove({network: id}, {safe: false});
+		application.Tabs.remove({network: id}, {safe: false});
+		// remove lingering data
 	});
 	// just sync clients up to this, instead of manually doing it
 	// we're asking for problems that way doing it this way means
