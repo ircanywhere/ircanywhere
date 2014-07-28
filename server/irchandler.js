@@ -108,11 +108,11 @@ IRCHandler.prototype.registered = function(client, message) {
 	}}, {multi: true, safe: false});
 	// update the tab
 
-	application.Tabs.update({network: client._id}, {$set: {
+	application.Tabs.update({network: client._id, type: {$ne: 'channel'}}, {$set: {
 		networkName: message.capabilities.network.name,
 		active: true
 	}}, {multi: true, safe: false});
-	// update any sub tabs
+	// update any sub tabs that are not channels
 
 	eventManager.insertEvent(client, {
 		nickname: message.nickname,

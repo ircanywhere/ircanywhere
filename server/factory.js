@@ -67,7 +67,7 @@ IRCFactory.prototype.init = function() {
 
 	this.events.on('message', function(message) {
 		if (message.event === 'synchronize') {
-			networkManager.getClients()
+			networkManager.getClients(message.keys)
 				.then(function(networks) {
 					var keys = _.keys(networks),
 						difference = _.difference(keys, message.keys);

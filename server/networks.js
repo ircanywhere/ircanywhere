@@ -144,11 +144,12 @@ NetworkManager.prototype.init = function() {
  * @method getClients
  * @return {promise} A promise containing the clients that should be started up
  */
-NetworkManager.prototype.getClients = function() {
+NetworkManager.prototype.getClients = function(keys) {
 	var self = this,
 		deferred = Q.defer(),
 		timeOutDeferred = Q.defer(),
 		clients = {},
+		inactive = [],
 		timeoutDate = new Date(),
 		timeout = application.config.clientSettings.activityTimeout;
 
@@ -187,7 +188,14 @@ NetworkManager.prototype.getClients = function() {
 				if (network.internal && network.internal.status !== self.flags.disconnected && _.indexOf(timedOutUsers, network.internal.userId.toString()) === -1) {
 					clients[network._id] = network;
 				}
+
+				if (_.indexOf(keys, network._id.toString()) === -1) {
+					inactive.push(network._id);
+				}
 			});
+
+			application.Tabs.update({network: {$in: inactive}}, {$set: {active: false}}, {multi: true, safe: false});
+			// mark any tabs for x network inactive
 
 			deferred.resolve(clients);
 		});
