@@ -73,6 +73,7 @@ IRCHandler.prototype.opened = function(client, message) {
 	// we need to make sure we've got all our required items
 
 	IdentdCache[message.localPort] = message;
+	delete client.forcedDisconnect;
 }
 
 /**
@@ -171,7 +172,7 @@ IRCHandler.prototype.closed = function(client, message) {
 	}, networkManager.flags.closed);
 
 	if (!message.reconnecting) {
-		ircFactory.destroy(client._id);
+		ircFactory.destroy(client._id, false);
 	}
 	// destroy the client if we're not coming back
 }
@@ -196,7 +197,7 @@ IRCHandler.prototype.failed = function(client, message) {
 		message: 'Connection closed. Retry attempts exhausted.',
 	}, networkManager.flags.closed);
 
-	ircFactory.destroy(client._id);
+	ircFactory.destroy(client._id, false);
 	// destroy the client
 }
 
