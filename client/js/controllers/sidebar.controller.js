@@ -1,4 +1,10 @@
 App.SidebarController = Ember.ArrayController.extend(App.Notification, {
+	content: [],	
+	increment: false,
+	
+	sortProperties: ['url'],
+	sortAscending: true,
+
 	statusChanged: function() {
 		Ember.$.each(Ember.View.views, function() {
 			if (this.get('templateName') === 'sidebar') {
@@ -8,16 +14,14 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		// XXX - i don't really like this but hey it works, I'll come back to it at some
 		// point in the future and see if theres a better way
 	}.observes('socket.networks.@each.internal'),
-	
-	increment: false,
-	sortProperties: ['url'],
-	sortAscending: true,
 
 	ready: function() {
 		this.set('increment', true);
 		this.set('user', this.get('socket.users')[0]);
 		this.set('content', this.get('socket.tabs'));
 		// set that to the tabs collection, it'll update automatically when they change
+
+		console.log(this.get('content'));
 	},
 
 	newTabMessage: function(object, backlog) {
