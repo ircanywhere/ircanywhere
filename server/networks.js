@@ -419,6 +419,9 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
 		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: {active: activate}}, {safe: false});
+	
+		application.ChannelUsers.remove({network: client._id, channel: target.toLowerCase()}, {safe: false});
+		// remove any users for the tab
 	} else {
 		application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
 	}
