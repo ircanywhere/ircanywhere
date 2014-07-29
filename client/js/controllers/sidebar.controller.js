@@ -1,7 +1,7 @@
 App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	content: [],	
 	increment: false,
-	
+
 	sortProperties: ['url'],
 	sortAscending: true,
 
@@ -20,8 +20,6 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		this.set('user', this.get('socket.users')[0]);
 		this.set('content', this.get('socket.tabs'));
 		// set that to the tabs collection, it'll update automatically when they change
-
-		console.log(this.get('content'));
 	},
 
 	newTabMessage: function(object, backlog) {
