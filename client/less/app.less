@@ -411,15 +411,21 @@ div.sidebar {
 				}
 			}
 
-			.child:not(.selected):not(.unread) {
+			.child:not(.selected) {
 				span.link {
 					padding-left: 8px;
 				}
 			}
 
+			.child.selected {
+				span.link {
+					padding-left: 3px;
+				}
+			}
+
 			span.alert {
 				padding: 2px 5px 2px 5px;
-				margin: 0 7px 0 0;
+				margin: 0 0 0 7px;
 				.border-radius(3px);
 
 				&.unread {
