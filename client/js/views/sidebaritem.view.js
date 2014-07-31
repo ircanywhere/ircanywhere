@@ -5,14 +5,10 @@ App.SidebaritemView = Ember.View.extend({
 
 	liClass: function() {
 		var classes = ['clear'],
-			tab = this.get('controller.content'),
-			selectedTab = this.get('controller.parentController.user.selectedTab');
+			tab = this.get('controller.content');
 
-		if (tab.url === selectedTab) {
+		if (tab.get('selected')) {
 			classes.push('selected');
-			tab.set('selected', true);
-		} else {
-			tab.set('selected', false);
 		}
 
 		if (tab.get('type') !== 'network') {
@@ -24,7 +20,7 @@ App.SidebaritemView = Ember.View.extend({
 		}
 
 		return classes.join(' ');
-	}.property('controller.parentController.user.selectedTab', 'controller.content.selected', 'controller.content.unread').cacheable(),
+	}.property('controller.content.selected', 'controller.content.unread').cacheable(),
 	
 	getClass: function() {
 		var classNames = [''],

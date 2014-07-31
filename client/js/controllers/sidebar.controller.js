@@ -1,9 +1,18 @@
 App.SidebarController = Ember.ArrayController.extend(App.Notification, {
-	content: [],	
 	increment: false,
 
 	sortProperties: ['url'],
 	sortAscending: true,
+
+	content: function() {
+		var selectedTab = this.get('user.selectedTab');
+
+		return this.get('socket.tabs').map(function (tab) {
+			tab.set('selected', tab.url === selectedTab);
+
+			return tab;
+		});
+	}.property('user.selectedTab', 'socket.tabs'),
 
 	statusChanged: function() {
 		Ember.$.each(Ember.View.views, function() {
@@ -18,7 +27,6 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	ready: function() {
 		this.set('increment', true);
 		this.set('user', this.get('socket.users')[0]);
-		this.set('content', this.get('socket.tabs'));
 		// set that to the tabs collection, it'll update automatically when they change
 	},
 
