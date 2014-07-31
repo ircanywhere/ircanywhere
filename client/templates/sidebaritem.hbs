@@ -1,5 +1,6 @@
 <a {{bind-attr href=view.url title=title}} {{action 'onClick' view.url}}>
 	<span {{bind-attr class=":link view.getClass"}}>
+		{{view.title}}
 		{{#if view.isPrivmsg}}
 			{{#if unread}}
 				<span class="alert highlight" {{action "markAsRead" _id bubbles=false}}>{{unread}}</span>
@@ -7,6 +8,5 @@
 		{{else}}
 			{{#if highlights}}<span class="alert highlight" {{action "markAsRead" _id bubbles=false}}>{{highlights}}</span>{{/if}}
 		{{/if}}
-		{{view.title}}
 	</span>
 </a>
