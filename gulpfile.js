@@ -92,4 +92,4 @@ gulp.task('static:watch', function() {
 });
 
 gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
-gulp.task('watch', ['css:watch', 'templates:watch', 'js:watch', 'static:watch']);
+gulp.task('watch', ['default', 'css:watch', 'templates:watch', 'js:watch', 'static:watch']);
