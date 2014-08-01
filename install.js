@@ -147,6 +147,10 @@ function isMongoRunning(isGlobal, path) {
 
 	mongo.connect('mongodb://127.0.0.1:27017', function(err, db) {
 		if (err) {
+			if(process.platform == "win32") {
+				console.log(COLOUR.red, "Please start your mongo server then restart the installation.");
+				return;
+			}
 			console.log(COLOUR.blue, 'Starting MongoDB process. If this is your own MongoDB installation it might require some configuration...');
 			console.log(LINE);
 
