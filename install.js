@@ -47,32 +47,45 @@ function mongoDbSetup() {
 
 	var local = fs.existsSync('./build/mongodb/bin/mongod'),
 		global = false,
-		path;
+		path,
+		platform = process.platform;
 
-	cp.exec('whereis mongod', function(error, stdout, stderr) {
-		if (!stdout || stdout === 'mongod:\n') {
-			cp.exec('which mongod', function(error, stdout, stderr) {
-				if (!stdout) {
-					done();
-					return;
-				}
-				// it's not in the $PATH
-
-				path = stdout.trim();
-				global = true;
-				done();
-			});
+	if(platform == "win32") {
+		if(fs.existsSync("C:\\Program Files\\MongoDB 2.6 Standard\\bin\\mongod.exe"))
+		{
+			global = true;
+			path = "C:\\Program Files\\MongoDB 2.6 Standard\\bin\\mongod.exe"
+			done();
+		}
+		else {
+			console.log(COLOUR.red, "Please install mongodb and restart the installation");
 			return;
 		}
-		// whereis can't find it
+	} else {
+		cp.exec('whereis mongod', function(error, stdout, stderr) {
+			if (!stdout || stdout === 'mongod:\n') {
+				cp.exec('which mongod', function(error, stdout, stderr) {
+					if (!stdout) {
+						done();
+						return;
+					}
+					// it's not in the $PATH
 
-		path = stdout.split(' ')[1].trim() || stdout.split(' ')[0].trim();
-		// OSX does not use a label on output, linux does
+					path = stdout.trim();
+					global = true;
+					done();
+				});
+				return;
+			}
+			// whereis can't find it
 
-		global = true;
-		done();
-	});
+			path = stdout.split(' ')[1].trim() || stdout.split(' ')[0].trim();
+			// OSX does not use a label on output, linux does
 
+			global = true;
+			done();
+		});
+	}
 	function done() {
 		if (!global && local) {
 			path = './build/mongodb/bin/mongod';
