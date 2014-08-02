@@ -36,18 +36,24 @@ Pre-requisites
 Before we start, make sure you have `Node.js and Npm`_ installed. **IRCAnywhere** also needs gulp_ to build client files. You can install gulp by running (may need to prefix command with ``sudo`` if you get permission errors): ::
 
     $ npm install -g gulp
+    
+On windows mongodb has to be setup first.  The install script cannot take care of install of mongodb.
 
 Install Script
 ~~~~~~~~~~~~~~
 
-The install script will automatically install MongoDB if needed, download node dependencies, start MongoDB correctly, create a default config file and compile the client side files.
+The install script will automatically install MongoDB if needed(A windows box has to be installed before install script), download node dependencies, start MongoDB correctly(will not start mongodb on windows), create a default config file and compile the client side files.
 
 Note that the install script is only available if you downloaded the development version of **IRCAnywhere**.
 
 To run the install script, type this command: ::
 
     $ ./install.sh
-
+    
+On windows the command to start install is 
+    
+    > install.bat
+    
 If you already have MongoDB installed but not set up correctly with Oplog tailing, the script can do that for you as well, simply run: ::
 
     $ sudo ./install.sh
