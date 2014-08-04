@@ -15,7 +15,8 @@ App.TitlebarView = Ember.View.extend({
 	},
 
 	documentClick: function(e) {
-		if (e.target.className === 'dropdown-toggle' || e.target.className === 'dropdown-menu') {
+		var elem = Ember.$(e.target);
+		if (elem.closest('.dropdown').length) {
 			return false;
 		}
 		// don't handle clicks if they're clicking the dropdown button
