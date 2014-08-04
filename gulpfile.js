@@ -4,7 +4,8 @@ var gulp = require('gulp'),
 	handlebars = require('gulp-ember-handlebars'),
 	uglify = require('gulp-uglifyjs'),
 	clean = require('gulp-clean'),
-	jshint = require('gulp-jshint');
+	jshint = require('gulp-jshint'),
+	mocha = require('gulp-mocha');
 
 gulp.task('clean', function() {
 	gulp.src('./client/build', {read: false})
@@ -75,6 +76,11 @@ gulp.task('server-jshint', function () {
 
 gulp.task('jshint', ['server-jshint', 'client-jshint']);
 
+gulp.task('mocha', function () {
+	return gulp.src('test/**/*.js')
+		.pipe(mocha({reporter: 'dot'}));
+});
+
 gulp.task('css:watch', function() {
 	gulp.watch(['./client/less/**/*.less', './modules/*/client/less/**/*.less'], ['css']);
 });
@@ -93,3 +99,4 @@ gulp.task('static:watch', function() {
 
 gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
 gulp.task('watch', ['default', 'css:watch', 'templates:watch', 'js:watch', 'static:watch']);
+gulp.task('test', ['client-jshint', 'mocha']);

@@ -7,7 +7,7 @@
   "main": "./server/ircanywhere",
   "scripts": {
     "start": "node ./server/ircanywhere start",
-    "test": "./node_modules/lab/bin/lab -clr console"
+    "test": "gulp test"
   },
   "contributors": [
     {
@@ -16,15 +16,17 @@
     }
   ],
   "devDependencies": {
+    "chai": "^1.9.1",
     "gulp": "~3.6.1",
     "gulp-clean": "~0.2.0",
     "gulp-concat-css": "^0.1.4",
     "gulp-ember-handlebars": "~0.6.0",
     "gulp-jshint": "^1.8.0",
     "gulp-less": "~1.2.3",
+    "gulp-mocha": "^0.5.2",
     "gulp-uglifyjs": "~0.2.0",
     "jshint-stylish": "^0.4.0",
-    "lab": "^3.0.0"
+    "mocha": "^1.21.0"
   },
   "dependencies": {
     "daemonize2": "~0.4.2",
@@ -34,7 +36,6 @@
     "hooks": "0.3.2",
     "irc-factory": "> 1.8.6",
     "jsonminify": "0.2.2",
-    "lab": "^3.0.0",
     "lodash": "~2.4.1",
     "mongodb": "~1.4.7",
     "simple-schema": "1.1.0",
