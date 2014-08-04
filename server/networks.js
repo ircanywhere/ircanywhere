@@ -111,9 +111,6 @@ NetworkManager.prototype.init = function() {
 
 	application.ee.on(['networks', 'delete'], function(id) {
 		delete Clients[id.toString()];
-
-		ircFactory.destroy(id, false);
-		// destroy the client if it hasn't been destroyed
 	});
 	// just sync clients up to this, instead of manually doing it
 	// we're asking for problems that way doing it this way means
