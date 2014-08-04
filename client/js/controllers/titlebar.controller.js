@@ -21,7 +21,6 @@ App.TitlebarController = Ember.ObjectController.extend({
 			}
 
 			this.socket.send('updateTab', tab.get('_id'), {hiddenUsers: !tab.get('hiddenUsers')});
-			this.set('showMenu', false);
 			// update & close the menu
 		},
 
@@ -43,7 +42,6 @@ App.TitlebarController = Ember.ObjectController.extend({
 			}
 
 			this.socket.send('updateTab', tab.get('_id'), {hiddenEvents: !tab.get('hiddenEvents')});
-			this.set('showMenu', false);
 			// update & close the menu
 		},
 
