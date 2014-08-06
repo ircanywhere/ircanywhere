@@ -51,16 +51,7 @@ function mongoDbSetup() {
 		platform = process.platform;
 
 	if(platform == "win32") {
-		if(fs.existsSync("C:\\Program Files\\MongoDB 2.6 Standard\\bin\\mongod.exe"))
-		{
-			global = true;
-			path = "C:\\Program Files\\MongoDB 2.6 Standard\\bin\\mongod.exe"
-			done();
-		}
-		else {
-			console.log(COLOUR.red, "Please install mongodb and restart the installation");
-			return;
-		}
+		done();
 	} else {
 		cp.exec('whereis mongod', function(error, stdout, stderr) {
 			if (!stdout || stdout === 'mongod:\n') {
@@ -148,7 +139,7 @@ function isMongoRunning(isGlobal, path) {
 	mongo.connect('mongodb://127.0.0.1:27017', function(err, db) {
 		if (err) {
 			if(process.platform == "win32") {
-				console.log(COLOUR.red, "Please start your mongo server then restart the installation.");
+				console.log(COLOUR.red, "Please make sure mongodb is installed and started then restart the installation.");
 				return;
 			}
 			console.log(COLOUR.blue, 'Starting MongoDB process. If this is your own MongoDB installation it might require some configuration...');
