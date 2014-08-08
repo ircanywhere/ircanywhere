@@ -47,32 +47,36 @@ function mongoDbSetup() {
 
 	var local = fs.existsSync('./build/mongodb/bin/mongod'),
 		global = false,
-		path;
+		path,
+		platform = process.platform;
 
-	cp.exec('whereis mongod', function(error, stdout, stderr) {
-		if (!stdout || stdout === 'mongod:\n') {
-			cp.exec('which mongod', function(error, stdout, stderr) {
-				if (!stdout) {
-					done();
-					return;
-				}
-				// it's not in the $PATH
-
-				path = stdout.trim();
-				global = true;
-				done();
-			});
-			return;
-		}
-		// whereis can't find it
-
-		path = stdout.split(' ')[1].trim() || stdout.split(' ')[0].trim();
-		// OSX does not use a label on output, linux does
-
-		global = true;
+	if(platform == "win32") {
 		done();
-	});
+	} else {
+		cp.exec('whereis mongod', function(error, stdout, stderr) {
+			if (!stdout || stdout === 'mongod:\n') {
+				cp.exec('which mongod', function(error, stdout, stderr) {
+					if (!stdout) {
+						done();
+						return;
+					}
+					// it's not in the $PATH
 
+					path = stdout.trim();
+					global = true;
+					done();
+				});
+				return;
+			}
+			// whereis can't find it
+
+			path = stdout.split(' ')[1].trim() || stdout.split(' ')[0].trim();
+			// OSX does not use a label on output, linux does
+
+			global = true;
+			done();
+		});
+	}
 	function done() {
 		if (!global && local) {
 			path = './build/mongodb/bin/mongod';
@@ -134,6 +138,10 @@ function isMongoRunning(isGlobal, path) {
 
 	mongo.connect('mongodb://127.0.0.1:27017', function(err, db) {
 		if (err) {
+			if(process.platform == "win32") {
+				console.log(COLOUR.red, "Please make sure mongodb is installed and started then restart the installation.");
+				return;
+			}
 			console.log(COLOUR.blue, 'Starting MongoDB process. If this is your own MongoDB installation it might require some configuration...');
 			console.log(LINE);
 

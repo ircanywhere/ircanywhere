@@ -43,11 +43,16 @@ Install Script
 The install script will automatically install MongoDB if needed, download node dependencies, start MongoDB correctly, create a default config file and compile the client side files.
 
 Note that the install script is only available if you downloaded the development version of **IRCAnywhere**.
+Note On windows mongodb has to be installed and started manually before running the install script.
 
 To run the install script, type this command: ::
 
     $ ./install.sh
-
+    
+On windows the command to start install is: ::
+    
+    > install.bat
+    
 If you already have MongoDB installed but not set up correctly with Oplog tailing, the script can do that for you as well, simply run: ::
 
     $ sudo ./install.sh
