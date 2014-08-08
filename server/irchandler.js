@@ -261,7 +261,6 @@ IRCHandler.prototype.join = function(client, message) {
 		networkManager.addTab(client, message.channel, 'channel', true);
 		ircFactory.send(client._id, 'mode', [message.channel]);
 		ircFactory.send(client._id, 'names', [message.channel]);
-
 		insertEvent();
 	} else {
 		channelManager.insertUsers(client._id, client.name, message.channel, [user])
@@ -451,7 +450,7 @@ IRCHandler.prototype.names = function(client, message) {
 		keys.sort();
 		users.sort();
 
-		if (!_.isEqual(keys, users)) {
+		if (!_.isEqual(keys, users) && message.channel !== '*') {
 			ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
 		}
 		// different lists.. lets do a /WHO
@@ -741,7 +740,7 @@ IRCHandler.prototype.list = function(client, message) {
  * @return void
  */
 IRCHandler.prototype.whois = function(client, message) {
-	if (!message.nickname || !message.username || !message.hostname || !message.realname) {
+	if (!message.nickname || !message.username || !message.hostname) {
 		return false;
 	}
 

@@ -47,10 +47,11 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 		user = user || false,
 		network = (client.name) ? client.name : client.server,
 		ours = (message.nickname === client.nick),
-		channel = (message.channel && !message.target) ? message.channel : message.target;
+		channel = (message.channel && !message.target) ? message.channel : message.target,
+		read = ours || client.clientConnected;
 
 	if (!message.channel && !message.target) {
-		var channel = null;
+		channel = null;
 	}
 	// dont get the tab id anymore, because if the tab is removed and rejoined, the logs are lost
 	// because the tab id is lost in the void. So we just refer to network and target now, target can also be null.
@@ -90,9 +91,9 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 					network: network,
 					target: target,
 					message: message,
-					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? (ours ? true : false) : true,
+					read: (type === 'action' || type === 'privmsg' || type === 'notice' || type === 'ctcp_request') ? read : true,
 					extra: {
-						self: (client.nick === message.nickname || client.nick === message.kicked) ? true : false,
+						self: (client.nick === message.nickname || client.nick === message.kicked),
 						highlight: eventManager.determineHighlight(client, message, type, ours),
 						prefix: prefixObject.prefix
 					}
@@ -246,6 +247,60 @@ EventManager.prototype.getPrefix = function(client, user) {
 	return {prefix: '', sort: 6};
 }
 
+/**
+ * Gets the most recent event from the database by its type.
+ *
+ * @param {String} type Event type
+ * @param {String} networkName Event network
+ * @param {String} userId Id of the user
+ * @returns {promise} Promise that resolves to event.
+ */
+EventManager.prototype.getEventByType = function (type, networkName, userId) {
+	var deferred = Q.defer();
+
+	application.Events.find({type: type, network: networkName, user: userId}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(event);
+	});
+
+	return deferred.promise;
+};
+
+/**
+ * Gets the message playback for an IRC server user since he was last seen.
+ *
+ * @param {String} networkName Network to get playback from
+ * @param {String} userId Id of the user
+ * @returns {promise} Promise that resolves to array of playback events.
+ */
+EventManager.prototype.getUserPlayback = function (networkName, userId) {
+	var deferred = Q.defer();
+
+	application.Events.find({read: false, network: networkName, user: userId})
+		.sort({"message.time": 1}).toArray(function(err, events) {
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(events);
+
+		application.Events.update({read: false, network: networkName, user: userId},
+			{$set: {read: true}}, {multi: true},
+			function (err) {
+				if (err) {
+					application.handleError(new Error(err));
+				}
+			});
+		// Mark all as read
+	});
+
+	return deferred.promise;
+};
 
 EventManager.prototype = _.extend(EventManager.prototype, hooks);
 

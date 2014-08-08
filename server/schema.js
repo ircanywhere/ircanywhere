@@ -27,6 +27,20 @@ exports.schema = {
 		type: 'boolean',
 		required: true
 	},
+	'ircServer': {
+		type: 'object',
+		required: true
+	},
+	'ircServer.enable': {
+		type: 'boolean',
+		required: true
+	},
+	'ircServer.port': {
+		type: 'number',
+		min: 1,
+		max: 65535,
+		required: false
+	},
 	'identd': {
 		type: 'object',
 		required: true

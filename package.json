@@ -35,13 +35,15 @@
     "express": "~3.4.0",
     "hooks": "0.3.2",
     "irc-factory": "> 1.8.6",
+    "irc-message": "^2.0.1",
     "jsonminify": "0.2.2",
     "lodash": "~2.4.1",
+    "moment": "^2.6.0",
     "mongodb": "~1.4.7",
+    "q": "~1.0.1",
     "simple-schema": "1.1.0",
     "sockjs": "~0.3.8",
-    "winston": "~0.7.2",
-    "q": "^1.0.1"
+    "winston": "~0.7.2"
   },
   "keywords": [
     "irc",

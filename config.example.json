@@ -37,6 +37,20 @@
 				 online when the main application closes. It'll also probably speed things up. It's recommended 
 				 to only ever set this to false when developing */
 
+	"ircServer": {
+		"enable": true,
+		/* -- required
+		 * -- boolean
+		 * -- usage: Whether to enable the IRC server or not. The IRC server allows you to connect from other
+					 clients to ircanywhere. */
+
+		"port": 6667
+		/* -- number
+		 * -- usage: The port to run the IRC server on, 6667 is the default IRC service port. */
+
+		/* TODO: SSL */
+ 	},
+
 	"identd": {
 		"enable": true,
 		/* -- required
