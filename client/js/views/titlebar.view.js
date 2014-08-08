@@ -15,12 +15,13 @@ App.TitlebarView = Ember.View.extend({
 	},
 
 	documentClick: function(e) {
-		if (e.target.className === 'dropdown-toggle' || e.target.className === 'dropdown-menu') {
-			return false;
-		}
-		// don't handle clicks if they're clicking the dropdown button
-
 		if (this.get('controller.showMenu')) {
+			var elem = Ember.$(e.target);
+			if (elem.closest('.dropdown-toggle').length) {
+				return false;
+			}
+			// don't handle clicks if they're clicking the dropdown button
+
 			this.get('controller').send('toggleProperty');
 		}
 	},

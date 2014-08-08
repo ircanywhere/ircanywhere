@@ -1,7 +1,7 @@
-var Lab = require('lab'),
-	helper = require('../../lib/helpers').Helpers;
+var helper = require('../../lib/helpers').Helpers,
+	expect = require('chai').expect;
 
-Lab.experiment('Helpers', function() {
+describe('Helpers', function() {
 	var fakeClientObject = {
 		internal: {
 			capabilities: {
@@ -25,100 +25,100 @@ Lab.experiment('Helpers', function() {
 		property: 1
 	};
 
-	Lab.test('exists should locate embedded properties correctly', function(done) {
-		Lab.expect(helper.exists(fakeClientObject, 'internal')).to.be.a('object');
+	it('exists should locate embedded properties correctly', function(done) {
+		expect(helper.exists(fakeClientObject, 'internal')).to.be.a('object');
 		done();
 	});
 
-	Lab.test('exists should evaluate invalid properties correctly', function(done) {
-		Lab.expect(helper.exists(false, 'internally')).to.equal(false);
-		Lab.expect(helper.exists(fakeClientObject, 'internally')).to.equal(false);
+	it('exists should evaluate invalid properties correctly', function(done) {
+		expect(helper.exists(false, 'internally')).to.equal(false);
+		expect(helper.exists(fakeClientObject, 'internally')).to.equal(false);
 		done();
 	});
 
-	Lab.test('trimInput should trim properly', function(done) {
-		Lab.expect(helper.trimInput(' dss  fds4  ')).to.equal('dss  fds4');
+	it('trimInput should trim properly', function(done) {
+		expect(helper.trimInput(' dss  fds4  ')).to.equal('dss  fds4');
 		done();
 	});
 
-	Lab.test('isValidName should check correct', function(done) {
-		Lab.expect(helper.isValidName('anameshorterthan35characters')).to.equal(true);
+	it('isValidName should check correct', function(done) {
+		expect(helper.isValidName('anameshorterthan35characters')).to.equal(true);
 		done();
 	});
 
-	Lab.test('isValidName should check incorrect', function(done) {
-		Lab.expect(helper.isValidName('anamelongerthan35charactersandsomemore')).to.equal(false);
+	it('isValidName should check incorrect', function(done) {
+		expect(helper.isValidName('anamelongerthan35charactersandsomemore')).to.equal(false);
 		done();
 	});
 
-	Lab.test('isValidNickname should check for valid nicknames', function(done) {
-		Lab.expect(helper.isValidNickname('avalidnickname')).to.be.a('array');
+	it('isValidNickname should check for valid nicknames', function(done) {
+		expect(helper.isValidNickname('avalidnickname')).to.be.a('array');
 		done();
 	});
 
-	Lab.test('isValidNickname should check for invalid nicknames', function(done) {
-		Lab.expect(helper.isValidNickname('aninvalid\nickname')).to.equal(null);
+	it('isValidNickname should check for invalid nicknames', function(done) {
+		expect(helper.isValidNickname('aninvalid\nickname')).to.equal(null);
 		done();
 	});
 
-	Lab.test('isValidEmail should check for valid emails', function(done) {
-		Lab.expect(helper.isValidEmail('a.valid.email@address.com')).to.be.a('array');
+	it('isValidEmail should check for valid emails', function(done) {
+		expect(helper.isValidEmail('a.valid.email@address.com')).to.be.a('array');
 		done();
 	});
 
-	Lab.test('isValidEmail should check for invalid emails', function(done) {
-		Lab.expect(helper.isValidEmail('a.valid.email@addresscom')).to.equal(null);
+	it('isValidEmail should check for invalid emails', function(done) {
+		expect(helper.isValidEmail('a.valid.email@addresscom')).to.equal(null);
 		done();
 	});
 
-	Lab.test('isValidPassword should check for valid passwords', function(done) {
-		Lab.expect(helper.isValidPassword('short')).to.equal(false);
+	it('isValidPassword should check for valid passwords', function(done) {
+		expect(helper.isValidPassword('short')).to.equal(false);
 		done();
 	});
 
-	Lab.test('isValidPassword should check for invalid passwords', function(done) {
-		Lab.expect(helper.isValidPassword('longer')).to.equal(true);
+	it('isValidPassword should check for invalid passwords', function(done) {
+		expect(helper.isValidPassword('longer')).to.equal(true);
 		done();
 	});
 
-	Lab.test('isChannel should check for valid channels', function(done) {
-		Lab.expect(helper.isChannel(fakeClientObject, '#chan')).to.equal(true);
-		Lab.expect(helper.isChannel(fakeClientObject, '&chan')).to.equal(true);
+	it('isChannel should check for valid channels', function(done) {
+		expect(helper.isChannel(fakeClientObject, '#chan')).to.equal(true);
+		expect(helper.isChannel(fakeClientObject, '&chan')).to.equal(true);
 		done();
 	});
 
-	Lab.test('isChannel should check for invalid channels', function(done) {
-		Lab.expect(helper.isChannel({}, 'chan')).to.equal(false);
-		Lab.expect(helper.isChannel(fakeClientObject, 'chan')).to.equal(false);
+	it('isChannel should check for invalid channels', function(done) {
+		expect(helper.isChannel({}, 'chan')).to.equal(false);
+		expect(helper.isChannel(fakeClientObject, 'chan')).to.equal(false);
 		done();
 	});
 
-	Lab.test('encodeChannel should encode channel names properly', function(done) {
-		Lab.expect(helper.encodeChannel('#chan')).to.equal('%23chan');
-		Lab.expect(helper.encodeChannel('##chan')).to.equal('%23%23chan');
+	it('encodeChannel should encode channel names properly', function(done) {
+		expect(helper.encodeChannel('#chan')).to.equal('%23chan');
+		expect(helper.encodeChannel('##chan')).to.equal('%23%23chan');
 		done();
 	});
 
-	Lab.test('decodeChannel should encode channel names properly', function(done) {
-		Lab.expect(helper.decodeChannel('%23chan')).to.equal('#chan');
-		Lab.expect(helper.decodeChannel('%23%23chan')).to.equal('##chan');
+	it('decodeChannel should encode channel names properly', function(done) {
+		expect(helper.decodeChannel('%23chan')).to.equal('#chan');
+		expect(helper.decodeChannel('%23%23chan')).to.equal('##chan');
 		done();
 	});
 
-	Lab.test('escape should escape values properly', function(done) {
-		Lab.expect(helper.escape('this.should.be.escaped')).to.equal('this\\.should\\.be\\.escaped');
+	it('escape should escape values properly', function(done) {
+		expect(helper.escape('this.should.be.escaped')).to.equal('this\\.should\\.be\\.escaped');
 		done();
 	});
 
-	Lab.test('cleanObjectIds should clean objects properly', function(done) {
-		Lab.expect(helper.cleanObjectIds(uncleanObject)._id).to.equal('[object Object]');
-		Lab.expect(helper.cleanObjectIds(uncleanObject)._bsontype).to.not.exist;
+	it('cleanObjectIds should clean objects properly', function(done) {
+		expect(helper.cleanObjectIds(uncleanObject)._id).to.equal('[object Object]');
+		expect(helper.cleanObjectIds(uncleanObject)._bsontype).to.not.exist;
 		done();
 	});
 
-	Lab.test('generateSalt should generate valid salts', function(done) {
-		Lab.expect(helper.generateSalt(10)).to.have.length(10);
-		Lab.expect(helper.generateSalt(10)).to.match(/[a-zA-Z0-9]/);
+	it('generateSalt should generate valid salts', function(done) {
+		expect(helper.generateSalt(10)).to.have.length(10);
+		expect(helper.generateSalt(10)).to.match(/[a-zA-Z0-9]/);
 		done();
 	});
 });
