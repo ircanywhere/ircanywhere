@@ -169,4 +169,41 @@
 	.hide-mobile {
 		display: none !important;
 	}
+
+	.modal {
+		width: 100%!important;
+		height: 100%!important;
+		max-height: 100%!important;
+		margin: 0!important;
+		.border-radius(0px)!important;
+
+		.clearfix {
+			margin-bottom: 10px;
+		}
+
+		label {
+			float: none!important;
+			width: auto;
+			display: block;
+			text-align: left;
+			padding-bottom: 7px;
+			border-bottom: 1px dotted #ddd;
+		}
+
+		.input {
+			margin: 10px 0;
+
+			.field:not(:last-child) {
+				display: block;
+				width: 90%;
+			}
+
+			input:not(.btn) {
+				width: 95%;
+			}
+
+			.tooltip {
+			}
+		}
+	}
 }
