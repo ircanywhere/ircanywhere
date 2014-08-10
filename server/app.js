@@ -319,7 +319,7 @@ Application.prototype.setupNode = function() {
 		json = {},
 		query = {_id: null},
 		defaultJson = {
-			endpoint: (this.config.ssl) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
+			endpoint: (this.config.secure) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
 			hostname: os.hostname(),
 			port: this.config.port,
 			ipAddress: '0.0.0.0'
@@ -410,7 +410,7 @@ Application.prototype.setupServer = function() {
 		app = express(),
 		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
 
-	if (application.config.ssl) {
+	if (application.config.secure) {
 		var https = require('https'),
 			options = {
 				key: fs.readFileSync('./private/certs/key.pem'),

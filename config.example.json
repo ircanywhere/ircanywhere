@@ -19,7 +19,7 @@
 	 * -- number
 	 * -- usage: The port to listen on */
 
-	"ssl": false,
+	"secure": false,
 	/* -- required
 	 * -- boolean
 	 * -- usage: Whether to setup the http server with SSL or not. Certificates will be required in
