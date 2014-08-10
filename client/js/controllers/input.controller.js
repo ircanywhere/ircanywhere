@@ -12,7 +12,7 @@ App.InputController = Ember.ObjectController.extend({
 	},
 
 	autoCompleteChar: function() {
-		return this.get('socket.users.0.profile.autoCompleteChar');
+		return this.get('socket.users.0.profile.autoCompleteChar') || ',';
 	}.property('socket.users.0.profile.autoCompleteChar'),
 
 	nick: function() {
