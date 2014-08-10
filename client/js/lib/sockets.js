@@ -272,6 +272,24 @@ Ember.Socket = Ember.Object.extend({
 		// figure out what event to push
 	},
 
+	_deleteWhere: function(type, query) {
+		var self = this,
+			collection = this.get(type),
+			records = this._find(true, type, query);
+
+		if (!collection) {
+			return false;
+		}
+
+		records.forEach(function(object) {
+			collection.removeObject(object);
+			// bump it out
+
+			self.emitter.determineEvent(type, 'delete', object);
+			// figure out what event to push
+		});
+	},
+
 	_search: function(query, obj) {
 		for (var key in query) {
 			if ((key in obj && query[key] === obj[key]) === false) {
@@ -284,25 +302,25 @@ Ember.Socket = Ember.Object.extend({
 	_find: function(many, type, query) {
 		var self = this,
 			collection = this.get(type),
-			collectoinSet;
+			collectionSet;
 		
 		if (!collection) {
 			return false;
 		}
 
 		if (many) {
-			collectoinSet = collection.filter(function(obj) {
+			collectionSet = collection.filter(function(obj) {
 				return self._search(query, obj);
 			});
 		} else {
-			collectoinSet = collection.find(function(obj) {
+			collectionSet = collection.find(function(obj) {
 				return self._search(query, obj);
 			});
 		}
 		// attempt to find
 
-		if (collectoinSet) {
-			return (many) ? collectoinSet.toArray() : collectoinSet;
+		if (collectionSet) {
+			return (many) ? collectionSet.toArray() : collectionSet;
 		} else {
 			return false;
 		}

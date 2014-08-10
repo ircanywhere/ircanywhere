@@ -26,14 +26,20 @@ App.InputController = Ember.ObjectController.extend({
 		
 		sendCommand: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true),
+				split = this.get('inputValue').split(' '),
+				command = split[0],
 				commandObject = {
 					command: this.get('inputValue'),
 					network: tab.network,
 					target: tab.target
 				};
 
-			this.socket.send('sendCommand', commandObject);
-			// unlike the last codebase
+			if (command.substr(0, 1) === '/' && this.commands[command]) {
+				this.commands[command].call(this, tab, split.slice(1));
+			} else {
+				this.socket.send('sendCommand', commandObject);
+				// unlike the last codebase
+			}
 
 			commandObject.timestamp = +new Date();
 			this.get('socket.commands').pushObject(commandObject);
@@ -114,6 +120,14 @@ App.InputController = Ember.ObjectController.extend({
 				this.set('commandIndex', index);
 			}
 			// set a new index and lastCommand
+		}
+	},
+
+	commands: {
+		'/clear': function(tab, params) {
+			var socketEngine = this.get('socket');
+
+			socketEngine._deleteWhere('events', {network: tab.networkName, target: tab.target});
 		}
 	}
 });
