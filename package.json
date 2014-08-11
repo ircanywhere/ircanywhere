@@ -19,11 +19,13 @@
     "chai": "^1.9.1",
     "gulp": "~3.6.1",
     "gulp-clean": "~0.2.0",
+    "gulp-concat": "^2.3.4",
     "gulp-concat-css": "^0.1.4",
     "gulp-ember-handlebars": "~0.6.0",
     "gulp-jshint": "^1.8.0",
     "gulp-less": "~1.2.3",
     "gulp-mocha": "^0.5.2",
+    "gulp-sourcemaps": "^1.1.1",
     "gulp-uglifyjs": "~0.2.0",
     "jshint-stylish": "^0.4.0",
     "mocha": "^1.21.0"

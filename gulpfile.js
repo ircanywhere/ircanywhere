@@ -5,7 +5,9 @@ var gulp = require('gulp'),
 	uglify = require('gulp-uglifyjs'),
 	clean = require('gulp-clean'),
 	jshint = require('gulp-jshint'),
-	mocha = require('gulp-mocha');
+	mocha = require('gulp-mocha'),
+	concat = require('gulp-concat'),
+	sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('clean', function() {
 	gulp.src('./client/build', {read: false})
@@ -13,7 +15,12 @@ gulp.task('clean', function() {
 });
 
 gulp.task('css', function() {
-	gulp.src(['./client/less/**/*.less', './modules/*/client/less/**/*.less', 'client/ext/*.css'])
+	gulp.src([
+		'client/ext/*.css',
+		'./client/less/**/!(mobile)*.less',  // make sure mobile.less is last
+		'./client/less/mobile.less',
+		'./modules/*/client/less/**/*.less'
+	])
 		.pipe(less({
 			paths: ['./client/less']
 		}))
@@ -26,7 +33,6 @@ gulp.task('templates', function() {
 		.pipe(handlebars({
 			outputType: 'browser'
 		}))
-		.pipe(gulp.dest('./client/build/templates'))
 		.pipe(uglify('templates.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
@@ -35,9 +41,19 @@ gulp.task('templates', function() {
 		.pipe(gulp.dest('./client/build'))
 });
 
+gulp.task('templates:debug', function() {
+	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
+		.pipe(handlebars({
+			outputType: 'browser'
+		}))
+		.pipe(sourcemaps.init())
+		.pipe(concat('templates.js'))
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('./client/build'))
+});
+
 gulp.task('js', function() {
 	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js', './modules/*/client/js/**/*.js'])
-		.pipe(gulp.dest('./client/build/js'))
 		.pipe(uglify('ircanywhere.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
@@ -46,15 +62,30 @@ gulp.task('js', function() {
 		.pipe(gulp.dest('./client/build'))
 });
 
+gulp.task('js:debug', function() {
+	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js', './modules/*/client/js/**/*.js'])
+		.pipe(sourcemaps.init())
+		.pipe(concat('ircanywhere.js'))
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('./client/build'))
+});
+
 gulp.task('dependencies', function() {
 	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
-		.pipe(gulp.dest('./client/build/ext'))
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
 			mangle: true
 		}))
 		.pipe(gulp.dest('./client/build'))
+});
+
+gulp.task('dependencies:debug', function() {
+	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
+		.pipe(sourcemaps.init())
+		.pipe(concat('dependencies.js'))
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest('client/build'))
 });
 
 gulp.task('static', function() {
@@ -100,3 +131,4 @@ gulp.task('static:watch', function() {
 gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
 gulp.task('watch', ['default', 'css:watch', 'templates:watch', 'js:watch', 'static:watch']);
 gulp.task('test', ['client-jshint', 'mocha']);
+gulp.task('debug', ['css', 'templates:debug', 'js:debug', 'dependencies:debug', 'static']);
