@@ -22,6 +22,7 @@ App.InputController = Ember.ObjectController.extend({
 	actions: {
 		resetTabCompletion: function() {
 			this.tabCompletionNicks = [];
+			this.set('tabCompletionIndex', 0);
 		},
 		
 		sendCommand: function() {
