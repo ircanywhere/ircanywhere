@@ -110,6 +110,13 @@ You can use a program called mon_ to keep the process running. You should use ``
 
 If you're running in a production environment it would be better to run this behind a nginx proxy or similar. You can see install instructions at `reverse proxies`_ section in the documentation.
 
+Connecting a client
+~~~~~~~~~~~~~~~~~~~
+
+IRCAnywhere has an built-in IRC server that allows you to connect using a regular IRC client. To enable the irc server make sure your ``ircServer.enable`` configuration is set to ``true`` and ``ircServer.port`` is set appropriately in your ``config.json`` file.
+
+To connect a client, use the email you used to register as your login name and set your password accordingly. If you have multiple networks, you need to inform which network you're connecting to in your login by appending your login email with a ``/`` and the network name. For example ``my@email.com/freenode``.
+
 Updating
 ~~~~~~~~
 

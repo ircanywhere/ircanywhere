@@ -147,7 +147,9 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
 		}
 		// is this a command? if it's prefixed with one / then yes
 	} else {
-		command = (command.charAt(1) === '/') ? command.substr(1) : command;
+		if (command.charAt(0) === '/' && command.charAt(1) === '/') {
+			command = command.substr(1);
+		}
 		// strip one of the /'s off if it has two at the start
 
 		this.msg(user, client, target, command.split(' '), true);
