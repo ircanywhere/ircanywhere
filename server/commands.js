@@ -362,10 +362,10 @@ CommandManager.prototype.cycle = function(user, client, target, params) {
  */
 CommandManager.prototype.topic = function(user, client, target, params) {
 	if (params.length === 0) {
-		return false;
-	}
-
-	if (helper.isChannel(client, params[0])) {
+		ircFactory.send(client._id, 'topic', [target]);
+	} else if (helper.isChannel(client, params[0]) && params.length === 1) {
+		ircFactory.send(client._id, 'topic', [params[0]]);
+	} else if (helper.isChannel(client, params[0]) && params.length > 1) {
 		var topic = [params.slice(1).join(' ')];
 		ircFactory.send(client._id, 'topic', [params[0]].concat(topic));
 	} else {

@@ -504,7 +504,16 @@ IRCHandler.prototype.topic = function(client, message) {
 		return false;
 	}
 
-	channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
+	var split = message.topicBy.split(/[!@]/);
+
+	message.nickname = split[0];
+	message.username = split[1];
+	message.hostname = split[2];
+	// reform this object
+
+	eventManager.insertEvent(client, message, 'topic', function() {
+		channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
+	});
 }
 
 /**
@@ -527,7 +536,7 @@ IRCHandler.prototype.topic_change = function(client, message) {
 	message.hostname = split[2];
 	// reform this object
 
-	eventManager.insertEvent(client, message, 'topic', function() {
+	eventManager.insertEvent(client, message, 'topic_change', function() {
 		channelManager.updateTopic(client._id, message.channel, message.topic, message.topicBy);
 	});
 }
