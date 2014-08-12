@@ -94,7 +94,7 @@ App.InputController = Ember.ObjectController.extend({
 			}
 		},
 
-		toggleUp: function() {
+		toggleDown: function() {
 			var index = this.get('commandIndex') - 1,
 				command = this.get('socket.commands')[index];
 
@@ -108,7 +108,7 @@ App.InputController = Ember.ObjectController.extend({
 			// set a new index and lastCommand
 		},
 
-		toggleDown: function() {
+		toggleUp: function() {
 			var index = this.get('commandIndex') + 1;
 				index = (index === (this.get('socket.commands').length + 1)) ? 0 : index;
 			var command = this.get('socket.commands').objectAt(index);
