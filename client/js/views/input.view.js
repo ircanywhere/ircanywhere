@@ -34,6 +34,7 @@ App.InputView = Ember.View.extend({
 			if (App.get('size') !== 'large') {
 				document.activeElement.blur();
 			}
+			this.get('controller').send('resetTabCompletion');
 		} else if (keyCode === key.tab) {
 			this.get('controller').send('tabComplete');
 			e.preventDefault();
