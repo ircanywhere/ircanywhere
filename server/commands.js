@@ -9,8 +9,7 @@
 
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	helper = require('../lib/helpers').Helpers,
-	mongo = require('mongodb');
+	helper = require('../lib/helpers').Helpers;
 
 /**
  * Responsible for handling all incoming commands from websocket clients
@@ -58,7 +57,7 @@ CommandManager.prototype.init = function() {
 	this.createAlias('/reconnect', '/connect');
 	this.createAlias('/nickserv', '/ns');
 	// setup aliases
-}
+};
 
 /**
  * Sets +b/-b on a specific channel on a chosen client, not extendable
@@ -72,8 +71,7 @@ CommandManager.prototype.init = function() {
  * @return void
  */
 CommandManager.prototype._ban = function(client, channel, nickname, ban) {
-	var nickname = params[0],
-		mode = (ban) ? '+b' : '-b';
+	var mode = (ban) ? '+b' : '-b';
 
 	application.ChannelUsers.findOne({
 		network: client.name,
@@ -87,7 +85,7 @@ CommandManager.prototype._ban = function(client, channel, nickname, ban) {
 
 		ircFactory.send(client._id, 'mode', [channel, mode, '*@' + user.hostname]);
 	});
-}
+};
 
 /**
  * Creates an alias from the first parameter to the remaining ones.
@@ -116,7 +114,7 @@ CommandManager.prototype.createAlias = function() {
 		alias = alias.substr(1);
 		self[alias] = self[original];
 	});
-}
+};
 
 /**
  * Parse a command string and determine where to send it after that based on what it is
@@ -131,7 +129,7 @@ CommandManager.prototype.createAlias = function() {
  */
 CommandManager.prototype.parseCommand = function(user, client, target, command, id) {
 	if (client === undefined) {
-		return false;
+		return;
 	}
 	// we've recieved a key for an invalid network
 
@@ -158,7 +156,7 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
 
 	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date()}}, {safe: false});
 	// update last seen time
-}
+};
 
 /**
  * '/nickserv' command
@@ -167,14 +165,14 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @param {Boolean} out Used to force the message to target or params[0]
  * @param {ObjectID} id The object id of the command so we can remove it if we need to
  * @return void
  */
 CommandManager.prototype.nickserv = function(user, client, target, params, out, id) {
 	if (params.length === 0) {
-		return false;
+		return;
 	}
 
 	ircFactory.send(client._id, 'raw', ['NICKSERV'].concat(params));
@@ -183,7 +181,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands
-}
+};
 
 /**
  * '/msg' command
@@ -222,7 +220,7 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands
-}
+};
 
 /**
  * '/notice' command
@@ -231,7 +229,7 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.notice = function(user, client, target, params) {
@@ -241,7 +239,7 @@ CommandManager.prototype.notice = function(user, client, target, params) {
 
 	ircFactory.send(client._id, 'notice', [target, params.join(' '), true]);
 	// again append with true
-}
+};
 
 /**
  * '/me' command
@@ -250,7 +248,7 @@ CommandManager.prototype.notice = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.me = function(user, client, target, params) {
@@ -260,7 +258,7 @@ CommandManager.prototype.me = function(user, client, target, params) {
 
 	ircFactory.send(client._id, 'me', [target, params.join(' '), true]);
 	// append with true
-}
+};
 
 /**
  * '/join' command
@@ -269,16 +267,19 @@ CommandManager.prototype.me = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.join = function(user, client, target, params) {
+	var channel,
+		password;
+
 	if (params.length > 0 && helper.isChannel(client, params[0])) {
-		var channel = params[0],
-			password = (params.length === 1) ? '' : params[1];
+		channel = params[0];
+		password = (params.length === 1) ? '' : params[1];
 	} else {
-		var channel = target,
-			password = (params.length === 0) ? '' : params[0];
+		channel = target;
+		password = (params.length === 0) ? '' : params[0];
 	}
 	// look for our parameters, we're expecting '#channel password' here, or '#channel'
 	// the original IRC protocol accepts '#channel1,#channel2' this command doesn't at
@@ -304,7 +305,7 @@ CommandManager.prototype.join = function(user, client, target, params) {
 
 	application.Networks.update({_id: client._id}, {$set: {channels: client.channels}}, {safe: false});
 	// we'll also store it in our reconnect settings
-}
+};
 
 /**
  * '/part' command
@@ -313,15 +314,17 @@ CommandManager.prototype.join = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.part = function(user, client, target, params) {
+	var channel;
+
 	if (params.length !== 0 && helper.isChannel(client, params[0])) {
-		var channel = params[0];
+		channel = params[0];
 		ircFactory.send(client._id, 'part', params);
 	} else {
-		var channel = target;
+		channel = target;
 		ircFactory.send(client._id, 'part', [target].concat(params));
 	}
 
@@ -330,7 +333,7 @@ CommandManager.prototype.part = function(user, client, target, params) {
 		application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
 	}
 	// does the index exist? lets remove it if so
-}
+};
 
 /**
  * '/cycle' command
@@ -339,7 +342,7 @@ CommandManager.prototype.part = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.cycle = function(user, client, target, params) {
@@ -350,7 +353,7 @@ CommandManager.prototype.cycle = function(user, client, target, params) {
 		ircFactory.send(client._id, 'part', [target].concat(params));
 		ircFactory.send(client._id, 'join', [target].concat(params));
 	}
-}
+};
 
 /**
  * '/topic' command
@@ -359,23 +362,25 @@ CommandManager.prototype.cycle = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.topic = function(user, client, target, params) {
+	var topic;
+
 	if (params.length === 0) {
 		ircFactory.send(client._id, 'topic', [target]);
 	} else if (helper.isChannel(client, params[0]) && params.length === 1) {
 		ircFactory.send(client._id, 'topic', [params[0]]);
 	} else if (helper.isChannel(client, params[0]) && params.length > 1) {
-		var topic = [params.slice(1).join(' ')];
+		topic = [params.slice(1).join(' ')];
 		ircFactory.send(client._id, 'topic', [params[0]].concat(topic));
 	} else {
-		var topic = [params.join(' ')];
+		topic = [params.join(' ')];
 		ircFactory.send(client._id, 'topic', [target].concat(topic));
 	}
 	// we need to do some altering on the topic becasue it has multiple spaces
-}
+};
 
 /**
  * '/mode' command
@@ -384,7 +389,7 @@ CommandManager.prototype.topic = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.mode = function(user, client, target, params) {
@@ -393,7 +398,7 @@ CommandManager.prototype.mode = function(user, client, target, params) {
 	} else {
 		ircFactory.send(client._id, 'mode', [target].concat(params));
 	}
-}
+};
 
 /**
  * '/invite' command
@@ -402,7 +407,7 @@ CommandManager.prototype.mode = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.invite = function(user, client, target, params) {
@@ -411,7 +416,7 @@ CommandManager.prototype.invite = function(user, client, target, params) {
 	} else {
 		ircFactory.send(client._id, 'raw', ['INVITE', params[0], target]);
 	}
-}
+};
 
 /**
  * '/kick' command
@@ -420,7 +425,7 @@ CommandManager.prototype.invite = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.kick = function(user, client, target, params) {
@@ -429,7 +434,7 @@ CommandManager.prototype.kick = function(user, client, target, params) {
 	} else {
 		ircFactory.send(client._id, 'raw', ['KICK', target].concat(params));
 	}
-}
+};
 
 /**
  * '/kickban' command
@@ -438,14 +443,14 @@ CommandManager.prototype.kick = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.kickban = function(user, client, target, params) {
-	this['ban'](user, client, target, params);
-	this['kick'](user, client, target, params);
+	this.ban(user, client, target, params);
+	this.kick(user, client, target, params);
 	// just straight up alias the commands
-}
+};
 
 /**
  * '/ban' command
@@ -454,13 +459,15 @@ CommandManager.prototype.kickban = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.ban = function(user, client, target, params) {
-	this._ban(client, target, nickname, ban, '+b');
+	var nickname = params[0];
+
+	this._ban(client, target, nickname, true);
 	// +b
-}
+};
 
 /**
  * '/unban' command
@@ -469,13 +476,15 @@ CommandManager.prototype.ban = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.unban = function(user, client, target, params) {
-	this._ban(client, target, nickname, ban, '-b');
+	var nickname = params[0];
+
+	this._ban(client, target, nickname, false);
 	// -b
-}
+};
 
 /**
  * '/nick' command
@@ -484,14 +493,14 @@ CommandManager.prototype.unban = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.nick = function(user, client, target, params) {
 	if (params.length > 0) {
 		ircFactory.send(client._id, 'raw', ['NICK'].concat(params));
 	}
-}
+};
 
 /**
  * '/ctcp' command
@@ -500,7 +509,7 @@ CommandManager.prototype.nick = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.ctcp = function(user, client, target, params) {
@@ -510,7 +519,7 @@ CommandManager.prototype.ctcp = function(user, client, target, params) {
 	if (user && type) {
 		ircFactory.send(client._id, 'privmsg', [targ, '\x01' + type.toUpperCase() + '\x01', true]);
 	}
-}
+};
 
 /**
  * '/away' command
@@ -519,13 +528,13 @@ CommandManager.prototype.ctcp = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.away = function(user, client, target, params) {
 	var message = (params.length === 0) ? 'Away from client' : params.join(' ');
 	ircFactory.send(client._id, 'raw', ['AWAY', message]);
-}
+};
 
 /**
  * '/unaway' command
@@ -533,13 +542,11 @@ CommandManager.prototype.away = function(user, client, target, params) {
  * @method unaway
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
- * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.unaway = function(user, client, target, params) {
+CommandManager.prototype.unaway = function(user, client) {
 	ircFactory.send(client._id, 'raw', ['AWAY']);
-}
+};
 
 /**
  * '/close' command
@@ -548,10 +555,9 @@ CommandManager.prototype.unaway = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.close = function(user, client, target, params) {
+CommandManager.prototype.close = function(user, client, target) {
 	var tlower = target.toLowerCase();
 
 	application.Tabs.findOne({target: tlower, network: client._id}, function(err, tab) {
@@ -586,7 +592,7 @@ CommandManager.prototype.close = function(user, client, target, params) {
 		}
 	});
 	// get the tab in question
-}
+};
 
 /**
  * '/query' command
@@ -595,12 +601,11 @@ CommandManager.prototype.close = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.query = function(user, client, target, params) {
+CommandManager.prototype.query = function(user, client, target) {
 	networkManager.addTab(client, target, 'query', true);
-}
+};
 
 /**
  * '/quit' command
@@ -608,16 +613,14 @@ CommandManager.prototype.query = function(user, client, target, params) {
  * @method quit
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
- * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.quit = function(user, client, target, params) {
+CommandManager.prototype.quit = function(user, client) {
 	networkManager.changeStatus({_id: client._id}, networkManager.flags.disconnected);
 	// mark as connecting and mark the tab as active again
 
 	ircFactory.destroy(client._id, true);
-}
+};
 
 /**
  * '/reconnect' command
@@ -625,11 +628,9 @@ CommandManager.prototype.quit = function(user, client, target, params) {
  * @method reconnect
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
- * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.reconnect = function(user, client, target, params) {
+CommandManager.prototype.reconnect = function(user, client) {
 	if (helper.exists(client, 'internal.connected') || helper.exists(client, 'internal.connecting')) {
 		ircFactory.send(client._id, 'reconnect', []);
 	} else {
@@ -639,7 +640,7 @@ CommandManager.prototype.reconnect = function(user, client, target, params) {
 
 	networkManager.changeStatus(client._id, networkManager.flags.connecting);
 	// mark as connecting and mark the tab as active again
-}
+};
 
 /**
  * '/list' command
@@ -648,7 +649,7 @@ CommandManager.prototype.reconnect = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.list = function(user, client, target, params) {
@@ -666,7 +667,7 @@ CommandManager.prototype.list = function(user, client, target, params) {
 
 	ircFactory.send(client._id, 'list', [search, page, limit]);
 	rpcHandler.push(client.internal.userId, 'openList', {search: search, page: page, network: client.name});
-}
+};
 
 /**
  * '/whois' command
@@ -675,7 +676,7 @@ CommandManager.prototype.list = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.whois = function(user, client, target, params) {
@@ -684,7 +685,7 @@ CommandManager.prototype.whois = function(user, client, target, params) {
 	}
 	
 	ircFactory.send(client._id, 'raw', ['WHOIS'].concat(params));
-}
+};
 
 /**
  * '/raw' command
@@ -693,7 +694,7 @@ CommandManager.prototype.whois = function(user, client, target, params) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
- * @param {String} command The command string
+ * @param {String} params The command string
  * @return void
  */
 CommandManager.prototype.raw = function(user, client, target, params) {
@@ -714,7 +715,7 @@ CommandManager.prototype.raw = function(user, client, target, params) {
 	// 		we don't really ever need to do request a who list from the server
 	// 		for a channel if we know we're in the channel because we have it stored in
 	// 		a database..
-}
+};
 
 CommandManager.prototype = _.extend(CommandManager.prototype, hooks);
 

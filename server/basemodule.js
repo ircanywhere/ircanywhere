@@ -96,7 +96,7 @@ Module.prototype.extend = function(object) {
 	}
 
 	return object;
-}
+};
 
 /**
  * Used to bind hooks for a function on a core object
@@ -120,10 +120,10 @@ Module.prototype.bindFunction = function(key, classObject, split, fn, object) {
 	}
 
 	if (hook === 'bind') {
-		classObject.__proto__[method] = fn.bind(object, classObject);
+		Object.getPrototypeOf(classObject)[method] = fn.bind(object, classObject);
 	} else {
 		classObject[hook](method, fn.bind(object));
 	}
-}
+};
 
 exports.Module = Module;

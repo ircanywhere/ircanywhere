@@ -96,13 +96,15 @@ gulp.task('static', function() {
 gulp.task('client-jshint', function () {
 	gulp.src(['./client/js/**/*.js'])
 		.pipe(jshint('./client/.jshintrc'))
-		.pipe(jshint.reporter('jshint-stylish'));
+		.pipe(jshint.reporter('jshint-stylish'))
+		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('server-jshint', function () {
 	gulp.src(['./server/*.js'])
 		.pipe(jshint('./server/.jshintrc'))
-		.pipe(jshint.reporter('jshint-stylish'));
+		.pipe(jshint.reporter('jshint-stylish'))
+		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('jshint', ['server-jshint', 'client-jshint']);
@@ -130,5 +132,5 @@ gulp.task('static:watch', function() {
 
 gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
 gulp.task('watch', ['default', 'css:watch', 'templates:watch', 'js:watch', 'static:watch']);
-gulp.task('test', ['client-jshint', 'mocha']);
+gulp.task('test', ['jshint', 'mocha']);
 gulp.task('debug', ['css', 'templates:debug', 'js:debug', 'dependencies:debug', 'static']);
