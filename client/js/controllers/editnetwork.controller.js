@@ -43,13 +43,13 @@ App.EditnetworkController = Ember.ObjectController.extend({
 			
 			Ember.$.post('/api/editnetwork', this.getProperties('networkId', 'server', 'secure', 'port', 'sasl', 'saslUsername', 'password', 'nick', 'name'), function(data) {
 				self[(data.failed) ? 'networkFail' : 'networkSuccess'](data);
-			}).fail(function(err) {
+			}).fail(function() {
 				self.networkFail(false);
 			});
 		}
 	},
 
-	networkSuccess: function(data) {
+	networkSuccess: function() {
 		this.set('errors', false);
 		this.send('closeModal');
 	},

@@ -125,7 +125,7 @@ App.InputController = Ember.ObjectController.extend({
 	},
 
 	commands: {
-		'/clear': function(tab, params) {
+		'/clear': function(tab) {
 			var socketEngine = this.get('socket');
 
 			socketEngine._deleteWhere('events', {network: tab.networkName, target: tab.target});
