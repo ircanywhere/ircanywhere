@@ -9,6 +9,7 @@
 
 var net = require('net'),
 	hooks = require('hooks'),
+	_ = require('lodash'),
 	ServerSession = require('./serverSession').ServerSession;
 
 /**
@@ -76,5 +77,7 @@ IRCServer.prototype.init = function() {
 IRCServer.prototype.onConnect = function(socket) {
 	new ServerSession(socket);
 };
+
+IRCServer.prototype = _.extend(IRCServer.prototype, hooks);
 
 exports.IRCServer = IRCServer;

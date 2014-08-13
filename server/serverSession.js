@@ -7,11 +7,12 @@
  * @author Rodrigo Silveira
  */
 
-var IrcMessage = require('irc-message').parseMessage,
+var parseMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
 	moment = require('moment'),
 	helper = require('../lib/helpers').Helpers,
-	Q = require('q');
+	Q = require('q'),
+	hooks = require('hooks');
 
 /**
  * Handles the communication between an IRC client and ircanywhere's IRC server. Instantiated on
@@ -41,14 +42,14 @@ ServerSession.prototype.init = function() {
 	var self = this;
 
 	this.socket.on('data', function(data) {
-		var lines = data.toString().split("\r\n");
+		var lines = data.toString().split('\r\n');
 		// One command por line
 
 		lines.pop();
 		// last line will be blank, ignore
 
 		lines.forEach(function(line) {
-			var message = IrcMessage(line),
+			var message = parseMessage(line),
 				command = message.command.toLowerCase();
 
 			if (self[command]) {
@@ -104,7 +105,7 @@ ServerSession.prototype.nick = function(message) {
 		this.clientNick = message.params[0];
 		// first nick, just store it locally for the welcome msg.
 	} else {
-		this.onClientMessage(message, 'nick')
+		this.onClientMessage(message, 'nick');
 	}
 };
 
@@ -112,7 +113,7 @@ ServerSession.prototype.nick = function(message) {
  * Handles QUIT message from client. Disconnects the user.
  */
 ServerSession.prototype.quit = function() {
-	this.sendRaw("ERROR :Quitting");
+	this.sendRaw('ERROR :Quitting');
 	this.disconnectUser();
 };
 
@@ -286,7 +287,7 @@ ServerSession.prototype.sendWelcome = function () {
 		nick = nick || network.nick;
 
 		function setNick(rawMessage) {
-			var message = new IrcMessage(rawMessage);
+			var message = new parseMessage(rawMessage);
 
 			message.params[0] = nick;
 
@@ -331,7 +332,7 @@ ServerSession.prototype.sendWelcome = function () {
 		})
 		.then(function (event) {
 			if (event) {
-				var message = IrcMessage(event.message.raw);
+				var message = parseMessage(event.message.raw);
 
 				message.prefix = network.nick;
 				message.params[0] = network.nick;
@@ -361,13 +362,13 @@ ServerSession.prototype.sendJoins = function () {
 			return Q.all(tabs.map(function (tab) {
 				var deferred = Q.defer();
 
-				application.Events.find({type: 'join', 'extra.self': true, network: network.name, user: self.user._id, target: tab.target}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+				application.Events.find({type: 'join', 'extra.self': true, network: network.name, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
 						deferred.reject(err);
 						return;
 					}
 
-					var message = IrcMessage(event.message.raw),
+					var message = parseMessage(event.message.raw),
 						hostmask = message.parseHostmaskFromPrefix();
 
 					message.prefix = network.nick;
@@ -409,14 +410,14 @@ ServerSession.prototype.sendPlayback = function () {
 				now = moment().zone(timezoneOffset);
 
 			events.forEach(function (event) {
-				var message = new IrcMessage(event.message.raw),
+				var message = new parseMessage(event.message.raw),
 					timestamp = moment(event.message.time).zone(timezoneOffset),
 					target = message.params[0],
 					daysAgo,
 					daysAgoString,
 					timestampStr,
 					isChannel = helper.isChannelString(target),
-					sender = isChannel ? "***!ircanywhere@ircanywhere.com" : message.prefix,
+					sender = isChannel ? '***!ircanywhere@ircanywhere.com' : message.prefix,
 					key = isChannel ? target : event.message.nickname;
 
 				if (!channelsSent[key]) {
@@ -559,10 +560,12 @@ ServerSession.prototype.onClientMessage = function(message, command) {
  */
 ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {
-		rawMessage = rawMessage.join("\r\n");
+		rawMessage = rawMessage.join('\r\n');
 	}
 
-	this.socket.write(rawMessage + "\r\n");
+	this.socket.write(rawMessage + '\r\n');
 };
+
+ServerSession.prototype = _.extend(ServerSession.prototype, hooks);
 
 exports.ServerSession = ServerSession;
