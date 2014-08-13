@@ -48,7 +48,7 @@ gulp.task('templates:debug', function() {
 		}))
 		.pipe(sourcemaps.init())
 		.pipe(concat('templates.js'))
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('./client/build'))
 });
 
@@ -66,7 +66,7 @@ gulp.task('js:debug', function() {
 	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js', './modules/*/client/js/**/*.js'])
 		.pipe(sourcemaps.init())
 		.pipe(concat('ircanywhere.js'))
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('./client/build'))
 });
 
@@ -84,7 +84,7 @@ gulp.task('dependencies:debug', function() {
 	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
 		.pipe(sourcemaps.init())
 		.pipe(concat('dependencies.js'))
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('client/build'))
 });
 
