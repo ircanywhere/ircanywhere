@@ -8,7 +8,6 @@
 */
 
 var _ = require('lodash'),
-	crypto = require('crypto'),
 	util = require('util'),
 	factory = require('irc-factory').Api,
 	helper = require('../lib/helpers').Helpers;
@@ -45,10 +44,10 @@ function IRCFactory() {
  * @member {Object} options The `irc-factory` options to use
  */
 IRCFactory.prototype.options = {
-	events: "tcp://127.0.0.1:31920",
-	rpc: "tcp://127.0.0.1:31930",
+	events: 'tcp://127.0.0.1:31920',
+	rpc: 'tcp://127.0.0.1:31930',
 	automaticSetup: true
-}
+};
 
 /**
  * Initiates the irc factory and it's connection and sets up an event handler
@@ -89,7 +88,7 @@ IRCFactory.prototype.init = function() {
 			self.handleEvent(message.event, message.message);
 		}
 	});
-}
+};
 
 /**
  * Handles incoming factory events, events are expected to come in the following format: ::
@@ -105,7 +104,7 @@ IRCFactory.prototype.init = function() {
  * More advanced docs can be found at https://github.com/ircanywhere/irc-factory/wiki/Events
  *
  * @method handleEvent
- * @param {Array[String]} event A valid event array from irc-factory `['52d3fc718132f8486dcde1d0', 'privmsg']`
+ * @param {[String]} event A valid event array from irc-factory `['52d3fc718132f8486dcde1d0', 'privmsg']`
  * @param {Object} object A valid event object from irc-factory
  * @return void
  */
@@ -127,7 +126,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 	if (application.verbose) {
 		console.log(new Date().toJSON(), '-', util.inspect({key: key, event: e, data: object}, {colors: true}));
 	}
-}
+};
 
 /**
  * Sends the command to `irc-factory` to create a new irc client with the given settings.
@@ -147,7 +146,7 @@ IRCFactory.prototype.create = function(network) {
 
 	this.rpc.emit('createClient', key, network);
 	application.logger.log('info', 'creating irc client', helper.cleanObjectIds(_.omit(Clients[key], 'internal')));
-}
+};
 
 /**
  * Sends the command to destroy a client with the given key. If the client doesn't exist
@@ -175,7 +174,7 @@ IRCFactory.prototype.destroy = function(key, forced) {
 	}
 
 	this.rpc.emit('destroyClient', key.toString());
-}
+};
 
 /**
  * Calls an RPC command on the irc-factory client, usually used to send
@@ -189,6 +188,6 @@ IRCFactory.prototype.destroy = function(key, forced) {
  */
 IRCFactory.prototype.send = function(key, command, args) {
 	this.rpc.emit('call', key.toString(), command, args);
-}
+};
 
 exports.IRCFactory = IRCFactory;

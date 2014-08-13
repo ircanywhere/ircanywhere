@@ -48,7 +48,7 @@ IdentdServer.prototype.init = function() {
 		socket.buffer = '';
 		socket.on('data', function(data) {
 			self.onData(socket, data);
-		})
+		});
 	});
 
 	this.server.on('error', function(error) {
@@ -74,7 +74,7 @@ IdentdServer.prototype.init = function() {
 		var address = self.server.address();
 		application.logger.log('info', 'identd server listening on', address.address, address.port);
 	});
-}
+};
 
 /**
  * Handles incoming data to the identd server, this shouldn't ever be called, but the documentation is
@@ -107,7 +107,7 @@ IdentdServer.prototype.onData = function(socket, data) {
 
 	socket.removeAllListeners();
 	socket.end(response);
-}
+};
 
 /**
  * Once the data has been handled it needs to be parsed so we can figure out what the identd request is
@@ -145,7 +145,7 @@ IdentdServer.prototype.parse = function(line) {
 		return local.toString() + ', ' + remote.toString() + ' : USERID : UNIX-IRCAnywhere : ' + item.username;
 		// we've got a response
 	}
-}
+};
 
 IdentdServer.prototype = _.extend(IdentdServer.prototype, hooks);
 

@@ -36,8 +36,7 @@ function ModeParser() {
  */
 ModeParser.prototype.sortModes = function(capabilities, modes) {
 	var params = [],
-		splitModes = [],
-		omodes = modes;
+		splitModes = [];
 
 	if (modes.charAt(0) != '+' && modes.charAt(0) != '-') {
 		modes = '+' + modes;
@@ -52,15 +51,15 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 
 	splitModes = modes.split('');
 	
-	var modes = {
-			plus: '',
-			minus: '',
-			params: (params.length == 0 || params[0] == '') ? {} : params
-		},
-		modeType = null,
-		newParams = {},
-		paramCount = 1;
-		params = [];
+	var modeType = null,
+		newParams = {};
+
+	modes = {
+		plus: '',
+		minus: '',
+		params: (params.length === 0 || params[0] === '') ? {} : params
+	};
+	params = [];
 	// set some variables
 
 	_.each(splitModes, function(mode) {
@@ -73,7 +72,7 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 		}
 		// set the modeType to plus or minus
 
-		if (modeType == null) {
+		if (modeType === null) {
 			return true;
 		}
 		// this shouldn't occur but if it does just bail
@@ -105,7 +104,7 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
 	modes.params = newParams;
 
 	return modes;
-}
+};
 
 /**
  * Handles the object of instructions returned from sortModes, and applies them
@@ -117,8 +116,9 @@ ModeParser.prototype.sortModes = function(capabilities, modes) {
  * @return {String} The channel mode string with the changes applied.
  */
 ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
-	var prefixModes = _.keys(capabilities.prefixmodes),
-		modes = modes || '';
+	var prefixModes = _.keys(capabilities.prefixmodes);
+
+	modes = modes || '';
 
 	if (modeArray.plus) {
 		_.each(modeArray.plus.split(), function(mode) {
@@ -219,7 +219,7 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
 	// handle modes with unrequired parameters, such as flj
 
 	return modes;
-}
+};
 
 /**
  * Applies any mode changes that contain status related modes, usually qaohv modes
@@ -230,7 +230,7 @@ ModeParser.prototype.changeModes = function(capabilities, modes, modeArray) {
  * @param {Object} capabilities A valid capabilities object from a client
  * @param {Object} users A valid users array for a channel
  * @param {Object} modeArray A valid modeArray from `sortModes`
- * @return {Array[Object]} An array of users that have been affected by the mode change
+ * @return {[Object]} An array of users that have been affected by the mode change
  */
 ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 	var prefixModes = _.keys(capabilities.prefixmodes),
@@ -285,6 +285,6 @@ ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 	// ie status modes and restriction modes, also keys
 
 	return changedUsers;
-}
+};
 
 exports.ModeParser = ModeParser;
