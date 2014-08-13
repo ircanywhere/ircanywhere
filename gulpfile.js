@@ -110,7 +110,7 @@ gulp.task('server-jshint', function () {
 gulp.task('jshint', ['server-jshint', 'client-jshint']);
 
 gulp.task('mocha', function () {
-	return gulp.src('test/**/*.js')
+	gulp.src('test/**/*.js', {read: false})
 		.pipe(mocha({reporter: 'dot'}));
 });
 

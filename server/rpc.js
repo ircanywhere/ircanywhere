@@ -532,7 +532,6 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 		return socket.send('error', {command: 'readEvents', error: 'invalid format, see API docs'});
 	}
 
-	console.log('obj is ', object, 'difference is', _.difference(_.keys(object), ['read']).length);
 	if (_.difference(_.keys(object), ['read']).length !== 0 && typeof object.read === 'boolean') {
 		return socket.send('error', {command: 'readEvents', error: 'invalid document properties, see API docs'});
 	}
