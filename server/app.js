@@ -15,7 +15,6 @@ var _ = require('lodash'),
 	fs = require('fs'),
 	util = require('util'),
 	schema = require('./schema').schema,
-	path = require('path'),
 	jsonminify = require('jsonminify'),
 	validate = require('simple-schema'),
 	express = require('express'),
@@ -154,7 +153,7 @@ Application.prototype.init = function() {
 		self.ee.emit('ready');
 		// initiate sub-objects
 	});
-}
+};
 
 /**
  * This method initiates the oplog tailing query which will look for any incoming changes on the database.
@@ -228,12 +227,11 @@ Application.prototype.setupOplog = function() {
 				_.each(item.o, function(cmdObject, cmd) {
 					self.ee.emit([cmdObject, cmd]);
 				});
-			default:
 				break;
 		}
 		// emit the event
 	});
-}
+};
 
 /**
  * This function sets up our winston logging levels and transports. You can safely extend
@@ -283,7 +281,7 @@ Application.prototype.setupWinston = function() {
 	});
 
 	process.on('uncaughtException', self.handleError.bind(self));
-}
+};
 
 /**
  * Handle things such as domain errors and properly report
@@ -292,7 +290,7 @@ Application.prototype.setupWinston = function() {
  * @return void
  */
 Application.prototype.handleError = function(err, exit) {
-	var exit = (exit === undefined) ? true : exit;
+	exit = (exit === undefined) ? true : exit;
 
 	if (!err) {
 		return;
@@ -303,7 +301,7 @@ Application.prototype.handleError = function(err, exit) {
 			process.exit(0);
 		}
 	});
-}
+};
 
 /**
  * Checks for a node record to store in the file system and database
@@ -319,7 +317,7 @@ Application.prototype.setupNode = function() {
 		json = {},
 		query = {_id: null},
 		defaultJson = {
-			endpoint: (this.config.ssl) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
+			endpoint: (this.config.secure) ? 'https://0.0.0.0:' + this.config.port : 'http://0.0.0.0:' + this.config.port,
 			hostname: os.hostname(),
 			port: this.config.port,
 			ipAddress: '0.0.0.0'
@@ -352,7 +350,7 @@ Application.prototype.setupNode = function() {
 		function saveNode(json) {
 			json._id = json._id.toString();
 			self.nodeId = json._id;
-			data = (data == '') ? {} : JSON.parse(data);
+			data = (data === '') ? {} : JSON.parse(data);
 			// house keeping
 
 			if (_.isEqual(data, json)) {
@@ -366,7 +364,7 @@ Application.prototype.setupNode = function() {
 			});
 		}
 	});
-}
+};
 
 /**
  * This function will select a suitable cipher suite and return
@@ -395,7 +393,7 @@ Application.prototype.selectCipherSuite = function() {
 	cipherString += 'HIGH:!MD5:!aNULL:!EDHM';
 
 	return cipherString;
-}
+};
 
 /**
  * This function is responsible for setting up the express webserver we use to serve the static files and
@@ -408,27 +406,30 @@ Application.prototype.selectCipherSuite = function() {
 Application.prototype.setupServer = function() {
 	var self = this,
 		app = express(),
-		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'});
+		sockjsServer = sockjs.createServer({sockjs_url: 'http://cdn.sockjs.org/sockjs-0.3.min.js'}),
+		server;
 
-	if (application.config.ssl) {
+	if (this.config.secure) {
 		var https = require('https'),
 			options = {
 				key: fs.readFileSync('./private/certs/key.pem'),
 				cert: fs.readFileSync('./private/certs/cert.pem'),
 				ciphers: this.selectCipherSuite(),
 				honorCipherOrder: true
-			},
-			server = https.createServer(options, app);
+			};
+
+		server = https.createServer(options, app);
 	} else {
-		var http = require('http'),
-			server = http.createServer(app);
+		var http = require('http');
+
+		server = http.createServer(app);
 	}
 	// setup a http(s) server
 
 	app.enable('trust proxy');
 	// express settings
 
-	var error = function(err, req, res, next) {
+	var error = function(err, req, res) {
 		self.handleError(err, false);
 		res.send(500, 'An error has occured');
 	};
@@ -453,7 +454,7 @@ Application.prototype.setupServer = function() {
 	this.app = app;
 	this.sockjs = sockjsServer;
 	// put them in the main namespace
-}
+};
 
 Application.prototype = _.extend(Application.prototype, hooks);
 

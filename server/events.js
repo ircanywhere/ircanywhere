@@ -26,7 +26,7 @@ function EventManager() {
 /**
  * @member channelEvents A list of events relating to channels
  */
-EventManager.prototype.channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action']
+EventManager.prototype.channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 'mode', 'topic', 'privmsg', 'action'];
 
 /**
  * Inserts an event into a backlog after all the checking has been done
@@ -43,12 +43,13 @@ EventManager.prototype.channelEvents = ['join', 'part', 'kick', 'quit', 'nick', 
 EventManager.prototype._insert = function(client, message, type, user, force) {
 	var self = this,
 		deferred = Q.defer(),
-		force = force || false,
-		user = user || false,
 		network = (client.name) ? client.name : client.server,
 		ours = (message.nickname === client.nick),
 		channel = (message.channel && !message.target) ? message.channel : message.target,
 		read = ours || client.clientConnected;
+
+	force = force || false;
+	user = user || false;
 
 	if (!message.channel && !message.target) {
 		channel = null;
@@ -103,7 +104,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 			// get the prefix, construct an output and insert it
 		});
 	// once we've got a valid user, continue
-}
+};
 
 /**
  * Inserts an event into the backlog, takes a client and message object and a type
@@ -113,6 +114,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
  * @param {Object} client A valid client object
  * @param {Object} message A valid message object from `irc-message`
  * @param {String} type Event type
+ * @param {Function} cb Callback function to be executed after insert
  * @return void
  */
 EventManager.prototype.insertEvent = function(client, message, type, cb) {
@@ -137,7 +139,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 			});
 		});
 
-		_.each(client.internal.tabs, function(value, key) {
+		_.each(client.internal.tabs, function(value) {
 			if (value.target === message.nickname.toLowerCase()) {
 				self._insert(client, message, type);
 			}
@@ -166,7 +168,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	if (cb) {
 		cb();
 	}
-}
+};
 
 /**
  * Determine whether a message should be marked as a highlight or not for the specific
@@ -192,7 +194,7 @@ EventManager.prototype.determineHighlight = function(client, message, type, ours
 	// XXX - does this match our highlight words
 
 	return false;
-}
+};
 
 /**
  * Gets the channel prefix for the irc client and the user object. A valid object returned is
@@ -227,25 +229,20 @@ EventManager.prototype.getPrefix = function(client, user) {
 		switch (mode) {
 			case 'q':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 1};
-				break;
 			case 'a':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 2};
-				break;
 			case 'o':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 3};
-				break;
 			case 'h':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 4};
-				break;
 			case 'v':
 				return {prefix: client.internal.capabilities.modes.prefixmodes[mode], sort: 5};
-				break;
 		}
 	}
 	// loop through the modes in a normal for loop so we can return
 
 	return {prefix: '', sort: 6};
-}
+};
 
 /**
  * Gets the most recent event from the database by its type.
@@ -258,7 +255,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 EventManager.prototype.getEventByType = function (type, networkName, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({type: type, network: networkName, user: userId}).sort({"message.time": -1}).limit(1).nextObject(function(err, event) {
+	application.Events.find({type: type, network: networkName, user: userId}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 		if (err) {
 			deferred.reject(err);
 			return;
@@ -281,7 +278,7 @@ EventManager.prototype.getUserPlayback = function (networkName, userId) {
 	var deferred = Q.defer();
 
 	application.Events.find({read: false, network: networkName, user: userId})
-		.sort({"message.time": 1}).toArray(function(err, events) {
+		.sort({'message.time': 1}).toArray(function(err, events) {
 		if (err) {
 			deferred.reject(err);
 			return;

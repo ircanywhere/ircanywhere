@@ -12,7 +12,7 @@ App.InputController = Ember.ObjectController.extend({
 	},
 
 	autoCompleteChar: function() {
-		return this.get('socket.users.0.profile.autoCompleteChar');
+		return this.get('socket.users.0.profile.autoCompleteChar') || ',';
 	}.property('socket.users.0.profile.autoCompleteChar'),
 
 	nick: function() {
@@ -22,18 +22,25 @@ App.InputController = Ember.ObjectController.extend({
 	actions: {
 		resetTabCompletion: function() {
 			this.tabCompletionNicks = [];
+			this.set('tabCompletionIndex', 0);
 		},
 		
 		sendCommand: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true),
+				split = this.get('inputValue').split(' '),
+				command = split[0],
 				commandObject = {
 					command: this.get('inputValue'),
 					network: tab.network,
 					target: tab.target
 				};
 
-			this.socket.send('sendCommand', commandObject);
-			// unlike the last codebase
+			if (command.substr(0, 1) === '/' && this.commands[command]) {
+				this.commands[command].call(this, tab, split.slice(1));
+			} else {
+				this.socket.send('sendCommand', commandObject);
+				// unlike the last codebase
+			}
 
 			commandObject.timestamp = +new Date();
 			this.get('socket.commands').pushObject(commandObject);
@@ -87,7 +94,7 @@ App.InputController = Ember.ObjectController.extend({
 			}
 		},
 
-		toggleUp: function() {
+		toggleDown: function() {
 			var index = this.get('commandIndex') - 1,
 				command = this.get('socket.commands')[index];
 
@@ -101,7 +108,7 @@ App.InputController = Ember.ObjectController.extend({
 			// set a new index and lastCommand
 		},
 
-		toggleDown: function() {
+		toggleUp: function() {
 			var index = this.get('commandIndex') + 1;
 				index = (index === (this.get('socket.commands').length + 1)) ? 0 : index;
 			var command = this.get('socket.commands').objectAt(index);
@@ -114,6 +121,14 @@ App.InputController = Ember.ObjectController.extend({
 				this.set('commandIndex', index);
 			}
 			// set a new index and lastCommand
+		}
+	},
+
+	commands: {
+		'/clear': function(tab) {
+			var socketEngine = this.get('socket');
+
+			socketEngine._deleteWhere('events', {network: tab.networkName, target: tab.target});
 		}
 	}
 });

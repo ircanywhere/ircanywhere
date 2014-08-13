@@ -51,15 +51,15 @@ ChannelManager.prototype.getChannel = function(network, channel) {
 			deferred.reject(err);
 		}
 
-		var chan = _.clone(self.channel);
-			chan.network = network;
-			chan.channel = channel;
+		chan = _.clone(self.channel);
+		chan.network = network;
+		chan.channel = channel;
 
 		deferred.resolve(chan);
 	});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Inserts a user or an array of users into a channel record matching the network key
@@ -69,17 +69,18 @@ ChannelManager.prototype.getChannel = function(network, channel) {
  * @param {ObjectID} key A valid Mongo ObjectID for the networks collection
  * @param {String} network The network name, such as 'freenode'
  * @param {String} channel The channel name '#ircanywhere'
- * @param {Array[Object]} users An array of valid user objects usually from a who/join output
+ * @param {[Object]} users An array of valid user objects usually from a who/join output
  * @param {Boolean} [force] Optional boolean whether to overwrite the contents of the channelUsers
  * @return {promise} A promise containing final array of the users inserted
  */
 ChannelManager.prototype.insertUsers = function(key, network, channel, users, force) {
 	var deferred = Q.defer(),
-		force = force || false,
-		channel = channel.toLowerCase(),
-		burst = (users.length > 1) ? true : false,
+		burst = (users.length > 1),
 		find = [],
 		finalArray = [];
+
+	force = force || false;
+	channel = channel.toLowerCase();
 
 	function insertUsers() {
 		_.each(users, function(u) {
@@ -106,7 +107,7 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 	}
 
 	this.getChannel(key, channel)
-		.then(function(chan) {
+		.then(function() {
 			_.each(users, function(u) {
 				u.network = network;
 				u.channel = channel;
@@ -130,7 +131,7 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
 		});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Removes a specific user from a channel, if users is omitted, channel should be equal to a nickname
@@ -143,8 +144,8 @@ ChannelManager.prototype.insertUsers = function(key, network, channel, users, fo
  * @return void
  */
 ChannelManager.prototype.removeUsers = function(network, channel, users) {
-	var channel = (_.isArray(channel)) ? channel : channel.toLowerCase(),
-		users = (_.isArray(channel)) ? channel : users;
+	channel = (_.isArray(channel)) ? channel : channel.toLowerCase();
+	users = (_.isArray(channel)) ? channel : users;
 	// basically we check if channel is an array, if it is we're being told to
 	// just remove the user from the entire network (on quits etc)
 
@@ -158,7 +159,7 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
 		application.ChannelUsers.remove({network: network, channel: channel, nickname: {$in: users}}, {safe: false});
 	}
 	// send the update out
-}
+};
 
 /**
  * Updates a user or an array of users from the specific channel with the values passed in.
@@ -171,8 +172,6 @@ ChannelManager.prototype.removeUsers = function(network, channel, users) {
  * @return void
  */
 ChannelManager.prototype.updateUsers = function(key, network, users, values) {
-	var update = {};
-
 	_.each(users, function(u) {
 		var s = {network: network, nickname: u};
 
@@ -192,7 +191,7 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
 	});
 	// this is hacky as hell I feel but it's getting done this way to
 	// comply with all the other functions in this class
-}
+};
 
 /**
  * Takes a mode string, parses it and handles any updates to any records relating to
@@ -208,8 +207,9 @@ ChannelManager.prototype.updateUsers = function(key, network, users, values) {
  * @return void
  */
 ChannelManager.prototype.updateModes = function(key, capab, network, channel, mode) {
-	var channel = channel.toLowerCase(),
-		us = {};
+	var us = {};
+
+	channel = channel.toLowerCase();
 
 	this.getChannel(key, channel)
 		.then(function(chan) {
@@ -242,7 +242,7 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
 				// update users now
 			});
 		});
-}
+};
 
 /**
  * Updates the specific channel's topic and setby in the internal records.
@@ -255,16 +255,16 @@ ChannelManager.prototype.updateModes = function(key, capab, network, channel, mo
  * @return void
  */
 ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
-	var channel = channel.toLowerCase(),
-		topic = {
-			topic: topic,
-			setter: setby || ''
-		};
+	channel = channel.toLowerCase();
+	topic = {
+		topic: topic,
+		setter: setby || ''
+	};
 	// update the topic record
 
 	application.Tabs.update({network: key, target: channel}, {$set: {topic: topic}}, {safe: false});
 	// update the record
-}
+};
 
 ChannelManager.prototype = _.extend(ChannelManager.prototype, hooks);
 

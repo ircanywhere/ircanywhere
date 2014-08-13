@@ -1,0 +1,4 @@
+<div data-type="topic" {{bind-attr class=classNames data-id=_id}}>
+	<span class="time">{{unbound time message.time}}</span>
+	<span class="column event">{{#if extra.self}}&ndash;  You have changed the topic to: {{unbound ircParse message.topic ...parentController.parentController.content._id}}{{else}}&ndash;  {{unbound userLink false null}} has changed the topic to: {{unbound ircParse message.topic ...parentController.parentController.content._id}}{{/if}}</span>
+</div>

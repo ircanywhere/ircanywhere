@@ -15,7 +15,7 @@ exports.schema = {
 		type: 'number',
 		required: true
 	},
-	'ssl': {
+	'secure': {
 		type: 'boolean',
 		required: true,
 	},

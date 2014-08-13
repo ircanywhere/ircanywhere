@@ -161,6 +161,10 @@ IRCFactory.prototype.create = function(network) {
 IRCFactory.prototype.destroy = function(key, forced) {
 	var client = Clients[key];
 
+	if (!client) {
+		return false;
+	}
+
 	if (typeof client.forcedDisconnect === 'undefined') {
 		client.forcedDisconnect = forced;
 	}
