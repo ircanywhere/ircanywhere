@@ -16,11 +16,11 @@ gulp.task('clean', function() {
 
 gulp.task('css', function() {
 	gulp.src([
-		'client/ext/*.css',
-		'./client/less/**/!(mobile)*.less',  // make sure mobile.less is last
-		'./client/less/mobile.less',
-		'./modules/*/client/less/**/*.less'
-	])
+			'client/ext/*.css',
+			'./client/less/**/!(mobile)*.less',  // make sure mobile.less is last
+			'./client/less/mobile.less',
+			'./modules/*/client/less/**/*.less'
+		])
 		.pipe(less({
 			paths: ['./client/less']
 		}))

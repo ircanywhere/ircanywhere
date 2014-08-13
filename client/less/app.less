@@ -547,6 +547,7 @@ div.sidebar {
 
 		.modal-header {
 			padding: 15px;
+			height: 16px;
 			border-bottom: 1px solid #E5E5E5;
 
 			&.clear {
@@ -554,6 +555,7 @@ div.sidebar {
 			}
 
 			h3 {
+				float: left;
 				font-weight: bold;
 				margin: 0;
 				padding: 0;
@@ -564,6 +566,14 @@ div.sidebar {
 					margin: 15px;
 					float: left;
 				}
+			}
+
+			i.close-icon {
+				float: right;
+				padding: 1px;
+				cursor: pointer;
+				font-size: 14px;
+				color: grey;
 			}
 
 			div.list-controls {
@@ -583,7 +593,7 @@ div.sidebar {
 				right: 0;
 				top: 0;
 				bottom: 0;
-				background: #fff;
+				background: @white;
 				opacity: 0.5;
 				text-align: center;
 
@@ -739,16 +749,16 @@ div.userlist::-webkit-scrollbar-thumb,
 div.items::-webkit-scrollbar-thumb {
 	background: #bbb;
 	background-clip: padding-box;
-	border: 3px solid #fff;
+	border: 3px solid @white;
 	border-radius: 6px;
 }
 
 div.backlog::-webkit-scrollbar-track-piece,
 div.userlist::-webkit-scrollbar-track-piece,
 div.items::-webkit-scrollbar-track-piece {
-	background: #fff;
+	background: @white;
 	background-clip: padding-box;
-	border: 3px solid #fff;
+	border: 3px solid @white;
 	border-radius: 6px;
 }
 

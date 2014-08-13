@@ -115,7 +115,7 @@
 			}
 
 			&[data-type=status] {
-				background: #eee;
+				background: @index-border;
 
 				.message {
 					font-family: "Courier New", Courier, monospace;
@@ -125,15 +125,15 @@
 			}
 
 			&[data-type=motd] {
-				background: #eee;
+				background: @index-border;
 				
 				.time {
 					padding-top: 11px;
 				}
 
 				.message {
-					background: #fff;
-					border: 1px solid #ddd;
+					background: @white;
+					border: 1px solid @disabled-input;
 					margin: 5px;
 					font-family: "Courier New", Courier, monospace;
 					font-size: 12px;
