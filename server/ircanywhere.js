@@ -16,7 +16,7 @@ switch (process.argv[2]) {
 		daemon.stop();
 		break;
 	case 'restart':
-		daemon.stop(function(err) {
+		daemon.stop(function() {
 			daemon.start();
 		});
 		break;

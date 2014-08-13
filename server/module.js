@@ -7,8 +7,7 @@
  * @author Rodrigo Silveira
  */
 
-var _ = require('lodash'),
-	fs = require('fs'),
+var fs = require('fs'),
 	Q = require('q');
 
 /**

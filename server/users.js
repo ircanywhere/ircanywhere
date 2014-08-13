@@ -68,7 +68,7 @@ UserManager.prototype.init = function() {
 
 	application.app.get('/api/logout', function(req, res) {
 		self.userLogout(req, res).then(function() {
-			res.redirect(307, "/");
+			res.redirect(307, '/');
 			res.end();
 		});
 	});
@@ -101,7 +101,7 @@ UserManager.prototype.init = function() {
 		});
 	});
 	// setup routes
-}
+};
 
 /**
  * Responsible for disconnecting any inactive users
@@ -156,7 +156,7 @@ UserManager.prototype.timeOutInactive = function() {
 	clearInterval(this.intervalId);
 	this.intervalId = setInterval(this.timeOutInactive.bind(this), ((60 * 60 * 1000) - (secondsPastHour * 1000)));
 	// re-set the intervalId to prevent drifting
-}
+};
 
 /**
  * Checks the sent in authentication string (should be "token=actualToken")
@@ -211,7 +211,7 @@ UserManager.prototype.isAuthenticated = function(data) {
 
 	return deferred.promise;
 	// validate the cookie and return promise
-}
+};
 
 /**
  * Handles user registrations, it takes req and res objects from express at the moment
@@ -220,10 +220,9 @@ UserManager.prototype.isAuthenticated = function(data) {
  *
  * @method registerUser
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.registerUser = function(req, res) {
+UserManager.prototype.registerUser = function(req) {
 	var self = this,
 		deferred = Q.defer(),
 		name = req.param('name', ''),
@@ -321,7 +320,7 @@ UserManager.prototype.registerUser = function(req, res) {
 					return errorOccured('An error has occured');
 				}
 
-				if (docs.length == 0) {
+				if (docs.length === 0) {
 					return errorOccured('Your account was not created, please contact an administrator');
 				}
 
@@ -349,7 +348,7 @@ UserManager.prototype.registerUser = function(req, res) {
 	});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Handles the login call to /api/login and sets an appropriate cookie if successful.
@@ -456,14 +455,13 @@ UserManager.prototype.loginServerUser = function(email, password) {
  *
  * @method userLogout
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.userLogout = function(req, res) {
+UserManager.prototype.userLogout = function(req) {
 	var deferred = Q.defer();
 
 	this.isAuthenticated(req.headers.cookie)
-		.fail(function(err) {
+		.fail(function() {
 			deferred.resolve(false);
 		})
 		.then(function(user) {
@@ -473,17 +471,16 @@ UserManager.prototype.userLogout = function(req, res) {
 		});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Handles the call to /api/forgot to send a forgot password link
  *
  * @method forgotPassword
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.forgotPassword = function(req, res) {
+UserManager.prototype.forgotPassword = function(req) {
 	var self = this,
 		deferred = Q.defer(),
 		output = {failed: false, successMessage: '', errors: []},
@@ -526,7 +523,7 @@ UserManager.prototype.forgotPassword = function(req, res) {
 	});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Handles the call to /api/reset which will be called when the reset password link is visited
@@ -534,16 +531,14 @@ UserManager.prototype.forgotPassword = function(req, res) {
  *
  * @method resetPassword
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.resetPassword = function(req, res) {
+UserManager.prototype.resetPassword = function(req) {
 	var self = this,
 		deferred = Q.defer(),
 		password = req.param('password', ''),
 		confirmPassword = req.param('confirmPassword', ''),
 		token = req.param('token', ''),
-		time = new Date(Date.now()),
 		output = {};
 
 	application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}}, function(err, user) {
@@ -558,10 +553,10 @@ UserManager.prototype.resetPassword = function(req, res) {
 		output = self.updatePassword(user, password, confirmPassword);
 
 		deferred.resolve(output);
-	})
+	});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Handles the call to /api/settings/updatesettings which will update the settings for that user
@@ -569,10 +564,9 @@ UserManager.prototype.resetPassword = function(req, res) {
  *
  * @method updateSettings
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.updateSettings = function(req, res) {
+UserManager.prototype.updateSettings = function(req) {
 	var self = this,
 		deferred = Q.defer(),
 		name = req.param('name', ''),
@@ -591,7 +585,7 @@ UserManager.prototype.updateSettings = function(req, res) {
 		}
 
 		self.isAuthenticated(req.headers.cookie)
-			.fail(function(err) {
+			.fail(function() {
 				output.failed = true;
 				output.errors.push({error: 'Not authenticated'});
 
@@ -647,7 +641,7 @@ UserManager.prototype.updateSettings = function(req, res) {
 	});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Handles the call to /api/settings/changepassword which is almost identical to resetPassword
@@ -656,10 +650,9 @@ UserManager.prototype.updateSettings = function(req, res) {
  *
  * @method resetPassword
  * @param {Object} req A valid request object from express
- * @param {Object} res A valid response object from express
  * @return {promise} An output object for the API call
  */
-UserManager.prototype.changePassword = function(req, res) {
+UserManager.prototype.changePassword = function(req) {
 	var self = this,
 		deferred = Q.defer(),
 		password = req.param('password', ''),
@@ -667,7 +660,7 @@ UserManager.prototype.changePassword = function(req, res) {
 		output = {};
 
 	this.isAuthenticated(req.headers.cookie)
-		.fail(function(err) {
+		.fail(function() {
 			output.failed = true;
 			output.errors.push({error: (password) ? 'Not authenticated' : 'Invalid reset password url'});
 
@@ -680,7 +673,7 @@ UserManager.prototype.changePassword = function(req, res) {
 		});
 
 	return deferred.promise;
-}
+};
 
 /**
  * Updates a users password, doesn't bypass any checkings, just doesn't
@@ -694,8 +687,9 @@ UserManager.prototype.changePassword = function(req, res) {
  * @return {Object} An output object for the API call
  */
 UserManager.prototype.updatePassword = function(user, password, confirmPassword, currentPassword) {
-	var currentPassword = currentPassword || '',
-		output = {failed: false, successMessage: '', errors: []};
+	var output = {failed: false, successMessage: '', errors: []};
+
+	currentPassword = currentPassword || '';
 
 	if (currentPassword !== '' && user.password !== crypto.createHmac('sha256', user.salt).update(currentPassword).digest('hex')) {
 		output.failed = true;
@@ -719,7 +713,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
 	}
 
 	return output;
-}
+};
 
 /**
  * An event which is called when a successful login occurs, this logic is kept out of
@@ -732,10 +726,11 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
  * @return void
  */
 UserManager.prototype.onUserLogin = function(me, force) {
-	var force = force || false,
-		userId = me._id;
+	var userId = me._id;
 
-	if (me == null) {
+	force = force || false;
+
+	if (!me) {
 		return;
 	}
 
@@ -758,7 +753,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 
 	application.logger.log('info', 'user logged in', {userId: userId.toString()});
 	// log this event
-}
+};
 
 /**
  * Looks for a template and parses the {{tags}} into the values in replace
@@ -778,7 +773,7 @@ UserManager.prototype.parse = function(file, replace) {
 	});
 
 	return template;
-}
+};
 
 /**
  * Update lastSeen entry of user.
