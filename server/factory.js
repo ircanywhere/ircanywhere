@@ -141,7 +141,8 @@ IRCFactory.prototype.create = function(network) {
 	// generate a key, we just use the network id because it's unique per network
 	// and doesn't need to be linked to a client, saves us hashing keys all the time
 
-	networkManager.changeStatus({_id: key}, networkManager.flags.connecting);
+	console.log({_id: network._id}, networkManager.flags.connecting);
+	networkManager.changeStatus({_id: network._id}, networkManager.flags.connecting);
 	// mark the network as connecting
 
 	this.rpc.emit('createClient', key, network);

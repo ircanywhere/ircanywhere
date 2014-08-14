@@ -204,6 +204,7 @@ NetworkManager.prototype.getClients = function(keys) {
 				}
 			});
 
+			//application.Networks.update({_id: {$in: inactive}}, {$set: {'internal.status': self.flags.disconnected}}, {multi: true, safe: false});
 			application.Tabs.update({network: {$in: inactive}}, {$set: {active: false}}, {multi: true, safe: false});
 			// mark any tabs for x network inactive
 
