@@ -320,8 +320,7 @@ Ember.Parser = Ember.Object.extend({
 	},
 
 	parseLinks: function(text, network) {
-		var self = this,
-			userList = App.__container__.cache.dict['controller:network'].get('socket').find('channelUsers', {network: network.name, channel: network.selectedTab.target}),
+		var userList = App.__container__.cache.dict['controller:network'].get('socket').find('channelUsers', {network: network.name, channel: network.selectedTab.target}),
 			regex = /(\()((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]+)(\))|(\[)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]+)(\])|(\{)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/[a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%\u0000-\uFFFF]+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%\u0000-\uFFFF]*)*[a-z0-9\-_~$()*+=\/#[\]@%\u0000-\uFFFF])/img;
 
 		text = text.replace(regex, '$1$4$7$10$13<a href="$2$5$8$11$14" target="_blank">$2$5$8$11$14</a>$3$6$9$12');
@@ -333,7 +332,7 @@ Ember.Parser = Ember.Object.extend({
 			var record = userList.findBy('nickname', word);
 			if (record) {
 				var route = '#/t/' + network.url + '/' + record.nickname;
-				split[index] = '<a href="' + route + '" rel="nick-link" data-nick="' + record.nickname + '">' + record.nickname + '</a>'
+				split[index] = '<a href="' + route + '" rel="nick-link" data-nick="' + record.nickname + '">' + record.nickname + '</a>';
 			}
 		});
 

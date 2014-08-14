@@ -429,7 +429,8 @@ Application.prototype.setupServer = function() {
 	app.enable('trust proxy');
 	// express settings
 
-	var error = function(err, req, res) {
+	/*jshint unused:false */
+	var error = function(err, req, res, next) {
 		self.handleError(err, false);
 		res.send(500, 'An error has occured');
 	};
