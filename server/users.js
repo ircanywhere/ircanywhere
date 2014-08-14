@@ -508,7 +508,7 @@ UserManager.prototype.forgotPassword = function(req) {
 
 		var link = application.config.url + '/#/reset/' + token,
 			message = {
-				text: self.parse('./private/emails/reset.txt', {name: user.name, link: link}),
+				text: self.parse('./private/emails/reset.txt', {name: user.profile.name, link: link}),
 				from: application.config.email.from,
 				to: email,
 				subject: 'Your new password'
