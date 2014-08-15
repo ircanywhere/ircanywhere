@@ -7,6 +7,8 @@
  * @author Rodrigo Silveira
  */
 
+"use strict";
+
 var parseMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
 	moment = require('moment'),
@@ -34,6 +36,11 @@ function ServerSession(socket) {
 }
 
 /**
+ * @member {Boolean} debug A flag to determine whether debug logging is enabled or not
+ */
+ServerSession.debug = (process.env.DEBUG_SERVER && process.env.DEBUG_SERVER === 'true');
+
+/**
  * Initializes session.
  *
  * @return void
@@ -51,6 +58,10 @@ ServerSession.prototype.init = function() {
 		lines.forEach(function(line) {
 			var message = parseMessage(line),
 				command = message.command.toLowerCase();
+
+			if (ServerSession.debug) {
+				console.log(new Date().toJSON(), 'from client -', line);
+			}
 
 			if (self[command]) {
 				self[command](message);
@@ -561,6 +572,10 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {
 		rawMessage = rawMessage.join('\r\n');
+	}
+
+	if (ServerSession.debug) {
+		console.log(new Date().toJSON(), 'to client -', rawMessage);
 	}
 
 	this.socket.write(rawMessage + '\r\n');
