@@ -424,28 +424,32 @@ UserManager.prototype.loginServerUser = function(email, password) {
 	var self = this,
 		deferred = Q.defer();
 
-	application.Users.findOne({email: email}, function(err, user) {
-		if (err || !user) {
-			deferred.reject(new Error('User not found ' + err));
-			return;
-		}
+	if (!password) {
+		deferred.reject('password not specified');
+	} else {
+		application.Users.findOne({email: email}, function(err, user) {
+			if (err || !user) {
+				deferred.reject('User ' + email + ' not found');
+				return;
+			}
 
-		var salt = user.salt,
-			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
+			var salt = user.salt,
+				hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
-		if (hash != user.password) {
-			deferred.reject(new Error('Password incorrect'));
-			return;
-		}
-		// check if password matches
+			if (hash != user.password) {
+				deferred.reject('Password incorrect');
+				return;
+			}
+			// check if password matches
 
-		application.Users.update({email: email}, {$set: {newUser: false}}, {safe: false});
-		// set newUser
+			application.Users.update({email: email}, {$set: {newUser: false}}, {safe: false});
+			// set newUser
 
-		self.onUserLogin(user, user.newUser);
+			self.onUserLogin(user, user.newUser);
 
-		deferred.resolve(user);
-	});
+			deferred.resolve(user);
+		});
+	}
 
 	return deferred.promise;
 };

@@ -7,7 +7,7 @@
  * @author Rodrigo Silveira
  */
 
-"use strict";
+'use strict';
 
 var parseMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
@@ -151,22 +151,7 @@ ServerSession.prototype.user = function(message) {
 		email = params[0],
 		networkName = params[1];
 
-	if (!self.password) {
-		application.logger.log('warn', 'Unable to log in user', email, 'password not specified.');
-		self.disconnectUser();
-		return;
-	}
-
 	userManager.loginServerUser(email, self.password)
-		.fail(function(error){
-			// TODO send a 464 ERR_PASSWDMISMATCH
-
-			application.logger.log('error', 'error logging in user ' + email);
-			application.handleError(error, false);
-			self.disconnectUser();
-
-			return Q.reject(error);
-		})
 		.then(function(user) {
 			self.user = user;
 			self.email = email;
@@ -174,14 +159,23 @@ ServerSession.prototype.user = function(message) {
 			return networkManager.getClientsForUser(user._id);
 		})
 		.then(function(networks) {
+			if (!networks || networks.length === 0) {
+				return Q.reject('No active network found');
+			}
+
 			if (networks.length === 1) {
 				self.networkId = networks[0]._id;
 				// if only one network, choose it
 			} else {
+				if (!networkName) {
+					return Q.reject('Network not defined, please specify network after username. Example: ' +
+						email + '/' + networks[0].name + '.');
+				}
+
 				var network = _.find(networks, {name: networkName});
 
 				if (!network) {
-					return Q.reject(new Error('Network ' + networkName + ' not found.'));
+					return Q.reject('Network ' + networkName + ' not found.');
 				}
 
 				self.networkId = network._id;
@@ -193,7 +187,7 @@ ServerSession.prototype.user = function(message) {
 					application.handleError(error, false);
 					self.disconnectUser();
 
-					return Q.reject(error);
+					return Q.reject('Error registering user');
 				});
 		})
 		.then(function () {
@@ -201,6 +195,14 @@ ServerSession.prototype.user = function(message) {
 		})
 		.then(function () {
 			self.sendPlayback();
+		})
+		.fail(function(error) {
+			application.logger.log('error', 'Error login in user ' + error);
+			self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + self.clientNick + ' :' + error);
+			self.sendRaw(':***!ircanywhere@ircanywhere.com 464 ' + self.clientNick + ' :' + error);
+			// Send a private message and 464 ERR_PASSWDMISMATCH with error description when login fails
+
+			self.disconnectUser();
 		});
 };
 
@@ -504,6 +506,11 @@ ServerSession.prototype.sendPlayback = function () {
  * @param {Object} message Received message
  */
 ServerSession.prototype.privmsg = function(message) {
+	if (!this.networkId) {
+		return;
+	}
+	// Not ready to take requests yet.
+
 	var hostmask = message.parseHostmaskFromPrefix(),
 		timestamp = new Date(),
 		hostname = (hostmask && hostmask.hostname) || 'none',
