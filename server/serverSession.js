@@ -7,6 +7,8 @@
  * @author Rodrigo Silveira
  */
 
+'use strict';
+
 var parseMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
 	moment = require('moment'),
@@ -34,6 +36,11 @@ function ServerSession(socket) {
 }
 
 /**
+ * @member {Boolean} debug A flag to determine whether debug logging is enabled or not
+ */
+ServerSession.debug = (process.env.DEBUG_SERVER && process.env.DEBUG_SERVER === 'true');
+
+/**
  * Initializes session.
  *
  * @return void
@@ -51,6 +58,10 @@ ServerSession.prototype.init = function() {
 		lines.forEach(function(line) {
 			var message = parseMessage(line),
 				command = message.command.toLowerCase();
+
+			if (ServerSession.debug) {
+				console.log(new Date().toJSON(), 'from client -', line);
+			}
 
 			if (self[command]) {
 				self[command](message);
@@ -140,22 +151,7 @@ ServerSession.prototype.user = function(message) {
 		email = params[0],
 		networkName = params[1];
 
-	if (!self.password) {
-		application.logger.log('warn', 'Unable to log in user', email, 'password not specified.');
-		self.disconnectUser();
-		return;
-	}
-
 	userManager.loginServerUser(email, self.password)
-		.fail(function(error){
-			// TODO send a 464 ERR_PASSWDMISMATCH
-
-			application.logger.log('error', 'error logging in user ' + email);
-			application.handleError(error, false);
-			self.disconnectUser();
-
-			return Q.reject(error);
-		})
 		.then(function(user) {
 			self.user = user;
 			self.email = email;
@@ -163,14 +159,23 @@ ServerSession.prototype.user = function(message) {
 			return networkManager.getClientsForUser(user._id);
 		})
 		.then(function(networks) {
+			if (!networks || networks.length === 0) {
+				return Q.reject('No active network found');
+			}
+
 			if (networks.length === 1) {
 				self.networkId = networks[0]._id;
 				// if only one network, choose it
 			} else {
+				if (!networkName) {
+					return Q.reject('Network not defined, please specify network after username. Example: ' +
+						email + '/' + networks[0].name + '.');
+				}
+
 				var network = _.find(networks, {name: networkName});
 
 				if (!network) {
-					return Q.reject(new Error('Network ' + networkName + ' not found.'));
+					return Q.reject('Network ' + networkName + ' not found.');
 				}
 
 				self.networkId = network._id;
@@ -182,7 +187,7 @@ ServerSession.prototype.user = function(message) {
 					application.handleError(error, false);
 					self.disconnectUser();
 
-					return Q.reject(error);
+					return Q.reject('Error registering user');
 				});
 		})
 		.then(function () {
@@ -190,6 +195,14 @@ ServerSession.prototype.user = function(message) {
 		})
 		.then(function () {
 			self.sendPlayback();
+		})
+		.fail(function(error) {
+			application.logger.log('error', 'Error login in user ' + error);
+			self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + self.clientNick + ' :' + error);
+			self.sendRaw(':***!ircanywhere@ircanywhere.com 464 ' + self.clientNick + ' :' + error);
+			// Send a private message and 464 ERR_PASSWDMISMATCH with error description when login fails
+
+			self.disconnectUser();
 		});
 };
 
@@ -219,7 +232,7 @@ ServerSession.prototype.setup = function() {
  * @param {Object} event Event to handle
  */
 ServerSession.prototype.handleEvent =  function(event) {
-	var ignore = ['registered', 'lusers', 'motd'],
+	var ignore = ['registered', 'lusers', 'motd', 'join'],
 		network = Clients[this.networkId.toString()];
 
 	if (event.message.clientId === this.id) {
@@ -256,7 +269,7 @@ ServerSession.prototype.handleEvent =  function(event) {
  * @param ircMessage
  */
 ServerSession.prototype.handleIrcMessage = function (ircMessage) {
-	var fwdMessages = ['names', 'who', 'whois', 'topic'],
+	var fwdMessages = ['names', 'who', 'whois', 'mode', 'banList', 'inviteList', 'exceptlist', 'quietlist', 'list', 'join'],
 		clientKey = ircMessage.event[0].toString(),
 		command = ircMessage.event[1],
 		message = ircMessage.message;
@@ -493,6 +506,11 @@ ServerSession.prototype.sendPlayback = function () {
  * @param {Object} message Received message
  */
 ServerSession.prototype.privmsg = function(message) {
+	if (!this.networkId) {
+		return;
+	}
+	// Not ready to take requests yet.
+
 	var hostmask = message.parseHostmaskFromPrefix(),
 		timestamp = new Date(),
 		hostname = (hostmask && hostmask.hostname) || 'none',
@@ -561,6 +579,10 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {
 		rawMessage = rawMessage.join('\r\n');
+	}
+
+	if (ServerSession.debug) {
+		console.log(new Date().toJSON(), 'to client -', rawMessage);
 	}
 
 	this.socket.write(rawMessage + '\r\n');
