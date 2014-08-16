@@ -1,7 +1,9 @@
 App.InputController = Ember.ObjectController.extend({
 	needs: ['network', 'tab'],
 
+	notIteratingBacklog: true,
 	commandIndex: 0,
+	oldInputValue: '',
 	inputValue: '',
 	originalInputValue: '',
 	tabCompletionNicks: [],
@@ -47,6 +49,8 @@ App.InputController = Ember.ObjectController.extend({
 			// we push it into the buffer manually, saves us getting the data sent back down
 			// through the pipe which is a waste of bandwidth
 
+			this.set('notIteratingBacklog', true);
+			this.set('oldInputValue', '');
 			this.set('inputValue', '');
 			// reset the input
 		},
@@ -98,12 +102,18 @@ App.InputController = Ember.ObjectController.extend({
 			var index = this.get('commandIndex') - 1,
 				command = this.get('socket.commands')[index];
 
+			if (this.get('notIteratingBacklog')) {
+				this.set('oldInputValue', this.get('inputValue'));
+			}
+
 			if (!command) {
-				this.set('inputValue', '');
+				this.set('inputValue', this.get('oldInputValue'));
 				this.set('commandIndex', this.get('socket.commands').length);
+				this.set('notIteratingBacklog', true);
 			} else {
 				this.set('inputValue', command.command);
 				this.set('commandIndex', index);
+				this.set('notIteratingBacklog', false);
 			}
 			// set a new index and lastCommand
 		},
@@ -113,12 +123,18 @@ App.InputController = Ember.ObjectController.extend({
 				index = (index === (this.get('socket.commands').length + 1)) ? 0 : index;
 			var command = this.get('socket.commands').objectAt(index);
 
+			if (this.get('notIteratingBacklog')) {
+				this.set('oldInputValue', this.get('inputValue'));
+			}
+
 			if (!command) {
-				this.set('inputValue', '');
+				this.set('inputValue', this.get('oldInputValue'));
 				this.set('commandIndex', -1);
+				this.set('notIteratingBacklog', true);
 			} else {
 				this.set('inputValue', command.command);
 				this.set('commandIndex', index);
+				this.set('notIteratingBacklog', false);
 			}
 			// set a new index and lastCommand
 		}
