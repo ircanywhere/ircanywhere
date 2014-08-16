@@ -269,7 +269,7 @@ ServerSession.prototype.handleEvent =  function(event) {
  * @param ircMessage
  */
 ServerSession.prototype.handleIrcMessage = function (ircMessage) {
-	var fwdMessages = ['names', 'who', 'whois', 'topic'],
+	var fwdMessages = ['names', 'who', 'whois', 'mode', 'banList', 'inviteList', 'exceptlist', 'quietlist', 'list'],
 		clientKey = ircMessage.event[0].toString(),
 		command = ircMessage.event[1],
 		message = ircMessage.message;
