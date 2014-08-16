@@ -232,7 +232,7 @@ ServerSession.prototype.setup = function() {
  * @param {Object} event Event to handle
  */
 ServerSession.prototype.handleEvent =  function(event) {
-	var ignore = ['registered', 'lusers', 'motd'],
+	var ignore = ['registered', 'lusers', 'motd', 'join'],
 		network = Clients[this.networkId.toString()];
 
 	if (event.message.clientId === this.id) {
@@ -269,7 +269,7 @@ ServerSession.prototype.handleEvent =  function(event) {
  * @param ircMessage
  */
 ServerSession.prototype.handleIrcMessage = function (ircMessage) {
-	var fwdMessages = ['names', 'who', 'whois', 'mode', 'banList', 'inviteList', 'exceptlist', 'quietlist', 'list'],
+	var fwdMessages = ['names', 'who', 'whois', 'mode', 'banList', 'inviteList', 'exceptlist', 'quietlist', 'list', 'join'],
 		clientKey = ircMessage.event[0].toString(),
 		command = ircMessage.event[1],
 		message = ircMessage.message;
