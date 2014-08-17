@@ -20,7 +20,7 @@ App.ResetController = Ember.ObjectController.extend({
 	resetSuccess: function(data) {
 		this.set('errors', false);
 		this.get('controllers.login').set('success', data.successMessage);
-+		this.transitionToRoute('login');
+		this.transitionToRoute('login');
 	},
 
 	resetFail: function(data) {
