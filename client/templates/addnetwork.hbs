@@ -1,6 +1,7 @@
 {{#modal-dialog action="close"}}
-	<div class="modal-header">
+	<div class="modal-header clearfix">
 		<h3>{{title}}</h3>
+		<i class="fa fa-times close-icon" {{action closeModal}}></i>
 	</div>
 	<div class="modal-body">
 		<form method="post" {{action "networkSubmit" on="submit"}}>
