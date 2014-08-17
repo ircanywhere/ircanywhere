@@ -50,9 +50,10 @@ App.InputView = Ember.View.extend({
 			this.get('controller').send('toggleDown');
 			this.get('controller').send('resetTabCompletion');
 		} else {
-			this.resize();
 			this.get('controller').send('resetTabCompletion');
 		}
+		setTimeout(this.resize.bind(this), 0);
+		// Resize after changing textarea content
 	},
 
 	resize: function() {
