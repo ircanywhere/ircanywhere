@@ -10,11 +10,14 @@ App.InputView = Ember.View.extend({
 		// difficult to do this without doing so
 		
 		this.$('textarea').on('keydown', this.onKeyDown.bind(this));
+		this.$('textarea').on('cut paste drop', this.resize.bind(this));
 	},
 
 	willDestroyElement: function() {
 		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+
 		this.$('textarea').off('keydown', this.onKeyDown.bind(this));
+		this.$('textarea').off('cut paste drop', this.resize.bind(this));
 	},
 
 	documentKeyDown: function(e) {
@@ -47,7 +50,18 @@ App.InputView = Ember.View.extend({
 			this.get('controller').send('toggleDown');
 			this.get('controller').send('resetTabCompletion');
 		} else {
+			this.resize();
 			this.get('controller').send('resetTabCompletion');
 		}
+	},
+
+	resize: function() {
+		var textarea = this.$('textarea'),
+			element = Ember.$(this.get('element')),
+			padding = parseInt(textarea.css('paddingTop'), 10) + parseInt(textarea.css('paddingBottom'), 10);
+
+		textarea.height('auto');
+		textarea.height(textarea.prop('scrollHeight') - padding);
+		element.height(textarea.prop('scrollHeight') + (padding * 2));
 	}
 });
