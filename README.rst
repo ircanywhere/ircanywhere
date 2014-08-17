@@ -1,4 +1,4 @@
-IRCAnywhere
+IRCAnywhere |TravisBuild|
 ===========
 
 **IRCAnywhere** is an open source web based `IRC bonucer`_  application written in javascript. It's designed to be a free alternative to IRCCloud_. Unlike IRCCloud where you have little control over uptime and the privacy of your users, **IRCAnywhere** aims to give the control to you.
@@ -144,3 +144,5 @@ Come talk to us on the #ircanywhere channel in freenode.
 .. _`reverse proxies`: http://ircanywhere.readthedocs.org/en/latest/reverse_proxies.html
 .. _gulp: http://gulpjs.com/
 .. _`installing MongoDB`: http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-mongodb
+.. |TravisBuild| image:: https://travis-ci.org/ircanywhere/ircanywhere.svg?branch=development
+    :target: https://travis-ci.org/ircanywhere/ircanywhere
