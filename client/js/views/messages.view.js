@@ -4,8 +4,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	classNameBindings: ['push'],
 
 	push: function() {
-		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
-	}.property('controller.target.content.selectedTab.unread').cacheable(),
+		return (this.get('controller.target.content.selectedTab.showMessageBar')) ? 'push' : '';
+	}.property('controller.target.content.selectedTab.showMessageBar').cacheable(),
 
 	animateScrollTo: function (scrollTo) {
 		this.$().animate({
@@ -27,10 +27,20 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		this.scrolled();
 		// immediately run this when the element is inserted
+
+		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
+		// bind keydown event so we can hook onto ESC
 	},
 
 	willRemoveElement: function() {
 		this.unbindScrolling();
+	},
+
+	documentKeyDown: function(e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode === 27) {
+			this.get('controller.target').markAllAsRead(this.get('controller.target.content.selectedTab._id'));
+		}
 	},
 
 	resizeSensor: function() {

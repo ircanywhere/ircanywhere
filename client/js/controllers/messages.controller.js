@@ -1,5 +1,5 @@
 App.MessagesController = Ember.ArrayController.extend(App.Notification, {
-	needs: ['index'],
+	needs: ['index', 'network'],
 	events: [],
 	readDocs: [],
 	unreadNotifications: [],
@@ -179,6 +179,10 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 			// already a pending timeout
 
+			if (unread === 0) {
+				tab.set('showMessageBar', false);
+			}
+
 			var scrollTimeout = setTimeout(function() {
 				self.markAsRead();
 				self.set('timeout', null);
@@ -193,7 +197,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	},
 
 	updated: function() {
-		var tab = this.get('parentController.selectedTab'),
+		var tab = this.get('controllers.network.selectedTab'),
 			container = Ember.$('.backlog');
 
 		if (!tab || tab.loading === false || container.length === 0) {
@@ -229,6 +233,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			});
 
 		this.unreadNotifications.pushObject(Notify);
+		// show notification
 	},
 
 	onHighlightBurst: function(object, backlog) {
@@ -251,6 +256,17 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		if (!backlog) {
 			this.newTabMessage(object, backlog);
 		}
+
+		var tab = this.get('controllers.network.selectedTab');
+
+		if (tab.get('unread') > 0) {
+			setTimeout(function() {
+				if (tab.get('unread') > 0) {
+					tab.set('showMessageBar', true);
+				}
+			}, 500);
+		}
+		// show unread message bar
 	},
 
 	onEventVisible: function(id, item) {
