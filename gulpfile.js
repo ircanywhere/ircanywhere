@@ -33,6 +33,7 @@ gulp.task('templates', function() {
 		.pipe(handlebars({
 			outputType: 'browser'
 		}))
+		.pipe(gulp.dest('./client/build/templates'))
 		.pipe(uglify('templates.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
@@ -54,6 +55,7 @@ gulp.task('templates:debug', function() {
 
 gulp.task('js', function() {
 	gulp.src(['./lib/*.js', './client/js/lib/*.js', './client/js/*.js', './client/js/helpers/*.js', './client/js/mixins/*.js', './client/js/routes/*.js', './client/js/models/*.js', './client/js/controllers/*.js', './client/js/components/*.js', './client/js/views/*.js', './modules/*/client/js/**/*.js'])
+		.pipe(gulp.dest('./client/build/js'))
 		.pipe(uglify('ircanywhere.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
@@ -72,6 +74,7 @@ gulp.task('js:debug', function() {
 
 gulp.task('dependencies', function() {
 	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
+		.pipe(gulp.dest('./client/build/ext'))
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
