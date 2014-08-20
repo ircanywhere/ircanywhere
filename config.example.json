@@ -37,6 +37,15 @@
 				 online when the main application closes. It'll also probably speed things up. It's recommended 
 				 to only ever set this to false when developing */
 
+	"retryWait": 10,
+	/* -- number
+	 * -- usage: How many seconds to wait between reconnect attemps, default is 10 */
+
+	"retryCount": 10,
+	/* -- number
+	 * -- usage: How many times to retry connecting if disconnected, default is 10. Set to negative to
+	 keep retrying and 0 to disable */
+
 	"ircServer": {
 		"enable": true,
 		/* -- required

@@ -702,7 +702,12 @@ NetworkManager.prototype.removeTab = function(client, target) {
  * @return void
  */
 NetworkManager.prototype.connectNetwork = function(network) {
-	ircFactory.create(network);
+	ircFactory.create(_.extend(network,
+		{
+			retryCount: (application.config.retryCount != null) ? application.config.retryCount : 10,
+			retryWait: application.config.retryWait * 1000 || 10000
+		}
+	));
 };
 
 /**
