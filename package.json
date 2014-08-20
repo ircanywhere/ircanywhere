@@ -7,6 +7,7 @@
   "main": "./server/ircanywhere",
   "scripts": {
     "start": "node ./server/ircanywhere start",
+    "stop": "node ./server/ircanywhere stop",
     "test": "gulp test"
   },
   "contributors": [
