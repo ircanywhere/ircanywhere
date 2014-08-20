@@ -9,6 +9,7 @@
 
 var _ = require('lodash'),
 	util = require('util'),
+	fs = require('fs'),
 	factory = require('irc-factory').Api,
 	helper = require('../lib/helpers').Helpers;
 
@@ -65,7 +66,11 @@ IRCFactory.prototype.init = function() {
 	// connect to our uplinks
 
 	this.events.on('message', function(message) {
-		if (message.event === 'synchronize') {
+		if (message.event === 'metadata') {
+			if (message.pid) {
+				fs.writeFile(__dirname + '/../irc-factory.pid', message.pid);
+			}
+		} else if (message.event === 'synchronize') {
 			networkManager.getClients(message.keys)
 				.then(function(networks) {
 					var keys = _.keys(networks),
