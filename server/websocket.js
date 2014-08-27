@@ -48,7 +48,7 @@ WebSocket.prototype.bindEvents = function() {
  * @return {Boolean} Whether the object is valid or not
  */
 WebSocket.prototype.isValid = function(parsed) {
-	return (parsed.event !== undefined || parsed.data !== undefined);
+	return (typeof parsed.event === 'string' && typeof parsed.data === 'object');
 };
 
 /**
@@ -75,6 +75,8 @@ WebSocket.prototype.onMessage = function(raw) {
 		data = parsed.data;
 
 		this.emit(event, data);
+	} else {
+		this.send('authenticate', {authenticated: false}, true);
 	}
 	// is the event valid? try emitting
 };

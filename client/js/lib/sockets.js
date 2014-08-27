@@ -90,7 +90,7 @@ Ember.Socket = Ember.Object.extend({
 		// alter the done variable when we're actually done
 
 		if (document.cookie) {
-			this._send('authenticate', document.cookie);
+			this._send('authenticate', {cookie: document.cookie});
 			// authenticate
 		} else {
 			self.set('authed', false);
@@ -113,7 +113,8 @@ Ember.Socket = Ember.Object.extend({
 
 		switch (event) {
 			case 'authenticate':
-				self.set('authed', data);
+				var authed = data.authenticated || false;
+				self.set('authed', authed);
 				break;
 			case 'burst':
 				Ember.$.get(data.url, function(data) {

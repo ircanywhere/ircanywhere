@@ -298,11 +298,12 @@ RPCHandler.prototype.onSocketOpen = function(socket) {
  * @return void
  */
 RPCHandler.prototype.handleAuth = function(socket, data) {
-	var self = this;
+	var self = this,
+		cookie = data.cookie || '';
 	
-	userManager.isAuthenticated(data)
+	userManager.isAuthenticated(cookie)
 		.fail(function() {
-			socket.send('authenticate', false, true);
+			socket.send('authenticate', {authenticated: false}, true);
 		})
 		.then(function(user) {
 			socket._user = user;
@@ -313,7 +314,7 @@ RPCHandler.prototype.handleAuth = function(socket, data) {
 				Users[user._id].push({id: socket.id, socket: socket});
 			}
 
-			socket.send('authenticate', true, false);
+			socket.send('authenticate', {authenticated: true}, false);
 
 			self.handleConnect(socket);
 			// handle sending out data on connect

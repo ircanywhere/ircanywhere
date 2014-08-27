@@ -175,7 +175,7 @@ UserManager.prototype.isAuthenticated = function(data) {
 	var deferred = Q.defer(),
 		parsed = (data) ? data.split('; ') : [],
 		cookies = {};
-
+	
 	parsed.forEach(function(cookie) {
 		var split = cookie.split('=');
 			cookies[split[0]] = split[1];
@@ -379,7 +379,7 @@ UserManager.prototype.userLogin = function(req, res) {
 		var salt = user.salt,
 			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
-		if (!req.cookies || !req.cookies.token || hash !== user.password) {
+		if (hash !== user.password) {
 			output.failed = true;
 			output.errors.push({error: 'Password incorrect'});
 		} else if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) || hash === user.password) {
