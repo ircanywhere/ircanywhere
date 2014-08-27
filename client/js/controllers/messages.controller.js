@@ -27,7 +27,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				return accum;
 			}
 
-			if ((item.network === tab.networkName || item.network === network.name) &&
+			if ((item.network === tab.network || item.network === network._id) &&
 				((tab.type === 'network' && item.target === '*') ||
 				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {
@@ -46,7 +46,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				return accum;
 			}
 				
-			if ((item.network === tab.networkName || item.network === network.name) &&
+			if ((item.network === tab.network || item.network === network._id) &&
 				((tab.type === 'network' && item.target === '*') ||
 				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {
@@ -224,7 +224,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var title = object.get('message.nickname') + ' - ' + object.target,
 			Notify = this.notify(title, {
 				body: object.get('message.message'),
-				tag: object.network + '/' + object.target,
+				tag: object._id + '/' + object.target,
 				id: object._id,
 				timeout: 5,
 				onClose: function(obj) {
@@ -278,7 +278,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 
 		this.unreadNotifications.forEach(function(item) {
-			if (!(App.get('isActive') && item.tag === tab.networkName + '/' + tab.title)) {
+			if (!(App.get('isActive') && item.tag === tab.network + '/' + tab.title)) {
 				return false;
 			}
 			// tab or window isnt active
