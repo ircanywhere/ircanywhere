@@ -379,17 +379,10 @@ UserManager.prototype.userLogin = function(req, res) {
 		var salt = user.salt,
 			hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
 
-		if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) !== undefined) {
-			output.successMessage = 'Login successful';
-
-			deferred.resolve(output);
-			return;
-		}
-
-		if (hash != user.password) {
+		if (!req.cookies || !req.cookies.token || hash !== user.password) {
 			output.failed = true;
 			output.errors.push({error: 'Password incorrect'});
-		} else {
+		} else if (req.cookies.token && _.find(user.tokens, {key: req.cookies.token}) || hash === user.password) {
 			output.successMessage = 'Login successful';
 			// set the output
 
