@@ -246,15 +246,16 @@ EventManager.prototype.getPrefix = function(client, user) {
 /**
  * Gets the most recent event from the database by its type.
  *
+ * @method getEventByType
  * @param {String} type Event type
- * @param {String} networkName Event network
+ * @param {ObjectID} network Event network
  * @param {String} userId Id of the user
  * @returns {promise} Promise that resolves to event.
  */
-EventManager.prototype.getEventByType = function (type, networkName, userId) {
+EventManager.prototype.getEventByType = function (type, network, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({type: type, network: networkName, user: userId}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
+	application.Events.find({type: type, network: network, user: userId}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 		if (err) {
 			deferred.reject(err);
 			return;
@@ -269,14 +270,15 @@ EventManager.prototype.getEventByType = function (type, networkName, userId) {
 /**
  * Gets the message playback for an IRC server user since he was last seen.
  *
- * @param {String} networkName Network to get playback from
+ * @method getUserPlayback
+ * @param {ObjectID} network Network to get playback from
  * @param {String} userId Id of the user
  * @returns {promise} Promise that resolves to array of playback events.
  */
-EventManager.prototype.getUserPlayback = function (networkName, userId) {
+EventManager.prototype.getUserPlayback = function (network, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({read: false, network: networkName, user: userId})
+	application.Events.find({read: false, network: network, user: userId})
 		.sort({'message.time': 1}).toArray(function(err, events) {
 		if (err) {
 			deferred.reject(err);
@@ -285,7 +287,7 @@ EventManager.prototype.getUserPlayback = function (networkName, userId) {
 
 		deferred.resolve(events);
 
-		application.Events.update({read: false, network: networkName, user: userId},
+		application.Events.update({read: false, network: network, user: userId},
 			{$set: {read: true}}, {multi: true},
 			function (err) {
 				if (err) {

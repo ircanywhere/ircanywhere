@@ -240,7 +240,7 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Don't duplicate events.
 
-	if (event.network !== network.name) {
+	if (event.network !== self.networkId) {
 		return;
 	}
 	// Check network
@@ -316,13 +316,13 @@ ServerSession.prototype.sendWelcome = function () {
 		}
 	}
 
-	return eventManager.getEventByType('registered', network.name, self.user._id)
+	return eventManager.getEventByType('registered', self.networkId, self.user._id)
 		.then(function (event) {
 			if (event) {
 				_sendWelcomeMessageToNick(event.message.raw, self.clientNick);
 			}
 
-			return eventManager.getEventByType('lusers', network.name, self.user._id);
+			return eventManager.getEventByType('lusers', self.networkId, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
@@ -334,14 +334,14 @@ ServerSession.prototype.sendWelcome = function () {
 			}
 			// Change nick on client to what we have on the network.
 
-			return eventManager.getEventByType('motd', network.name, self.user._id);
+			return eventManager.getEventByType('motd', self.networkId, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
 				_sendWelcomeMessageToNick(event.message.raw);
 			}
 
-			return eventManager.getEventByType('usermode', network.name, self.user._id);
+			return eventManager.getEventByType('usermode', self.networkId, self.user._id);
 		})
 		.then(function (event) {
 			if (event) {
@@ -375,7 +375,7 @@ ServerSession.prototype.sendJoins = function () {
 			return Q.all(tabs.map(function (tab) {
 				var deferred = Q.defer();
 
-				application.Events.find({type: 'join', 'extra.self': true, network: network.name, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
+				application.Events.find({type: 'join', 'extra.self': true, network: self.networkId, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
 						deferred.reject(err);
 						return;
@@ -416,7 +416,7 @@ ServerSession.prototype.sendPlayback = function () {
 		channelsSent = {},
 		network = Clients[this.networkId.toString()];
 
-	eventManager.getUserPlayback(network.name, self.user._id)
+	eventManager.getUserPlayback(self.networkId, self.user._id)
 		.then(function (events) {
 			var lastDate = {},
 				timezoneOffset = parseInt(self.user.timezoneOffset, 10) || new Date().getTimezoneOffset(),
