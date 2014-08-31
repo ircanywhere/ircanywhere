@@ -109,7 +109,7 @@ RPCHandler.prototype.handleNetworksAll = function(doc) {
 	} else if (eventName === 'update') {
 		rpcHandler.push(doc.internal.userId, 'updateNetwork', doc);
 	} else if (eventName === 'delete') {
-		rpcHandler.push(doc.internal.userId, 'removeNetwork', doc);
+		rpcHandler.push(doc.internal.userId, 'removeNetwork', {_id: doc});
 	}
 };
 
@@ -146,7 +146,7 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 	} else if (eventName === 'update') {
 		rpcHandler.push(uid, 'updateTab', doc);
 	} else if (eventName === 'delete') {
-		rpcHandler.push(uid, 'removeTab', doc);
+		rpcHandler.push(uid, 'removeTab', {_id: doc});
 	}
 };
 
@@ -192,7 +192,7 @@ RPCHandler.prototype.handleCommandsAll = function(doc) {
 	if (eventName === 'insert') {
 		rpcHandler.push(doc.user, 'newBacklog', doc);
 	} else if (eventName === 'delete') {
-		rpcHandler.push(doc.user, 'removeBacklog', doc);
+		rpcHandler.push(doc.user, 'removeBacklog', {_id: doc});
 	}
 };
 
@@ -228,7 +228,7 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 		} else if (eventName === 'update') {
 			rpcHandler.push(uid, 'updateChannelUser', doc);
 		} else if (eventName === 'delete') {
-			rpcHandler.push(uid, 'deleteChannelUser', doc);
+			rpcHandler.push(uid, 'removeChannelUser', {_id: doc});
 		}
 	});
 };

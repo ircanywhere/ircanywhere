@@ -145,7 +145,7 @@ Ember.Socket = Ember.Object.extend({
 				self._update('networks', data._id, data);
 				break;
 			case 'removeNetwork':
-				self._delete('networks', data);
+				self._delete('networks', data._id);
 				break;
 			case 'addTab':
 				self._store('tabs', [data]);
@@ -154,7 +154,7 @@ Ember.Socket = Ember.Object.extend({
 				self._update('tabs', data._id, data);
 				break;
 			case 'removeTab':
-				self._delete('tabs', data);
+				self._delete('tabs', data._id);
 				break;
 			case 'newEvent':
 				self._store('events', [data]);
@@ -166,7 +166,7 @@ Ember.Socket = Ember.Object.extend({
 				self._store('commands', [data]);
 				break;
 			case 'removeBacklog':
-				self._delete('commands', data);
+				self._delete('commands', data._id);
 				break;
 			case 'newChannelUser':
 				self._store('channelUsers', [data], false, userInsertCheck);
@@ -174,8 +174,8 @@ Ember.Socket = Ember.Object.extend({
 			case 'updateChannelUser':
 				self._update('channelUsers', data._id, data);
 				break;
-			case 'deleteChannelUser':
-				self._delete('channelUsers', data);
+			case 'removeChannelUser':
+				self._delete('channelUsers', data._id);
 				break;
 			case 'banList':
 				self.emitter.determineEvent('banList', 'new', data, false);
