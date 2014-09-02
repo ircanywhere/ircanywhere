@@ -93,7 +93,7 @@ Application.prototype.init = function() {
 
 	var validation = validate(this.config, schema);
 	if (validation.length > 0) {
-		console.log(new Date().toJSON(), '-', util.inspect(validation, {colors: true}));
+		this.logger.log('error', util.inspect(validation, {colors: false}));
 		throw new Error('Invalid config settings, please amend.');
 	}
 	// attempt to validate our config file
