@@ -240,7 +240,7 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Don't duplicate events.
 
-	if (event.network !== self.networkId) {
+	if (event.network !== this.networkId) {
 		return;
 	}
 	// Check network
@@ -373,7 +373,8 @@ ServerSession.prototype.sendJoins = function () {
 	return networkManager.getActiveChannelsForUser(self.user._id, self.networkId)
 		.then(function (tabs) {
 			return Q.all(tabs.map(function (tab) {
-				var deferred = Q.defer();
+				var prefix = '',
+					deferred = Q.defer();
 
 				application.Events.find({type: 'join', 'extra.self': true, network: self.networkId, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
@@ -394,9 +395,10 @@ ServerSession.prototype.sendJoins = function () {
 						message.prefix += '@' + hostmask.hostname;
 					}
 
+					prefix = message.prefix;
 					self.sendRaw(message.toString());
 
-					ircFactory.send(self.networkId.toString(), 'raw', ['NAMES', tab.target]);
+					self.sendChannelInfo(tab);
 
 					deferred.resolve();
 				});
@@ -405,6 +407,26 @@ ServerSession.prototype.sendJoins = function () {
 			}));
 		});
 };
+
+/**
+ * Sends channel information, such as NAMES, TOPIC etc
+ *
+ * @param {Object} tab Channel tab
+ * @return void
+ */
+ServerSession.prototype.sendChannelInfo = function (tab) {
+	var self = this,
+		network = Clients[this.networkId.toString()];
+
+	if (typeof tab.topic === 'object') {
+		this.sendRaw(':' + network.server + ' 332 ' + network.nick + ' ' + tab.target + ' :' + tab.topic.topic);
+		this.sendRaw(':' + network.server + ' 333 ' + network.nick + ' ' + tab.target + ' ' + tab.topic.setter + ' ' + (+new Date() / 1000));
+	}
+	// send topic
+
+	ircFactory.send(this.networkId.toString(), 'raw', ['NAMES', tab.target]);
+	// send NAMES
+}
 
 /**
  * Sends playback messages to client.

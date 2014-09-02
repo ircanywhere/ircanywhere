@@ -121,9 +121,9 @@ ChannelManager.prototype.insertUsers = function(key, channel, users, force) {
 			// turn this into an array of nicknames
 
 			if (force) {
-				application.ChannelUsers.remove({network: key, channel: channel}, {safe: false});
+				application.ChannelUsers.remove({network: key, channel: channel}, insertUsers);
 			} else {
-				application.ChannelUsers.remove({network: key, channel: channel, nickname: {$in: find}}, {safe: false});
+				application.ChannelUsers.remove({network: key, channel: channel, nickname: {$in: find}}, insertUsers);
 			}
 			// ok so here we've gotta remove any users in the channel already
 			// and all of them if we're being told to force the update
