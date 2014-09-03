@@ -114,6 +114,10 @@ NetworkManager.prototype.init = function() {
 
 		ircFactory.destroy(id, false);
 		// destroy the client if it hasn't been destroyed
+
+		application.ChannelUsers.remove({network: id}, {safe: false});
+		application.Tabs.remove({network: id}, {safe: false});
+		// remove lingering data
 	});
 	// just sync clients up to this, instead of manually doing it
 	// we're asking for problems that way doing it this way means
@@ -656,6 +660,9 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
 		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: {active: activate}}, {safe: false});
+	
+		application.ChannelUsers.remove({network: client._id, channel: target.toLowerCase()}, {safe: false});
+		// remove any users for the tab
 	} else {
 		application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
 	}

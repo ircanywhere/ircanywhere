@@ -136,15 +136,6 @@ IRCHandler.prototype.registered = function(client, message) {
 			// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
 		});
 		// find our channels to automatically join from the network setup
-
-		setTimeout(function() {
-			application.Events.update({user: client.internal.userId, network: client.server}, {$set: {
-				network: message.capabilities.network.name,
-			}}, {multi: true, safe: false});
-		}, 5000);
-		// update events later on so when we're totally finished connecting (we can't assume at any point because of half assed ircds
-		// not sending out proper stuff.. we know that we're registered here we just give it 5 seconds for other shit to come in
-		// could be large who lists etc.
 	});
 };
 
@@ -261,7 +252,7 @@ IRCHandler.prototype.join = function(client, message) {
 		ircFactory.send(client._id, 'names', [message.channel]);
 		insertEvent();
 	} else {
-		channelManager.insertUsers(client._id, client.name, message.channel, [user])
+		channelManager.insertUsers(client._id, message.channel, [user])
 			.then(insertEvent);
 	}
 	// if it's us joining a channel we'll create a tab for it and request a mode
@@ -285,7 +276,7 @@ IRCHandler.prototype.part = function(client, message) {
 	}
 
 	eventManager.insertEvent(client, message, 'part', function() {
-		channelManager.removeUsers(client.name, message.channel, [message.nickname]);
+		channelManager.removeUsers(client._id, message.channel, [message.nickname]);
 
 		if (message.nickname === client.nick) {
 			networkManager.activeTab(client, message.channel, false);
@@ -308,7 +299,7 @@ IRCHandler.prototype.kick = function(client, message) {
 	}
 
 	eventManager.insertEvent(client, message, 'kick', function() {
-		channelManager.removeUsers(client.name, message.channel, [message.kicked]);
+		channelManager.removeUsers(client._id, message.channel, [message.kicked]);
 
 		if (message.kicked === client.nick) {
 			networkManager.activeTab(client, message.channel, false);
@@ -331,7 +322,7 @@ IRCHandler.prototype.quit = function(client, message) {
 	}
 
 	eventManager.insertEvent(client, message, 'quit', function() {
-		channelManager.removeUsers(client.name, [message.nickname]);
+		channelManager.removeUsers(client._id, [message.nickname]);
 	});
 };
 
@@ -360,7 +351,7 @@ IRCHandler.prototype.nick = function(client, message) {
 	// is this a client we're chatting to whos changed their nickname?
 	
 	eventManager.insertEvent(client, message, 'nick', function() {
-		channelManager.updateUsers(client._id, client.name, [message.nickname], {nickname: message.newnick});
+		channelManager.updateUsers(client._id, [message.nickname], {nickname: message.newnick});
 	});
 };
 
@@ -407,7 +398,7 @@ IRCHandler.prototype.who = function(client, message) {
 		users.push(user);
 	});
 
-	channelManager.insertUsers(client._id, client.name, message.channel, users, true)
+	channelManager.insertUsers(client._id, message.channel, users, true)
 		.then(function(inserts) {
 			rpcHandler.push(client.internal.userId, 'channelUsers', inserts);
 			// burst emit these instead of letting the oplog tailer handle it, it's too heavy
@@ -427,7 +418,7 @@ IRCHandler.prototype.names = function(client, message) {
 		return false;
 	}
 
-	application.ChannelUsers.find({network: client.name, channel: message.channel.toLowerCase()}).toArray(function(err, channelUsers) {
+	application.ChannelUsers.find({network: client._id, channel: message.channel.toLowerCase()}).toArray(function(err, channelUsers) {
 		if (err || !channelUsers) {
 			return false;
 		}
@@ -468,7 +459,7 @@ IRCHandler.prototype.mode = function(client, message) {
 		return false;
 	}
 
-	channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
+	channelManager.updateModes(client._id, client.internal.capabilities.modes, message.channel, message.mode);
 };
 
 /**
@@ -485,7 +476,7 @@ IRCHandler.prototype.mode_change = function(client, message) {
 	}
 
 	eventManager.insertEvent(client, message, 'mode', function() {
-		channelManager.updateModes(client._id, client.internal.capabilities.modes, client.name, message.channel, message.mode);
+		channelManager.updateModes(client._id, client.internal.capabilities.modes, message.channel, message.mode);
 	});
 };
 
