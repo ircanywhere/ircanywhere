@@ -131,6 +131,9 @@ Application.prototype.init = function() {
 		self.Events = db.collection('events');
 		self.Commands = db.collection('commands');
 
+		self.cleanCollections();
+		// ensure the collections are clean if < 0.1-beta
+
 		mongo.MongoClient.connect(self.config.oplog, self.database.settings, function(oerr, odb) {
 			if (oerr) {
 				throw oerr;
@@ -153,6 +156,49 @@ Application.prototype.init = function() {
 		self.ee.emit('ready');
 		// initiate sub-objects
 	});
+};
+
+/**
+ * Clean `channelUsers` and `events` collection if needed. Usually when someone has installed
+ * 0.1-beta before installing this version and has incompatible data lingering around.
+ *
+ * @method cleanCollections
+ * @return void
+ */
+Application.prototype.cleanCollections = function() {
+	var self = this,
+		chanUserIds = [],
+		eventIds = [];
+
+	this.ChannelUsers.find({network: {$type: 2}}).toArray(function(err, docs) {
+		if (err) {
+			throw err;
+		}
+
+		_.each(docs, function(doc) {
+			chanUserIds.push(doc._id);
+		})
+		
+		if (chanUserIds.length) {
+			self.ChannelUsers.remove({_id: {$in: chanUserIds}}, {multi: true, safe: false});
+		}
+	});
+	// remove lingering channel user objects
+
+	this.Events.find({network: {$type: 2}}).toArray(function(err, docs) {
+		if (err) {
+			throw err;
+		}
+
+		_.each(docs, function(doc) {
+			eventIds.push(doc._id);
+		})
+		
+		if (eventIds.length) {
+			self.Events.remove({_id: {$in: eventIds}}, {multi: true, safe: false});
+		}
+	});
+	// same for events
 };
 
 /**

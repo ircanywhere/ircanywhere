@@ -7,6 +7,11 @@ IRCAnywhere |TravisBuild|
 
 Full documentation for **IRCAnywhere** is available at `http://ircanywhere.readthedocs.org/`_
 
+Release v0.2-beta
+~~~~~~~~~~~~~~~~~
+
+Release `v0.2-beta` is the second installment of **IRCAnywhere**, which includes a large amount of new features and bug fixes since the previous release, `v0.2-alpha`. This release contains non backwards compatible database changes, when starting the server, it will warn you about this and advise a clean out of a number of collections `channelUsers` and `events` to ensure that nothing breaks.
+
 History
 ~~~~~~~
 
