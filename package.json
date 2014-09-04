@@ -46,7 +46,8 @@
     "q": "~1.0.1",
     "simple-schema": "1.1.0",
     "sockjs": "~0.3.8",
-    "winston": "~0.7.2"
+    "winston": "~0.7.2",
+    "redmark": "^1.0.1"
   },
   "keywords": [
     "irc",

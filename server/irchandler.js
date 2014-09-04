@@ -8,6 +8,7 @@
  */
 
 var _ = require('lodash'),
+	queue = require('redmark'),
 	hooks = require('hooks'),
 	helper = require('../lib/helpers').Helpers;
 
@@ -22,7 +23,10 @@ var _ = require('lodash'),
  * @return void
  */
 function IRCHandler() {
-	
+	this.queueId = queue.seed(function(id, chan) {
+		ircFactory.send(id, 'raw', ['WHO', chan]);
+	}, {time: 1000, total: 10, max: 1000});
+	// rate limit /who call
 }
 
 /**
@@ -413,6 +417,8 @@ IRCHandler.prototype.who = function(client, message) {
  * @return void
  */
 IRCHandler.prototype.names = function(client, message) {
+	var self = this;
+
 	if (!message.names || !message.channel) {
 		return false;
 	}
@@ -439,14 +445,7 @@ IRCHandler.prototype.names = function(client, message) {
 		users.sort();
 
 		if (!_.isEqual(keys, users) && message.channel !== '*') {
-			setTimeout(function() {
-				ircFactory.send(client._id, 'raw', ['WHO', message.channel]);
-			}, Math.floor(Math.random() * 2001));
-			// generate a randoom time between 0 and 2 seconds to send a /WHO
-			// out, otherwise we risk Excess flooding
-			// XXX - Not sure if anyone can think of a better way of doing this?
-			// We could actually rate limit the function call.. Gradually building up
-			// user lists..
+			queue.add(self.queueId, [client._id, message.channel]);
 		}
 		// different lists.. lets do a /WHO
 	});
