@@ -102,7 +102,7 @@ ChannelManager.prototype.queueJoin = function(id, channel, key) {
 				return (_.indexOf(remove, obj.channel) === -1);
 			});
 
-			ircFactory.send(id, 'join', [message]);
+			ircFactory.send(id, 'raw', 'JOIN ' + message);
 			// send the join
 
 			if (self.queues[i].length > 0) {
