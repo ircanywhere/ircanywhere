@@ -1,17 +1,19 @@
 var gulp = require('gulp'),
 	less = require('gulp-less'),
 	concatCss = require('gulp-concat-css'),
-	handlebars = require('gulp-ember-handlebars'),
+	handlebars = require('gulp-handlebars'),
 	uglify = require('gulp-uglifyjs'),
-	clean = require('gulp-clean'),
+	rimraf = require('gulp-rimraf'),
 	jshint = require('gulp-jshint'),
 	mocha = require('gulp-mocha'),
 	concat = require('gulp-concat'),
+	wrap = require('gulp-wrap'),
+	declare = require('gulp-declare'),
 	sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('clean', function() {
 	gulp.src('./client/build', {read: false})
-		.pipe(clean({force: true}));
+		.pipe(rimraf({force: true}));
 });
 
 gulp.task('css', function() {
@@ -31,7 +33,15 @@ gulp.task('css', function() {
 gulp.task('templates', function() {
 	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
 		.pipe(handlebars({
-			outputType: 'browser'
+			handlebars: require('ember-handlebars')
+		}))
+		.pipe(wrap('Ember.Handlebars.template(<%= contents %>)'))
+		.pipe(declare({
+			namespace: 'Ember.TEMPLATES',
+			noRedeclare: true,
+			processName: function(filePath) {
+				return filePath.replace(__dirname + '/client/templates/', '').replace('.js', '');
+			}
 		}))
 		.pipe(gulp.dest('./client/build/templates'))
 		.pipe(uglify('templates.js', {
