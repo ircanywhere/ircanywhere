@@ -128,12 +128,7 @@ IRCHandler.prototype.registered = function(client, message) {
 		// 		 nickserv identify or something
 
 		_.each(client.channels, function(channel) {
-			var chan = channel.channel,
-				password = channel.password || '';
-
-			ircFactory.send(client._id, 'join', [chan, password]);
-			ircFactory.send(client._id, 'mode', [chan]);
-			// request the mode aswell.. I thought this was sent out automatically anyway? Seems no.
+			channelManager.queueJoin(client._id, channel.channel, channel.password || '');
 		});
 		// find our channels to automatically join from the network setup
 	});
@@ -248,9 +243,13 @@ IRCHandler.prototype.join = function(client, message) {
 
 	if (message.nickname === client.nick) {
 		networkManager.addTab(client, message.channel, 'channel', true);
+		// add tab
+
 		ircFactory.send(client._id, 'mode', [message.channel]);
-		ircFactory.send(client._id, 'names', [message.channel]);
+		// request modes
+
 		insertEvent();
+		// insert join event
 	} else {
 		channelManager.insertUsers(client._id, message.channel, [user])
 			.then(insertEvent);

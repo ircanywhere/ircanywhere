@@ -21,6 +21,8 @@ var _ = require('lodash'),
  * @return void
  */
 function ChannelManager() {
+	var self = this;
+
 	this.channel = {
 		network: '',
 		channel: '',
@@ -28,7 +30,89 @@ function ChannelManager() {
 		modes: ''
 	};
 	// a default channel object
+
+	this.queues = {};
+	// queue object
 }
+
+/**
+ * Queues a channel for join
+ *
+ * @method queueJoin
+ * @param {ObjectID} id A valid Mongo ObjectID for the networks collection
+ * @param {String} channel A valid channel name
+ * @param {String} key A key to join the channel if necessary
+ * @return void
+ */
+ChannelManager.prototype.queueJoin = function(id, channel, key) {
+	var self = this,
+		time = +new Date();
+
+	if (!this.queues[id]) {
+		this.queues[id] = [];
+	}
+	// is there a queue for this user?
+
+	var queue = this.queues[id];
+	if (queue.length) {
+		var item = queue[queue.length - 1];
+		clearTimeout(item.timeoutId);
+		delete item.timeoutId;
+	}
+	// get last item
+
+	var timeout = setTimeout(function() {
+		commitJoin(id);
+	}, 50);
+
+	queue.push({id: id, channel: channel, key: key || '0', timeoutId: timeout});
+	// push to the queue
+
+	function commitJoin(i) {
+		var message = '',
+			remove = [];
+
+		_.each(self.queues[i], function(item, key) {
+			if (!item) {
+				return;
+			}
+			
+			if (message === '') {
+				message = item.channel + ' ' + item.key;
+			} else {
+				var parts = message.split(' '),
+					channels = parts[0].split(','),
+					keys = parts[1].split(',');
+
+				channels.push(item.channel);
+				keys.push(item.key);
+				message = channels.join(',') + ' ' + keys.join(',');
+			}
+
+			remove.push(item.channel);
+			
+			if (message.length >= 503) {
+				return false;
+			}
+		});
+		// construct a string that IRC understands from our channel objects
+
+		if (remove.length) {
+			self.queues[i] = _.filter(self.queues[i], function(obj) {
+				return (_.indexOf(remove, obj.channel) === -1);
+			});
+
+			ircFactory.send(id, 'join', [message]);
+			// send the join
+
+			if (self.queues[i].length > 0) {
+				commitJoin(i);
+			} else {
+				delete self.queues[i];
+			}
+		}
+	}
+};
 
 /**
  * Gets a tab record from the parameters passed in, strictly speaking this doesn't have to
