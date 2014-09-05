@@ -53,35 +53,38 @@ NetworkManager.prototype.init = function() {
 		networks = application.Networks.find(),
 		tabs = application.Tabs.find();
 
-	networks.each(function(err, doc) {
-		if (err || !doc) {
+	networks.toArray(function(err, docs) {
+		if (err || !docs) {
 			return;
 		}
 		// error
 
-		var id = doc._id.toString();
-		if (!doc.internal) {
-			return;
-		}
+		_.each(docs, function(doc) {
+			var id = doc._id.toString();
+			if (!doc.internal) {
+				return;
+			}
 
-		Clients[id] = doc;
-		Clients[id].internal.tabs = {};
+			Clients[id] = doc;
+			Clients[id].internal.tabs = {};
+		});
+
+		tabs.each(function(err, doc) {
+			if (err || !doc) {
+				return;
+			}
+			// error
+
+			var client = Clients[doc.network.toString()];
+			if (!client || !client.internal) {
+				return;
+			}
+
+			client.internal.tabs[doc.target] = doc;
+		});
+		
 	});
 	// load up networks and push them into Clients
-
-	tabs.each(function(err, doc) {
-		if (err || !doc) {
-			return;
-		}
-		// error
-
-		var client = Clients[doc.network.toString()];
-		if (!client || !client.internal) {
-			return;
-		}
-
-		client.internal.tabs[doc.target] = doc;
-	});
 
 	application.ee.on(['networks', 'insert'], function(doc) {
 		var id = doc._id.toString();

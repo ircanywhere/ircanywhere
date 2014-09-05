@@ -1,3 +1,4 @@
+.idea
 private/node.json
 private/certs/*
 client/build/*

@@ -77,7 +77,6 @@ App.NetworkController = Ember.ObjectController.extend({
 			unread += tab.unread;
 			highlights += tab.highlights;
 		});
-
 		
 		if (unread > 0) {
 			title.unshift('*');

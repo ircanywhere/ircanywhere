@@ -33,7 +33,7 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object, backlog) {
 		var self = this;
 
-		var tab = this.get('socket.tabs').findBy('network', object.network),
+		var tab = this.socket.findOne('tabs', {network: object.network, target: object.target}),
 			network = this.get('socket.networks').findBy('_id', object.network);
 
 		if (!tab || !network) {
