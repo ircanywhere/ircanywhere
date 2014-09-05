@@ -7,11 +7,12 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	content: function() {
 		var selectedTab = this.get('user.selectedTab');
 
-		return this.get('socket.tabs').map(function (tab) {
+		this.get('socket.tabs').map(function (tab) {
 			tab.set('selected', tab.url === selectedTab);
-
 			return tab;
 		});
+
+		return this.get('socket.tabs');
 	}.property('user.selectedTab', 'socket.tabs'),
 
 	statusChanged: function() {
@@ -33,21 +34,23 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object, backlog) {
 		var self = this;
 
-		var tab = this.socket.findOne('tabs', {network: object.network, target: object.target}),
+		var tabs = this.socket.find('tabs', {network: object.network}),
 			network = this.get('socket.networks').findBy('_id', object.network);
 
-		if (!tab || !network) {
+		if (!tabs || !network) {
 			return;
 		}
 
-		if (tab.type === 'channel' && object.target === tab.target) {
-			self.incrementCounters(network, tab, object, backlog);
-		} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
-			self.incrementCounters(network, tab, object, backlog);
-		} else if (tab.type === 'network' && object.target === '*') {
-			self.incrementCounters(network, tab, object, backlog);
-		}
-		// we need to dig a little deeper to find out the exact tab this message is in
+		tabs.forEach(function(tab) {
+			if (tab.type === 'channel' && object.target === tab.target) {
+				self.incrementCounters(network, tab, object, backlog);
+			} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
+				self.incrementCounters(network, tab, object, backlog);
+			} else if (tab.type === 'network' && object.target === '*') {
+				self.incrementCounters(network, tab, object, backlog);
+			}
+			// we need to dig a little deeper to find out the exact tab this message is in
+		});
 	},
 
 	incrementCounters: function(network, tab, object, backlog) {

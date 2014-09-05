@@ -147,14 +147,15 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 		// we'll have to do some calculating to determine where we want them
 		// we shall put them in channel and privmsg tab events
 
-		if (message.nickname === client.nick) {
+		if (message.nickname.toLowerCase() === client.nick.toLowerCase()) {
 			self._insert(client, message, type, null, true);
 		}
 		// we can also push it into the * backlog if it's us
-	} else if (type == 'privmsg' || type == 'action') {
-		var tab = client.internal.tabs[message.target.toLowerCase()];
+	} else if (type === 'privmsg' || type === 'action') {
+		var target = message.target.toLowerCase(),
+			tab = client.internal.tabs[message.target.toLowerCase()];
 
-		if (!tab && message.nickname !== client.nick) {
+		if (!tab && target === client.nick.toLowerCase()) {
 			networkManager.addTab(client, message.nickname, 'query', false);
 		}
 		// create the tab if its undefined
