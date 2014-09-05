@@ -36,6 +36,7 @@ App.NetworkController = Ember.ObjectController.extend({
 		query.read = false;
 		events.setEach('unread', false);
 		tab.set('unread', 0);
+		tab.set('highlights', 0);
 		tab.set('showMessageBar', false);
 		// mark them as unread to hide the bar
 
@@ -59,7 +60,6 @@ App.NetworkController = Ember.ObjectController.extend({
 	},
 
 	gotoHighlight: function() {
-		console.log('goto first highlight');
 		// XXX
 	},
 
