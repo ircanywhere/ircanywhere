@@ -1,7 +1,7 @@
 {
   "name": "ircanywhere",
   "description": "IRCAnywhere web bnc system",
-  "version": "0.2.0-alpha",
+  "version": "0.2.0-beta",
   "author": "Ricki Hastings <ricki@ircanywhere.com> (https://ircanywhere.com)",
   "homepage": "https://ircanywhere.com",
   "main": "./server/ircanywhere",
