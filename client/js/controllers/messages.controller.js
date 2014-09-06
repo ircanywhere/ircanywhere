@@ -29,7 +29,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 
 			if ((item.network === tab.network || item.network === network._id) &&
 				((tab.type === 'network' && item.target === '*') ||
-				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
+				(tab.type === 'query' && (Helpers.compareStrings(item.target, tab.target, true) || (Helpers.compareStrings(item.target, network.nick, true) && Helpers.compareStrings(item.message.nickname, tab.target, true)))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {
 				// messy conditional
 				accum.pushObject(item);
@@ -48,7 +48,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				
 			if ((item.network === tab.network || item.network === network._id) &&
 				((tab.type === 'network' && item.target === '*') ||
-				(tab.type === 'query' && (item.target === tab.target || (item.target === network.nick && item.message.nickname.toLowerCase() === tab.target))) ||
+				(tab.type === 'query' && (Helpers.compareStrings(item.target, tab.target, true) || (Helpers.compareStrings(item.target, network.nick, true) && Helpers.compareStrings(item.message.nickname, tab.target, true)))) ||
 				(tab.type === 'channel' && item.target === tab.target))) {
 				// messy conditional
 				accum.removeObject(item);

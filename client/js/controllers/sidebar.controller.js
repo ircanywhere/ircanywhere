@@ -44,7 +44,7 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 		tabs.forEach(function(tab) {
 			if (tab.type === 'channel' && object.target === tab.target) {
 				self.incrementCounters(network, tab, object, backlog);
-			} else if (tab.type === 'query' && (object.target === tab.target || (object.target === network.nick && object.message.nickname.toLowerCase() === tab.target))) {
+			} else if (tab.type === 'query' && (Helpers.compareStrings(object.target, tab.target, true) || (Helpers.compareStrings(object.target, network.nick, true) && Helpers.compareStrings(object.message.nickname, tab.target, true)))) {
 				self.incrementCounters(network, tab, object, backlog);
 			} else if (tab.type === 'network' && object.target === '*') {
 				self.incrementCounters(network, tab, object, backlog);

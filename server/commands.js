@@ -177,7 +177,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 
 	ircFactory.send(client._id, 'raw', ['NICKSERV'].concat(params));
 
-	if (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login') {
+	if (helpers.compareStrings(params[0], 'identify', true) || helpers.compareStrings(params[0], 'id', true) || helpers.compareStrings(params[0], 'login', true)) {
 		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands
