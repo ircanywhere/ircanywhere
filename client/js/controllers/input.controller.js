@@ -49,6 +49,7 @@ App.InputController = Ember.ObjectController.extend({
 			// we push it into the buffer manually, saves us getting the data sent back down
 			// through the pipe which is a waste of bandwidth
 
+			this.set('commandIndex', 0);
 			this.set('notIteratingBacklog', true);
 			this.set('oldInputValue', '');
 			this.set('inputValue', '');
