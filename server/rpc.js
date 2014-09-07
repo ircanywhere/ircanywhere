@@ -209,7 +209,7 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 		return false;
 	}
 
-	var query = (ext) ? {'networkName': ext.network, 'target': ext.channel} : {'networkName': doc.network, 'target': doc.channel},
+	var query = (ext) ? {'network': ext.network, 'target': ext.channel} : {'network': doc.network, 'target': doc.channel},
 		eventName = this.event[1],
 		uid = false;
 
