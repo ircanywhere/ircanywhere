@@ -215,11 +215,13 @@ Application.prototype.setupOplog = function() {
 
 	this.channelUserDocs = {};
 	this.ChannelUsers.find({}).each(function(err, item) {
-		if (err || !item) {
+		if (err) {
 			throw err;
 		}
 
-		self.channelUserDocs[item._id] = item;
+		if (item) {
+			self.channelUserDocs[item._id] = item;
+		}
 	});
 
 	this.Oplog.find({ts: {$gte: new mongo.Timestamp(start, start)}}, {tailable: true, timeout: false}).each(function(err, item) {
