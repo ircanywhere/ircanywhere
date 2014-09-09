@@ -177,7 +177,7 @@ Application.prototype.cleanCollections = function() {
 
 		_.each(docs, function(doc) {
 			chanUserIds.push(doc._id);
-		})
+		});
 		
 		if (chanUserIds.length) {
 			self.ChannelUsers.remove({_id: {$in: chanUserIds}}, {multi: true, safe: false});
@@ -192,7 +192,7 @@ Application.prototype.cleanCollections = function() {
 
 		_.each(docs, function(doc) {
 			eventIds.push(doc._id);
-		})
+		});
 		
 		if (eventIds.length) {
 			self.Events.remove({_id: {$in: eventIds}}, {multi: true, safe: false});

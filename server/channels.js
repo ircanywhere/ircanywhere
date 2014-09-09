@@ -21,8 +21,6 @@ var _ = require('lodash'),
  * @return void
  */
 function ChannelManager() {
-	var self = this;
-
 	this.channel = {
 		network: '',
 		channel: '',
@@ -45,8 +43,7 @@ function ChannelManager() {
  * @return void
  */
 ChannelManager.prototype.queueJoin = function(id, channel, key) {
-	var self = this,
-		time = +new Date();
+	var self = this;
 
 	if (!this.queues[id]) {
 		this.queues[id] = [];
@@ -72,7 +69,7 @@ ChannelManager.prototype.queueJoin = function(id, channel, key) {
 		var message = '',
 			remove = [];
 
-		_.each(self.queues[i], function(item, key) {
+		_.each(self.queues[i], function(item) {
 			if (!item) {
 				return;
 			}
@@ -227,8 +224,8 @@ ChannelManager.prototype.insertUsers = function(key, channel, users, force) {
  * @return void
  */
 ChannelManager.prototype.removeUsers = function(key, channel, users) {
-	var channel = (_.isArray(channel)) ? channel : channel.toLowerCase(),
-		users = (_.isArray(channel)) ? channel : users;
+	channel = (_.isArray(channel)) ? channel : channel.toLowerCase();
+	users = (_.isArray(channel)) ? channel : users;
 	// basically we check if channel is an array, if it is we're being told to
 	// just remove the user from the entire network (on quits etc)
 
@@ -254,8 +251,6 @@ ChannelManager.prototype.removeUsers = function(key, channel, users) {
  * @return void
  */
 ChannelManager.prototype.updateUsers = function(key, users, values) {
-	var update = {};
-
 	_.each(users, function(u) {
 		var s = {network: key, nickname: u};
 
@@ -291,8 +286,9 @@ ChannelManager.prototype.updateUsers = function(key, users, values) {
  */
 
 ChannelManager.prototype.updateModes = function(key, capab, channel, mode) {
-	var channel = channel.toLowerCase(),
-		us = {};
+	var us = {};
+	
+	channel = channel.toLowerCase()
 
 	this.getChannel(key, channel)
 		.then(function(chan) {

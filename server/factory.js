@@ -129,7 +129,7 @@ IRCFactory.prototype.handleEvent = function(event, object) {
 	}
 	
 	if (application.verbose) {
-		console.log(new Date().toJSON(), "\x1b[32m<< INCOMING <<\x1b[0m", util.inspect({key: key, event: e, data: object}, {colors: true}));
+		console.log(new Date().toJSON(), '<< INCOMING <<', util.inspect({key: key, event: e, data: object}, {colors: true}));
 	}
 };
 
@@ -195,7 +195,7 @@ IRCFactory.prototype.send = function(key, command, args) {
 	this.rpc.emit('call', key.toString(), command, args);
 
 	if (application.verbose) {
-		console.log(new Date().toJSON(), "\x1b[31m>> OUTGOING >>\x1b[0m", util.inspect({key: key, event: command, data: args}, {colors: true}));
+		console.log(new Date().toJSON(), '>> OUTGOING >>', util.inspect({key: key, event: command, data: args}, {colors: true}));
 	}
 };
 

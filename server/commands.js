@@ -9,7 +9,7 @@
 
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	helper = require('../lib/helpers').Helpers;
+	helper = require('../lib/helper').helper;
 
 /**
  * Responsible for handling all incoming commands from websocket clients
@@ -177,7 +177,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 
 	ircFactory.send(client._id, 'raw', ['NICKSERV'].concat(params));
 
-	if (helpers.compareStrings(params[0], 'identify', true) || helpers.compareStrings(params[0], 'id', true) || helpers.compareStrings(params[0], 'login', true)) {
+	if (helper.compareStrings(params[0], 'identify', true) || helper.compareStrings(params[0], 'id', true) || helper.compareStrings(params[0], 'login', true)) {
 		application.Commands.remove({_id: id}, {safe: false});
 	}
 	// remove sensitive commands

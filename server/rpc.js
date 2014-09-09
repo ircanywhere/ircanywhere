@@ -411,9 +411,9 @@ RPCHandler.prototype.handleConnect = function(socket) {
 				if (tab.type === 'query') {
 					query = {network: tab.network, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
 				} else if (tab.type === 'network') {
-					query = {network: tab.network, target: '*', user: user._id}
+					query = {network: tab.network, target: '*', user: user._id};
 				} else {
-					query = {network: tab.network, target: tlower, user: user._id}
+					query = {network: tab.network, target: tlower, user: user._id};
 				}
 
 				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {

@@ -714,7 +714,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
 NetworkManager.prototype.connectNetwork = function(network) {
 	ircFactory.create(_.extend(network,
 		{
-			retryCount: (application.config.retryCount != null) ? application.config.retryCount : 10,
+			retryCount: (application.config.retryCount !== null) ? application.config.retryCount : 10,
 			retryWait: application.config.retryWait * 1000 || 10000
 		}
 	));
