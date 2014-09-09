@@ -1,5 +1,6 @@
 App.UserlistController = Ember.ArrayController.extend({
 	needs: ['index', 'network', 'tab'],
+	rerender: false,
 
 	owners: Ember.computed.filterBy('filtered', 'sort', 1),
 	admins: Ember.computed.filterBy('filtered', 'sort', 2),
@@ -12,6 +13,10 @@ App.UserlistController = Ember.ArrayController.extend({
 		return (this.get('filtered.length') !== this.get('normal.length'));
 	}.property('filtered.length', 'normal.length'),
 
+	tabChanged: function() {
+		this.set('rerender', true);
+	}.observes('controllers.index.tabId'),
+
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		initialize: function(array, changeMeta, instanceMeta) {
 			if (!this.get('controllers.index.tabId')) {
@@ -19,6 +24,9 @@ App.UserlistController = Ember.ArrayController.extend({
 			}
 
 			instanceMeta.tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
+
+			this.set('rerender', true);
+			// mark as re-render
 
 			return instanceMeta;
 		},

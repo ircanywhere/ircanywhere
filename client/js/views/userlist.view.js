@@ -3,6 +3,10 @@ App.UserlistView = Ember.View.extend({
 	classNameBindings: ['divClass'],
 	controller: App.UserlistController,
 
+	tabChanged: function() {
+		this.rerender();
+	}.observes('controller.controllers.index.tabId'),
+
 	divClass: function() {
 		var classNames = ['userlist'],
 			hidden = (this.get('controller.parentController.content.selectedTab.hiddenUsers') === true) ? 'hide' : 'show';
