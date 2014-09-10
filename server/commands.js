@@ -9,7 +9,7 @@
 
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	helper = require('../lib/helper').helper;
+	helper = require('../lib/helpers').Helpers;
 
 /**
  * Responsible for handling all incoming commands from websocket clients
