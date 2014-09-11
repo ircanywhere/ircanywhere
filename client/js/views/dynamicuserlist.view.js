@@ -28,13 +28,13 @@ App.DynamicuserlistView = Ember.View.extend({
 
 		this.list.forEach(function(item, index) {
 			if (user.nickname.toLowerCase() < item.nickname.toLowerCase() && toInsert) {
-				self.$('li[data-type="' + self.get('classType') + '"][data-user=' + item.nickname.toLowerCase() + ']').before(self.generateUserLink(user));
+				self.$('li[data-type=' + self.get('classType') + '][data-user-id=' + item._id + ']').before(self.generateUserLink(user));
 				toInsert = false;
 			}
 		});
 
 		if (toInsert) {
-			this.$('li[data-type="' + this.get('classType') + '"].head').after(this.generateUserLink(user));
+			this.$('li[data-type=' + this.get('classType') + '].head').after(this.generateUserLink(user));
 		}
 	},
 
@@ -47,7 +47,7 @@ App.DynamicuserlistView = Ember.View.extend({
 	},
 
 	generateUserLink: function(user) {
-		return '<li data-type="' + this.get('classType') + '" data-user="' + user.nickname.toLowerCase() + '">' + Ember.Handlebars.helpers.userLink._rawFunction.apply(this.get('controller'), [true, user]) + '</li>';
+		return '<li data-type="' + this.get('classType') + '" data-user-id="' + user._id + '">' + Ember.Handlebars.helpers.userLink._rawFunction.apply(this.get('controller'), [true, user]) + '</li>';
 	},
 
 	render: function(buffer) {
