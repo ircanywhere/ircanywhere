@@ -732,6 +732,11 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 		});
 	}
 	// convert _id to proper mongo IDs
+	
+	if (query.network) {
+		query.network = new mongo.ObjectID(query.network);
+	}
+	// convert _id to proper mongo IDs
 
 	application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
 		if (err || !response) {
@@ -739,8 +744,6 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 		} else {
 			socket.send('events', response);
 		}
-
-
 	});
 	// perform the query 
 };
