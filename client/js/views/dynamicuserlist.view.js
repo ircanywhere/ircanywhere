@@ -29,13 +29,13 @@ App.DynamicuserlistView = Ember.View.extend({
 
 		this.list.forEach(function(item, index) {
 			if (user.nickname.toLowerCase() < item.nickname.toLowerCase() && toInsert) {
-				self.$('li[data-user=' + item.nickname.toLowerCase() + ']').before(self.generateUserLink(user));
+				self.$('li[data-type="' + this.get('classType') + '"][data-user=' + item.nickname.toLowerCase() + ']').before(self.generateUserLink(user));
 				toInsert = false;
 			}
 		});
 
 		if (toInsert) {
-			this.$('li.head').after(this.generateUserLink(user));
+			this.$('li[data-type="' + this.get('classType') + '"].head').after(this.generateUserLink(user));
 		}
 	},
 
