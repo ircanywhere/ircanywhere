@@ -39,7 +39,7 @@ App.DynamicuserlistView = Ember.View.extend({
 	},
 
 	removeUser: function(offset, user) {
-		var element = self.$('li[data-user=' + user.nickname.toLowerCase() + ']');
+		var element = self.$('li[data-user-id=' + user._id + ']');
 
 		if (element && element.length) {
 			element.remove();
