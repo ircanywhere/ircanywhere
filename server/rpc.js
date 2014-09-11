@@ -561,6 +561,10 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 		});
 	}
 	// convert _id to proper mongo IDs
+
+	if (query.network) {
+		query.network = new mongo.ObjectID(query.network);
+	}
 	
 	application.Events.update(query, {$set: object}, {multi: true, safe: false});
 };
