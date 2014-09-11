@@ -8,7 +8,6 @@ App.DynamicuserlistView = Ember.View.extend({
 		this.list.addArrayObserver(this, {
 			willChange: function(list, offset, removeCount, addCount) {
 				var item = list.objectAt(offset);
-				console.log(self.get('controller.rerender'));
 				if (removeCount > 0 && self.get('controller.rerender') === false) {
 					self.removeUser(offset, item);
 				}
@@ -29,7 +28,7 @@ App.DynamicuserlistView = Ember.View.extend({
 
 		this.list.forEach(function(item, index) {
 			if (user.nickname.toLowerCase() < item.nickname.toLowerCase() && toInsert) {
-				self.$('li[data-type="' + this.get('classType') + '"][data-user=' + item.nickname.toLowerCase() + ']').before(self.generateUserLink(user));
+				self.$('li[data-type="' + self.get('classType') + '"][data-user=' + item.nickname.toLowerCase() + ']').before(self.generateUserLink(user));
 				toInsert = false;
 			}
 		});
