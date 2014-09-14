@@ -43,12 +43,13 @@ function UserManager() {
  */
 UserManager.prototype.init = function() {
 	var self = this,
-		smtp = application.config.email.smtp.split(/(^smtp\:\/\/|\:|\@)/);
+		smtp = application.config.email.smtp.match(/smtp(s)?\/\/(?:([^:@]*)(?::([^@]*))?@)?([^:]+)(?::(.*))?$/);
 		this.server = emails.server.connect({
-			user: smtp[2],
-			password: smtp[4],
-			host: smtp[6],
-			ssl: true
+			user:     smtp[2] || '',
+			password: smtp[3] || '',
+			host:     smtp[4],
+			port:     smtp[5] || null,
+			ssl:      !!smtp[1]
 		});
 	// setup email server
 
