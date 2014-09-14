@@ -537,7 +537,7 @@ UserManager.prototype.resetPassword = function(req) {
 		password = req.param('password', ''),
 		confirmPassword = req.param('confirmPassword', ''),
 		token = req.param('token', ''),
-		output = {};
+		output = {failed: false, successMessage: '', errors: []};
 
 	application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}}, function(err, user) {
 		if (err || !user) {
@@ -655,7 +655,7 @@ UserManager.prototype.changePassword = function(req) {
 		deferred = Q.defer(),
 		password = req.param('password', ''),
 		newPassword = req.param('newPassword', ''),
-		output = {};
+		output = {failed: false, successMessage: '', errors: []};
 
 	this.isAuthenticated(req.headers.cookie)
 		.fail(function() {
