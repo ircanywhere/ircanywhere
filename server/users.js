@@ -43,7 +43,7 @@ function UserManager() {
  */
 UserManager.prototype.init = function() {
 	var self = this,
-		smtp = application.config.email.smtp.match(/smtp(s)?\/\/(?:([^:@]*)(?::([^@]*))?@)?([^:]+)(?::(.*))?$/);
+		smtp = application.config.email.smtp.match(/smtp(s)?:\/\/(?:([^:@]*)(?::([^@]*))?@)?([^:]+)(?::(.*))?$/);
 		this.server = emails.server.connect({
 			user:     smtp[2] || '',
 			password: smtp[3] || '',
