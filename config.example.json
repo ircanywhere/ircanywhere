@@ -86,11 +86,12 @@
 		 * -- usage: The email address to send emails from, can be either email@domain.tld
 					 or Name <email@domain.tld> */
 
-		"smtp": "smtp://username:password@smtp.gmail.com"
+		"smtp": "smtps://username:password@smtp.gmail.com"
 		/* -- required
 		 * -- string 
 		 * -- usage: The smtp server to connect to, it's advised you set this up properly, you can run
-		 			 a local server and pass in a local url, or get free accounts from places like Mailgun */
+		 			 a local server and pass in a local url, or get free accounts from places like Mailgun.
+		 			 Note the prefix smtps:// enables SSL, whereas smtp:// is unsecure. */
 	},
 
 	"clientSettings": {
