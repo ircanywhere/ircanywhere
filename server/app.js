@@ -84,7 +84,7 @@ Application.prototype.init = function() {
 		this.config = require('../config');
 		// A copy of the parsed config object
 	} catch (e) {
-		throw new Error('Configuration file not found.')
+		throw new Error('Configuration file not found.');
 		// Fail and exit if config file not found
 	}
 
