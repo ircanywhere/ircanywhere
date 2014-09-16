@@ -33,6 +33,9 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	},
 
 	willRemoveElement: function() {
+		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		// unbind keydown
+
 		this.unbindScrolling();
 	},
 

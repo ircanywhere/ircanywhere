@@ -4,19 +4,32 @@ App.ModalDialogComponent = Ember.Component.extend({
 	didInsertElement: function() {
 		var self = this;
 
-		this.$('.overlay').on('click', function(e) {
-			if (e.target.className === 'overlay' && !self.alert) {
+		this.$('.overlay, .close-icon').on('click', function(e) {
+			if ((e.target.className === 'overlay' || e.target.className === 'fa fa-times close-icon') && !self.alert) {
 				self.close();
 			}
 		});
 		
 		this.$('.modal').slideDown('fast');
 		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
+
+		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
+		// bind keydown event so we can hook onto ESC
 	},
 
 	willDestroyElement: function() {
+		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		// unbind keydown
+
 		this.$('.overlay').off();
 		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
+	},
+
+	documentKeyDown: function(e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode === 27 && !this.alert) {
+			this.close();
+		}
 	},
 
 	nullifyLink: function(e) {
@@ -24,8 +37,10 @@ App.ModalDialogComponent = Ember.Component.extend({
 	},
 
 	close: function() {
-		this.$('.modal').slideUp('fast', function() {
-			this.sendAction();
-		}.bind(this));
+		var self = this;
+
+		self.$('.modal').slideUp('fast', function() {
+			self.sendAction();
+		});	
 	}
 });
