@@ -42,7 +42,6 @@
     "hooks": "0.3.2",
     "irc-factory": "> 1.8.8",
     "irc-message": "^2.0.1",
-    "jsonminify": "0.2.2",
     "lodash": "~2.4.1",
     "moment": "^2.6.0",
     "mongodb": "~1.4.7",
