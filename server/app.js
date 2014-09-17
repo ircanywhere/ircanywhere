@@ -81,8 +81,12 @@ Application.prototype.init = function() {
 	this.setupWinston();
 	// setup winston first
 
-	if (!fs.existsSync('./config.json')) {
-		throw new Error('Configuration file config.json not found.');
+	try {
+		this.config = require('../config').config;
+		// A copy of the parsed config object
+	} catch (e) {
+		throw new Error('Configuration file not found. If you have recently pulled from development branch, please amend your config.json and rename it to config.js.');
+		// Fail and exit if config file not found
 	}
 	// Fail and exit if config file not found
 

@@ -1,4 +1,4 @@
-{
+exports.config = {
 	"mongo": "mongodb://127.0.0.1:27017/ircanywhere",
 	/* -- required
 	 * -- string
@@ -155,4 +155,4 @@
 		 * -- usage: An array of channels to connect to on startup, the channel must be the
 					 same as the above object, password is optional, channel is not. */
 	}
-}
+};
