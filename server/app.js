@@ -15,7 +15,6 @@ var _ = require('lodash'),
 	fs = require('fs'),
 	util = require('util'),
 	schema = require('./schema').schema,
-	jsonminify = require('jsonminify'),
 	validate = require('simple-schema'),
 	express = require('express'),
 	sockjs = require('sockjs'),
@@ -89,11 +88,6 @@ Application.prototype.init = function() {
 		// Fail and exit if config file not found
 	}
 	// Fail and exit if config file not found
-
-	var rawConfig = fs.readFileSync('./config.json').toString();
-
-	this.config = JSON.parse(jsonminify(rawConfig));
-	// A copy of the parsed config object
 
 	var validation = validate(this.config, schema);
 	if (validation.length > 0) {
