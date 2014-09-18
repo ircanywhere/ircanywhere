@@ -223,6 +223,10 @@ Application.prototype.setupOplog = function() {
 			throw err;
 		}
 		
+		if (!item) {
+			return;
+		}
+		
 		var collection = item.ns.split('.'),
 			col = collection[1];
 		// get the collection name
