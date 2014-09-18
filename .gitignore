@@ -6,5 +6,5 @@ build
 node_modules
 logs
 *.sublime*
-config.json
+config.js*
 *.pid
