@@ -4,8 +4,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	classNameBindings: ['push'],
 
 	push: function() {
-		return (this.get('controller.target.content.selectedTab.showMessageBar')) ? 'push' : '';
-	}.property('controller.target.content.selectedTab.showMessageBar').cacheable(),
+		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
+	}.property('controller.target.content.selectedTab.unread').cacheable(),
 
 	animateScrollTo: function (scrollTo) {
 		this.$().animate({

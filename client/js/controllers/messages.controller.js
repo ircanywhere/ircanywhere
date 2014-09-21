@@ -179,10 +179,6 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 			// already a pending timeout
 
-			if (unread === 0) {
-				tab.set('showMessageBar', false);
-			}
-
 			var scrollTimeout = setTimeout(function() {
 				self.markAsRead();
 				self.set('timeout', null);
@@ -256,17 +252,6 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		if (!backlog) {
 			this.newTabMessage(object, backlog);
 		}
-
-		var tab = this.get('controllers.network.selectedTab');
-
-		if (tab.get('unread') > 0) {
-			setTimeout(function() {
-				if (tab.get('unread') > 0) {
-					tab.set('showMessageBar', true);
-				}
-			}, 500);
-		}
-		// show unread message bar
 	},
 
 	onEventVisible: function(id, item) {
