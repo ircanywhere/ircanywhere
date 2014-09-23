@@ -232,8 +232,7 @@ ServerSession.prototype.setup = function() {
  * @param {Object} event Event to handle
  */
 ServerSession.prototype.handleEvent =  function(event) {
-	var ignore = ['registered', 'lusers', 'motd', 'join'],
-		network = Clients[this.networkId.toString()];
+	var ignore = ['registered', 'lusers', 'motd', 'join'];
 
 	if (event.message.clientId === this.id) {
 		return;
@@ -415,8 +414,7 @@ ServerSession.prototype.sendJoins = function () {
  * @return void
  */
 ServerSession.prototype.sendChannelInfo = function (tab) {
-	var self = this,
-		network = Clients[this.networkId.toString()];
+	var network = Clients[this.networkId.toString()];
 
 	if (typeof tab.topic === 'object') {
 		this.sendRaw(':' + network.server + ' 332 ' + network.nick + ' ' + tab.target + ' :' + tab.topic.topic);
@@ -426,7 +424,7 @@ ServerSession.prototype.sendChannelInfo = function (tab) {
 
 	ircFactory.send(this.networkId.toString(), 'raw', ['NAMES', tab.target]);
 	// send NAMES
-}
+};
 
 /**
  * Sends playback messages to client.

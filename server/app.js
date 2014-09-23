@@ -15,7 +15,6 @@ var _ = require('lodash'),
 	fs = require('fs'),
 	util = require('util'),
 	schema = require('./schema').schema,
-	jsonminify = require('jsonminify'),
 	validate = require('simple-schema'),
 	express = require('express'),
 	sockjs = require('sockjs'),
@@ -81,15 +80,14 @@ Application.prototype.init = function() {
 	this.setupWinston();
 	// setup winston first
 
-	if (!fs.existsSync('./config.json')) {
-		throw new Error('Configuration file config.json not found.');
+	try {
+		this.config = require('../config').config;
+		// A copy of the parsed config object
+	} catch (e) {
+		throw new Error('Configuration file not found. If you have recently pulled from development branch, please amend your config.json and rename it to config.js.');
+		// Fail and exit if config file not found
 	}
 	// Fail and exit if config file not found
-
-	var rawConfig = fs.readFileSync('./config.json').toString();
-
-	this.config = JSON.parse(jsonminify(rawConfig));
-	// A copy of the parsed config object
 
 	var validation = validate(this.config, schema);
 	if (validation.length > 0) {
@@ -177,7 +175,7 @@ Application.prototype.cleanCollections = function() {
 
 		_.each(docs, function(doc) {
 			chanUserIds.push(doc._id);
-		})
+		});
 		
 		if (chanUserIds.length) {
 			self.ChannelUsers.remove({_id: {$in: chanUserIds}}, {multi: true, safe: false});
@@ -192,7 +190,7 @@ Application.prototype.cleanCollections = function() {
 
 		_.each(docs, function(doc) {
 			eventIds.push(doc._id);
-		})
+		});
 		
 		if (eventIds.length) {
 			self.Events.remove({_id: {$in: eventIds}}, {multi: true, safe: false});
@@ -223,6 +221,10 @@ Application.prototype.setupOplog = function() {
 	this.Oplog.find({ts: {$gte: new mongo.Timestamp(start, start)}}, {tailable: true, timeout: false}).each(function(err, item) {
 		if (err) {
 			throw err;
+		}
+		
+		if (!item) {
+			return;
 		}
 		
 		var collection = item.ns.split('.'),

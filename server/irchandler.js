@@ -132,7 +132,9 @@ IRCHandler.prototype.registered = function(client, message) {
 		// 		 nickserv identify or something
 
 		_.each(client.channels, function(channel) {
-			channelManager.queueJoin(client._id, channel.channel, channel.password || '');
+			if (channel.channel.trim() !== '') {
+				channelManager.queueJoin(client._id, channel.channel, channel.password || '');
+			}
 		});
 		// find our channels to automatically join from the network setup
 	});
@@ -430,7 +432,8 @@ IRCHandler.prototype.names = function(client, message) {
 
 		var users = [],
 			keys = [],
-			regex = new RegExp('[' + helper.escape(client.internal.capabilities.modes.prefixes) + ']', 'g');
+			prefixes = helper.exists(client, 'internal.capabilities.modes.prefixes') || '@+';
+			regex = new RegExp('[' + helper.escape(prefixes) + ']', 'g');
 
 		channelUsers.forEach(function(u) {
 			keys.push(u.nickname);

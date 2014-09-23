@@ -55,7 +55,15 @@ gulp.task('templates', function() {
 gulp.task('templates:debug', function() {
 	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
 		.pipe(handlebars({
-			outputType: 'browser'
+			handlebars: require('ember-handlebars')
+		}))
+		.pipe(wrap('Ember.Handlebars.template(<%= contents %>)'))
+		.pipe(declare({
+			namespace: 'Ember.TEMPLATES',
+			noRedeclare: true,
+			processName: function(filePath) {
+				return filePath.replace(__dirname + '/client/templates/', '').replace('.js', '');
+			}
 		}))
 		.pipe(sourcemaps.init())
 		.pipe(concat('templates.js'))

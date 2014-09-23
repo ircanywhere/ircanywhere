@@ -111,11 +111,11 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 			query;
 
 		if (object.type === 'network') {
-			var query = {network: object.network, target: '*'};
+			query = {network: object.network, target: '*'};
 		} else if (object.type === 'query') {
-			var query = {network: object.network, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
+			query = {network: object.network, $or: [{target: object.target}, {'message.nickname': object.target, target: network.nick}]};
 		} else if (object.type === 'channel') {
-			var query = {network: object.network, target: object.target};
+			query = {network: object.network, target: object.target};
 		}
 
 		object.set('query', query);

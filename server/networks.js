@@ -303,8 +303,10 @@ NetworkManager.prototype.addNetworkApi = function(req) {
 		})
 		.then(function(user) {
 			restriction.forEach(function(item) {
-				var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
-				escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+				if (item && item.trim() !== '') {
+					var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
+					escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+				}
 			});
 			// create an array of restrictions
 
@@ -333,7 +335,7 @@ NetworkManager.prototype.addNetworkApi = function(req) {
 					output.errors.push({error: 'You have reached the maximum network limit of ' + application.config.clientSettings.networkLimit + ' and may not add anymore'});
 				}
 
-				var restricted = true;
+				var restricted = (restriction.length) ? true : false;
 				_.each(escapedRestrictions, function(item) {
 					if (item.test(server)) {
 						restricted = false;
@@ -341,7 +343,7 @@ NetworkManager.prototype.addNetworkApi = function(req) {
 				});
 
 				if (restricted) {
-					output.errors.push({error: 'There is a restriction inplace limiting your connections to ' + restriction});
+					output.errors.push({error: 'There is a restriction in place limiting your connections to ' + restriction});
 				}
 
 				if (output.errors.length > 0) {
@@ -416,8 +418,10 @@ NetworkManager.prototype.editNetworkApi = function(req) {
 		})
 		.then(function(user) {
 			restriction.forEach(function(item) {
-				var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
-				escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+				if (item && item.trim() !== '') {
+					var regex = helper.escape(item).replace(/\\\*/g, '(.*)');
+					escapedRestrictions.push(new RegExp('(' + regex + ')', 'i'));
+				}
 			});
 			// create an array of restrictions
 
@@ -451,7 +455,7 @@ NetworkManager.prototype.editNetworkApi = function(req) {
 					output.errors.push({error: 'The port you have entered is invalid'});
 				}
 
-				var restricted = true;
+				var restricted = (restriction.length) ? true : false;
 				_.each(escapedRestrictions, function(item) {
 					if (item.test(server)) {
 						restricted = false;
@@ -714,7 +718,7 @@ NetworkManager.prototype.removeTab = function(client, target) {
 NetworkManager.prototype.connectNetwork = function(network) {
 	ircFactory.create(_.extend(network,
 		{
-			retryCount: (application.config.retryCount != null) ? application.config.retryCount : 10,
+			retryCount: (application.config.retryCount !== null) ? application.config.retryCount : 10,
 			retryWait: application.config.retryWait * 1000 || 10000
 		}
 	));

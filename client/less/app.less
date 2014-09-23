@@ -519,6 +519,24 @@ div.sidebar {
 		display: none;
 		overflow-y: auto;
 
+		&.listbox .modal-header {
+			padding: 8px;
+			border-bottom: 0;
+
+			h3.left {
+				float: left;
+				padding: 8px;
+			}
+
+			div.list-controls {
+				padding: 0 0 8px 8px;
+			}
+
+			i.close-icon {
+				padding: 8px 8px 8px 14px;
+			}
+		}
+
 		&.wide {
 			width: 70%;
 		}
@@ -555,7 +573,6 @@ div.sidebar {
 				color: @black;
 
 				&.left {
-					margin: 15px;
 					float: left;
 				}
 			}

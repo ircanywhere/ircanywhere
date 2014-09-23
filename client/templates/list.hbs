@@ -1,11 +1,13 @@
-{{#modal-dialog action="close" className="wide"}}
-	<div class="modal-header clear">
+{{#modal-dialog action="close" className="wide listbox"}}
+	<div class="modal-header clearfix">
 		<h3 class="left">{{title}}</h3>
+		<i class="fa fa-times close-icon"></i>
 		<div class="list-controls">
 			<a href="#" {{bind-attr class=":btn isPrev::disabled"}} {{action prevPage}}>&larr; Previous Page</a>
 			<a href="#" class="btn disabled" {{action curPage}}>Page {{page}}</a>
 			<a href="#" {{bind-attr class=":btn isNext::disabled"}} {{action nextPage}}>Next Page &rarr;</a>
 		</div>
+		
 	</div>
 	<div class="modal-body">
 		<table width="100%" cellpadding="0" cellspacing="0" class="infolist">

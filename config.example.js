@@ -1,4 +1,4 @@
-{
+exports.config = {
 	"mongo": "mongodb://127.0.0.1:27017/ircanywhere",
 	/* -- required
 	 * -- string
@@ -86,11 +86,12 @@
 		 * -- usage: The email address to send emails from, can be either email@domain.tld
 					 or Name <email@domain.tld> */
 
-		"smtp": "smtp://username:password@smtp.gmail.com"
+		"smtp": "smtps://username:password@smtp.gmail.com"
 		/* -- required
 		 * -- string 
 		 * -- usage: The smtp server to connect to, it's advised you set this up properly, you can run
-		 			 a local server and pass in a local url, or get free accounts from places like Mailgun */
+		 			 a local server and pass in a local url, or get free accounts from places like Mailgun.
+		 			 Note the prefix smtps:// enables SSL, whereas smtp:// is unsecure. */
 	},
 
 	"clientSettings": {
@@ -154,4 +155,4 @@
 		 * -- usage: An array of channels to connect to on startup, the channel must be the
 					 same as the above object, password is optional, channel is not. */
 	}
-}
+};

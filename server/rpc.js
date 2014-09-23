@@ -411,9 +411,9 @@ RPCHandler.prototype.handleConnect = function(socket) {
 				if (tab.type === 'query') {
 					query = {network: tab.network, user: user._id, $or: [{target: tlower}, {'message.nickname': new RegExp('(' + helper.escape(tlower) + ')', 'i'), target: netIds[tab.network].nick.toLowerCase()}]};
 				} else if (tab.type === 'network') {
-					query = {network: tab.network, target: '*', user: user._id}
+					query = {network: tab.network, target: '*', user: user._id};
 				} else {
-					query = {network: tab.network, target: tlower, user: user._id}
+					query = {network: tab.network, target: tlower, user: user._id};
 				}
 
 				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
@@ -561,6 +561,10 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 		});
 	}
 	// convert _id to proper mongo IDs
+
+	if (query.network) {
+		query.network = new mongo.ObjectID(query.network);
+	}
 	
 	application.Events.update(query, {$set: object}, {multi: true, safe: false});
 };
@@ -732,6 +736,11 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 		});
 	}
 	// convert _id to proper mongo IDs
+	
+	if (query.network) {
+		query.network = new mongo.ObjectID(query.network);
+	}
+	// convert _id to proper mongo IDs
 
 	application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
 		if (err || !response) {
@@ -739,8 +748,6 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 		} else {
 			socket.send('events', response);
 		}
-
-
 	});
 	// perform the query 
 };
