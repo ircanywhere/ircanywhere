@@ -2,33 +2,31 @@ App.DynamicuserlistView = Ember.View.extend({
 	type: 'normal',
 	classType: 'user',
 
+	addEvent: null,
+	removeEvent: null,
+
 	init: function() {
-		var self = this;
+		this.set('addEvent', 'addUser:' + this.get('type'));
+		this.set('removeEvent', 'removeUser:' + this.get('type'));
 
-		this.list.addArrayObserver(this, {
-			willChange: function(list, offset, removeCount, addCount) {
-				var item = list.objectAt(offset);
-				if (removeCount > 0 && self.get('controller.rerender') === false) {
-					self.removeUser(offset, item);
-				}
-			},
-			didChange: function(list, offset, removeCount, addCount) {
-				var item = list.objectAt(offset);
-				
-				if (addCount > 0 && self.get('controller.rerender') === false) {
-					self.addUser(offset, item);
-				}
-			}
-		});
-	}.on('render'),
+		this.get('controller')
+			.on(this.addEvent, this, this.addUser)
+			.on(this.removeEvent, this, this.removeUser);
+	},
 
-	addUser: function(offset, user) {
+	willDestroy: function() {
+		this.get('controller')
+			.off(this.addEvent, this, this.addUser)
+			.off(this.removeEvent, this, this.removeUser);
+	},
+
+	addUser: function(user) {
 		var self = this,
 			toInsert = true;
 
 		this.list.forEach(function(item, index) {
-			if (user.nickname.toLowerCase() < item.nickname.toLowerCase() && toInsert) {
-				self.$('li[data-type=' + self.get('classType') + '][data-user-id=' + item._id + ']').before(self.generateUserLink(user));
+			if (Ember.compare(user.nickname.toLowerCase(), item.nickname.toLowerCase()) === -1 && toInsert) {
+				$('li[data-type=' + self.get('classType') + '][data-user-id=' + item._id + ']').before(self.generateUserLink(user));
 				toInsert = false;
 			}
 		});
@@ -38,8 +36,8 @@ App.DynamicuserlistView = Ember.View.extend({
 		}
 	},
 
-	removeUser: function(offset, user) {
-		var element = self.$('li[data-user-id=' + user._id + ']');
+	removeUser: function(user) {
+		var element = $('li[data-user-id=' + user._id + ']');
 
 		if (element && element.length) {
 			element.remove();

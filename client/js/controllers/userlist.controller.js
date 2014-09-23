@@ -1,4 +1,4 @@
-App.UserlistController = Ember.ArrayController.extend({
+App.UserlistController = Ember.ArrayController.extend(Ember.Evented, {
 	needs: ['index', 'network', 'tab'],
 	rerender: false,
 
@@ -8,6 +8,32 @@ App.UserlistController = Ember.ArrayController.extend({
 	halfops: Ember.computed.filterBy('filtered', 'sort', 4),
 	voiced: Ember.computed.filterBy('filtered', 'sort', 5),
 	normal: Ember.computed.filterBy('filtered', 'sort', 6),
+
+	arrayKeys: ['owners', 'admins', 'operators', 'halfops', 'voiced', 'normal'],
+
+	init: function () {
+		var self = this;
+
+		this.arrayKeys.forEach(function(key) {
+			var arr = self.get(key);
+
+			arr.addArrayObserver(self, {
+				willChange: function(list, offset, removeCount, addCount) {
+					var item = list.objectAt(offset);
+					if (removeCount > 0 && self.get('rerender') === false) {
+						self.trigger('removeUser:' + key, item);
+					}
+				},
+				didChange: function(list, offset, removeCount, addCount) {
+					var item = list.objectAt(offset);
+					
+					if (addCount > 0 && self.get('rerender') === false) {
+						self.trigger('addUser:' + key, item);
+					}
+				}
+			});
+		});
+	},
 
 	displayHeading: function() {
 		return (this.get('filtered.length') !== this.get('normal.length'));
