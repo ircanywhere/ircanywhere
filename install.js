@@ -389,7 +389,7 @@ function runGulp() {
 }
 
 function checkConfig() {
-	var configExists = fs.existsSync('./config.json');
+	var configExists = fs.existsSync('./config.js');
 
 	if (configExists) {
 		console.log(COLOUR.green, 'Found config file');
@@ -418,19 +418,19 @@ function checkConfig() {
 			}
 		}).on('close', function() {
 			if (install) {
-				cp.exec('cp config.example.json config.json', function(error, stdout, stderr) {
+				cp.exec('cp config.example.js config.js', function(error, stdout, stderr) {
 					if (stderr) {
 						throw stderr;
 					}
 
-					console.log(COLOUR.green, 'Default config created as config.json');
+					console.log(COLOUR.green, 'Default config created as config.js');
 					done();
 				});
 			} else {
 				done();
 			}
 		});
-		// prompt the user with a y/n to see if they want us to copy the example config json over.
+		// prompt the user with a y/n to see if they want us to copy the example config js over.
 	}
 }
 
