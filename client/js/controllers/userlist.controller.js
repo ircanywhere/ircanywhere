@@ -26,7 +26,6 @@ App.UserlistController = Ember.ArrayController.extend(Ember.Evented, {
 				},
 				didChange: function(list, offset, removeCount, addCount) {
 					var item = list.objectAt(offset);
-					
 					if (addCount > 0 && self.get('rerender') === false) {
 						self.trigger('addUser:' + key, item);
 					}
@@ -95,6 +94,46 @@ App.UserlistController = Ember.ArrayController.extend(Ember.Evented, {
 
 	onQuit: function(object, backlog) {
 		this._onRemove(object, backlog);
+	},
+
+	onNick: function(object, backlog) {
+		if (backlog || this.get('rerender')) {
+			return;
+		}
+
+		var list;
+		var item = this.get('socket').findOne('channelUsers', {nickname: object.message.nickname, network: object.network, channel: object.target});
+
+		if (!item) {
+			item = this.get('socket').findOne('channelUsers', {nickname: object.message.newnick, network: object.network, channel: object.target});
+		}
+		// because javascript is async, we might have other shit going on and a delayed update, so check newnick too.
+
+		if (!item) {
+			return;
+		}
+		// this, however the hell it has happeened may possibly have led to an inconsistent state, but it's better than throwing an error!
+
+		switch(item.sort) {
+			case 1:
+				list = 'owners';
+			case 2:
+				list = 'admins';
+			case 3:
+				list = 'operators';
+			case 4:
+				list = 'halfops';
+			case 5:
+				list = 'voiced';
+			case 6:
+				list = 'normal';
+		}
+
+		var copy = Ember.copy(item);
+			copy.nickname = object.message.newnick;
+			
+		this.trigger('removeUser:' + list, item);
+		this.trigger('addUser:' + list, copy);
 	},
 
 	ready: function() {

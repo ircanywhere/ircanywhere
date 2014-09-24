@@ -22,17 +22,35 @@ App.DynamicuserlistView = Ember.View.extend({
 
 	addUser: function(user) {
 		var self = this,
+			prevItem,
 			toInsert = true;
 
 		this.list.forEach(function(item, index) {
 			if (Ember.compare(user.nickname.toLowerCase(), item.nickname.toLowerCase()) === -1 && toInsert) {
-				$('li[data-type=' + self.get('classType') + '][data-user-id=' + item._id + ']').before(self.generateUserLink(user));
+				var el = $('li[data-type=' + self.get('classType') + '][data-user-id=' + item._id + ']');
+
+				if (!el.length) {
+					el = $('li[data-type=' + self.get('classType') + '][data-user-id=' + prevItem._id + ']');
+					el.after(self.generateUserLink(user));
+				} else {
+					el.before(self.generateUserLink(user));
+				}
+
 				toInsert = false;
+				return false;
 			}
+
+			prevItem = item;
 		});
 
 		if (toInsert) {
-			this.$('li[data-type=' + this.get('classType') + '].head').after(this.generateUserLink(user));
+			var el = $('li[data-type=' + this.get('classType') + ']:last-child');
+
+			if (el.length) {
+				el.after(this.generateUserLink(user));
+			} else {
+				this.$().html(this.generateUserLink(user));
+			}
 		}
 	},
 
