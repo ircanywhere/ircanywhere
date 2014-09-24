@@ -95,8 +95,8 @@ IRCHandler.prototype.registered = function(client, message) {
 	// set this immediately so the other stuff works
 
 	application.Networks.update({_id: client._id}, {$set: {
-		'nick': message.nickname,
-		'name': message.capabilities.network.name,
+		nick: message.nickname,
+		name: message.capabilities.network.name,
 		'internal.status': networkManager.flags.connected,
 		'internal.capabilities': message.capabilities
 	}}, {safe: false});
@@ -344,13 +344,13 @@ IRCHandler.prototype.nick = function(client, message) {
 		return false;
 	}
 
-	if (message.nickname === client.nick) {
+	var mlower = message.nickname.toLowerCase();
+	if (mlower === client.nick.toLowerCase()) {
 		application.Networks.update({_id: client._id}, {$set: {nick: message.newnick}}, {safe: false});
 	}
 	// update the nickname because its us changing our nick
 
-	if (_.has(client.internal.tabs, message.nickname)) {
-		var mlower = message.nickname.toLowerCase();
+	if (_.has(client.internal.tabs, mlower)) {
 		application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}}, {safe: false});
 	}
 	// is this a client we're chatting to whos changed their nickname?
