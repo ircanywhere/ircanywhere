@@ -18,7 +18,6 @@ App.InputController = Ember.ObjectController.extend({
 
 		this.get('socket').findButWait('commands', {network: network, target: target})
 			.then(function(items) {
-				console.log(items);
 				self.set('backlog', items);
 			});
 	}.observes('controllers.network.model._id', 'controllers.index.tabId'),
