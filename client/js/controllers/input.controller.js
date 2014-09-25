@@ -1,5 +1,5 @@
 App.InputController = Ember.ObjectController.extend({
-	needs: ['network', 'tab'],
+	needs: ['index', 'network', 'tab'],
 
 	notIteratingBacklog: true,
 	commandIndex: 0,
@@ -9,8 +9,22 @@ App.InputController = Ember.ObjectController.extend({
 	tabCompletionNicks: [],
 	tabCompletionIndex: 0,
 
+	backlog: [],
+
+	tabChanged: function () {
+		var self = this,
+			network = this.get('controllers.network.model._id'),
+			target = this.get('controllers.network.model.selectedTab.target');
+
+		this.get('socket').findButWait('commands', {network: network, target: target})
+			.then(function(items) {
+				console.log(items);
+				self.set('backlog', items);
+			});
+	}.observes('controllers.network.model._id', 'controllers.index.tabId'),
+
 	ready: function() {
-		this.set('commandIndex', this.get('socket.commands').length);
+		this.set('commandIndex', this.get('backlog').length);
 	},
 
 	autoCompleteChar: function() {
@@ -45,7 +59,7 @@ App.InputController = Ember.ObjectController.extend({
 			}
 
 			commandObject.timestamp = +new Date();
-			this.get('socket.commands').pushObject(commandObject);
+			this.get('backlog').pushObject(commandObject);
 			// we push it into the buffer manually, saves us getting the data sent back down
 			// through the pipe which is a waste of bandwidth
 
@@ -101,7 +115,7 @@ App.InputController = Ember.ObjectController.extend({
 
 		toggleDown: function() {
 			var index = this.get('commandIndex') - 1,
-				command = this.get('socket.commands')[index];
+				command = this.get('backlog')[index];
 
 			if (this.get('notIteratingBacklog')) {
 				this.set('oldInputValue', this.get('inputValue'));
@@ -109,7 +123,7 @@ App.InputController = Ember.ObjectController.extend({
 
 			if (!command) {
 				this.set('inputValue', this.get('oldInputValue'));
-				this.set('commandIndex', this.get('socket.commands').length);
+				this.set('commandIndex', this.get('backlog').length);
 				this.set('notIteratingBacklog', true);
 			} else {
 				this.set('inputValue', command.command);
@@ -121,8 +135,8 @@ App.InputController = Ember.ObjectController.extend({
 
 		toggleUp: function() {
 			var index = this.get('commandIndex') + 1;
-				index = (index === (this.get('socket.commands').length + 1)) ? 0 : index;
-			var command = this.get('socket.commands').objectAt(index);
+				index = (index === (this.get('backlog').length + 1)) ? 0 : index;
+			var command = this.get('backlog').objectAt(index);
 
 			if (this.get('notIteratingBacklog')) {
 				this.set('oldInputValue', this.get('inputValue'));
