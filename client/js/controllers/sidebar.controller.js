@@ -1,9 +1,6 @@
 App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	increment: false,
 
-	sortProperties: ['url'],
-	sortAscending: true,
-
 	content: function() {
 		var selectedTab = this.get('user.selectedTab');
 
@@ -12,7 +9,7 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 			return tab;
 		});
 
-		return this.get('socket.tabs');
+		return this.get('socket.tabs').sortBy('url');
 	}.property('user.selectedTab', 'socket.tabs'),
 
 	statusChanged: function() {
