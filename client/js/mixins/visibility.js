@@ -1,11 +1,15 @@
 App.Visibility = Ember.Mixin.create({
 	bindVisibility: function() {
-		var visProp = this.getHiddenProp();
+		var self = this,
+			visProp = this.getHiddenProp();
 		
 		if (visProp) {
 			var evtname = visProp.replace(/[H|h]idden/, '') + 'visibilitychange';
-			Ember.$(document).on(evtname, this.visChange.bind(this));
-			this.visChange();
+			self.visChange();
+
+			Ember.$(document).on(evtname, function() {
+				self.visChange(self.isHidden());
+			});
 		}
 	},
 
@@ -19,12 +23,8 @@ App.Visibility = Ember.Mixin.create({
 		return document[prop];
 	},
 
-	visChange: function() {
-		if (this.isHidden()) {
-			App.set('isActive', false);
-		} else {
-			App.set('isActive', true);
-		}
+	visChange: function(hidden) {
+		this.set('isActive', !hidden);
 	},
 
 	getHiddenProp: function() {

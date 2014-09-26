@@ -68,7 +68,8 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var events = this.get('content'),
 			limit = (tab) ? tab.get('messageLimit', 50) : 50,
 			slice = events.length - limit;
-			slice = (slice < 0 || tab.get('requestedBacklog')) ? 0 : slice;
+			slice = (slice < 0 || tab.get('requestedBacklog')) ? 0 : slice,
+			prev = null;
 
 		var proxy = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 			content: events,
@@ -146,7 +147,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
-					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
+					if ((top === 0 || top < topOffset && topOffset < bottom) && self.get('controllers.index.isActive')) {
 						item.set('read', true);
 						
 						if (self.readDocs.indexOf(item._id) === -1) {
@@ -213,7 +214,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object) {
 		var self = this;
 
-		if (App.get('isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
+		if (this.get('controllers.index.isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
 			return false;
 		}
 
@@ -255,6 +256,8 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	},
 
 	onEventVisible: function(id, item) {
+		var self = this;
+
 		if (!item.get('extra.highlight')) {
 			return false;
 		}
@@ -263,7 +266,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 
 		this.unreadNotifications.forEach(function(item) {
-			if (!(App.get('isActive') && item.tag === tab.network + '/' + tab.title)) {
+			if (!(self.get('controllers.index.isActive') && item.tag === tab.network + '/' + tab.title)) {
 				return false;
 			}
 			// tab or window isnt active

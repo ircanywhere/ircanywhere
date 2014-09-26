@@ -52,26 +52,30 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		}
 		// we've not rendered the view yet so just bail
 
-		var parent = this.$().context,
+		var self = this,
+			parent = this.$().context,
 			height = parent.scrollHeight - parent.clientHeight,
 			pos = parent.scrollTop,
 			last = this.$('.inside-backlog').find('div.row:last-of-type'),
-			offset = height - pos;
+			offset = height - pos,
+			scrollHeight = this.$().context.scrollHeight;
 		// get some variables and do some calculations
 
-		if (offset === last.height() || pos === height) {
-			Ember.run.later(this, function() {
-				if (this.$() !== undefined) {
-					this.animateScrollTo(this.$().context.scrollHeight);
-					this.set('scrollPosition', this.$().context.scrollHeight);
-				}
-			}, 100);
+		var scrollTo = function(position) {
+			if (this.$() !== undefined) {
+				this.animateScrollTo(position);
+				this.set('scrollPosition', position);
+
+				this.scrolled();
+			}
+		};
+
+		if ((offset === last.height() || pos === height) && this.get('controller.controllers.index.isActive')) {
+			Ember.run.later(self, function() {
+				scrollTo.call(this, scrollHeight);
+			});
 		}
 		// we need to reposition the scrollbar!
-
-		Ember.run.later(this, function() {
-			this.scrolled();
-		}, 100);
 	}.observes('controller.filtered.@each'),
 
 	scrolled: function() {
@@ -79,6 +83,10 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 			return false;
 		}
 		// we've not rendered the view yet so just bail
+
+		if (!this.get('controller.controllers.index.isActive')) {
+			return false;
+		}
 		
 		var self = this,
 			parent = this.$(),
@@ -92,5 +100,5 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		self.set('scrollPosition', scrollBottom);
 		// reset the scroll position
-	}.observes('App.isActive')
+	}.observes('controller.controllers.index.isActive')
 });
