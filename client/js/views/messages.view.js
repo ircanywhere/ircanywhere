@@ -14,9 +14,11 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		this.$().animate({
 			scrollTop: scrollTo
-		}, 0);
+		}, 50);
 		// Animate scroll to work around iPhone bug on setting scroll
 		// position on touch scrollable elements.
+
+		this.scrolled();
 	},
 
 	didInsertElement: function() {
@@ -86,12 +88,11 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		// ignore tabs in this state
 		
 		var parent = this.$(),
-			container = this.$('.inside-backlog'),
 			tabId = parent.parents('.tab').attr('id').substr(4),
 			scrollBottom = parent.height() + parent.scrollTop(),
 			scrollTop = scrollBottom - parent.height();
-		
-		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom, container);
+
+		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom);
 		// send to controller to do the actual updating
 
 		this.set('controller.target.content.selectedTab.scrollPosition', this.$()[0].scrollTop);
