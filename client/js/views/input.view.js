@@ -4,25 +4,25 @@ App.InputView = Ember.View.extend({
 	classNames: 'channel-input',
 
 	didInsertElement: function() {
-		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
+		document.addEvent('keydown', this.documentKeyDown.bind(this));
 		// bind an event to re-focus the box when someone hits a key
 		// it's not entirely ember-ish binding events manually but it's
 		// difficult to do this without doing so
 		
-		this.$('textarea').on('keydown', this.onKeyDown.bind(this));
-		this.$('textarea').on('cut paste drop', this.resize.bind(this));
+		this.get('element').querySelector('textarea').addEvent('keydown', this.onKeyDown.bind(this));
+		this.get('element').querySelector('textarea').addEvent('cut paste drop', this.resize.bind(this));
 	},
 
 	willDestroyElement: function() {
-		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		document.removeEvent('keydown', this.documentKeyDown.bind(this));
 
-		this.$('textarea').off('keydown', this.onKeyDown.bind(this));
-		this.$('textarea').off('cut paste drop', this.resize.bind(this));
+		this.get('element').querySelector('textarea').removeEvent('keydown', this.onKeyDown.bind(this));
+		this.get('element').querySelector('textarea').removeEvent('cut paste drop', this.resize.bind(this));
 	},
 
 	documentKeyDown: function(e) {
-		var textarea = document.querySelector('.channel-input textarea'),
-			element = document.querySelector('.channel-input input, .channel-input textarea');
+		var textarea = this.get('element').querySelector('textarea'),
+			element = this.get('element').querySelector('input, .channel-input textarea');
 
 		if (!e.metaKey && !e.ctrlKey && textarea && element !== document.activeElement) {
 			textarea.focus();
@@ -58,7 +58,7 @@ App.InputView = Ember.View.extend({
 	},
 
 	resize: function() {
-		var textarea = document.querySelector('.channel-input textarea'),
+		var textarea = this.get('element').querySelector('.channel-input textarea'),
 			txStyle = window.getComputedStyle(textarea, null),
 			element = this.get('element'),
 			padding = parseInt(txStyle['padding-top'], 10) + parseInt(txStyle['padding-bottom'], 10);

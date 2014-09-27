@@ -4,25 +4,25 @@ App.ModalDialogComponent = Ember.Component.extend({
 	didInsertElement: function() {
 		var self = this;
 
-		this.$('.overlay, .close-icon').on('click', function(e) {
+		this.get('element').querySelector('.overlay, .close-icon').addEvent('click', function(e) {
 			if ((e.target.className === 'overlay' || e.target.className === 'fa fa-times close-icon') && !self.alert) {
 				self.close();
 			}
 		});
 		
 		this.$('.modal').slideDown('fast');
-		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
+		this.get('element').querySelector('a[rel="twipsy"]').addEvent('click', this.nullifyLink.bind(this));
 
-		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
+		document.addEvent('keydown', this.documentKeyDown.bind(this));
 		// bind keydown event so we can hook onto ESC
 	},
 
 	willDestroyElement: function() {
-		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		document.removeEvent('keydown', this.documentKeyDown.bind(this));
 		// unbind keydown
 
 		this.$('.overlay').off();
-		this.$('a[rel=twipsy]').on('click', this.nullifyLink.bind(this));
+		this.get('element').querySelector('a[rel="twipsy"]').removeEvent('click', this.nullifyLink.bind(this));
 	},
 
 	documentKeyDown: function(e) {

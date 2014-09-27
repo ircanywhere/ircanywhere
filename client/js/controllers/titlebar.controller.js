@@ -10,7 +10,7 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 	actions: {
 		setTopic: function() {
-			var element = document.querySelector('.channel-input textarea.command-field');
+			var element = this.get('element').querySelector('textarea.command-field');
 			element.focus();
 			element.value = '/topic';
 		},

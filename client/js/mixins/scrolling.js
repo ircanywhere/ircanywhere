@@ -3,7 +3,7 @@ App.Scrolling = Ember.Mixin.create({
 		var self = this,
 			onScroll;
 
-		opts = opts || {element: Ember.$(window), debounce: 100};
+		opts = opts || {element: document, debounce: 100};
 		this.opts = opts;
 
 		if (this.opts.debounce) {
@@ -18,10 +18,10 @@ App.Scrolling = Ember.Mixin.create({
 			};
 		}
 
-		this.opts.element.bind('scroll', onScroll);
+		this.opts.element.addEvent('scroll', onScroll);
 	},
 
 	unbindScrolling: function() {
-		this.opts.element.unbind('scroll');
+		this.opts.element.removeEvent('scroll');
 	}
 });

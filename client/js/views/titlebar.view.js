@@ -3,14 +3,16 @@ App.TitlebarView = Ember.View.extend({
 	classNames: 'topbar',
 
 	didInsertElement: function() {
-		Ember.$(document).on('click.TitlebarView', this.documentClick.bind(this));
-		this.$('ul#options-menu li > a, ul#options-menu li > ul').on('mouseenter', this.mouseLeave);
+		document.addEvent('click.TitlebarView', this.documentClick.bind(this));
+
+		this.get('element').querySelector('ul#options-menu li > a, ul#options-menu li > ul').addEvent('mouseenter', this.mouseLeave);
 		// setup dynamic events for individual elements
 	},
 
 	willDestroyElement: function() {
-		Ember.$(document).off('click.TitlebarView');
-		this.$('ul#options-menu li > a').off('mouseenter', this.mouseLeave);
+		document.removeEvent('click.TitlebarView');
+
+		this.get('element').querySelector('ul#options-menu li > a').removeEvent('mouseenter', this.mouseLeave);
 		// bring the events down to prevent duplicates which could lead to leaks
 	},
 

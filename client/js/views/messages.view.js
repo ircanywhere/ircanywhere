@@ -22,18 +22,18 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		}, 100);
 		// scroll to bottom on render
 
-		this.bindScrolling({debounce: 50, element: this.$()});
+		this.bindScrolling({debounce: 50, element: this.get('element')});
 		// scroll handler
 
 		this.scrolled();
 		// immediately run this when the element is inserted
 
-		Ember.$(document).on('keydown', this.documentKeyDown.bind(this));
+		document.addEvent('keydown', this.documentKeyDown.bind(this));
 		// bind keydown event so we can hook onto ESC
 	},
 
 	willRemoveElement: function() {
-		Ember.$(document).off('keydown', this.documentKeyDown.bind(this));
+		document.removeEvent('keydown', this.documentKeyDown.bind(this));
 		// unbind keydown
 
 		this.unbindScrolling();
@@ -47,7 +47,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	},
 
 	resizeSensor: function() {
-		if (this.$() === undefined) {
+		if (!this.get('element')) {
 			return false;
 		}
 		// we've not rendered the view yet so just bail
@@ -61,7 +61,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 		if (offset === last.clientHeight || pos === height) {
 			Ember.run.later(this, function() {
-				if (this.$() !== undefined) {
+				if (!this.get('element')) {
 					this.animateScrollTo(parent.scrollHeight);
 					this.set('scrollPosition', parent.scrollHeight);
 				}

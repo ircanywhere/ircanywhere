@@ -140,7 +140,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 
 			events.forEach(function(item) {
-				var el = document.querySelectorAll('div.row[data-id=' + item._id + ']'),
+				var el = document.querySelectorAll('div.row[data-id="' + item._id + '"]'),
 					type = el.attr('data-type');
 
 				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el) {
@@ -202,7 +202,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 
 		if (tab.preBacklogId) {
 			Ember.run.later(function() {
-				var element = container.querySelector('div.row[data-id=' + tab.preBacklogId + ']');
+				var element = container.querySelector('div.row[data-id="' + tab.preBacklogId + '"]');
 				container.scrollTop = element.offsetTop;
 			}, 100);
 		}
