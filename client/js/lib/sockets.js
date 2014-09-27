@@ -54,6 +54,10 @@ Ember.Socket = Ember.Object.extend({
 		this.set('socket', socket);
 	},
 
+	_loadComplete: function () {
+		Ember.$('body div.loading').remove();
+	},
+
 	_generateInterval: function(k) {
 		var maxInterval = (Math.pow(2, k) - 1) * 1000;
 
@@ -125,6 +129,8 @@ Ember.Socket = Ember.Object.extend({
 							self._store(type, data[type], true);
 						}
 					}
+
+					self._loadComplete();
 				});
 				break;
 			case 'channelUsers':

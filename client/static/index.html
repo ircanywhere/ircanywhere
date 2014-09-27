@@ -8,13 +8,24 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<link rel="shortcut icon" href="/favicon.ico" />
 
-		<script src="/dependencies.js"></script>
-		<script src="/templates.js"></script>
-		<script src="/ircanywhere.js"></script>
+		<script type="text/javascript" src="/dependencies.js" defer></script>
+		<script type="text/javascript" src="/templates.js" defer></script>
+		<script type="text/javascript" src="/ircanywhere.js" defer></script>
 
 		<link rel="stylesheet" type="text/css" href="/ircanywhere.css" />
 	</head>
 	<body>
+		<div class="loading page">
+			<h1>IRCAnywhere</h1>
+			<h2>Hang tight, we're loading everything for you...</h2>
+			<div class="spinner">
+				<div class="rect1"></div>
+				<div class="rect2"></div>
+				<div class="rect3"></div>
+				<div class="rect4"></div>
+				<div class="rect5"></div>
+			</div>
+		</div>
 		<script type="text/x-handlebars">
 			{{outlet}}
 			{{outlet 'modal'}}
