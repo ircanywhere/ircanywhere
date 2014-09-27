@@ -71,7 +71,10 @@ App.InputController = Ember.ObjectController.extend({
 
 		tabComplete: function() {
 			var self = this,
-				input = (this.tabCompletionNicks.length === 0) ? this.get('inputValue').split(/\s+/) : this.get('originalInputValue').split(/\s+/),
+				el = Ember.$('.channel-input textarea').get(0),
+				selectionArea = this.get('inputValue').substr(0, el.selectionStart || this.get('inputValue').length),
+				unselectedArea = (el.selectionStart) ? this.get('inputValue').substr(el.selectionStart, this.get('inputValue').length) : '',
+				input = (this.tabCompletionNicks.length === 0) ? selectionArea.split(/\s+/) : this.get('originalInputValue').split(/\s+/),
 				lastWord = input[input.length - 1],
 				tab = this.get('socket.tabs').findBy('selected', true),
 				users = this.socket.find('channelUsers', {network: tab.network, channel: tab.target});
@@ -108,7 +111,7 @@ App.InputController = Ember.ObjectController.extend({
 				this.set('inputValue', this.get('originalInputValue'));
 			} else {
 				input[input.length - 1] = (input.length === 1) ? currentNick + this.get('autoCompleteChar') + ' ' : currentNick;
-				this.set('inputValue', input.join(' '));
+				this.set('inputValue', input.join(' ') + ((unselectedArea !== '') ? ' ' + unselectedArea : ''));
 			}
 		},
 
