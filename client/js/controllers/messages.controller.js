@@ -189,6 +189,15 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		}
 	},
 
+	showUnreadBar: function () {
+		var self = this;
+
+		Ember.run.later(self, function() {
+			var unread = this.get('controllers.network.selectedTab.unread');
+			self.set('controllers.network.unreadBar', (unread > 0));
+		}, 250);
+	}.observes('controllers.network.selectedTab.unread'),
+
 	ready: function() {
 		this.set('events', this.socket.get('events'));
 	},

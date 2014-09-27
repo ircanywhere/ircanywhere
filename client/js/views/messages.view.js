@@ -4,24 +4,22 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	classNameBindings: ['push'],
 
 	push: function() {
-		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
-	}.property('controller.target.content.selectedTab.unread').cacheable(),
+		return (this.get('controllers.network.unreadBar')) ? 'push' : '';
+	}.property('controllers.network.unreadBar').cacheable(),
 
 	animateScrollTo: function (scrollTo) {
+		if (!this.$()) {
+			return false;
+		}
+
 		this.$().animate({
 			scrollTop: scrollTo
-		}, 250);
+		}, 0);
 		// Animate scroll to work around iPhone bug on setting scroll
 		// position on touch scrollable elements.
 	},
 
 	didInsertElement: function() {
-		Ember.run.later(this, function() {
-			this.animateScrollTo(this.$().context.scrollHeight);
-			this.set('scrollPosition', this.$().context.scrollHeight);
-		}, 100);
-		// scroll to bottom on render
-
 		this.bindScrolling({debounce: 50, element: this.$()});
 		// scroll handler
 
@@ -46,8 +44,20 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		}
 	},
 
+	onTabChange: function () {
+		var pos = this.get('controller.target.content.selectedTab.scrollPosition');
+		Ember.run.later(this, function() {
+			if (pos) {
+				this.animateScrollTo(pos);
+			} else {
+				this.animateScrollTo(this.$().context.scrollHeight);
+			}
+		}, 250);
+		// scroll to bottom or last position on render
+	}.observes('controller.target.content.selectedTab._id'),
+
 	resizeSensor: function() {
-		if (this.$() === undefined) {
+		if (!this.$()) {
 			return false;
 		}
 		// we've not rendered the view yet so just bail
@@ -60,36 +70,22 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 			offset = height - pos,
 			scrollHeight = this.$().context.scrollHeight;
 		// get some variables and do some calculations
-
-		var scrollTo = function(position) {
-			if (this.$() !== undefined) {
-				this.animateScrollTo(position);
-				this.set('scrollPosition', position);
-
-				this.scrolled();
-			}
-		};
-
+		
 		if ((offset === last.height() || pos === height) && this.get('controller.controllers.index.isActive')) {
 			Ember.run.later(self, function() {
-				scrollTo.call(this, scrollHeight);
-			});
+				this.animateScrollTo(scrollHeight);
+			}, 100);
 		}
 		// we need to reposition the scrollbar!
 	}.observes('controller.filtered.@each'),
 
 	scrolled: function() {
-		if (this.$() === undefined) {
+		if (!this.$() || !this.get('controller.controllers.index.isActive')) {
 			return false;
 		}
-		// we've not rendered the view yet so just bail
-
-		if (!this.get('controller.controllers.index.isActive')) {
-			return false;
-		}
+		// ignore tabs in this state
 		
-		var self = this,
-			parent = this.$(),
+		var parent = this.$(),
 			container = this.$('.inside-backlog'),
 			tabId = parent.parents('.tab').attr('id').substr(4),
 			scrollBottom = parent.height() + parent.scrollTop(),
@@ -98,7 +94,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom, container);
 		// send to controller to do the actual updating
 
-		self.set('scrollPosition', scrollBottom);
+		this.set('controller.target.content.selectedTab.scrollPosition', this.$()[0].scrollTop);
+		this.set('scrollPosition', scrollBottom);
 		// reset the scroll position
 	}.observes('controller.controllers.index.isActive')
 });

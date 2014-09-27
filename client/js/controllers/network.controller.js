@@ -1,5 +1,7 @@
 App.NetworkController = Ember.ObjectController.extend({
 	needs: ['index', 'messages'],
+	
+	unreadBar: false,
 
 	tabChanged: function() {
 		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
