@@ -2,15 +2,17 @@
 	<div {{bind-attr class=":messages view.showUserList::no-right"}}>
 		{{render "overlaybar" this}}
 		{{#if unreadBar}}
-		<div class="top-message-bar message-bar clear" {{action "gotoUnread" selectedTab._id}}>
-			<span class="left">
-				<span class="last hide">0</span>
-				<span class="message-number">There are <span class="alert unread">{{selectedTab.unread}}</span> unread messages{{#if selectedTab.highlights}} and <span class="alert highlight" {{action "gotoHighlight" selectedTab._id}}>{{selectedTab.highlights}}</span> highlights{{/if}} since your last visit.</span>
-			</span>
-			<span class="right">
-				<a href="#" {{action "markAllAsRead" selectedTab._id}} class="read-backlog">Mark as read (or ESC key)</a>
-			</span>
-		</div>
+			{{#if selectedTab.unread}}
+			<div class="top-message-bar message-bar clear" {{action "gotoUnread" selectedTab._id}}>
+				<span class="left">
+					<span class="last hide">0</span>
+					<span class="message-number">There are <span class="alert unread">{{selectedTab.unread}}</span> unread messages{{#if selectedTab.highlights}} and <span class="alert highlight" {{action "gotoHighlight" selectedTab._id}}>{{selectedTab.highlights}}</span> highlights{{/if}} since your last visit.</span>
+				</span>
+				<span class="right">
+					<a href="#" {{action "markAllAsRead" selectedTab._id}} class="read-backlog">Mark as read (or ESC key)</a>
+				</span>
+			</div>
+			{{/if}}
 		{{/if}}
 		{{render "messages"}}
 		{{render "input"}}
