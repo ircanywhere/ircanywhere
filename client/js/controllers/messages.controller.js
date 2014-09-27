@@ -97,7 +97,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		loadBacklog: function() {
 			var tab = this.get('socket.tabs').findBy('selected', true),
 				count = 50,
-				container = Ember.$('.inside-backlog');
+				container = document.querySelector('.inside-backlog');
 
 			if (!tab || tab.loading) {
 				return false;
@@ -106,7 +106,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			var query = Ember.copy(tab.query),
 				contentLength = this.get('content').length,
 				filteredLength = this.get('filtered').length,
-				top = container.find('div.row:first').attr('data-id'),
+				top = container.querySelector('div.row').getAttribute('data-id'),
 				item = this.socket.events.findBy('_id', top);
 			// get some query variables
 
@@ -140,11 +140,11 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 			}
 
 			events.forEach(function(item) {
-				var el = Ember.$('div.row[data-id=' + item._id + ']'),
+				var el = document.querySelectorAll('div.row[data-id=' + item._id + ']'),
 					type = el.attr('data-type');
 
-				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
-					var topOffset = el[0].offsetTop;
+				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el) {
+					var topOffset = el.offsetTop;
 
 					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
 						item.set('read', true);
@@ -194,16 +194,16 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 
 	updated: function() {
 		var tab = this.get('controllers.network.selectedTab'),
-			container = Ember.$('.backlog');
+			container = document.querySelector('.backlog');
 
-		if (!tab || tab.loading === false || container.length === 0) {
+		if (!tab || tab.loading === false || !container) {
 			return false;
 		}
 
 		if (tab.preBacklogId) {
 			Ember.run.later(function() {
-				var element = container.find('div.row[data-id=' + tab.preBacklogId + ']');
-				container[0].scrollTop = element[0].offsetTop;
+				var element = container.querySelector('div.row[data-id=' + tab.preBacklogId + ']');
+				container.scrollTop = element.offsetTop;
 			}, 100);
 		}
 

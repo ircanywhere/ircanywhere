@@ -17,8 +17,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 
 	didInsertElement: function() {
 		Ember.run.later(this, function() {
-			this.animateScrollTo(this.$().context.scrollHeight);
-			this.set('scrollPosition', this.$().context.scrollHeight);
+			this.animateScrollTo(this.get('element').scrollHeight);
+			this.set('scrollPosition', this.get('element').scrollHeight);
 		}, 100);
 		// scroll to bottom on render
 
@@ -52,18 +52,18 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		}
 		// we've not rendered the view yet so just bail
 
-		var parent = this.$().context,
+		var parent = this.get('element'),
 			height = parent.scrollHeight - parent.clientHeight,
 			pos = parent.scrollTop,
-			last = this.$('.inside-backlog').find('div.row:last-of-type'),
+			last = parent.querySelectorAll('.inside-backlog div.row:last-of-type'),
 			offset = height - pos;
 		// get some variables and do some calculations
 
-		if (offset === last.height() || pos === height) {
+		if (offset === last.clientHeight || pos === height) {
 			Ember.run.later(this, function() {
 				if (this.$() !== undefined) {
-					this.animateScrollTo(this.$().context.scrollHeight);
-					this.set('scrollPosition', this.$().context.scrollHeight);
+					this.animateScrollTo(parent.scrollHeight);
+					this.set('scrollPosition', parent.scrollHeight);
 				}
 			}, 100);
 		}
@@ -82,12 +82,11 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 		
 		var self = this,
 			parent = this.$(),
-			container = this.$('.inside-backlog'),
 			tabId = parent.parents('.tab').attr('id').substr(4),
 			scrollBottom = parent.height() + parent.scrollTop(),
 			scrollTop = scrollBottom - parent.height();
 		
-		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom, container);
+		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom);
 		// send to controller to do the actual updating
 
 		self.set('scrollPosition', scrollBottom);

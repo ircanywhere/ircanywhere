@@ -55,7 +55,8 @@ Ember.Socket = Ember.Object.extend({
 	},
 
 	_loadComplete: function () {
-		Ember.$('body div.loading').remove();
+		var el = document.querySelector('body div.loading');
+		el.parentNode.removeChild(el);
 	},
 
 	_generateInterval: function(k) {

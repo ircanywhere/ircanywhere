@@ -3,7 +3,7 @@ App.Notification = Ember.Mixin.create({
 	audioNotification: null,
 
 	init: function() {
-		this.set('audioNotification', Ember.$('audio#audio-notification').get(0));
+		this.set('audioNotification', document.querySelector('audio#audio-notification'));
 		this.set('notification', window.Notification);
 	},
 

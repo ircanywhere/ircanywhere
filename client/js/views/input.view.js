@@ -21,9 +21,10 @@ App.InputView = Ember.View.extend({
 	},
 
 	documentKeyDown: function(e) {
-		var textarea = this.$('textarea');
+		var textarea = document.querySelector('.channel-input textarea'),
+			element = document.querySelector('.channel-input input, .channel-input textarea');
 
-		if (!e.metaKey && !e.ctrlKey && textarea && !Ember.$('input, textarea').is(':focus')) {
+		if (!e.metaKey && !e.ctrlKey && textarea && element !== document.activeElement) {
 			textarea.focus();
 		}
 	},
@@ -57,12 +58,14 @@ App.InputView = Ember.View.extend({
 	},
 
 	resize: function() {
-		var textarea = this.$('textarea'),
-			element = Ember.$(this.get('element')),
-			padding = parseInt(textarea.css('paddingTop'), 10) + parseInt(textarea.css('paddingBottom'), 10);
+		var textarea = document.querySelector('.channel-input textarea'),
+			txStyle = window.getComputedStyle(textarea, null),
+			element = this.get('element'),
+			padding = parseInt(txStyle['padding-top'], 10) + parseInt(txStyle['padding-bottom'], 10);
 
-		textarea.height('auto');
-		textarea.height(textarea.prop('scrollHeight') - padding);
-		element.height(textarea.prop('scrollHeight') + (padding * 2));
+		textarea.style.height = 'auto';
+		textarea.style.height = textarea.scrollHeight - padding;
+
+		element.style.height = textarea.scrollHeight + (padding * 2);
 	}
 });

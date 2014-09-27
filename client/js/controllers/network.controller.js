@@ -16,7 +16,10 @@ App.NetworkController = Ember.ObjectController.extend({
 			// set content.selectedTab (network) - so we can find the full selected tab object in
 			// the network's object for quick access
 
-			Ember.$('.main-view').removeClass('mobileChannels');
+			var mainView = document.querySelector('.main-view');
+			if (mainView) {
+				mainView.removeClass('mobileChannels');
+			}
 		}
 		// update this.tab if we have a new selected tab
 	}.observes('controllers.index.tabId', 'socket.tabs.@each.selected'),
@@ -46,15 +49,15 @@ App.NetworkController = Ember.ObjectController.extend({
 
 	gotoUnread: function() {
 		var first = this.get('controllers.messages.content').filterProperty('read', false).objectAt(0),
-			tabElement = Ember.$('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
+			tabElement = document.querySelector('#tab-' + this.get('controllers.index.tabId') + ' .backlog');
 
 		if (first) {
-			var firstElement = tabElement.find('[data-id=' + first._id + ']')[0];
+			var firstElement = tabElement.querySelector('[data-id=' + first._id + ']');
 			if (firstElement) {
-				tabElement[0].scrollTop = firstElement.offsetTop - firstElement.offsetHeight;
+				tabElement.scrollTop = firstElement.offsetTop - firstElement.offsetHeight;
 			}
 		} else {
-			tabElement[0].scrollTop = 0;
+			tabElement.scrollTop = 0;
 		}
 		// XXX - Work on this.. A bit iffy
 	},

@@ -10,7 +10,9 @@ App.TitlebarController = Ember.ObjectController.extend({
 
 	actions: {
 		setTopic: function() {
-			Ember.$('textarea.command-field:visible').select().val('/topic ');
+			var element = document.querySelector('.channel-input textarea.command-field');
+			element.focus();
+			element.value = '/topic';
 		},
 
 		toggleUsers: function() {
@@ -25,13 +27,13 @@ App.TitlebarController = Ember.ObjectController.extend({
 		},
 
 		toggleMobileChannels: function() {
-			Ember.$('.tab.selected').removeClass('mobileSidebar');
-			Ember.$('.main-view').toggleClass('mobileChannels');
+			document.querySelector('.tab.selected').removeClass('mobileSidebar');
+			document.querySelector('.main-view').classList += 'mobileChannels';
 		},
 
 		toggleMobileSidebar: function() {
-			Ember.$('.tab.selected').toggleClass('mobileSidebar');
-			Ember.$('.main-view').removeClass('mobileChannels');
+			document.querySelector('.main-view').classList += 'mobileSidebar';
+			document.querySelector('.main-view').removeClass('mobileChannels');
 		},
 
 		toggleEvents: function() {
