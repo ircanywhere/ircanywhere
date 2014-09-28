@@ -57,6 +57,28 @@ IRCHandler.prototype._formatRaw = function(raw) {
 };
 
 /**
+ * Handles the connecting event from `irc-factory` 
+ *
+ * @method opened
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.connecting = function(client, message) {
+	application.Networks.update({_id: client._id}, {$set: {
+		'internal.status': networkManager.flags.connecting
+	}}, {safe: false});
+
+	networkManager.activeTab(client, false);
+	// update tabs etc as connecting
+
+	if (message.localPort) {
+		IdentdCache[message.localPort] = message;
+	}
+	// have we got a local port yet?
+};
+
+/**
  * Handles the opened event from `irc-factory` which just tells us what localPort and any other
  * information relating to the client so we can make sure the identd server is working.
  *
