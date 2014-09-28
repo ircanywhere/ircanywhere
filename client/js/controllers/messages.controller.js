@@ -147,7 +147,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
-					if ((top === 0 || top < topOffset && topOffset < bottom) && self.get('controllers.index.isActive')) {
+					if ((top < topOffset && topOffset < bottom) && self.get('controllers.index.isActive')) {
 						item.set('read', true);
 						
 						if (self.readDocs.indexOf(item._id) === -1) {

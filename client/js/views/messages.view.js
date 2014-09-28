@@ -4,8 +4,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	classNameBindings: ['push'],
 
 	push: function() {
-		return (this.get('controllers.network.unreadBar')) ? 'push' : '';
-	}.property('controllers.network.unreadBar').cacheable(),
+		return (this.get('controller.target.content.selectedTab.unread')) ? 'push' : '';
+	}.property('controller.target.content.selectedTab.unread').cacheable(),
 
 	animateScrollTo: function (scrollTo) {
 		if (!this.$()) {
@@ -91,6 +91,8 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 			tabId = parent.parents('.tab').attr('id').substr(4),
 			scrollBottom = parent.height() + parent.scrollTop(),
 			scrollTop = scrollBottom - parent.height();
+
+		console.log(scrollTop, scrollBottom);
 
 		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom);
 		// send to controller to do the actual updating
