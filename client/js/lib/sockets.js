@@ -28,6 +28,8 @@ Ember.Socket = Ember.Object.extend({
 				return false;
 			}
 
+			self._loadComplete(true);
+
 			Ember.run.later(self._flushData.bind(self), 1000);
 			// show the popup
 
@@ -54,8 +56,12 @@ Ember.Socket = Ember.Object.extend({
 		this.set('socket', socket);
 	},
 
-	_loadComplete: function () {
-		Ember.$('body div.loading').remove();
+	_loadComplete: function (complete) {
+		if (complete) {
+			Ember.$('body div.loading').hide();
+		} else {
+			Ember.$('body div.loading').show();
+		}
 	},
 
 	_generateInterval: function(k) {
@@ -130,7 +136,7 @@ Ember.Socket = Ember.Object.extend({
 						}
 					}
 
-					self._loadComplete();
+					self._loadComplete(true);
 				});
 				break;
 			case 'channelUsers':

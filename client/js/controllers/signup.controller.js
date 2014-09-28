@@ -10,6 +10,12 @@ App.SignupController = Ember.ObjectController.extend({
 	confirmPassword: '',
 	timezoneOffset: new Date().getTimezoneOffset(),
 
+	init: function () {
+		if (!this.socket.socket) {
+			this.socket._loadComplete(true);
+		}
+	},
+
 	actions: {
 		signupSubmit: function() {
 			var self = this;
