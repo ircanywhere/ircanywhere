@@ -52,7 +52,8 @@ App.InputView = Ember.View.extend({
 		} else {
 			this.get('controller').send('resetTabCompletion');
 		}
-		setTimeout(this.resize.bind(this), 0);
+		
+		Ember.run.later(this, this.resize, 0);
 		// Resize after changing textarea content
 	},
 

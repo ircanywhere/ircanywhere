@@ -1,6 +1,7 @@
 App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	needs: ['infolist'],
 	tabId: null,
+	isActive: true,
 
 	init: function() {
 		this.bindVisibility();
