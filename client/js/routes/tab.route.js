@@ -33,8 +33,16 @@ App.TabRoute = AppRoute.extend({
 	actions: {
 		willTransition: function(transition) {
 			var params = transition.params,
-				parts = transition.providedModelsArray,
+				parts = [],
 				url;
+
+			if (params.network && params.network.url) {
+				parts.push(params.network.url);
+			}
+
+			if (params.tab && params.tab.tab) {
+				parts.push(params.tab.tab);
+			}
 
 			if (parts.length === 0) {
 				url = (!params.tab) ? params.url : params.url + '/' + Helpers.decodeChannel(params.tab).toLowerCase();

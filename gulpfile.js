@@ -96,7 +96,7 @@ gulp.task('dependencies', function() {
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
-			mangle: true
+			mangle: false
 		}))
 		.pipe(gulp.dest('./client/build'))
 });

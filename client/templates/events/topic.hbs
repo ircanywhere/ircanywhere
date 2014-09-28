@@ -1,4 +1,4 @@
 <div data-type="topic" {{bind-attr class=classNames data-id=_id}}>
 	<span class="time">{{unbound time message.time}}</span>
-	<span class="column event">&ndash;  Topic for {{unbound message.channel}} is: "{{unbound ircParse message.topic ...parentController.parentController.content._id}}" set by {{userLink false null}}</span>
+	<span class="column event">&ndash;  Topic for {{unbound message.channel}} is: "{{unbound ircParse message.topic ...parentController.parentController.content._id}}" set by {{userLink false content}}</span>
 </div>

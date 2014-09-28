@@ -1,4 +1,4 @@
 <div data-type="join" {{bind-attr class=classNames data-id=content._id}}>
 	<span class="time">{{time content.message.time}}</span>
-	<span class="column event">{{#if content.extra.self}}&rarr; You have joined {{content.message.channel}}{{else}}&rarr; {{userLink false null}}{{hostname}}has joined {{content.message.channel}}{{/if}}</span>
+	<span class="column event">{{#if content.extra.self}}&rarr; You have joined {{content.message.channel}}{{else}}&rarr; {{userLink false content}}{{hostname}}has joined {{content.message.channel}}{{/if}}</span>
 </div>
