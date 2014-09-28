@@ -92,8 +92,6 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 			scrollBottom = parent.height() + parent.scrollTop(),
 			scrollTop = scrollBottom - parent.height();
 
-		console.log(scrollTop, scrollBottom);
-
 		this.controller.send('detectUnread', tabId, scrollTop, scrollBottom);
 		// send to controller to do the actual updating
 
