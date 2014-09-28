@@ -288,7 +288,7 @@ ChannelManager.prototype.updateUsers = function(key, users, values) {
 ChannelManager.prototype.updateModes = function(key, capab, channel, mode) {
 	var us = {};
 	
-	channel = channel.toLowerCase()
+	channel = channel.toLowerCase();
 
 	this.getChannel(key, channel)
 		.then(function(chan) {

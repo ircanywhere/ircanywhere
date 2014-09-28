@@ -432,7 +432,7 @@ IRCHandler.prototype.names = function(client, message) {
 
 		var users = [],
 			keys = [],
-			prefixes = helper.exists(client, 'internal.capabilities.modes.prefixes') || '@+';
+			prefixes = helper.exists(client, 'internal.capabilities.modes.prefixes') || '@+',
 			regex = new RegExp('[' + helper.escape(prefixes) + ']', 'g');
 
 		channelUsers.forEach(function(u) {

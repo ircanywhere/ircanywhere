@@ -68,8 +68,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var events = this.get('content'),
 			limit = (tab) ? tab.get('messageLimit', 50) : 50,
 			slice = events.length - limit;
-			slice = (slice < 0 || tab.get('requestedBacklog')) ? 0 : slice,
-			prev = null;
+			slice = (slice < 0 || tab.get('requestedBacklog')) ? 0 : slice;
 
 		var proxy = Ember.ArrayProxy.createWithMixins(Ember.SortableMixin, {
 			content: events,
