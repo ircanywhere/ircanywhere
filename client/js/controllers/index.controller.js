@@ -5,14 +5,12 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	history: [],
 
 	init: function() {
-		var self = this;
+		if (!this.socket.socket || !this.socket.authed) {
+			this.socket._loadComplete(true);
+		}
 
 		this.bindVisibility();
-
-		this.history.push(document.location.href);
-		window.onpopstate = function(e) {
-			self.history.push(document.location.href);
-		};
+		this.setupHistory();
 	},
 
 	tabChanged: function() {
@@ -54,6 +52,15 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 			this.transitionToRoute('login');
 		}
 	}.observes('socket.authed'),
+
+	setupHistory: function() {
+		var self = this;
+
+		self.history.push(document.location.href);
+		window.onpopstate = function(e) {
+			self.history.push(document.location.href);
+		};
+	},
 
 	ready: function() {
 		this.tabChanged();
