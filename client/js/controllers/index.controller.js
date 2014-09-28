@@ -2,9 +2,17 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 	needs: ['infolist'],
 	tabId: null,
 	isActive: true,
+	history: [],
 
 	init: function() {
+		var self = this;
+
 		this.bindVisibility();
+
+		this.history.push(document.location.href);
+		window.onpopstate = function(e) {
+			self.history.push(document.location.href);
+		};
 	},
 
 	tabChanged: function() {

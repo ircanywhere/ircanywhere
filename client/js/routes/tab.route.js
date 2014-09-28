@@ -78,7 +78,7 @@ App.TabRoute = AppRoute.extend({
 				target = transition.params.tab,
 				network = this.modelFor('network').get('_id');
 
-			socket.send('insertTab', {target: target, network: network, selected: true});
+			socket.send('insertTab', {target: target.tab, network: network, selected: true});
 		}
 	}
 });

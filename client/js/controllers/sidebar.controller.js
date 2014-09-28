@@ -1,4 +1,6 @@
 App.SidebarController = Ember.ArrayController.extend(App.Notification, {
+	needs: ['index', 'network'],
+
 	increment: false,
 
 	content: function() {
@@ -100,7 +102,18 @@ App.SidebarController = Ember.ArrayController.extend(App.Notification, {
 	},
 
 	onRemovedTab: function() {
-		window.history.back();
+		var tabHistory = this.get('controllers.index.history'),
+			lastItem = tabHistory[tabHistory.length - 3];
+
+		if (lastItem) {
+			document.location.href = lastItem;
+		} else {
+			var tab = this.get('controllers.network.selectedTab');
+			
+			if (tab) {
+				document.location.href = '#/t/' + tab.url.split('/')[0];
+			}
+		}
 	},
 
 	_updateQuery: function(object) {
