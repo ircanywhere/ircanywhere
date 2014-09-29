@@ -1,6 +1,6 @@
 /*global App:true */
 App = Ember.Application.create({
-	LOG_TRANSITIONS: true,
+	LOG_TRANSITIONS: false,
 	// ember settings
 	
 	defaultTitle: 'IRCAnywhere',

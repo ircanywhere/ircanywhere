@@ -1,6 +1,6 @@
 App.InputView = Ember.View.extend({
 	templateName: 'input',
-	tagName: 'table',
+	tagName: 'div',
 	classNames: 'channel-input',
 
 	didInsertElement: function() {
