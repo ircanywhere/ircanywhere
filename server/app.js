@@ -85,6 +85,7 @@ Application.prototype.init = function() {
 		// A copy of the parsed config object
 	} catch (e) {
 		throw new Error('Configuration file not found. If you have recently pulled from development branch, please amend your config.json and rename it to config.js.');
+		process.exit(1);
 		// Fail and exit if config file not found
 	}
 	// Fail and exit if config file not found
@@ -93,6 +94,7 @@ Application.prototype.init = function() {
 	if (validation.length > 0) {
 		this.logger.log('error', util.inspect(validation, {colors: false}));
 		throw new Error('Invalid config settings, please amend.');
+		process.exit(1);
 	}
 	// attempt to validate our config file
 
@@ -118,6 +120,7 @@ Application.prototype.init = function() {
 	mongo.MongoClient.connect(this.config.mongo, this.database.settings, function(err, db) {
 		if (err) {
 			throw err;
+			process.exit(1);
 		}
 
 		self.mongo = db;
@@ -135,6 +138,7 @@ Application.prototype.init = function() {
 		mongo.MongoClient.connect(self.config.oplog, self.database.settings, function(oerr, odb) {
 			if (oerr) {
 				throw oerr;
+				process.exit(1);
 			}
 
 			self.oplog = odb;
