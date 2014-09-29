@@ -34,7 +34,7 @@ function ModuleManager() {
 ModuleManager.prototype.loadModule = function(moduleName) {
 	var self = this,
 		deferred = Q.defer(),
-		modulePath = 'modules/' + moduleName + '/server';
+		modulePath = './modules/' + moduleName + '/server';
 
 	fs.exists(modulePath, function (exists) {
 		if (!exists) {
