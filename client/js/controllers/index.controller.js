@@ -57,7 +57,7 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 		var self = this;
 
 		self.history.push(document.location.href);
-		window.onpopstate = function(e) {
+		window.onpopstate = function() {
 			self.history.push(document.location.href);
 		};
 	},
