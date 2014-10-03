@@ -207,7 +207,7 @@ ServerSession.prototype.user = function(message) {
 			self.sendPlayback();
 		})
 		.fail(function(error) {
-			application.logger.log('error', 'Error login in user ' + error);
+			application.logger.log('error', 'Error login in user ' + email + ': ' + error);
 			self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + self.clientNick + ' :' + error);
 			self.sendRaw(':***!ircanywhere@ircanywhere.com 464 ' + self.clientNick + ' :' + error);
 			// Send a private message and 464 ERR_PASSWDMISMATCH with error description when login fails
@@ -252,7 +252,7 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Don't duplicate events.
 
-	if (event.network !== this.networkId) {
+	if (event.network.toString() !== this.networkId.toString()) {
 		return;
 	}
 	// Check network
