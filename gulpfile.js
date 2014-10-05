@@ -90,7 +90,7 @@ gulp.task('js:debug', function() {
 });
 
 gulp.task('dependencies', function() {
-	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
+	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js', './modules/*/client/deps/*.js'])
 		.pipe(gulp.dest('./client/build/ext'))
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
@@ -101,7 +101,7 @@ gulp.task('dependencies', function() {
 });
 
 gulp.task('dependencies:debug', function() {
-	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js'])
+	gulp.src(['client/ext/jquery*.js', 'client/ext/handlebars*.js', 'client/ext/ember*.js', 'client/ext/sockjs*.js', './modules/*/client/deps/*.js'])
 		.pipe(sourcemaps.init())
 		.pipe(concat('dependencies.js'))
 		.pipe(sourcemaps.write('.'))
@@ -150,7 +150,7 @@ gulp.task('static:watch', function() {
 	gulp.watch(['client/static/**'], ['static']);
 });
 
-gulp.task('default', ['css', 'templates', 'js', 'dependencies', 'static']);
+gulp.task('default', ['clean', 'css', 'templates', 'js', 'dependencies', 'static']);
 gulp.task('watch', ['default', 'css:watch', 'templates:watch', 'js:watch', 'static:watch']);
 gulp.task('test', ['jshint', 'mocha']);
 gulp.task('debug', ['css', 'templates:debug', 'js:debug', 'dependencies:debug', 'static']);
