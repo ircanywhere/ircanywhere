@@ -2,9 +2,9 @@ Ember.Handlebars.helper('safeString', function(value) {
 	return new Ember.Handlebars.SafeString(value);
 });
 
-Ember.Handlebars.helper('lookup', function(component, context, options) {
+Ember.Handlebars.helper('lookup', function(component, context, controller, options) {
 	if (Ember.TEMPLATES[component]) {
-		Ember.TEMPLATES[component](this, options);
+		Ember.TEMPLATES[component](controller, options);
 	} else if (component !== false) {
 		console.warn('Got event, but template for:', component, 'does not exist');
 	}
