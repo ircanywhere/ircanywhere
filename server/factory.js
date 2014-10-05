@@ -78,6 +78,7 @@ IRCFactory.prototype.init = function() {
 
 					_.each(message.keys, function(key) {
 						networkManager.changeStatus({_id: key}, networkManager.flags.connected);
+						self.send(key, 'ping', []);
 					});
 					
 					_.each(difference, function(net) {
