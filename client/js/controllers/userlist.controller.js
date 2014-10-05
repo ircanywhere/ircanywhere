@@ -38,10 +38,6 @@ App.UserlistController = Ember.ArrayController.extend(Ember.Evented, {
 		return (this.get('filtered.length') !== this.get('normal.length'));
 	}.property('filtered.length', 'normal.length'),
 
-	tabChanged: function() {
-		this.set('rerender', true);
-	}.observes('controllers.index.tabId'),
-
 	filtered: Ember.arrayComputed('sorted', 'controllers.index.tabId', {
 		initialize: function(array, changeMeta, instanceMeta) {
 			if (!this.get('controllers.index.tabId')) {

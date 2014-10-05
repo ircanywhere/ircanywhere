@@ -1,13 +1,11 @@
 /**
- * IRCAnywhere server/serverSession.js
+ * IRCAnywhere server/serversession.js
  *
  * @title ServerSession
  * @copyright (c) 2013-2014 http://ircanywhere.com
  * @license GPL v2
  * @author Rodrigo Silveira
  */
-
-'use strict';
 
 var parseMessage = require('irc-message').parseMessage,
 	_ = require('lodash'),
@@ -19,9 +17,11 @@ var parseMessage = require('irc-message').parseMessage,
 /**
  * Handles the communication between an IRC client and ircanywhere's IRC server. Instantiated on
  * every new client connection.
- *
+
+ * @class ServerSession
+ * @method ServerSession
  * @param {Object} socket Connection socket to the client
- * @constructor ServerSession
+ * @return void
  */
 function ServerSession(socket) {
 	this.socket = socket;
@@ -43,6 +43,7 @@ ServerSession.debug = (process.env.DEBUG_SERVER && process.env.DEBUG_SERVER === 
 /**
  * Initializes session.
  *
+ * @method init
  * @return void
  */
 ServerSession.prototype.init = function() {
@@ -98,7 +99,9 @@ ServerSession.prototype.init = function() {
 /**
  * Handles PASS message from client. Stores password for login.
  *
+ * @method pass
  * @param {Object} message Received message
+ * @return void
  */
 ServerSession.prototype.pass = function(message) {
 	this.password = message.params[0];
@@ -109,7 +112,9 @@ ServerSession.prototype.pass = function(message) {
  * Handles NICK message from client. If message arrives before welcome, just store nickname temporarily to use
  * on the welcome message. Otherwise forward it.
  *
+ * @method nick
  * @param {Object} message Received message
+ * @return void
  */
 ServerSession.prototype.nick = function(message) {
 	if (!this.welcomed) {
@@ -122,6 +127,9 @@ ServerSession.prototype.nick = function(message) {
 
 /**
  * Handles QUIT message from client. Disconnects the user.
+ *
+ * @method quit
+ * @return void
  */
 ServerSession.prototype.quit = function() {
 	this.sendRaw('ERROR :Quitting');
@@ -143,7 +151,9 @@ ServerSession.prototype.disconnectUser = function() {
  *
  * 	user@email.com/networkName
  *
+ * @method user
  * @param {Object} message Received message
+ * @return void
  */
 ServerSession.prototype.user = function(message) {
 	var self = this,
@@ -197,7 +207,7 @@ ServerSession.prototype.user = function(message) {
 			self.sendPlayback();
 		})
 		.fail(function(error) {
-			application.logger.log('error', 'Error login in user ' + error);
+			application.logger.log('error', 'Error login in user ' + email + ': ' + error);
 			self.sendRaw(':***!ircanywhere@ircanywhere.com PRIVMSG ' + self.clientNick + ' :' + error);
 			self.sendRaw(':***!ircanywhere@ircanywhere.com 464 ' + self.clientNick + ' :' + error);
 			// Send a private message and 464 ERR_PASSWDMISMATCH with error description when login fails
@@ -209,6 +219,7 @@ ServerSession.prototype.user = function(message) {
 /**
  * Sets up client to listen to IRC activity.
  *
+ * @method setup
  * @return void
  */
 ServerSession.prototype.setup = function() {
@@ -229,7 +240,9 @@ ServerSession.prototype.setup = function() {
 /**
  * Handle IRC events.
  *
+ * @method handleEvent
  * @param {Object} event Event to handle
+ * @return void
  */
 ServerSession.prototype.handleEvent =  function(event) {
 	var ignore = ['registered', 'lusers', 'motd', 'join'];
@@ -239,7 +252,7 @@ ServerSession.prototype.handleEvent =  function(event) {
 	}
 	// Don't duplicate events.
 
-	if (event.network !== this.networkId) {
+	if (event.network.toString() !== this.networkId.toString()) {
 		return;
 	}
 	// Check network
@@ -265,7 +278,9 @@ ServerSession.prototype.handleEvent =  function(event) {
 /**
  * Forwards messages that are not stored in the events collection in the database.
  *
- * @param ircMessage
+ * @method handleIrcMessage
+ * @param {Object} ircMessage Irc Message object
+ * @return void
  */
 ServerSession.prototype.handleIrcMessage = function (ircMessage) {
 	var fwdMessages = ['names', 'who', 'whois', 'mode', 'banList', 'inviteList', 'exceptlist', 'quietlist', 'list', 'join'],
@@ -288,6 +303,7 @@ ServerSession.prototype.handleIrcMessage = function (ircMessage) {
  * Sends stored welcome message from network to client. Message order is registered, lusers,
  * nick (to set to stored nick), motd and usermode.
  *
+ * @method sendWelcome
  * @return {promise}
  */
 ServerSession.prototype.sendWelcome = function () {
@@ -363,6 +379,7 @@ ServerSession.prototype.sendWelcome = function () {
 /**
  * Sends to client a join message for each active channel tab.
  *
+ * @method sendJoins
  * @return {promise}
  */
 ServerSession.prototype.sendJoins = function () {
@@ -410,6 +427,7 @@ ServerSession.prototype.sendJoins = function () {
 /**
  * Sends channel information, such as NAMES, TOPIC etc
  *
+ * @method sendChannelInfo
  * @param {Object} tab Channel tab
  * @return void
  */
@@ -429,6 +447,7 @@ ServerSession.prototype.sendChannelInfo = function (tab) {
 /**
  * Sends playback messages to client.
  *
+ * @method sendPlayback
  * @return void
  */
 ServerSession.prototype.sendPlayback = function () {
@@ -523,7 +542,9 @@ ServerSession.prototype.sendPlayback = function () {
 /**
  * Handles PRIVMSG messages from client. Forwards to ircHandler and to ircFactory.
  *
+ * @method privmsg
  * @param {Object} message Received message
+ * @return void
  */
 ServerSession.prototype.privmsg = function(message) {
 	if (!this.networkId) {
@@ -558,8 +579,10 @@ ServerSession.prototype.privmsg = function(message) {
 /**
  * Handles all message that do not have a specific handler.
  *
+ * @method onClientMessage
  * @param {Object} message Received message
  * @param {String} command Messages command
+ * @return void
  */
 ServerSession.prototype.onClientMessage = function(message, command) {
 	if (!this.networkId) {
@@ -594,7 +617,9 @@ ServerSession.prototype.onClientMessage = function(message, command) {
 /**
  * Sends a raw message to the client
  *
+ * @method sendRaw
  * @param {String} rawMessage Raw message
+ * @return void
  */
 ServerSession.prototype.sendRaw = function(rawMessage) {
 	if (_.isArray(rawMessage)) {

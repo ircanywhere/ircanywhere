@@ -1,13 +1,12 @@
 /*global App:true */
 App = Ember.Application.create({
-	LOG_TRANSITIONS: true,
+	LOG_TRANSITIONS: false,
 	// ember settings
 	
 	defaultTitle: 'IRCAnywhere',
 	title: 'IRCAnywhere',
 	timeout: null,
 	timein: null,
-	isActive: true,
 	size: '',
 	// global variables
 

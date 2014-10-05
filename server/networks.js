@@ -80,7 +80,7 @@ NetworkManager.prototype.init = function() {
 				return;
 			}
 
-			client.internal.tabs[doc.target] = doc;
+			Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 		});
 		
 	});
@@ -99,16 +99,17 @@ NetworkManager.prototype.init = function() {
 
 	application.ee.on(['networks', 'update'], function(doc) {
 		var id = doc._id.toString();
-		
-		Clients[id] = doc;
-		Clients[id].internal.tabs = {};
-		
+
+		doc.internal.tabs = Clients[id].internal.tabs;
+		Clients[id] = _.extend(Clients[id], doc);
+
 		application.Tabs.find({user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
 			if (err || !tab) {
 				return;
 			}
 			// error
-			Clients[id].internal.tabs[tab.target] = tab;
+
+			Clients[id.toString()].internal.tabs[tab.target] = tab;
 		});
 	});
 

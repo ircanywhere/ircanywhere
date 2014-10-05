@@ -12,6 +12,12 @@ App.LoginController = Ember.ObjectController.extend({
 	password: 'Password',
 	resetEmail: 'Email Address',
 
+	init: function () {
+		if (!this.socket.socket) {
+			this.socket._loadComplete(true);
+		}
+	},
+
 	actions: {
 		loginSubmit: function() {
 			var self = this,

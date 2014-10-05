@@ -69,7 +69,6 @@ App.DynamicuserlistView = Ember.View.extend({
 	render: function(buffer) {
 		var self = this;
 
-		this.set('controller.rerender', false);
 		this.list.forEach(function(user) {
 			buffer.push(self.generateUserLink(user));
 		});

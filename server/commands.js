@@ -44,18 +44,18 @@ CommandManager.prototype.init = function() {
 
 			var client = Clients[doc.network.toString()];
 
-			self.parseCommand(user, client, doc.target, doc.command, doc._id);
+			self._parseCommand(user, client, doc.target, doc.command, doc._id);
 			// success
 		});
 	});
 
-	this.createAlias('/join', '/j');
-	this.createAlias('/part', '/p', '/leave');
-	this.createAlias('/cycle', '/hop');
-	this.createAlias('/quit', '/disconnect');
-	this.createAlias('/query', '/q');
-	this.createAlias('/reconnect', '/connect');
-	this.createAlias('/nickserv', '/ns');
+	this._createAlias('/join', '/j');
+	this._createAlias('/part', '/p', '/leave');
+	this._createAlias('/cycle', '/hop');
+	this._createAlias('/quit', '/disconnect');
+	this._createAlias('/query', '/q');
+	this._createAlias('/reconnect', '/connect');
+	this._createAlias('/nickserv', '/ns');
 	// setup aliases
 };
 
@@ -100,7 +100,7 @@ CommandManager.prototype._ban = function(client, channel, nickname, ban) {
  * @param {...String} alias A command to map to
  * @return void
  */
-CommandManager.prototype.createAlias = function() {
+CommandManager.prototype._createAlias = function() {
 	var self = this,
 		original = arguments[0].substr(1),
 		aliases = Array.prototype.slice.call(arguments, 1);
@@ -120,14 +120,14 @@ CommandManager.prototype.createAlias = function() {
  * Parse a command string and determine where to send it after that based on what it is
  * ie just text or a string like: '/join #channel'
  * 
- * @method parseCommand
+ * @method _parseCommand
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
  * @param {String} command The command string
  * @return void
  */
-CommandManager.prototype.parseCommand = function(user, client, target, command, id) {
+CommandManager.prototype._parseCommand = function(user, client, target, command, id) {
 	if (client === undefined) {
 		return;
 	}
@@ -138,7 +138,7 @@ CommandManager.prototype.parseCommand = function(user, client, target, command, 
 			execute = params[0].toLowerCase().substr(1);
 			params.shift();
 
-		if (_.isFunction(this[execute])) {
+		if (_.isFunction(this[execute]) && execute.substr(0, 1) !== '_' && execute !== 'init') {
 			this[execute].call(this, user, client, target, params, false, id);
 		} else {
 			this.raw(user, client, target, [execute].concat(params));

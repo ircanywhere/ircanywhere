@@ -246,7 +246,7 @@ ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 		
 			if (param.plus) {
 				_.each(param.plus.split(''), function(pm) {
-					if (prefixModes.indexOf(pm) == -1) {
+					if (prefixModes.indexOf(pm) === -1) {
 						return true;
 					}
 					// we've found a user but be careful, this could still
@@ -261,12 +261,11 @@ ModeParser.prototype.handleParams = function(capabilities, users, modeArray) {
 
 			if (param.minus) {
 				_.each(param.minus.split(''), function(mm) {
-					if (prefixModes.indexOf(mm) == -1) {
+					if (prefixModes.indexOf(mm) === -1) {
 						return true;
 					}
 					// we've found a user but be careful, this could still
 					// be a key, with the name of a user
-					
 					if (_.has(user.modes, capabilities.prefixmodes[mm])) {
 						delete user.modes[capabilities.prefixmodes[mm]];
 					}

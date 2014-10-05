@@ -57,6 +57,28 @@ IRCHandler.prototype._formatRaw = function(raw) {
 };
 
 /**
+ * Handles the connecting event from `irc-factory` 
+ *
+ * @method opened
+ * @param {Object} client A valid client object
+ * @param {Object} message A valid message object
+ * @return void
+ */
+IRCHandler.prototype.connecting = function(client, message) {
+	application.Networks.update({_id: client._id}, {$set: {
+		'internal.status': networkManager.flags.connecting
+	}}, {safe: false});
+
+	networkManager.activeTab(client, false);
+	// update tabs etc as connecting
+
+	if (message.localPort) {
+		IdentdCache[message.localPort] = message;
+	}
+	// have we got a local port yet?
+};
+
+/**
  * Handles the opened event from `irc-factory` which just tells us what localPort and any other
  * information relating to the client so we can make sure the identd server is working.
  *
@@ -95,8 +117,8 @@ IRCHandler.prototype.registered = function(client, message) {
 	// set this immediately so the other stuff works
 
 	application.Networks.update({_id: client._id}, {$set: {
-		'nick': message.nickname,
-		'name': message.capabilities.network.name,
+		nick: message.nickname,
+		name: message.capabilities.network.name,
 		'internal.status': networkManager.flags.connected,
 		'internal.capabilities': message.capabilities
 	}}, {safe: false});
@@ -344,11 +366,12 @@ IRCHandler.prototype.nick = function(client, message) {
 		return false;
 	}
 
-	if (message.nickname === client.nick) {
+	var mlower = message.nickname.toLowerCase();
+	if (mlower === client.nick.toLowerCase()) {
 		application.Networks.update({_id: client._id}, {$set: {nick: message.newnick}}, {safe: false});
 	}
 	// update the nickname because its us changing our nick
-
+	
 	var mlower = message.nickname.toLowerCase();
 	if (_.has(client.internal.tabs, mlower)) {
 		application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}}, {safe: false});
@@ -432,7 +455,7 @@ IRCHandler.prototype.names = function(client, message) {
 
 		var users = [],
 			keys = [],
-			prefixes = helper.exists(client, 'internal.capabilities.modes.prefixes') || '@+';
+			prefixes = helper.exists(client, 'internal.capabilities.modes.prefixes') || '@+',
 			regex = new RegExp('[' + helper.escape(prefixes) + ']', 'g');
 
 		channelUsers.forEach(function(u) {

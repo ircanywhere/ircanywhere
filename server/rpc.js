@@ -141,6 +141,10 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 		uid = doc.user;
 	}
 
+	if (!uid) {
+		return false;
+	}
+
 	if (eventName === 'insert') {
 		rpcHandler.push(uid, 'addTab', doc);
 	} else if (eventName === 'update') {
@@ -167,6 +171,10 @@ RPCHandler.prototype.handleEventsAll = function(doc) {
 	
 	doc = _.omit(doc, 'user');
 	// alter the document
+
+	if (!uid) {
+		return false;
+	}
 
 	if (eventName === 'insert') {
 		rpcHandler.push(uid, 'newEvent', doc);
@@ -220,6 +228,8 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 		var tab = _.find(value.internal.tabs, query);
 		if (tab) {
 			uid = tab.user;
+		} else {
+			return;
 		}
 		// find the tab that this change is for
 

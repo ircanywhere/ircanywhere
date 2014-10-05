@@ -146,7 +146,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 				if ((type === 'privmsg' || type === 'action' || type === 'notice') && el.get(0)) {
 					var topOffset = el[0].offsetTop;
 
-					if ((top === 0 || top < topOffset && topOffset < bottom) && App.get('isActive')) {
+					if ((top < topOffset && topOffset < bottom) && self.get('controllers.index.isActive')) {
 						item.set('read', true);
 						
 						if (self.readDocs.indexOf(item._id) === -1) {
@@ -188,6 +188,15 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		}
 	},
 
+	showUnreadBar: function () {
+		var self = this;
+
+		Ember.run.later(self, function() {
+			var unread = this.get('controllers.network.selectedTab.unread');
+			self.set('controllers.network.unreadBar', (unread > 0));
+		}, 250);
+	}.observes('controllers.network.selectedTab.unread'),
+
 	ready: function() {
 		this.set('events', this.socket.get('events'));
 	},
@@ -213,7 +222,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object) {
 		var self = this;
 
-		if (App.get('isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
+		if (this.get('controllers.index.isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
 			return false;
 		}
 
@@ -255,6 +264,8 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	},
 
 	onEventVisible: function(id, item) {
+		var self = this;
+
 		if (!item.get('extra.highlight')) {
 			return false;
 		}
@@ -263,7 +274,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		var tab = this.get('socket.tabs').findBy('_id', this.get('controllers.index.tabId'));
 
 		this.unreadNotifications.forEach(function(item) {
-			if (!(App.get('isActive') && item.tag === tab.network + '/' + tab.title)) {
+			if (!(self.get('controllers.index.isActive') && item.tag === tab.network + '/' + tab.title)) {
 				return false;
 			}
 			// tab or window isnt active

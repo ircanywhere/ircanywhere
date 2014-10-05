@@ -5,31 +5,33 @@
 	margin: 0;
 	border-top: 2px solid #D9D9D9;
 	background: @white;
-	width: 100%;
 	.snap-notop;
+	.flex;
 
-	td:first-child {
-		width: 100px;
-	}
-
-	td:last-child {
-		padding-right: 6px;
+	.outer-nick-button {
+		margin: 0;
+		padding: 6px 0 6px 6px;
+		width: auto;
 	}
 
 	.nick-button {
-		margin: 0;
-		padding: 9px 14px 9px 31px;
+		background: @index-border;
 		font-size: 13px;
 		font-weight: bold;
+		width: auto;
+		padding: 5px 15px;
+		margin: 0;
+		.border-radius(3px);
 	}
 
 	form.input-area {
 		padding: 0 4px;
-		margin: 0;
+		margin: 6px;
 		border: 1px solid #0069D6;
 		color: #000;
 		background: @white;
 		.border-radius(3px);
+		.setflex(20);
 	}
 
 	textarea {

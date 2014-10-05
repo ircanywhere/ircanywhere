@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 	concatCss = require('gulp-concat-css'),
 	handlebars = require('gulp-handlebars'),
 	uglify = require('gulp-uglifyjs'),
-	rimraf = require('gulp-rimraf'),
+	del = require('del'),
 	jshint = require('gulp-jshint'),
 	mocha = require('gulp-mocha'),
 	concat = require('gulp-concat'),
@@ -12,8 +12,7 @@ var gulp = require('gulp'),
 	sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('clean', function() {
-	gulp.src('./client/build', {read: false})
-		.pipe(rimraf({force: true}));
+	del.sync(['./client/build'], {force: true});
 });
 
 gulp.task('css', function() {
@@ -96,7 +95,7 @@ gulp.task('dependencies', function() {
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
-			mangle: true
+			mangle: false
 		}))
 		.pipe(gulp.dest('./client/build'))
 });
