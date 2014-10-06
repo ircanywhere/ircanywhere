@@ -71,6 +71,8 @@ App.TabRoute = AppRoute.extend({
 			// send update to backend
 
 			this.controllerFor('network').onUnreadChange();
+
+			return true;
 		},
 
 		error: function(error, transition) {

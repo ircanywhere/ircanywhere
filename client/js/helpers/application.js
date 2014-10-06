@@ -1,3 +1,7 @@
+Ember.Handlebars.helper('json', function(value) {
+	console.log(JSON.stringify(value, undefined, 2));
+});
+
 Ember.Handlebars.helper('safeString', function(value) {
 	return new Ember.Handlebars.SafeString(value);
 });
@@ -66,4 +70,16 @@ Ember.Handlebars.helper('userLink', function(show, user) {
 	
 	return new Ember.Handlebars.SafeString(html);
 	// return the element
+});
+
+Ember.Handlebars.helper('motd', function(messages) {
+	var str = '',
+		network = this.get('parentController.parentController.content'),
+		id = network._id;
+
+	messages.forEach(function(text) {
+		str += App.Parser.exec(text, network) + '<br />';
+	});
+
+	return new Ember.Handlebars.SafeString(str);
 });

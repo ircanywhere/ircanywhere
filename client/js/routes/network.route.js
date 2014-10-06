@@ -68,6 +68,8 @@ App.NetworkRoute = AppRoute.extend({
 			// send update to backend
 
 			this.controller.onUnreadChange();
+
+			return true;
 		},
 
 		markAsRead: function(id) {

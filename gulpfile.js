@@ -46,7 +46,13 @@ gulp.task('templates', function() {
 		.pipe(uglify('templates.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
-			mangle: false
+			mangle: false,
+			output: {
+				source_map: {
+					file: 'templates.js.map',
+					root: '/'
+				}
+			}
 		}))
 		.pipe(gulp.dest('./client/build'))
 });
@@ -76,7 +82,13 @@ gulp.task('js', function() {
 		.pipe(uglify('ircanywhere.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
-			mangle: false
+			mangle: false,
+			output: {
+				source_map: {
+					file: 'ircanywhere.js.map',
+					root: '/'
+				}
+			}
 		}))
 		.pipe(gulp.dest('./client/build'))
 });
@@ -95,7 +107,13 @@ gulp.task('dependencies', function() {
 		.pipe(uglify('dependencies.js', {
 			outSourceMap: true,
 			basePath: '/client/build/',
-			mangle: false
+			mangle: false,
+			output: {
+				source_map: {
+					file: 'dependencies.js.map',
+					root: '/'
+				}
+			}
 		}))
 		.pipe(gulp.dest('./client/build'))
 });
