@@ -163,18 +163,8 @@ App.InputController = Ember.ObjectController.extend({
 			socketEngine._deleteWhere('events', {network: tab.network, target: tab.target});
 		}
 	},
-
-	bindCommands: function () {
-		var _commands = this.get('_commands');
-		for (var key in _commands) {
-			if (!_commands.hasOwnProperty(key)) {
-				continue;
-			}
-			// ignore prototype properties
-
-			this.set('commands.' + key, _commands[key]);
-		}
-	}
+	
+	mergedProperties: ['commands'],
 });
 
 App.injectController('input');
