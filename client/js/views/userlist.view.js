@@ -27,27 +27,34 @@ App.UserlistView = Ember.View.extend(App.Scrolling, {
 		// position on touch scrollable elements.
 	},
 
-	onTabChange: function () {
-		var pos = this.get('controller.target.content.selectedTab.userListScrollPosition');
-		Ember.run.later(this, function() {
-			if (pos) {
-				this.animateScrollTo(pos);
-			} else {
-				this.animateScrollTo(0);
-			}
-		}, 250);
-		// scroll to bottom or last position on render
-	}.observes('controllers.index.tabId'),
+	onTabChange: function() {
+		Ember.run.scheduleOnce('afterRender', this, this.onRender);
+
+		this.set('controller.rerender', true);
+		this.rerender();
+	}.observes('controller.target.content.selectedTab._id'),
 
 	divClass: function() {
 		var classNames = ['userlist'],
-			hidden = (this.get('controller.parentController.content.selectedTab.hiddenUsers') === true) ? 'hide' : 'show';
+			hidden = (this.get('controller.target.content.selectedTab.hiddenUsers') === true) ? 'hide' : 'show';
 			classNames.push(hidden);
 
 		return classNames.join(' ');
-	}.property('controller.parentController.content.selectedTab.hiddenUsers').cacheable(),
+	}.property('controller.target.content.selectedTab.hiddenUsers').cacheable(),
 
-	scrolled: function () {
+	scrolled: function() {
 		this.set('controller.target.content.selectedTab.userListScrollPosition', this.$()[0].scrollTop);
+	},
+
+	onRender: function() {
+		var pos = this.get('controller.target.content.selectedTab.userListScrollPosition');
+		if (pos) {
+			this.animateScrollTo(pos);
+		} else {
+			this.animateScrollTo(0);
+		}
+		// scroll to bottom or last position on render
+
+		this.set('controller.rerender', false);
 	}
 });

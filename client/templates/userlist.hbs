@@ -3,42 +3,30 @@
 	<span class="right">{{filtered.length}}</span>
 </div>
 <ul>
-	{{#if owners}}
+	{{#if owners.length}}
 		<li data-type="op" class="head clear"><span class="left">Owners</span><span class="right">{{owners.length}}</span></li>
-		{{#each user in owners groupedRows=true}}
-			<li data-type="op">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='owners' classType='op' list=controller.owners controller=controller}}
 	{{/if}}
-	{{#if admins}}
+	{{#if admins.length}}
 		<li data-type="op" class="head clear"><span class="left">Administrators</span><span class="right">{{admins.length}}</span></li>
-		{{#each user in admins groupedRows=true}}
-			<li data-type="op">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='admins' classType='op' list=controller.admins controller=controller}}
 	{{/if}}
-	{{#if operators}}
+	{{#if operators.length}}
 		<li data-type="op" class="head clear"><span class="left">Operators</span><span class="right">{{operators.length}}</span></li>
-		{{#each user in operators groupedRows=true}}
-			<li data-type="op">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='operators' classType='op' list=controller.operators controller=controller}}
 	{{/if}}
-	{{#if halfops}}
+	{{#if halfops.length}}
 		<li data-type="halfop" class="head clear"><span class="left">Half Operators</span><span class="right">{{halfops.length}}</span></li>
-		{{#each user in halfops groupedRows=true}}
-			<li data-type="halfop">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='halfops' classType='halfop' list=controller.halfops controller=controller}}
 	{{/if}}
-	{{#if voiced}}
+	{{#if voiced.length}}
 		<li data-type="voice" class="head clear"><span class="left">Voiced</span><span class="right">{{voiced.length}}</span></li>
-		{{#each user in voiced groupedRows=true}}
-			<li data-type="voice">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='voiced' classType='voice' list=controller.voiced controller=controller}}
 	{{/if}}
-	{{#if normal}}
+	{{#if normal.length}}
 		{{#if displayHeading}}
 			<li data-type="user" class="head clear"><span class="left">Users</span><span class="right">{{normal.length}}</span></li>
 		{{/if}}
-		{{#each user in normal groupedRows=true}}
-			<li data-type="user">{{userLink true user}}</li>
-		{{/each}}
+		{{view App.DynamicuserlistView type='normal' classType='user' list=controller.normal controller=controller}}
 	{{/if}}
 </ul>

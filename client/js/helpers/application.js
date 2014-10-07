@@ -46,7 +46,7 @@ Ember.Handlebars.helper('userLink', function(show, user) {
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
 		prefixClass = '',
-		url = this.get('controllers.network.model').url;
+		url = this.get('controllers.network.model.url');
 
 	if (!nickname) {
 		return '';

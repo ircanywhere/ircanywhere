@@ -252,7 +252,10 @@ ChannelManager.prototype.removeUsers = function(key, channel, users) {
  */
 ChannelManager.prototype.updateUsers = function(key, users, values) {
 	_.each(users, function(u) {
-		var s = {network: key, nickname: u};
+		var s = {
+			network: key,
+			nickname: new RegExp('^' + u + '$', 'i')
+		};
 
 		application.ChannelUsers.find(s).toArray(function(err, records) {
 			if (err || !records) {
