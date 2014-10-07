@@ -74,8 +74,7 @@ Ember.Handlebars.helper('userLink', function(show, user) {
 
 Ember.Handlebars.helper('motd', function(messages) {
 	var str = '',
-		network = this.get('parentController.parentController.content'),
-		id = network._id;
+		network = this.get('parentController.parentController.content');
 
 	messages.forEach(function(text) {
 		str += App.Parser.exec(text, network) + '<br />';

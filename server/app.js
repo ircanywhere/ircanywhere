@@ -39,6 +39,7 @@ var _ = require('lodash'),
 function Application() {
 	var self = this;
 
+	this.exitProcess = false;
 	this.ee = new events.EventEmitter2({
 		wildcard: true,
 		delimiter: '.',
@@ -84,8 +85,8 @@ Application.prototype.init = function() {
 		this.config = require('../config').config;
 		// A copy of the parsed config object
 	} catch (e) {
+		this.exitProcess = true;
 		throw new Error('Configuration file not found. If you have recently pulled from development branch, please amend your config.json and rename it to config.js.');
-		process.exit(1);
 		// Fail and exit if config file not found
 	}
 	// Fail and exit if config file not found
@@ -93,8 +94,8 @@ Application.prototype.init = function() {
 	var validation = validate(this.config, schema);
 	if (validation.length > 0) {
 		this.logger.log('error', util.inspect(validation, {colors: false}));
+		this.exitProcess = true;
 		throw new Error('Invalid config settings, please amend.');
-		process.exit(1);
 	}
 	// attempt to validate our config file
 
@@ -119,8 +120,8 @@ Application.prototype.init = function() {
 
 	mongo.MongoClient.connect(this.config.mongo, this.database.settings, function(err, db) {
 		if (err) {
+			this.exitProcess = true;
 			throw err;
-			process.exit(1);
 		}
 
 		self.mongo = db;
@@ -137,8 +138,8 @@ Application.prototype.init = function() {
 
 		mongo.MongoClient.connect(self.config.oplog, self.database.settings, function(oerr, odb) {
 			if (oerr) {
+				this.exitProcess = true;
 				throw oerr;
-				process.exit(1);
 			}
 
 			self.oplog = odb;
@@ -340,6 +341,8 @@ Application.prototype.setupWinston = function() {
  * @return void
  */
 Application.prototype.handleError = function(err, exit) {
+	var self = this;
+
 	exit = (exit === undefined) ? true : exit;
 
 	if (!err) {
@@ -347,7 +350,7 @@ Application.prototype.handleError = function(err, exit) {
 	}
 
 	this.logger.log('error', err.stack, function() {
-		if (exit) {
+		if (exit || self.exitProcess) {
 			process.exit(0);
 		}
 	});
