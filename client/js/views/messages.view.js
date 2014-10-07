@@ -42,7 +42,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	documentKeyDown: function(e) {
 		var keyCode = e.keyCode || e.which;
 		if (keyCode === 27) {
-			this.get('controller.target').markAllAsRead(this.get('controllers.index.tabId'));
+			this.get('controller.target').markAllAsRead(this.get('controller.target.content.selectedTab._id'));
 			e.preventDefault();
 		}
 	},
