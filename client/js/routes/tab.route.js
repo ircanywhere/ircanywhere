@@ -53,25 +53,7 @@ App.TabRoute = AppRoute.extend({
 			}
 			// attempt to construct a url from resolves models or parameters
 
-			var index = this.controllerFor('index'),
-				socket = index.socket,
-				tab = socket.tabs.findBy('url', url);
-
-			if (!tab || tab && tab.selected) {
-				return false;
-			}
-
-			socket.get('users').setEach('selectedTab', url);
-			tab.set('requestedBacklog', false);
-			tab.set('messageLimit', 50);
-			// mark tab as selected and reset some tab related settings
-
-			index.socket.send('selectTab', tab.url);
-			// send update to backend
-
-			this.controllerFor('network').onUnreadChange();
-
-			return true;
+			this.controllerFor('index').socket.send('selectTab', url);
 		},
 
 		error: function(error, transition) {
