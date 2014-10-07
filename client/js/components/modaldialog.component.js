@@ -29,6 +29,7 @@ App.ModalDialogComponent = Ember.Component.extend({
 		var keyCode = e.keyCode || e.which;
 		if (keyCode === 27 && !this.alert) {
 			this.close();
+			e.preventDefault();
 		}
 	},
 
