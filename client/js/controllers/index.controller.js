@@ -33,8 +33,6 @@ App.IndexController = Ember.ObjectController.extend(App.Visibility, {
 			this.get('socket.users').setEach('selectedTab', tab.url);
 			this.set('tabId', tab.get('_id'));
 			this.get('controllers.network').onUnreadChange();
-			console.log('isnt it');
-			//this.get('socket').send('selectTab', tab.url);
 			// change the tab information
 		}
 	}.observes('socket.users.@each.selectedTab'),
