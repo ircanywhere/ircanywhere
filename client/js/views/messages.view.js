@@ -42,7 +42,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 	documentKeyDown: function(e) {
 		var keyCode = e.keyCode || e.which;
 		if (keyCode === 27) {
-			this.get('controller.target').markAllAsRead(this.get('controller.target.content.selectedTab._id'));
+			this.get('controller.target').markAllAsRead(this.get('controllers.index.tabId'));
 		}
 	},
 
@@ -56,7 +56,7 @@ App.MessagesView = Ember.View.extend(App.Scrolling, {
 			}
 		}, 250);
 		// scroll to bottom or last position on render
-	}.observes('controller.target.content.selectedTab._id'),
+	}.observes('controllers.index.tabId'),
 
 	resizeSensor: function() {
 		if (!this.$()) {

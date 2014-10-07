@@ -77,7 +77,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 		});
 
 		return proxy.slice(slice);
-	}.property('content.@each', 'socket.tabs.@each.selected', 'socket.tabs.@each.messageLimit'),
+	}.property('content.@each', 'controllers.index.tabId', 'socket.tabs.@each.messageLimit'),
 
 	markAsRead: function() {
 		var query = {'$in': []};

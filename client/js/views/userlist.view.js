@@ -37,7 +37,7 @@ App.UserlistView = Ember.View.extend(App.Scrolling, {
 			}
 		}, 250);
 		// scroll to bottom or last position on render
-	}.observes('controller.target.content.selectedTab._id'),
+	}.observes('controllers.index.tabId'),
 
 	divClass: function() {
 		var classNames = ['userlist'],

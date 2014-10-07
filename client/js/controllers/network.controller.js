@@ -21,7 +21,7 @@ App.NetworkController = Ember.ObjectController.extend({
 			Ember.$('.main-view').removeClass('mobileChannels');
 		}
 		// update this.tab if we have a new selected tab
-	}.observes('controllers.index.tabId', 'socket.tabs.@each.selected'),
+	}.observes('controllers.index.tabId'),
 
 	markAllAsRead: function(id) {
 		var tab = this.get('socket.tabs').findBy('_id', id);

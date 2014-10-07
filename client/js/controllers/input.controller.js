@@ -20,7 +20,7 @@ App.InputController = Ember.ObjectController.extend({
 			.then(function(items) {
 				self.set('backlog', items);
 			});
-	}.observes('controllers.network.model._id', 'controllers.index.tabId'),
+	}.observes('controllers.index.tabId'),
 
 	ready: function() {
 		this.set('commandIndex', this.get('backlog').length);

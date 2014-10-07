@@ -66,7 +66,6 @@ App.TabRoute = AppRoute.extend({
 			tab.set('messageLimit', 50);
 			// mark tab as selected and reset some tab related settings
 
-			index.set('tabId', tab._id);
 			index.socket.send('selectTab', tab.url);
 			// send update to backend
 
