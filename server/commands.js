@@ -44,7 +44,7 @@ CommandManager.prototype.init = function() {
 
 			var client = Clients[doc.network.toString()];
 
-			self._parseCommand(user, client, doc.target, doc.command, doc._id);
+			self._parseCommand(user, client, doc.target, doc.type, doc.command, doc._id);
 			// success
 		});
 	});
@@ -124,10 +124,12 @@ CommandManager.prototype._createAlias = function() {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
+ * @param {String} type Type of tab
  * @param {String} command The command string
+ * @param {String} id The id of the command record
  * @return void
  */
-CommandManager.prototype._parseCommand = function(user, client, target, command, id) {
+CommandManager.prototype._parseCommand = function(user, client, target, type, command, id) {
 	if (client === undefined) {
 		return;
 	}
@@ -139,9 +141,9 @@ CommandManager.prototype._parseCommand = function(user, client, target, command,
 			params.shift();
 
 		if (_.isFunction(this[execute]) && execute.substr(0, 1) !== '_' && execute !== 'init') {
-			this[execute].call(this, user, client, target, params, false, id);
+			this[execute].call(this, user, client, target, params, false, id, type);
 		} else {
-			this.raw(user, client, target, [execute].concat(params));
+			this.raw(user, client, target, [execute].concat(params), false, id, type);
 		}
 		// is this a command? if it's prefixed with one / then yes
 	} else {
@@ -150,7 +152,7 @@ CommandManager.prototype._parseCommand = function(user, client, target, command,
 		}
 		// strip one of the /'s off if it has two at the start
 
-		this.msg(user, client, target, command.split(' '), true);
+		this.msg(user, client, target, command.split(' '), true, type);
 		// just split it to follow standards with other commands, it'll be rejoined before sent out
 	}
 
@@ -555,12 +557,15 @@ CommandManager.prototype.unaway = function(user, client) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
+ * @param {Boolean} out Unused here
+ * @param {ObjectID} id Unused here
+ * @param {String} type Type of tab
  * @return void
  */
-CommandManager.prototype.close = function(user, client, target) {
+CommandManager.prototype.close = function(user, client, target, params, out, id, type) {
 	var tlower = target.toLowerCase();
 
-	application.Tabs.findOne({target: tlower, network: client._id}, function(err, tab) {
+	application.Tabs.findOne({target: tlower, network: client._id, type: type}, function(err, tab) {
 		if (err || !tab) {
 			return false;
 		}
@@ -601,10 +606,15 @@ CommandManager.prototype.close = function(user, client, target) {
  * @param {Object} user A valid user object
  * @param {Object} client A valid client object
  * @param {String} target Target to send command to, usually a channel or username
+ * @param {String} params The command string
  * @return void
  */
-CommandManager.prototype.query = function(user, client, target) {
-	networkManager.addTab(client, target, 'query', true);
+CommandManager.prototype.query = function(user, client, target, params) {
+	if (!params.length) {
+		return false;
+	}
+
+	networkManager.addTab(client, params[0], 'query', true);
 };
 
 /**

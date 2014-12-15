@@ -482,7 +482,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
  */
 RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 	var allow = false,
-		allowed = ['command', 'network', 'target'],
+		allowed = ['command', 'network', 'target', 'type'],
 		command,
 		user = socket._user;
 
@@ -495,7 +495,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 	}
 
 	_.forOwn(data, function(value, item) {
-		if ((item === 'command' || item === 'network' || item === 'target') && typeof value === 'string') {
+		if ((item === 'command' || item === 'network' || item === 'target' || item === 'type') && typeof value === 'string') {
 			allow = true;
 		}
 
@@ -509,7 +509,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		return socket.send('error', {command: command, error: 'invalid document properties, see API docs'});
 	}
 
-	application.Tabs.findOne({network: new mongo.ObjectID(data.network), user: user._id, target: data.target}, function(err, find) {
+	application.Tabs.findOne({network: new mongo.ObjectID(data.network), user: user._id, target: data.target, type: data.type}, function(err, find) {
 		if (err || !find) {
 			return socket.send('error', {command: command, error: 'not authorised to call this command'});
 		}
@@ -517,6 +517,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		data.user = user._id;
 		data.timestamp = +new Date();
 		data.network = find.network;
+		data.type = data.type;
 		data.backlog = !exec;
 		// bail if we can't find the tab, if we can re-set the network value
 

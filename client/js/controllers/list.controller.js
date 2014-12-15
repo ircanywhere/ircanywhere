@@ -70,7 +70,8 @@ App.ListController = Ember.ArrayController.extend({
 			this.socket.send('execCommand', {
 				command: '/list ' + this.get('search') + ' ' + page,
 				network: tab.network,
-				target: tab.target
+				target: tab.target,
+				type: tab.type
 			});
 
 			this.set('loading', true);
@@ -90,7 +91,8 @@ App.ListController = Ember.ArrayController.extend({
 			this.socket.send('execCommand', {
 				command: '/list ' + this.get('search') + ' ' + (this.get('page') + 1),
 				network: tab.network,
-				target: tab.target
+				target: tab.target,
+				type: tab.type
 			});
 
 			this.set('loading', true);
