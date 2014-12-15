@@ -15,7 +15,7 @@ Ember.Handlebars.helper('lookup', function(component, context, controller, optio
 });
 
 Ember.Handlebars.helper('time', function(context) {
-	return new Date(context).format('g:i A');
+	return new Date(context).toLocaleTimeString();
 });
 
 Ember.Handlebars.registerBoundHelper('ircParse', function(text, networkId) {
