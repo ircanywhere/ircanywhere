@@ -37,7 +37,7 @@ CommandManager.prototype.init = function() {
 	var self = this;
 
 	application.ee.on(['commands', 'insert'], function(doc) {
-		application.Users.findOne({_id: doc.user}, function(err, user) {
+		application.db.findOne('users', {_id: doc.user}, function(err, user) {
 			if (err || !user) {
 				return;
 			}
@@ -73,7 +73,7 @@ CommandManager.prototype.init = function() {
 CommandManager.prototype._ban = function(client, channel, nickname, ban) {
 	var mode = (ban) ? '+b' : '-b';
 
-	application.ChannelUsers.findOne({
+	application.db.findOne('channelUsers', {
 		network: client._id,
 		channel: new RegExp('^' + channel + '$', 'i'),
 		nickname: new RegExp('^' + nickname + '$', 'i')
@@ -103,7 +103,7 @@ CommandManager.prototype._ban = function(client, channel, nickname, ban) {
 CommandManager.prototype._createAlias = function() {
 	var self = this,
 		original = arguments[0].substr(1),
-		aliases = Array.prototype.slice.call(arguments, 1);
+		aliases = helper.copyArguments(arguments).slice(1);
 
 	if (!_.isFunction(this[original])) {
 		return false;
@@ -565,7 +565,7 @@ CommandManager.prototype.unaway = function(user, client) {
 CommandManager.prototype.close = function(user, client, target, params, out, id, type) {
 	var tlower = target.toLowerCase();
 
-	application.Tabs.findOne({target: tlower, network: client._id, type: type}, function(err, tab) {
+	application.db.findOne('tabs', {target: tlower, network: client._id, type: type}, function(err, tab) {
 		if (err || !tab) {
 			return false;
 		}

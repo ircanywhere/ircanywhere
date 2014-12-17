@@ -125,7 +125,7 @@ UserManager.prototype.timeOutInactive = function() {
 		timeoutDate.setHours(timeoutDate.getHours() - timeout);
 		// alter the date as per configuration
 
-		application.Users.find({lastSeen: {$lt: timeoutDate}}).toArray(function(err, docs) {
+		application.db.find('users', {lastSeen: {$lt: timeoutDate}}).toArray(function(err, docs) {
 			if (err || !docs) {
 				return;
 			}
@@ -191,7 +191,7 @@ UserManager.prototype.isAuthenticated = function(data) {
 	var query = {};
 		query['tokens.' + cookies.token] = {$exists: true};
 
-	application.Users.findOne(query, function(err, user) {
+	application.db.findOne('users', query, function(err, user) {
 		if (err || !user) {
 			deferred.reject(err);
 			return;
@@ -286,7 +286,7 @@ UserManager.prototype.registerUser = function(req) {
 		deferred.resolve(output);
 	}
 
-	application.Users.find().count(function(err, userCount) {
+	application.db.find('users', {}).count(function(err, userCount) {
 		if (err) {
 			return errorOccured('An error has occured');
 		}
@@ -310,7 +310,7 @@ UserManager.prototype.registerUser = function(req) {
 			};
 		// the user record
 
-		application.Users.find({email: email}).toArray(function(err, find) {
+		application.db.find('users', {email: email}).toArray(function(err, find) {
 			if (err || find.length > 0) {
 				return errorOccured((err) ? 'An error has occured' : 'The email you have used is already in use');
 			}
@@ -368,7 +368,7 @@ UserManager.prototype.userLogin = function(req, res) {
 		expire = new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)),
 		output = {failed: false, successMessage: '', errors: []};
 
-	application.Users.findOne({email: email}, function(err, user) {
+	application.db.findOne('users', {email: email}, function(err, user) {
 		if (err || !user) {
 			output.failed = true;
 			output.errors.push({error: 'User not found'});
@@ -421,7 +421,7 @@ UserManager.prototype.loginServerUser = function(email, password) {
 	if (!password) {
 		deferred.reject('password not specified');
 	} else {
-		application.Users.findOne({email: email}, function(err, user) {
+		application.db.findOne('users', {email: email}, function(err, user) {
 			if (err || !user) {
 				deferred.reject('User ' + email + ' not found');
 				return;
@@ -486,7 +486,7 @@ UserManager.prototype.forgotPassword = function(req) {
 		token = helper.generateSalt(25),
 		expire = new Date(Date.now() + (24 * 60 * 60 * 1000));
 
-	application.Users.findOne({email: email}, function(err, user) {
+	application.db.findOne('users', {email: email}, function(err, user) {
 		if (err || !user) {
 			output.failed = true;
 			output.errors.push({error: 'User not found'});
@@ -539,7 +539,7 @@ UserManager.prototype.resetPassword = function(req) {
 		token = req.param('token', ''),
 		output = {failed: false, successMessage: '', errors: []};
 
-	application.Users.findOne({'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}}, function(err, user) {
+	application.db.findOne('users', {'resetToken.token': token, 'resetToken.time': {$lte: new Date(Date.now() + (24 * 60 * 60 * 1000))}}, function(err, user) {
 		if (err || !user) {
 			output.failed = true;
 			output.errors.push({error: 'Not authenticated'});
@@ -573,7 +573,7 @@ UserManager.prototype.updateSettings = function(req) {
 		autoCompleteChar = req.param('autoCompleteChar', ''),
 		output = {failed: false, successMessage: '', errors: []};
 
-	application.Users.findOne({email: email}, function(err, emailUser) {
+	application.db.findOne('users', {email: email}, function(err, emailUser) {
 		if (err) {
 			output.failed = true;
 			output.errors.push({error: 'An error has occured'});
@@ -732,7 +732,7 @@ UserManager.prototype.onUserLogin = function(me, force) {
 		return;
 	}
 
-	application.Networks.find({'internal.userId': userId}).each(function(err, network) {
+	application.db.find('networks', {'internal.userId': userId}).each(function(err, network) {
 		if (err || !network) {
 			return;
 		}

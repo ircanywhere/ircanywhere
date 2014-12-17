@@ -448,7 +448,7 @@ IRCHandler.prototype.names = function(client, message) {
 		return false;
 	}
 
-	application.ChannelUsers.find({network: client._id, channel: message.channel.toLowerCase()}).toArray(function(err, channelUsers) {
+	application.db.find('channelUsers', {network: client._id, channel: message.channel.toLowerCase()}).toArray(function(err, channelUsers) {
 		if (err || !channelUsers) {
 			return false;
 		}

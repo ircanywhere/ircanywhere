@@ -59,7 +59,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 	if (user) {
 		deferred.resolve(user);
 	} else {
-		application.ChannelUsers.findOne({network: client._id, channel: channel, nickname: message.nickname}, function(err, doc) {
+		application.db.findOne('channelUsers', {network: client._id, channel: channel, nickname: message.nickname}, function(err, doc) {
 			if (err) {
 				deferred.reject();
 			} else {
@@ -120,7 +120,7 @@ EventManager.prototype.insertEvent = function(client, message, type, cb) {
 	var self = this;
 
 	if (type == 'nick' || type == 'quit') {
-		application.ChannelUsers.find({network: client._id, nickname: message.nickname}).toArray(function(err, userRecords) {
+		application.db.find('channelUsers', {network: client._id, nickname: message.nickname}).toArray(function(err, userRecords) {
 			if (err || !userRecords) {
 				return;
 			}
@@ -256,7 +256,7 @@ EventManager.prototype.getPrefix = function(client, user) {
 EventManager.prototype.getEventByType = function (type, network, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({type: type, network: network, user: userId}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
+	application.db.find('events', {type: type, network: network, user: userId}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 		if (err) {
 			deferred.reject(err);
 			return;
@@ -279,7 +279,7 @@ EventManager.prototype.getEventByType = function (type, network, userId) {
 EventManager.prototype.getUserPlayback = function (network, userId) {
 	var deferred = Q.defer();
 
-	application.Events.find({read: false, network: network, user: userId})
+	application.db.find('events', {read: false, network: network, user: userId})
 		.sort({'message.time': 1}).toArray(function(err, events) {
 		if (err) {
 			deferred.reject(err);

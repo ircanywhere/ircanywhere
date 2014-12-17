@@ -20,6 +20,8 @@ var _ = require('lodash'),
 	sockjs = require('sockjs'),
 	mongo = require('mongodb');
 
+var Database = require('./database').Database;
+
 /**
  * The applications's main object, contains all the startup functions.
  * All of the objects contained in this prototype are extendable by standard
@@ -104,61 +106,9 @@ Application.prototype.init = function() {
 	}
 	// amend any settings
 
-	this.database = {
-		mongo: this.config.mongo.split(/\//i),
-		oplog: this.config.oplog.split(/\//i),
-		settings: {
-			db: {
-				native_parser: true
-			},
-			server: {
-				auto_reconnect: true
-			}
-			// XXX - Add repl set options and tie to config file
-		}
-	};
-
-	mongo.MongoClient.connect(this.config.mongo, this.database.settings, function(err, db) {
-		if (err) {
-			this.exitProcess = true;
-			throw err;
-		}
-
-		self.mongo = db;
-		self.Nodes = db.collection('nodes');
-		self.Users = db.collection('users');
-		self.Networks = db.collection('networks');
-		self.Tabs = db.collection('tabs');
-		self.ChannelUsers = db.collection('channelUsers');
-		self.Events = db.collection('events');
-		self.Commands = db.collection('commands');
-
-		self.cleanCollections();
-		// ensure the collections are clean if < 0.1-beta
-
-		mongo.MongoClient.connect(self.config.oplog, self.database.settings, function(oerr, odb) {
-			if (oerr) {
-				this.exitProcess = true;
-				throw oerr;
-			}
-
-			self.oplog = odb;
-			self.Oplog = odb.collection('oplog.rs');
-
-			self.setupOplog();
-			// setup the oplog tailer when we connect
-		});
-
-		self.setupNode();
-		// next thing to do if we're all alright is setup our node
-		// this has been implemented now in the way for clustering
-
-		self.setupServer();
-		// setup express server
-
-		self.ee.emit('ready');
-		// initiate sub-objects
-	});
+	this.db = new Database(this.config);
+	this.db.connect();
+	// Setup a new database layer
 };
 
 /**
@@ -173,7 +123,7 @@ Application.prototype.cleanCollections = function() {
 		chanUserIds = [],
 		eventIds = [];
 
-	this.ChannelUsers.find({network: {$type: 2}}).toArray(function(err, docs) {
+	this.db.find('channelUsers', {network: {$type: 2}}).toArray(function(err, docs) {
 		if (err) {
 			throw err;
 		}
@@ -188,7 +138,7 @@ Application.prototype.cleanCollections = function() {
 	});
 	// remove lingering channel user objects
 
-	this.Events.find({network: {$type: 2}}).toArray(function(err, docs) {
+	this.db.find('events', {network: {$type: 2}}).toArray(function(err, docs) {
 		if (err) {
 			throw err;
 		}
@@ -217,12 +167,13 @@ Application.prototype.setupOplog = function() {
 		start = (new Date().getTime() / 1000);
 
 	this.channelUserDocs = {};
-	this.ChannelUsers.find({}).each(function(err, item) {
+	this.db.find('channelUsers', {}).each(function(err, item) {
 		if (!err && item) {
 			self.channelUserDocs[item._id] = item;
 		}
 	});
 
+	// XXX - DB LAYER
 	this.Oplog.find({ts: {$gte: new mongo.Timestamp(start, start)}}, {tailable: true, timeout: false}).each(function(err, item) {
 		if (err) {
 			throw err;
@@ -236,7 +187,7 @@ Application.prototype.setupOplog = function() {
 			col = collection[1];
 		// get the collection name
 
-		if (collection[0] !== self.database.mongo[3]) {
+		if (collection[0] !== self.db.database.mongo[3]) {
 			return false;
 		}
 		// bail if this is a different database
@@ -384,7 +335,7 @@ Application.prototype.setupNode = function() {
 		json = defaultJson;
 	}
 
-	this.Nodes.findOne(query, function(err, doc) {
+	this.db.findOne('nodes', query, function(err, doc) {
 		if (err) {
 			throw err;
 		}

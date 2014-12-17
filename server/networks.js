@@ -50,8 +50,8 @@ NetworkManager.prototype.flags = {
  */
 NetworkManager.prototype.init = function() {
 	var self = this,
-		networks = application.Networks.find(),
-		tabs = application.Tabs.find();
+		networks = application.db.find('networks', {}),
+		tabs = application.db.find('tabs', {});
 
 	networks.toArray(function(err, docs) {
 		if (err || !docs) {
@@ -103,7 +103,7 @@ NetworkManager.prototype.init = function() {
 		doc.internal.tabs = Clients[id].internal.tabs;
 		Clients[id] = _.extend(Clients[id], doc);
 
-		application.Tabs.find({user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
+		application.db.find('tabs', {user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
 			if (err || !tab) {
 				return;
 			}
@@ -175,7 +175,7 @@ NetworkManager.prototype.getClients = function(keys) {
 		timeoutDate.setHours(timeoutDate.getHours() - timeout);
 		// alter the timeout date as per configuration
 
-		application.Users.find({lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
+		application.db.find('users', {lastSeen: {$lt: timeoutDate}}, ['_id']).toArray(function(err, docs) {
 			if (err) {
 				return;
 			}
@@ -196,7 +196,7 @@ NetworkManager.prototype.getClients = function(keys) {
 	}
 
 	timeOutDeferred.promise.then(function (timedOutUsers) {
-		application.Networks.find().toArray(function(err, networks) {
+		application.db.find('networks', {}).toArray(function(err, networks) {
 			if (err || !networks) {
 				deferred.reject();
 				return;
@@ -234,7 +234,7 @@ NetworkManager.prototype.getClients = function(keys) {
 NetworkManager.prototype.getClientsForUser = function(userId) {
 	var deferred = Q.defer();
 
-	application.Networks.find({'internal.userId': userId, 'internal.status': networkManager.flags.connected})
+	application.db.find('networks', {'internal.userId': userId, 'internal.status': networkManager.flags.connected})
 		.toArray(function(err, networksArray) {
 			if (err) {
 				deferred.reject(err);
@@ -258,7 +258,7 @@ NetworkManager.prototype.getClientsForUser = function(userId) {
 NetworkManager.prototype.getActiveChannelsForUser = function(userId, networkId) {
 	var deferred = Q.defer();
 
-	application.Tabs.find({user: userId, network: networkId, active: true, type: 'channel'}).toArray(function(err, tabsArray) {
+	application.db.find('tabs', {user: userId, network: networkId, active: true, type: 'channel'}).toArray(function(err, tabsArray) {
 		if (err) {
 			deferred.reject(err);
 			return;
@@ -311,7 +311,7 @@ NetworkManager.prototype.addNetworkApi = function(req) {
 			});
 			// create an array of restrictions
 
-			application.Networks.find({'internal.userId': user._id}).count(function(err, networkCount) {
+			application.db.find('networks', {'internal.userId': user._id}).count(function(err, networkCount) {
 				server = helper.trimInput(server);
 				name = helper.trimInput(name);
 				nick = helper.trimInput(nick);
@@ -426,7 +426,7 @@ NetworkManager.prototype.editNetworkApi = function(req) {
 			});
 			// create an array of restrictions
 
-			application.Networks.findOne({_id: new mongo.ObjectID(networkId)}, function(err, doc) {
+			application.db.findOne('networks', {_id: new mongo.ObjectID(networkId)}, function(err, doc) {
 				if (err || !doc) {
 					output.errors.push({error: 'An error has occured, please contact your system administrator'});
 					output.failed = true;
@@ -554,7 +554,7 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 	var self = this,
 		deferred = Q.defer();
 
-	application.Networks.find({'internal.userId': new mongo.ObjectID(user._id), url: network.url}).count(function(err, docs) {
+	application.db.find('networks', {'internal.userId': new mongo.ObjectID(user._id), url: network.url}).count(function(err, docs) {
 		if (err) {
 			return;
 		}

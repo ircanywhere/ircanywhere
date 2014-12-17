@@ -127,7 +127,7 @@ ChannelManager.prototype.getChannel = function(network, channel) {
 	var self = this,
 		deferred = Q.defer();
 
-	application.Tabs.findOne({network: network, target: channel}, function(err, chan) {
+	application.db.findOne('tabs', {network: network, target: channel}, function(err, chan) {
 		if (err || !chan) {
 			deferred.reject(err);
 		}
@@ -257,7 +257,7 @@ ChannelManager.prototype.updateUsers = function(key, users, values) {
 			nickname: new RegExp('^' + u + '$', 'i')
 		};
 
-		application.ChannelUsers.find(s).toArray(function(err, records) {
+		application.db.find('channelUsers', s).toArray(function(err, records) {
 			if (err || !records) {
 				return false;
 			}
@@ -295,7 +295,7 @@ ChannelManager.prototype.updateModes = function(key, capab, channel, mode) {
 
 	this.getChannel(key, channel)
 		.then(function(chan) {
-			application.ChannelUsers.find({network: key, channel: channel}).toArray(function(err, users) {
+			application.db.find('channelUsers', {network: key, channel: channel}).toArray(function(err, users) {
 				if (err || !users) {
 					return false;
 				}

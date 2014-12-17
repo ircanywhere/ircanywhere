@@ -362,7 +362,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		burstend: true
 	};
 
-	application.Networks.find({'internal.userId': user._id}).toArray(function(err, nets) {
+	application.db.find('networks', {'internal.userId': user._id}).toArray(function(err, nets) {
 		if (err || !nets) {
 			deferred.reject(err);
 		} else {
@@ -386,7 +386,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 				};
 			});
 
-			application.Tabs.find({user: user._id}).toArray(function(err, dbTabs) {
+			application.db.find('tabs', {user: user._id}).toArray(function(err, dbTabs) {
 				promise.resolve(dbTabs);
 			});
 
@@ -426,9 +426,11 @@ RPCHandler.prototype.handleConnect = function(socket) {
 					query = {network: tab.network, target: tlower, user: user._id};
 				}
 
-				application.Events.find(query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
-					application.Events.find(_.extend({read: false}, query)).count(function(err, dbUnreadItems) {
-						application.Events.find(_.extend({'extra.highlight': true, read: false}, query)).toArray(function(err, dbUnreadHighlights) {
+				application.db.find('events', query, ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(50).toArray(function(err, dbEventResults) {
+					
+					application.db.find('events', _.extend({read: false}, query)).count(function(err, dbUnreadItems) {
+						
+						application.db.find('events', _.extend({'extra.highlight': true, read: false}, query)).toArray(function(err, dbUnreadHighlights) {
 							
 							output.events = _.union(output.events, dbEventResults);
 							output.highlights = _.union(output.highlights, dbUnreadHighlights);
@@ -441,7 +443,9 @@ RPCHandler.prototype.handleConnect = function(socket) {
 								promise.resolve();
 								return;
 							}
+						
 						});
+					
 					});
 				});
 				// XXX: I hate doing this, horribly messy. Suggestions on improving?
@@ -449,12 +453,15 @@ RPCHandler.prototype.handleConnect = function(socket) {
 			// loop tabs
 
 			return promise.promise.then(function() {
-				application.ChannelUsers.find(usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).toArray(function(err, dbUsers) {
-					application.Commands.find(_.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).toArray(function(err, dbCommands) {
+
+				application.db.find('channelUsers', usersQuery, ['nickname', 'network', 'channel', 'sort', 'prefix', '_id']).toArray(function(err, dbUsers) {
+
+					application.db.find('commands', _.extend({user: user._id, backlog: true}, commandsQuery)).sort({timestamp: -1}).limit(20).toArray(function(err, dbCommands) {
 						output.channelUsers = dbUsers || [];
 						output.commands = dbCommands || [];
 
 						sendResponse();
+					
 					});
 				});
 				// get channel users and commands
@@ -509,7 +516,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		return socket.send('error', {command: command, error: 'invalid document properties, see API docs'});
 	}
 
-	application.Tabs.findOne({network: new mongo.ObjectID(data.network), user: user._id, target: data.target, type: data.type}, function(err, find) {
+	application.db.findOne('tabs', {network: new mongo.ObjectID(data.network), user: user._id, target: data.target, type: data.type}, function(err, find) {
 		if (err || !find) {
 			return socket.send('error', {command: command, error: 'not authorised to call this command'});
 		}
@@ -753,7 +760,7 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 	}
 	// convert _id to proper mongo IDs
 
-	application.Events.find(_.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
+	application.db.find('events', _.extend({user: user._id}, data.query), ['_id', 'extra', 'message', 'network', 'read', 'target', 'type']).sort({'message.time': -1}).limit(limit).toArray(function(err, response) {
 		if (err || !response) {
 			socket.send('events', []);
 		} else {
