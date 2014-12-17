@@ -65,7 +65,7 @@ IRCHandler.prototype._formatRaw = function(raw) {
  * @return void
  */
 IRCHandler.prototype.connecting = function(client, message) {
-	application.Networks.update({_id: client._id}, {$set: {
+	application.db.update('networks', {_id: client._id}, {$set: {
 		'internal.status': networkManager.flags.connecting
 	}}, {safe: false});
 
@@ -116,7 +116,7 @@ IRCHandler.prototype.registered = function(client, message) {
 	client.internal.capabilities = message.capabilities;
 	// set this immediately so the other stuff works
 
-	application.Networks.update({_id: client._id}, {$set: {
+	application.db.update('networks', {_id: client._id}, {$set: {
 		nick: message.nickname,
 		name: message.capabilities.network.name,
 		'internal.status': networkManager.flags.connected,
@@ -126,14 +126,14 @@ IRCHandler.prototype.registered = function(client, message) {
 	// commented this out because we do other changes to the network object here
 	// so we don't use this but we use a straight update to utilise 1 query instead of 2
 
-	application.Tabs.update({target: client.name.toLowerCase(), network: client._id}, {$set: {
+	application.db.update('tabs', {target: client.name.toLowerCase(), network: client._id}, {$set: {
 		title: message.capabilities.network.name,
 		target: message.capabilities.network.name.toLowerCase(),
 		active: true
 	}}, {multi: true, safe: false});
 	// update the tab
 
-	application.Tabs.update({network: client._id, type: {$ne: 'channel'}}, {$set: {
+	application.db.update('tabs', {network: client._id, type: {$ne: 'channel'}}, {$set: {
 		networkName: message.capabilities.network.name,
 		active: true
 	}}, {multi: true, safe: false});
@@ -368,13 +368,13 @@ IRCHandler.prototype.nick = function(client, message) {
 
 	var mlower = message.nickname.toLowerCase();
 	if (mlower === client.nick.toLowerCase()) {
-		application.Networks.update({_id: client._id}, {$set: {nick: message.newnick}}, {safe: false});
+		application.db.update('networks', {_id: client._id}, {$set: {nick: message.newnick}}, {safe: false});
 	}
 	// update the nickname because its us changing our nick
 	
 	var mlower = message.nickname.toLowerCase();
 	if (_.has(client.internal.tabs, mlower)) {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}}, {safe: false});
+		application.db.update('tabs', {user: client.internal.userId, network: client._id, target: mlower}, {$set: {title: message.nickname, target: mlower, url: client.url + '/' + mlower}}, {safe: false});
 	}
 	// is this a client we're chatting to whos changed their nickname?
 	

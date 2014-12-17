@@ -180,7 +180,7 @@ CommandManager.prototype.nickserv = function(user, client, target, params, out, 
 	ircFactory.send(client._id, 'raw', ['NICKSERV'].concat(params));
 
 	if (helper.compareStrings(params[0], 'identify', true) || helper.compareStrings(params[0], 'id', true) || helper.compareStrings(params[0], 'login', true)) {
-		application.Commands.remove({_id: id}, {safe: false});
+		application.db.remove('commands', {_id: id}, {safe: false});
 	}
 	// remove sensitive commands
 };
@@ -219,7 +219,7 @@ CommandManager.prototype.msg = function(user, client, target, params, out, id) {
 	// do parsing on the privmsg there, and splitting etc, no point duplicating the code
 
 	if (target.toLowerCase() === 'nickserv' && (params[0].toLowerCase() === 'identify' || params[0].toLowerCase() === 'id' || params[0].toLowerCase() === 'login')) {
-		application.Commands.remove({_id: id}, {safe: false});
+		application.db.remove('commands', {_id: id}, {safe: false});
 	}
 	// remove sensitive commands
 };
@@ -305,7 +305,7 @@ CommandManager.prototype.join = function(user, client, target, params) {
 	// attempt to figure out if we've got an autojoin record set - just defining a
 	// tab isn't enough for us
 
-	application.Networks.update({_id: client._id}, {$set: {channels: client.channels}}, {safe: false});
+	application.db.update('networks', {_id: client._id}, {$set: {channels: client.channels}}, {safe: false});
 	// we'll also store it in our reconnect settings
 };
 
@@ -332,7 +332,7 @@ CommandManager.prototype.part = function(user, client, target, params) {
 
 	var index = _.findIndex(client.channels, {channel: channel.toLowerCase()});
 	if (index > -1) {
-		application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
+		application.db.update('networks', {_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
 	}
 	// does the index exist? lets remove it if so
 };
@@ -581,7 +581,7 @@ CommandManager.prototype.close = function(user, client, target, params, out, id,
 			var index = _.findIndex(client.channels, {channel: tlower});
 
 			if (index > -1) {
-				application.Networks.update({_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
+				application.db.update('networks', {_id: client._id}, {$pull: {channels: client.channels[index]}}, {safe: false});
 			}
 			// does the index in client.channels exist? lets remove it if so
 		} else if (tab.type === 'query') {

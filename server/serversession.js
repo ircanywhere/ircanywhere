@@ -85,7 +85,7 @@ ServerSession.prototype.init = function() {
 		application.logger.log('info', 'Client disconnected. id=', self.id);
 
 		if (self.networkId) {
-			application.Networks.update({_id: self.networkId}, {$set: {clientConnected: false}}, {safe: false});
+			application.db.update('networks', {_id: self.networkId}, {$set: {clientConnected: false}}, {safe: false});
 		}
 
 		process.nextTick(function () {
@@ -229,7 +229,7 @@ ServerSession.prototype.setup = function() {
 	application.ee.on(['events', 'insert'], eventsCallback);
 	ircFactory.events.on('message', ircMessageCallback);
 
-	application.Networks.update({_id: this.networkId}, {$set: {clientConnected: true}}, {safe: false});
+	application.db.update('networks', {_id: this.networkId}, {$set: {clientConnected: true}}, {safe: false});
 
 	this.socket.on('close', function() {
 		application.ee.removeListener(['events', 'insert'], eventsCallback);
@@ -392,7 +392,7 @@ ServerSession.prototype.sendJoins = function () {
 				var prefix = '',
 					deferred = Q.defer();
 
-				application.Events.find({type: 'join', 'extra.self': true, network: self.networkId, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
+				application.db.find('events', {type: 'join', 'extra.self': true, network: self.networkId, user: self.user._id, target: tab.target}).sort({'message.time': -1}).limit(1).nextObject(function(err, event) {
 					if (err || !event) {
 						deferred.reject(err);
 						return;

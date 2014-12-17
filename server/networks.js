@@ -119,8 +119,8 @@ NetworkManager.prototype.init = function() {
 		ircFactory.destroy(id, false);
 		// destroy the client if it hasn't been destroyed
 
-		application.ChannelUsers.remove({network: id}, {safe: false});
-		application.Tabs.remove({network: id}, {safe: false});
+		application.db.remove('channelUsers', {network: id}, {safe: false});
+		application.db.remove('tabs', {network: id}, {safe: false});
 		// remove lingering data
 	});
 	// just sync clients up to this, instead of manually doing it
@@ -212,8 +212,8 @@ NetworkManager.prototype.getClients = function(keys) {
 				}
 			});
 
-			//application.Networks.update({_id: {$in: inactive}}, {$set: {'internal.status': self.flags.disconnected}}, {multi: true, safe: false});
-			application.Tabs.update({network: {$in: inactive}}, {$set: {active: false}}, {multi: true, safe: false});
+			//application.db.update('networks', {_id: {$in: inactive}}, {$set: {'internal.status': self.flags.disconnected}}, {multi: true, safe: false});
+			application.db.update('tabs', {network: {$in: inactive}}, {$set: {active: false}}, {multi: true, safe: false});
 			// mark any tabs for x network inactive
 
 			deferred.resolve(clients);
@@ -563,7 +563,7 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 			network.url = network.url + ':' + docs;
 		}
 
-		application.Networks.insert(network, function(err, docs) {
+		application.db.insert('networks', network, function(err, docs) {
 			if (err || docs.length === 0) {
 				deferred.reject();
 				return;
@@ -594,7 +594,7 @@ NetworkManager.prototype.addNetwork = function(user, network, status) {
 NetworkManager.prototype.editNetwork = function(user, network) {
 	var deferred = Q.defer();
 
-	application.Networks.update({'_id': new mongo.ObjectID(network._id)}, _.omit(network, '_id'), {multi: false}, function(err) {
+	application.db.update('networks', {'_id': new mongo.ObjectID(network._id)}, _.omit(network, '_id'), {multi: false}, function(err) {
 		if (err) {
 			deferred.reject();
 			return;
@@ -641,7 +641,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	// empty, bolt it
 
 	var callback = function() {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: obj.target, type: type}, {$set: obj}, {safe: false, upsert: true});
+		application.db.update('tabs', {user: client.internal.userId, network: client._id, target: obj.target, type: type}, {$set: obj}, {safe: false, upsert: true});
 		// insert to db, or update old record
 	};
 
@@ -667,12 +667,12 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
  */
 NetworkManager.prototype.activeTab = function(client, target, activate) {
 	if (typeof target !== 'boolean') {
-		application.Tabs.update({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: {active: activate}}, {safe: false});
+		application.db.update('tabs', {user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {$set: {active: activate}}, {safe: false});
 	
-		application.ChannelUsers.remove({network: client._id, channel: target.toLowerCase()}, {safe: false});
+		application.db.remove('channelUsers', {network: client._id, channel: target.toLowerCase()}, {safe: false});
 		// remove any users for the tab
 	} else {
-		application.Tabs.update({user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
+		application.db.update('tabs', {user: client.internal.userId, network: client._id}, {$set: {active: target}}, {multi: true, safe: false});
 	}
 	// update the activation flag
 };
@@ -691,10 +691,10 @@ NetworkManager.prototype.removeTab = function(client, target) {
 	// removed, because of Ember's stateful urls, we can just do history.back() and get a reliable switch
 	
 	if (target) {
-		application.Tabs.remove({user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {safe: false});
+		application.db.remove('tabs', {user: client.internal.userId, network: client._id, target: target.toLowerCase()}, {safe: false});
 	} else {
-		application.Tabs.remove({user: client.internal.userId, network: client._id}, function() {
-			application.Networks.remove({_id: client._id}, {safe: false});
+		application.db.remove('tabs', {user: client.internal.userId, network: client._id}, function() {
+			application.db.remove('networks', {_id: client._id}, {safe: false});
 		});
 	}
 	// remove tabs
@@ -743,7 +743,7 @@ NetworkManager.prototype.changeStatus = function(query, status) {
 		return;
 	}
 
-	application.Networks.update(query, {$set: {'internal.status': status}}, {safe: false});
+	application.db.update('networks', query, {$set: {'internal.status': status}}, {safe: false});
 };
 
 NetworkManager.prototype = _.extend(NetworkManager.prototype, hooks);

@@ -54,12 +54,6 @@ Database.prototype.connect = function() {
 		}
 
 		application.mongo = db;
-		application.Networks = db.collection('networks');
-		application.Tabs = db.collection('tabs');
-		application.ChannelUsers = db.collection('channelUsers');
-		application.Events = db.collection('events');
-		application.Commands = db.collection('commands');
-		// XXX - DB LAYER
 
 		self.collections.nodes = db.collection('nodes');
 		self.collections.users = db.collection('users');
@@ -177,7 +171,14 @@ Database.prototype.update = function(collection) {
  * @return void
  */
 Database.prototype.remove = function(collection) {
-	
+	var mongoCollection = this.collections[collection],
+		args = helper.copyArguments(arguments).slice(1);
+
+	if (typeof mongoCollection !== 'object') {
+		throw new Error('Invalid collection ' + collection + ' for remove()');
+	}
+
+	return mongoCollection.remove.apply(mongoCollection, args);
 }
 
 exports.Database = Database;

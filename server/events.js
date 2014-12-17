@@ -99,7 +99,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 					}
 				};
 
-			application.Events.insert(output, {safe: false});
+			application.db.insert('events', output, {safe: false});
 			// get the prefix, construct an output and insert it
 		});
 	// once we've got a valid user, continue
@@ -288,7 +288,7 @@ EventManager.prototype.getUserPlayback = function (network, userId) {
 
 		deferred.resolve(events);
 
-		application.Events.update({read: false, network: network, user: userId},
+		application.db.update('events', {read: false, network: network, user: userId},
 			{$set: {read: true}}, {multi: true},
 			function (err) {
 				if (err) {

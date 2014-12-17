@@ -47,7 +47,7 @@ IRCServer.prototype.init = function() {
 	var self = this,
 		bindPort = application.config.ircServer.port || 6667;
 
-	application.Networks.update({_id: { $exists : true }}, {$set: {clientConnected: false}}, {multi: true},
+	application.db.update('networks', {_id: { $exists : true }}, {$set: {clientConnected: false}}, {multi: true},
 		function (err) {
 			if (err) {
 				application.handleError(new Error(err));
