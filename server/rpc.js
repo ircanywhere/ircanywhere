@@ -472,7 +472,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		socket.sendBurst(output);
 		// send output
 
-		application.Users.update({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
+		application.db.update('users', ({_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
 		// update last seen time
 	}
 };
@@ -620,7 +620,7 @@ RPCHandler.prototype.handleSelectTab = function(socket, data) {
 		return socket.send('error', {command: 'selectTab', error: 'invalid document properties, see API docs'});
 	}
 
-	application.Users.update({_id: user._id}, {$set: {selectedTab: url}}, {safe: false});
+	application.db.update('users', {_id: user._id}, {$set: {selectedTab: url}}, {safe: false});
 };
 
 /**

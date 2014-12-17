@@ -54,8 +54,6 @@ Database.prototype.connect = function() {
 		}
 
 		application.mongo = db;
-		application.Nodes = db.collection('nodes');
-		application.Users = db.collection('users');
 		application.Networks = db.collection('networks');
 		application.Tabs = db.collection('tabs');
 		application.ChannelUsers = db.collection('channelUsers');
@@ -133,6 +131,53 @@ Database.prototype.findOne = function(collection) {
 	}
 
 	return mongoCollection.findOne.apply(mongoCollection, args);
+}
+
+/**
+ * Insert a record into the database
+ *
+ * @method insert
+ * @param {String} collection Name of the collection
+ * @return void
+ */
+Database.prototype.insert = function(collection) {
+	var mongoCollection = this.collections[collection],
+		args = helper.copyArguments(arguments).slice(1);
+
+	if (typeof mongoCollection !== 'object') {
+		throw new Error('Invalid collection ' + collection + ' for insert()');
+	}
+
+	return mongoCollection.insert.apply(mongoCollection, args);
+}
+
+/**
+ * Update a record in the database
+ *
+ * @method update
+ * @param {String} collection Name of the collection
+ * @return void
+ */
+Database.prototype.update = function(collection) {
+	var mongoCollection = this.collections[collection],
+		args = helper.copyArguments(arguments).slice(1);
+
+	if (typeof mongoCollection !== 'object') {
+		throw new Error('Invalid collection ' + collection + ' for update()');
+	}
+
+	return mongoCollection.update.apply(mongoCollection, args);
+}
+
+/**
+ * Remove a record from the database
+ *
+ * @method remove
+ * @param {String} collection Name of the collection
+ * @return void
+ */
+Database.prototype.remove = function(collection) {
+	
 }
 
 exports.Database = Database;

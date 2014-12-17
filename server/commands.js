@@ -156,7 +156,7 @@ CommandManager.prototype._parseCommand = function(user, client, target, type, co
 		// just split it to follow standards with other commands, it'll be rejoined before sent out
 	}
 
-	application.Users.update({_id: user._id}, {$set: {lastSeen: new Date()}}, {safe: false});
+	application.db.update('users', {_id: user._id}, {$set: {lastSeen: new Date()}}, {safe: false});
 	// update last seen time
 };
 

@@ -646,7 +646,7 @@ NetworkManager.prototype.addTab = function(client, target, type, select, active)
 	};
 
 	if (select) {
-		application.Users.update({_id: client.internal.userId}, {$set: {selectedTab: obj.url}}, callback);
+		application.db.update('users', {_id: client.internal.userId}, {$set: {selectedTab: obj.url}}, callback);
 	} else {
 		callback(null, null);
 	}
