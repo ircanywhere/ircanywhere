@@ -108,7 +108,7 @@ RPCHandler.prototype.handleNetworksAll = function(doc) {
 		rpcHandler.push(doc.internal.userId, 'addNetwork', doc);
 	} else if (eventName === 'update') {
 		rpcHandler.push(doc.internal.userId, 'updateNetwork', doc);
-	} else if (eventName === 'delete') {
+	} else if (eventName === 'remove') {
 		rpcHandler.push(doc.internal.userId, 'removeNetwork', {_id: doc});
 	}
 };
@@ -128,7 +128,7 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 	var eventName = this.event[1],
 		uid = false;
 
-	if (eventName === 'delete') {
+	if (eventName === 'remove') {
 		_.each(Clients, function(value, key) {
 			var tab = _.find(value.internal.tabs, {'_id': doc});
 			if (tab) {
@@ -149,7 +149,7 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 		rpcHandler.push(uid, 'addTab', doc);
 	} else if (eventName === 'update') {
 		rpcHandler.push(uid, 'updateTab', doc);
-	} else if (eventName === 'delete') {
+	} else if (eventName === 'remove') {
 		rpcHandler.push(uid, 'removeTab', {_id: doc});
 	}
 };
@@ -199,7 +199,7 @@ RPCHandler.prototype.handleCommandsAll = function(doc) {
 
 	if (eventName === 'insert') {
 		rpcHandler.push(doc.user, 'newBacklog', doc);
-	} else if (eventName === 'delete') {
+	} else if (eventName === 'remove') {
 		rpcHandler.push(doc.user, 'removeBacklog', {_id: doc});
 	}
 };
@@ -237,7 +237,7 @@ RPCHandler.prototype.handleChannelUsersAll = function(doc, ext) {
 			rpcHandler.push(uid, 'newChannelUser', doc);
 		} else if (eventName === 'update') {
 			rpcHandler.push(uid, 'updateChannelUser', doc);
-		} else if (eventName === 'delete') {
+		} else if (eventName === 'remove') {
 			rpcHandler.push(uid, 'removeChannelUser', {_id: doc});
 		}
 	});

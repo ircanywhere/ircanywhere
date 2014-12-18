@@ -55,21 +55,18 @@ Database.prototype._wrap = function(collection, action, args) {
 
 	if (fn === -1) {
 		args.push(function(err, data) {
-			console.log(arguments);
-			if (!err) {
+			if (!err && data) {
 				self._emit(collection, action, data);
 			}
 		});
 		// else do our own
-
-		console.log(args);
 	}
 	else {
 		args[fn] = _.wrap(args[fn], function(func) {
 			var ags = helper.copyArguments(arguments).slice(1);
 
 			// emit if success
-			if (!ags[0]) {
+			if (!ags[0] && args[1]) {
 				self._emit(collection, action, ags[1]);
 			}
 
@@ -92,7 +89,9 @@ Database.prototype._wrap = function(collection, action, args) {
  * @return void
  */
 Database.prototype._emit = function(collection, action, data) {
-	console.log(collection, action, data);
+	data = (_.isArray(data)) ? data[0] : data;
+
+	application.ee.emit([collection, action], data);
 }
 
 /**

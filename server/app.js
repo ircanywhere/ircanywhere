@@ -163,7 +163,7 @@ Application.prototype.cleanCollections = function() {
  * @return void
  */
 Application.prototype.setupOplog = function() {
-	var self = this,
+	/*var self = this,
 		start = (new Date().getTime() / 1000);
 
 	this.channelUserDocs = {};
@@ -232,7 +232,7 @@ Application.prototype.setupOplog = function() {
 				break;
 		}
 		// emit the event
-	});
+	});*/
 };
 
 /**

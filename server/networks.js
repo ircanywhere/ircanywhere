@@ -83,61 +83,64 @@ NetworkManager.prototype.init = function() {
 			Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
 		});
 		
+		ready();
 	});
 	// load up networks and push them into Clients
 
-	application.ee.on(['networks', 'insert'], function(doc) {
-		var id = doc._id.toString();
-		if (!doc.internal) {
-			return false;
-		}
-
-		Clients[id] = doc;
-		Clients[id].internal.tabs = {};
-		// update internal records
-	});
-
-	application.ee.on(['networks', 'update'], function(doc) {
-		var id = doc._id.toString();
-
-		doc.internal.tabs = Clients[id].internal.tabs;
-		Clients[id] = _.extend(Clients[id], doc);
-
-		application.db.find('tabs', {user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
-			if (err || !tab) {
-				return;
+	function ready() {
+		application.ee.on(['networks', 'insert'], function(doc) {
+			var id = doc._id.toString();
+			if (!doc.internal) {
+				return false;
 			}
-			// error
 
-			Clients[id.toString()].internal.tabs[tab.target] = tab;
+			Clients[id] = doc;
+			Clients[id].internal.tabs = {};
+			// update internal records
 		});
-	});
 
-	application.ee.on(['networks', 'delete'], function(id) {
-		delete Clients[id.toString()];
+		application.ee.on(['networks', 'update'], function(doc) {
+			var id = doc._id.toString();
 
-		ircFactory.destroy(id, false);
-		// destroy the client if it hasn't been destroyed
+			doc.internal.tabs = Clients[id].internal.tabs;
+			Clients[id] = _.extend(Clients[id], doc);
 
-		application.db.remove('channelUsers', {network: id});
-		application.db.remove('tabs', {network: id});
-		// remove lingering data
-	});
-	// just sync clients up to this, instead of manually doing it
-	// we're asking for problems that way doing it this way means
-	// this object will be identical to the network list
-	// this method is inspired by meteor's observe capabilities
+			application.db.find('tabs', {user: doc.internal.userId, network: doc._id}).each(function(err, tab) {
+				if (err || !tab) {
+					return;
+				}
+				// error
 
-	application.ee.on(['tabs', 'insert'], function(doc) {
-		Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
-	});
+				Clients[id.toString()].internal.tabs[tab.target] = tab;
+			});
+		});
 
-	application.ee.on(['tabs', 'update'], function(doc) {
-		Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
-	});
-	// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
-	// instead of querying each time which is very inefficient
-	// - the delete is handled in sockets.js after we've propogated it
+		application.ee.on(['networks', 'remove'], function(id) {
+			delete Clients[id.toString()];
+
+			ircFactory.destroy(id, false);
+			// destroy the client if it hasn't been destroyed
+
+			application.db.remove('channelUsers', {network: id});
+			application.db.remove('tabs', {network: id});
+			// remove lingering data
+		});
+		// just sync clients up to this, instead of manually doing it
+		// we're asking for problems that way doing it this way means
+		// this object will be identical to the network list
+		// this method is inspired by meteor's observe capabilities
+
+		application.ee.on(['tabs', 'insert'], function(doc) {
+			Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+		});
+
+		application.ee.on(['tabs', 'update'], function(doc) {
+			Clients[doc.network.toString()].internal.tabs[doc.target] = doc;
+		});
+		// sync Tabs to client.internal.tabs so we can do quick lookups when entering events
+		// instead of querying each time which is very inefficient
+		// - the delete is handled in sockets.js after we've propogated it
+	}
 
 	application.app.post('/api/addnetwork', function(req, res) {
 		self.addNetworkApi(req, res).then(function(response) {
