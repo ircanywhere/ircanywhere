@@ -7,7 +7,8 @@
  * @author Ricki Hastings
 */
 
-var helper = require('../lib/helpers').Helpers,
+var _ = require('lodash'),
+	helper = require('../lib/helpers').Helpers,
 	mongo = require('mongodb');
 
 /**
@@ -36,6 +37,62 @@ function Database(config) {
 
 	this.collections = {};
 	// An object containing references to all the collections
+}
+
+/**
+ * Wrap any callback functions and emit an event so we know the database
+ * has been altered.
+ *
+ * @method _wrap
+ * @param {String} collection The collection the event happened on
+ * @param {String} action The action, 'insert', 'update' etc
+ * @param {Array} args The array of arguments
+ * @return void
+ */
+Database.prototype._wrap = function(collection, action, args) {
+	var self = this,
+		fn = helper.findFunctionInArray(_, args);
+
+	if (fn === -1) {
+		args.push(function(err, data) {
+			console.log(arguments);
+			if (!err) {
+				self._emit(collection, action, data);
+			}
+		});
+		// else do our own
+
+		console.log(args);
+	}
+	else {
+		args[fn] = _.wrap(args[fn], function(func) {
+			var ags = helper.copyArguments(arguments).slice(1);
+
+			// emit if success
+			if (!ags[0]) {
+				self._emit(collection, action, ags[1]);
+			}
+
+			// call original function
+			func.apply(func.prototype, ags);
+		});
+		// if a function exists we need to extend it
+	}
+
+	return args;
+}
+
+/**
+ * Emit an event on the global emitter (basically internal oplog tailing)
+ *
+ * @method _emit
+ * @param {String} collection The collection the event happened on
+ * @param {String} action The action, 'insert', 'update' etc
+ * @param {Object} data The updated data
+ * @return void
+ */
+Database.prototype._emit = function(collection, action, data) {
+	console.log(collection, action, data);
 }
 
 /**
@@ -142,7 +199,7 @@ Database.prototype.insert = function(collection) {
 		throw new Error('Invalid collection ' + collection + ' for insert()');
 	}
 
-	return mongoCollection.insert.apply(mongoCollection, args);
+	return mongoCollection.insert.apply(mongoCollection, this._wrap(collection, 'insert', args));
 }
 
 /**
@@ -160,7 +217,10 @@ Database.prototype.update = function(collection) {
 		throw new Error('Invalid collection ' + collection + ' for update()');
 	}
 
-	return mongoCollection.update.apply(mongoCollection, args);
+	// insert a sort method in (because we're actually going to use findAndModify)
+	args.splice(1, 0, [['_id', 1]]);
+
+	return mongoCollection.findAndModify.apply(mongoCollection, this._wrap(collection, 'update', args));
 }
 
 /**
@@ -178,7 +238,7 @@ Database.prototype.remove = function(collection) {
 		throw new Error('Invalid collection ' + collection + ' for remove()');
 	}
 
-	return mongoCollection.remove.apply(mongoCollection, args);
+	return mongoCollection.remove.apply(mongoCollection, this._wrap(collection, 'update', args));
 }
 
 exports.Database = Database;

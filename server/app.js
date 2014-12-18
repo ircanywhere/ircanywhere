@@ -133,7 +133,7 @@ Application.prototype.cleanCollections = function() {
 		});
 		
 		if (chanUserIds.length) {
-			self.db.remove('channelUsers', {_id: {$in: chanUserIds}}, {multi: true, safe: false});
+			self.db.remove('channelUsers', {_id: {$in: chanUserIds}}, {multi: true});
 		}
 	});
 	// remove lingering channel user objects
@@ -148,7 +148,7 @@ Application.prototype.cleanCollections = function() {
 		});
 		
 		if (eventIds.length) {
-			self.db.remove('events', {_id: {$in: eventIds}}, {multi: true, safe: false});
+			self.db.remove('events', {_id: {$in: eventIds}}, {multi: true});
 		}
 	});
 	// same for events
@@ -347,7 +347,7 @@ Application.prototype.setupNode = function() {
 				}
 			});
 		} else {
-			self.db.update('nodes', query, defaultJson, {safe: false});
+			self.db.update('nodes', query, defaultJson);
 			saveNode(_.extend(doc, defaultJson));
 		}
 

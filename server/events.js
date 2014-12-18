@@ -99,7 +99,7 @@ EventManager.prototype._insert = function(client, message, type, user, force) {
 					}
 				};
 
-			application.db.insert('events', output, {safe: false});
+			application.db.insert('events', output);
 			// get the prefix, construct an output and insert it
 		});
 	// once we've got a valid user, continue

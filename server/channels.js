@@ -195,7 +195,7 @@ ChannelManager.prototype.insertUsers = function(key, channel, users, force) {
 				find.push(u.nickname);
 
 				if (u.nickname == Clients[key].nick) {
-					application.db.update('networks', {_id: key}, {$set: {hostname: u.hostname}}, {safe: false});
+					application.db.update('networks', {_id: key}, {$set: {hostname: u.hostname}});
 				}
 				// update hostname
 			});
@@ -234,9 +234,9 @@ ChannelManager.prototype.removeUsers = function(key, channel, users) {
 	}
 
 	if (_.isArray(channel)) {
-		application.db.remove('channelUsers', {network: key, nickname: {$in: users}}, {safe: false});
+		application.db.remove('channelUsers', {network: key, nickname: {$in: users}});
 	} else {
-		application.db.remove('channelUsers', {network: key, channel: channel, nickname: {$in: users}}, {safe: false});
+		application.db.remove('channelUsers', {network: key, channel: channel, nickname: {$in: users}});
 	}
 	// send the update out
 };
@@ -266,7 +266,7 @@ ChannelManager.prototype.updateUsers = function(key, users, values) {
 				var updated = _.extend(user, values);
 					updated.sort = eventManager.getPrefix(Clients[key], updated).sort;
 
-				application.db.update('channelUsers', s, _.omit(updated, '_id'), {safe: false});
+				application.db.update('channelUsers', s, _.omit(updated, '_id'));
 				// update the record
 			});
 		});
@@ -306,7 +306,7 @@ ChannelManager.prototype.updateModes = function(key, capab, channel, mode) {
 				var modes = modeParser.changeModes(capab, chan.modes, parsedModes);
 				// we need to attempt to update the record now with the new info
 
-				application.db.update('tabs', {network: key, target: channel}, {$set: {modes: modes}}, {safe: false});
+				application.db.update('tabs', {network: key, target: channel}, {$set: {modes: modes}});
 				// update the record
 
 				_.each(users, function(u) {
@@ -319,7 +319,7 @@ ChannelManager.prototype.updateModes = function(key, capab, channel, mode) {
 					u.sort = prefix.sort;
 					u.prefix = prefix.prefix;
 
-					application.db.update('channelUsers', {network: key, channel: channel, nickname: u.nickname}, u, {safe: false});
+					application.db.update('channelUsers', {network: key, channel: channel, nickname: u.nickname}, u);
 				});
 				// update users now
 			});
@@ -344,7 +344,7 @@ ChannelManager.prototype.updateTopic = function(key, channel, topic, setby) {
 	};
 	// update the topic record
 
-	application.db.update('tabs', {network: key, target: channel}, {$set: {topic: topic}}, {safe: false});
+	application.db.update('tabs', {network: key, target: channel}, {$set: {topic: topic}});
 	// update the record
 };
 

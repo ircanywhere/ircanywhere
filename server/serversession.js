@@ -85,7 +85,7 @@ ServerSession.prototype.init = function() {
 		application.logger.log('info', 'Client disconnected. id=', self.id);
 
 		if (self.networkId) {
-			application.db.update('networks', {_id: self.networkId}, {$set: {clientConnected: false}}, {safe: false});
+			application.db.update('networks', {_id: self.networkId}, {$set: {clientConnected: false}});
 		}
 
 		process.nextTick(function () {
@@ -229,7 +229,7 @@ ServerSession.prototype.setup = function() {
 	application.ee.on(['events', 'insert'], eventsCallback);
 	ircFactory.events.on('message', ircMessageCallback);
 
-	application.db.update('networks', {_id: this.networkId}, {$set: {clientConnected: true}}, {safe: false});
+	application.db.update('networks', {_id: this.networkId}, {$set: {clientConnected: true}});
 
 	this.socket.on('close', function() {
 		application.ee.removeListener(['events', 'insert'], eventsCallback);

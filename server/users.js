@@ -148,7 +148,7 @@ UserManager.prototype.timeOutInactive = function() {
 				updateIds.push(doc._id);
 			});
 
-			application.db.update('users', {_id: {$in: updateIds}}, {$set: {lastSeen: d}}, {safe: false});
+			application.db.update('users', {_id: {$in: updateIds}}, {$set: {lastSeen: d}});
 			// re-update the last seen date so we don't see these record again next time	
 		});
 		// perform our hourly task of looking for invalid users
@@ -201,7 +201,7 @@ UserManager.prototype.isAuthenticated = function(data) {
 			var unset = {};
 				unset['tokens.' + cookies.token] = 1;
 
-			application.db.update('users', query, {$unset: unset}, {safe: false});
+			application.db.update('users', query, {$unset: unset});
 			// token is expired, remove it
 
 			deferred.reject();
@@ -393,7 +393,7 @@ UserManager.prototype.userLogin = function(req, res) {
 					ip: req.ip
 				};
 
-			application.db.update('users', {email: email}, {$set: {tokens: tokens, newUser: false}}, {safe: false});
+			application.db.update('users', {email: email}, {$set: {tokens: tokens, newUser: false}});
 			res.cookie('token', token, {expires: expire});
 			// set a login key and a cookie
 
@@ -436,7 +436,7 @@ UserManager.prototype.loginServerUser = function(email, password) {
 			}
 			// check if password matches
 
-			application.db.update('users', {email: email}, {$set: {newUser: false}}, {safe: false});
+			application.db.update('users', {email: email}, {$set: {newUser: false}});
 			// set newUser
 
 			self.onUserLogin(user, user.newUser);
@@ -463,7 +463,7 @@ UserManager.prototype.userLogout = function(req) {
 			deferred.resolve(false);
 		})
 		.then(function(user) {
-			application.db.update('users', {_id: user._id}, {$set: {tokens: {}}}, {safe: false});
+			application.db.update('users', {_id: user._id}, {$set: {tokens: {}}});
 
 			deferred.resolve(true);
 		});
@@ -501,7 +501,7 @@ UserManager.prototype.forgotPassword = function(req) {
 			ip: req.ip
 		};
 
-		application.db.update('users', {email: email}, {$set: {resetToken: resetToken}}, {safe: false});
+		application.db.update('users', {email: email}, {$set: {resetToken: resetToken}});
 		// set the reset token
 
 		var link = application.config.url + '/#/reset/' + token,
@@ -629,7 +629,7 @@ UserManager.prototype.updateSettings = function(req) {
 					'profile.nickname': nickname,
 					'profile.autoCompleteChar': autoCompleteChar,
 					email: email
-				}}, {safe: false});
+				}});
 				// update the settings
 
 				output.successMessage = 'Your settings successfully have been updated.';
@@ -704,7 +704,7 @@ UserManager.prototype.updatePassword = function(user, password, confirmPassword,
 	} else {
 		var hash = crypto.createHmac('sha256', user.salt).update(password).digest('hex');
 
-		application.db.update('users', {_id: user._id}, {$unset: {resetToken: 1}, $set: {password: hash}}, {safe: false});
+		application.db.update('users', {_id: user._id}, {$unset: {resetToken: 1}, $set: {password: hash}});
 		// set the password && unset any reset tokens
 
 		output.successMessage = 'Your password has been reset, you may now login';
@@ -782,7 +782,7 @@ UserManager.prototype.parse = function(file, replace) {
 UserManager.prototype.updateLastSeen = function (userId, lastSeen) {
 	var timestamp = lastSeen || new Date();
 
-	application.db.update('users', {_id: userId}, {$set: {lastSeen: timestamp}}, {safe: false});
+	application.db.update('users', {_id: userId}, {$set: {lastSeen: timestamp}});
 };
 
 UserManager.prototype = _.extend(UserManager.prototype, hooks);

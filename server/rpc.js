@@ -472,7 +472,7 @@ RPCHandler.prototype.handleConnect = function(socket) {
 		socket.sendBurst(output);
 		// send output
 
-		application.db.update('users', {_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}}, {safe: false});
+		application.db.update('users', {_id: user._id}, {$set: {lastSeen: new Date(), selectedTab: user.selectedTab}});
 		// update last seen time
 	}
 };
@@ -528,7 +528,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 		data.backlog = !exec;
 		// bail if we can't find the tab, if we can re-set the network value
 
-		application.db.insert('commands', data, {safe: false});
+		application.db.insert('commands', data);
 		// insert
 	});
 	// try and find a valid tab
@@ -584,7 +584,7 @@ RPCHandler.prototype.handleReadEvents = function(socket, data) {
 		query.network = new mongo.ObjectID(query.network);
 	}
 	
-	application.db.update('events', query, {$set: object}, {multi: true, safe: false});
+	application.db.update('events', query, {$set: object}, {multi: true});
 };
 
 /**
@@ -620,7 +620,7 @@ RPCHandler.prototype.handleSelectTab = function(socket, data) {
 		return socket.send('error', {command: 'selectTab', error: 'invalid document properties, see API docs'});
 	}
 
-	application.db.update('users', {_id: user._id}, {$set: {selectedTab: url}}, {safe: false});
+	application.db.update('users', {_id: user._id}, {$set: {selectedTab: url}});
 };
 
 /**
@@ -663,7 +663,7 @@ RPCHandler.prototype.handleUpdateTab = function(socket, data) {
 	tab = new mongo.ObjectID(tab);
 	// update it to a proper mongo id
 
-	application.db.update('tabs', {_id: tab, user: user._id}, {$set: data}, {safe: false});
+	application.db.update('tabs', {_id: tab, user: user._id}, {$set: data});
 	// update
 };
 
