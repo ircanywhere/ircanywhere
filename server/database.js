@@ -54,9 +54,9 @@ Database.prototype._wrap = function(collection, action, args) {
 		fn = helper.findFunctionInArray(_, args);
 
 	if (fn === -1) {
-		args.push(function(err, data) {
+		args.push(function(err, data, meta) {
 			if (!err && data) {
-				self._emit(collection, action, data);
+				self._emit(collection, action, data, meta);
 			}
 		});
 		// else do our own
@@ -66,8 +66,8 @@ Database.prototype._wrap = function(collection, action, args) {
 			var ags = helper.copyArguments(arguments).slice(1);
 
 			// emit if success
-			if (!ags[0] && args[1]) {
-				self._emit(collection, action, ags[1]);
+			if (!ags[0] && ags[1]) {
+				self._emit(collection, action, ags[1], ags[2]);
 			}
 
 			// call original function
@@ -86,12 +86,31 @@ Database.prototype._wrap = function(collection, action, args) {
  * @param {String} collection The collection the event happened on
  * @param {String} action The action, 'insert', 'update' etc
  * @param {Object} data The updated data
+ * @param {Object} meta The meta data from mongodb's query
  * @return void
  */
-Database.prototype._emit = function(collection, action, data) {
+Database.prototype._emit = function(collection, action, data, meta) {
 	data = (_.isArray(data)) ? data[0] : data;
 
-	application.ee.emit([collection, action], data);
+	//console.log(meta);
+
+	switch (action) {
+		case 'insert':
+			application.ee.emit([collection, 'insert'], data);
+			break;
+		case 'update':
+			if (meta && meta.lastErrorObject && meta.lastErrorObject.updatedExisting) {
+				application.ee.emit([collection, 'update'], data);
+			} else {
+				application.ee.emit([collection, 'insert'], data);
+			}
+			break;
+		case 'remove':
+			application.ee.emit([collection, 'remove'], data);
+			break;
+		default:
+			break;
+	}
 }
 
 /**
@@ -142,8 +161,9 @@ Database.prototype.connect = function() {
 		application.setupServer();
 		// setup express server
 
-		application.ee.emit('ready');
-		// initiate sub-objects
+		application.ee.emit('pre-ready');
+		/* initiate pre-ready handling (important stuff which needs to be done inbetween
+		 * establishing a database connection and booting everything up */
 	});
 }
 
@@ -237,7 +257,10 @@ Database.prototype.remove = function(collection) {
 		throw new Error('Invalid collection ' + collection + ' for remove()');
 	}
 
-	return mongoCollection.remove.apply(mongoCollection, this._wrap(collection, 'update', args));
+	// insert a sort method in (because we're actually going to use findAndRemove)
+	args.splice(1, 0, [['_id', 1]]);
+
+	return mongoCollection.findAndRemove.apply(mongoCollection, this._wrap(collection, 'remove', args));
 }
 
 exports.Database = Database;

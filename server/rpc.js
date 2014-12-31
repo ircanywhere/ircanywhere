@@ -125,6 +125,8 @@ RPCHandler.prototype.handleTabsAll = function(doc) {
 		return false;
 	}
 
+	console.log(this.event, doc);
+
 	var eventName = this.event[1],
 		uid = false;
 
