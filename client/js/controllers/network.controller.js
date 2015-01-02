@@ -14,7 +14,7 @@ App.NetworkController = Ember.ObjectController.extend({
 			// delete this because it'll cause a circular reference
 
 			network.set('selectedTab', tab);
-			this.set('content', network);
+			this.set('model', network);
 			// set content.selectedTab (network) - so we can find the full selected tab object in
 			// the network's object for quick access
 
