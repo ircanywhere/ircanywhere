@@ -6,14 +6,6 @@ Ember.Handlebars.helper('safeString', function(value) {
 	return new Ember.Handlebars.SafeString(value);
 });
 
-Ember.Handlebars.helper('lookup', function(component, context, controller, options) {
-	if (Ember.TEMPLATES[component]) {
-		Ember.TEMPLATES[component](controller, options);
-	} else if (component !== false) {
-		console.warn('Got event, but template for:', component, 'does not exist');
-	}
-});
-
 Ember.Handlebars.helper('time', function(context) {
 	return new Date(context).toLocaleTimeString();
 });
@@ -41,7 +33,18 @@ Ember.Handlebars.registerHelper('group', function(options) {
 	view.appendChild(childView);
 });
 
-Ember.Handlebars.helper('userLink', function(show, user) {
+Ember.Handlebars.helper('motd', function(messages) {
+	var str = '',
+		network = this.get('parentController.parentController.content');
+
+	messages.forEach(function(text) {
+		str += App.Parser.exec(text, network) + '<br />';
+	});
+
+	return new Ember.Handlebars.SafeString(str);
+});
+
+var generateUserLink = function(show, user) {
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
@@ -70,15 +73,6 @@ Ember.Handlebars.helper('userLink', function(show, user) {
 	
 	return new Ember.Handlebars.SafeString(html);
 	// return the element
-});
+};
 
-Ember.Handlebars.helper('motd', function(messages) {
-	var str = '',
-		network = this.get('parentController.parentController.content');
-
-	messages.forEach(function(text) {
-		str += App.Parser.exec(text, network) + '<br />';
-	});
-
-	return new Ember.Handlebars.SafeString(str);
-});
+Ember.Handlebars.helper('userLink', generateUserLink);

@@ -32,13 +32,7 @@ gulp.task('css', function() {
 gulp.task('templates', function() {
 	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
 		.pipe(templateCompiler())
-		.pipe(declare({
-			namespace: 'Ember.TEMPLATES',
-			noRedeclare: true,
-			processName: function(filePath) {
-				return filePath.replace(__dirname + '/client/templates/', '').replace('.js', '');
-			}
-		}))
+		
 		.pipe(gulp.dest('./client/build/templates'))
 		.pipe(uglify('templates.js', {
 			outSourceMap: true,

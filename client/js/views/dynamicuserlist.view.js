@@ -63,7 +63,7 @@ App.DynamicuserlistView = Ember.View.extend({
 	},
 
 	generateUserLink: function(user) {
-		return '<li data-type="' + this.get('classType') + '" data-user-id="' + user._id + '">' + Ember.Handlebars.helpers.userLink._rawFunction.apply(this.get('controller'), [true, user]) + '</li>';
+		return '<li data-type="' + this.get('classType') + '" data-user-id="' + user._id + '">' + generateUserLink.apply(this.get('controller'), [true, user]) + '</li>';
 	},
 
 	render: function(buffer) {
