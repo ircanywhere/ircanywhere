@@ -1,7 +1,7 @@
 var gulp = require('gulp'),
 	less = require('gulp-less'),
 	concatCss = require('gulp-concat-css'),
-	handlebars = require('gulp-handlebars'),
+	templateCompiler = require('gulp-ember-template-compiler'),
 	uglify = require('gulp-uglifyjs'),
 	del = require('del'),
 	jshint = require('gulp-jshint'),
@@ -31,10 +31,7 @@ gulp.task('css', function() {
 
 gulp.task('templates', function() {
 	gulp.src(['./client/templates/**/*.hbs', './modules/*/client/templates/**/*.hbs'])
-		.pipe(handlebars({
-			handlebars: require('ember-handlebars')
-		}))
-		.pipe(wrap('Ember.Handlebars.template(<%= contents %>)'))
+		.pipe(templateCompiler())
 		.pipe(declare({
 			namespace: 'Ember.TEMPLATES',
 			noRedeclare: true,
