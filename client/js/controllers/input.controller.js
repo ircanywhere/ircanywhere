@@ -47,7 +47,8 @@ App.InputController = Ember.ObjectController.extend({
 				commandObject = {
 					command: this.get('inputValue'),
 					network: tab.network,
-					target: tab.target
+					target: tab.target,
+					type: tab.type
 				};
 
 			if (command.substr(0, 1) === '/' && this.commands[command]) {
