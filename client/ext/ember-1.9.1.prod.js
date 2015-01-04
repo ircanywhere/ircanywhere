@@ -28341,7 +28341,7 @@ enifed("ember-runtime/controllers/array_controller",
       arrayContentDidChange: function(idx, removedCnt, addedCnt) {
         var subControllers = this._subControllers;
 
-        if (subControllers.length) {
+        if (subControllers && subControllers.length) {
           var subControllersToRemove = subControllers.slice(idx, idx + removedCnt);
 
           forEach(subControllersToRemove, function(subController) {
@@ -28383,7 +28383,7 @@ enifed("ember-runtime/controllers/array_controller",
         var subControllers = this._subControllers;
         var fullName, subController, subControllerFactory, parentController, options;
 
-        if (subControllers.length > idx) {
+        if (subControllers && subControllers.length > idx) {
           subController = subControllers[idx];
 
           if (subController) {
@@ -28422,7 +28422,7 @@ enifed("ember-runtime/controllers/array_controller",
         var controller;
         var subControllers = this._subControllers;
 
-        if (subControllers.length) {
+        if (subControllers && subControllers.length) {
           for (var i = 0, length = subControllers.length; length > i; i++) {
             controller = subControllers[i];
 
