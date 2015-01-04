@@ -5,6 +5,8 @@
 		<a href="#" class="backlog-load btn secondary" {{action 'loadBacklog'}}>Load previous messages</a>
 	{{/if}}
 	{{#each event in filtered itemController="event" groupedRows=true}}
-		{{render event.templateName contentBinding="event"}}
+		{{#with event}}
+			{{partial event.templateName}}
+		{{/with}}
 	{{/each}}
 </div>

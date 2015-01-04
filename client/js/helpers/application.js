@@ -44,7 +44,7 @@ Ember.Handlebars.helper('motd', function(messages) {
 	return new Ember.Handlebars.SafeString(str);
 });
 
-var generateUserLink = function(show, user) {
+Ember.Handlebars.helper('userLink', function(show, user) {
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
@@ -74,5 +74,3 @@ var generateUserLink = function(show, user) {
 	return new Ember.Handlebars.SafeString(html);
 	// return the element
 };
-
-Ember.Handlebars.helper('userLink', generateUserLink);
