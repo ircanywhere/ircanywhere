@@ -490,7 +490,7 @@ RPCHandler.prototype.handleCommand = function(socket, data, exec) {
 	command = (exec) ? 'execCommand' : 'sendCommand';
 	data = data.object;
 
-	if (!data) {
+	if (!data || !user) {
 		return socket.send('error', {command: command, error: 'invalid format, see API docs'});
 	}
 
@@ -594,7 +594,7 @@ RPCHandler.prototype.handleSelectTab = function(socket, data) {
 		exists = false,
 		url = data.object;
 
-	if (!url) {
+	if (!url || !user) {
 		return socket.send('error', {command: 'selectTab', error: 'invalid format, see API docs'});
 	}
 
@@ -633,7 +633,7 @@ RPCHandler.prototype.handleUpdateTab = function(socket, data) {
 
 	data = data.object;
 
-	if (!tab || !data) {
+	if (!tab || !data || !user) {
 		return socket.send('error', {command: 'updateTab', error: 'invalid format, see API docs'});
 	}
 
@@ -675,7 +675,7 @@ RPCHandler.prototype.handleInsertTab = function(socket, data) {
 
 	data = data.object;
 
-	if (!data) {
+	if (!data || !user) {
 		return socket.send('error', {command: 'insertTab', error: 'invalid format, see API docs'});
 	}
 
@@ -728,7 +728,7 @@ RPCHandler.prototype.handleGetEvents = function(socket, data) {
 		query = data.query,
 		limit = data.object || 50;
 
-	if (!query) {
+	if (!query || !user) {
 		return socket.send('error', {command: 'getEvents', error: 'invalid format, see API docs'});
 	}
 
