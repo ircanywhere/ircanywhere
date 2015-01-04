@@ -9,7 +9,8 @@
 
 var _ = require('lodash'),
 	hooks = require('hooks'),
-	Q = require('q');
+	Q = require('q'),
+	helper = require('../lib/helpers').Helpers;
 
 /**
  * This object is responsible for managing everything related to channel records, such as
@@ -254,7 +255,7 @@ ChannelManager.prototype.updateUsers = function(key, users, values) {
 	_.each(users, function(u) {
 		var s = {
 			network: key,
-			nickname: new RegExp('^' + u + '$', 'i')
+			nickname: new RegExp('^' + helper.escape(u) + '$', 'i')
 		};
 
 		application.ChannelUsers.find(s).toArray(function(err, records) {

@@ -75,8 +75,8 @@ CommandManager.prototype._ban = function(client, channel, nickname, ban) {
 
 	application.ChannelUsers.findOne({
 		network: client._id,
-		channel: new RegExp('^' + channel + '$', 'i'),
-		nickname: new RegExp('^' + nickname + '$', 'i')
+		channel: new RegExp('^' + helper.escape(channel) + '$', 'i'),
+		nickname: new RegExp('^' + helper.escape(nickname) + '$', 'i')
 	}, function(err, user) {
 		if (err || !user) {
 			return false;
