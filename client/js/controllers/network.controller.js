@@ -71,7 +71,7 @@ App.NetworkController = Ember.ObjectController.extend({
 			title = (selectedTab) ? [selectedTab.get('title'), '-', App.get('defaultTitle')] : [App.get('defaultTitle')],
 			unread = 0,
 			highlights = 0,
-			route = App.__container__.cache.dict['route:network'];
+			route = App.__container__.cache['route:network'];
 		// this will probably make Ember people mad but it works and I dunno how to get to the router from here
 		// maybe the update title function shouldn't be in the router? huh?.. idk
 

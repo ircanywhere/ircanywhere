@@ -42,6 +42,8 @@ Ember.Handlebars.registerHelper('group', function(options) {
 });
 
 Ember.Handlebars.helper('userLink', function(show, user) {
+	console.log(user);
+
 	var context = (user) ? user : this.get('content'),
 		prefix = (!context.extra) ? context.prefix : context.extra.prefix,
 		nickname = context.nickname || context.message.nickname,
