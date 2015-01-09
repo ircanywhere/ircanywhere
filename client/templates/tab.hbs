@@ -9,7 +9,7 @@
 					<span class="message-number">There are <span class="alert unread">{{selectedTab.unread}}</span> unread messages{{#if selectedTab.highlights}} and <span class="alert highlight" {{action "gotoHighlight" selectedTab._id}}>{{selectedTab.highlights}}</span> highlights{{/if}} since your last visit.</span>
 				</span>
 				<span class="right">
-					<a href="#" {{action "markAllAsRead" selectedTab._id}} class="read-backlog">Mark as read (or ESC key)</a>
+					<a href="#" {{action "markAsRead" selectedTab._id}} class="read-backlog">Mark as read (or ESC key)</a>
 				</span>
 			</div>
 			{{/if}}
