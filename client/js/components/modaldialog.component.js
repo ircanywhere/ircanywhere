@@ -38,9 +38,14 @@ App.ModalDialogComponent = Ember.Component.extend({
 	},
 
 	close: function() {
-		var self = this;
+		var self = this,
+			modal = self.$('.modal');
 
-		self.$('.modal').slideUp('fast', function() {
+		if (!self.$ || !modal) {
+			return false;
+		}
+
+		modal.slideUp('fast', function() {
 			self.sendAction();
 		});	
 	}
