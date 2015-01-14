@@ -222,7 +222,7 @@ App.MessagesController = Ember.ArrayController.extend(App.Notification, {
 	newTabMessage: function(object) {
 		var self = this;
 
-		if (this.get('controllers.index.isActive') || !(object.get('extra.highlight') && (!object.read || object.unread))) {
+		if ((object.get('extra.highlight') && (!object.read || object.unread)) === false) {
 			return false;
 		}
 

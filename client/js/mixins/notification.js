@@ -8,6 +8,8 @@ App.Notification = Ember.Mixin.create({
 	},
 
 	notify: function(title, o) {
+		console.log(title, o, this.isSupported());
+
 		if (!title || !o.body) {
 			throw new Error('Options object needs at least a body');
 		}
@@ -17,16 +19,16 @@ App.Notification = Ember.Mixin.create({
 		}
 
 		var options = {
-				icon: '',
-				body: '',
-				tag: '',
-				id: '',
-				onShow: null,
-				onClose: null,
-				onClick: null,
-				onError: null,
-				timeout: null
-			};
+			icon: '',
+			body: '',
+			tag: '',
+			id: '',
+			onShow: null,
+			onClose: null,
+			onClick: null,
+			onError: null,
+			timeout: null
+		};
 
 		options = Ember.merge(options, o);
 		// extend options with o
