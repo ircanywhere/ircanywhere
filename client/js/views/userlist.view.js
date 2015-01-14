@@ -43,7 +43,9 @@ App.UserlistView = Ember.View.extend(App.Scrolling, {
 	}.property('controller.target.content.selectedTab.hiddenUsers').cacheable(),
 
 	scrolled: function() {
-		this.set('controller.target.content.selectedTab.userListScrollPosition', this.$()[0].scrollTop);
+		if (this.get('controller.target.content.selectedTab')) {
+			this.set('controller.target.content.selectedTab.userListScrollPosition', this.$()[0].scrollTop);
+		}
 	},
 
 	onRender: function() {

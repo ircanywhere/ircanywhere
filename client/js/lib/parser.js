@@ -320,6 +320,10 @@ Ember.Parser = Ember.Object.extend({
 	},
 
 	parseLinks: function(text, network) {
+		if (!text || !network || !(network && network.selectedTab)) {
+			return false;
+		} 
+
 		var userList = App.__container__.cache['controller:network'].get('socket').find('channelUsers', {network: network.name, channel: network.selectedTab.target}),
 			regex = /(\()((?:ht|f)tps?:\/\/(?:\S|[\-._~!$&'()*+,;=:\/?#[\]@%])+)(\))|(\[)((?:ht|f)tps?:\/\/(?:\S|[\-._~!$&'()*+,;=:\/?#[\]@%])+)(\])|(\{)((?:ht|f)tps?:\/\/(?:\S|[\-._~!$&'()*+,;=:\/?#[\]@%])+)(\})|(<|&(?:lt|#60|#x3c);)((?:ht|f)tps?:\/\/(?:\S|[\-._~!$&'()*+,;=:\/?#[\]@%])+)(>|&(?:gt|#62|#x3e);)|((?:^|[^=\s'"\]])\s*['"]?|[^=\s]\s+)(\b(?:ht|f)tps?:\/\/(?:\S|[\-._~!$'()*+,;=:\/?#[\]@%])+(?:(?!&(?:gt|#0*62|#x0*3e);|&(?:amp|apos|quot|#0*3[49]|#x0*2[27]);[.!&',:?;]?(?:[^a-z0-9\-._~!$&'()*+,;=:\/?#[\]@%\u0000-\uFFFF]|$))&[a-z0-9\-._~!$'()*+,;=:\/?#[\]@%\u0000-\uFFFF]*)*[a-z0-9\-_~$()*+=\/#[\]@%\u0000-\uFFFF])/img;
 
