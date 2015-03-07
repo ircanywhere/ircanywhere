@@ -120,7 +120,7 @@ exports.config = {
 	},
 
 	"defaultNetwork": {
-		"server": "irc.freenode.org",
+		"server": "irc.freenode.net",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */
