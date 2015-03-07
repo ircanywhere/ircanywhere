@@ -106,7 +106,7 @@ exports.config = {
 		 * -- usage: Network limit for users, minimum is 0, maximum is 10, at the moment */
 
 		"networkRestriction": [
-			"*.freenode.org"
+			"*.freenode.net"
 		],
 		/* -- array
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
