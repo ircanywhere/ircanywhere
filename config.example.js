@@ -106,7 +106,7 @@ exports.config = {
 		 * -- usage: Network limit for users, minimum is 0, maximum is 10, at the moment */
 
 		"networkRestriction": [
-			"*.freenode.org"
+			"*.freenode.net"
 		],
 		/* -- array
 		 * -- usage: Whether to restrict clients to connecting to specific hostmasks, can be
@@ -120,7 +120,7 @@ exports.config = {
 	},
 
 	"defaultNetwork": {
-		"server": "irc.freenode.org",
+		"server": "irc.freenode.net",
 		/* -- required
 		 * -- string 
 		 * -- usage: Hostname of the default network to connect new users to */
