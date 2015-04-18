@@ -1,7 +1,7 @@
 IRCAnywhere |TravisBuild|
 ===========
 
-**IRCAnywhere** is an open source web based `IRC bonucer`_  application written in javascript. It's designed to be a free alternative to IRCCloud_. Unlike IRCCloud where you have little control over uptime and the privacy of your users, **IRCAnywhere** aims to give the control to you.
+**IRCAnywhere** is an open source web based `IRC bouncer`_  application written in javascript. It's designed to be a free alternative to IRCCloud_. Unlike IRCCloud where you have little control over uptime and the privacy of your users, **IRCAnywhere** aims to give the control to you.
 
 .. image:: http://ircanywhere.com/img/banner1.png
 
@@ -139,7 +139,7 @@ Any bugs (preferably) should be reported via the `issues page`_ on this reposito
 
 Come talk to us on the #ircanywhere channel in freenode.
 
-.. _`IRC bonucer`: http://en.wikipedia.org/wiki/BNC_%28software%29#IRC
+.. _`IRC bouncer`: http://en.wikipedia.org/wiki/BNC_%28software%29#IRC
 .. _`configuration file`: #configuration-file
 .. _IRCCloud: https://www.irccloud.com
 .. _http://ircanywhere.readthedocs.org/: http://ircanywhere.readthedocs.org/
