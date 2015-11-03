@@ -38,9 +38,7 @@ You can either clone the github repository, or install from the ``0.2-alpha`` re
 Pre-requisites
 ~~~~~~~~~~~~~~
 
-Before we start, make sure you have `Node.js and Npm`_ installed. **IRCAnywhere** also needs gulp_ to build client files. You can install gulp by running (may need to prefix command with ``sudo`` if you get permission errors): ::
-
-    $ npm install -g gulp
+Before we start, make sure you have `Node.js and Npm`_ installed.
 
 Install Script
 ~~~~~~~~~~~~~~
@@ -75,7 +73,7 @@ We need to first install Node dependencies: ::
 
 Next we'll build the client source: ::
 
-    $ gulp
+    $ npm run gulp
 
 Finally, rename the sample configuration file ``config.example.json`` to ``config.json``.
 
