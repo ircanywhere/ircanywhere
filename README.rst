@@ -142,7 +142,7 @@ Come talk to us on the #ircanywhere channel in freenode.
 .. _IRCCloud: https://www.irccloud.com
 .. _http://ircanywhere.readthedocs.org/: http://ircanywhere.readthedocs.org/
 .. _`Node.js and Npm`: http://ircanywhere.readthedocs.org/en/latest/pre_requirements.html#installing-node-js-and-npm
-.. _mon: https://github.com/visionmedia/mon
+.. _mon: https://github.com/tj/mon
 .. _`issues page`: https://github.com/ircanywhere/ircanywhere/issues
 .. _`reverse proxies`: http://ircanywhere.readthedocs.org/en/latest/reverse_proxies.html
 .. _gulp: http://gulpjs.com/
