@@ -188,13 +188,37 @@ function isMongoRunning(isGlobal, path) {
 			
 		db.command({replSetInitiate: null}, function(err, result) {
 			if (err === null || (result !== null && result.ok === 1)) {
-				doneInstalling(db, result);
+				waitForRsInitiated(db, result);
 			} else {
 				console.log(err, result);
 				console.log(COLOUR.red, 'rs.initiate() failed. Needs manual intervention.');
 				process.exit(1);
 			}
 		});
+	}
+
+	// waittime is in seconds
+	function waitForRsInitiated(db, originalResult, waittime=30) {
+		waittime = waittime * 2 // check every half-second, so double the count
+
+		process.stdout.write(COLOUR.blue, 'Checking if the replica set is fully initiated...');
+		while (waittime > 0) {
+			db.command({rs.status}, function(err, result) {
+				if (result.myState == 1) {
+					process.stdout.write(' Success!\n');
+					break;
+				} else if (waittime > 0) {
+					waittime = waittime - 1;
+					process.stdout.write('.');
+					time.sleep(0.5);
+				} else {
+					process.stdout.write('\n');
+					console.log(COLOUR.yellow, 'It appears that the mongodb replica set has not yet been initiated.');
+					console.log(COLOUR.yellow, 'MongoDB may magically correct this in seconds or minutes, but please be aware of this issue.');
+				}
+			});
+		}
+		doneInstalling(db, originalResult);
 	}
 
 	function repairMongoDb(dbPath, logFile, path) {
