@@ -202,19 +202,20 @@ function isMongoRunning(isGlobal, path) {
 		waittime = waittime * 2 // check every half-second, so double the count
 
 		process.stdout.write(COLOUR.blue, 'Checking if the replica set is fully initiated...');
-		while (waittime > 0) {
+		while (waittime => 0) {
 			db.command({rs.status}, function(err, result) {
 				if (result.myState == 1) {
 					process.stdout.write(' Success!\n');
 					break;
-				} else if (waittime > 0) {
+				} else if (waittime == 0) {
+					process.stdout.write('\n');
+					process.stdout.write(COLOUR.yellow, 'It appears that the mongodb replica set has not yet been initiated.');
+					process.stdout.write(COLOUR.yellow, 'MongoDB may magically correct this in seconds or minutes, but please be aware of this issue.');
+					break;
+				} else {
 					waittime = waittime - 1;
 					process.stdout.write('.');
 					time.sleep(0.5);
-				} else {
-					process.stdout.write('\n');
-					console.log(COLOUR.yellow, 'It appears that the mongodb replica set has not yet been initiated.');
-					console.log(COLOUR.yellow, 'MongoDB may magically correct this in seconds or minutes, but please be aware of this issue.');
 				}
 			});
 		}
