@@ -1,0 +1,16 @@
+.idea
+private/node.json
+private/certs/*
+client/build/*
+build
+node_modules
+logs
+test
+*.sublime*
+config.js*
+*.pid
+config.js
+config.example.js
+CONTRIBUTING.md
+LICENSE
+README.rst
